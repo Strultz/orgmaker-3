@@ -16,8 +16,8 @@ extern int sSmoothScroll;
 extern int NoteWidth;
 void OrgData::PlayData(void)
 {
-	char str[10];
-	char oldstr[10];
+	char str[12];
+	char oldstr[12];
 	char end_cnt = MAXTRACK;
 //	PlaySoundObject(1,1);
 	//メロディの再生
@@ -61,7 +61,7 @@ void OrgData::PlayData(void)
 
 	itoa(play_p%(info.dot*info.line),str,10);
 	GetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,oldstr,10);
-	if(strcmp(str, oldstr) != 0)SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,str);
+	if(strcmp(str, oldstr) != 0) SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,str);
 	//自動スクロール
 	/*if(actApp){//アクティブの時だけ
 		

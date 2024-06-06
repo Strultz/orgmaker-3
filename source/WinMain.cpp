@@ -57,6 +57,7 @@ BOOL CALLBACK DialogEZCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void SetModified(bool mod);
 void CheckLoupeMenu(void);
@@ -146,6 +147,7 @@ int iKeyPushDown[256]; // 2010.09.22 A
 char *strMIDIFile;
 
 char *gSelectedTheme;
+char *gSelectedWave;
 
 bool OpenDoSave(HWND hwnd, bool savenew) {
 	char res;
@@ -230,6 +232,7 @@ void GetApplicationPath(char* path) {
 	strcpy(path, drv);
 }
 
+// Oops!
 LONG WINAPI OrgCrashHandler(EXCEPTION_POINTERS* ep) {
 	MessageBox(NULL, "A fatal error has occurred. The program will now exit.", "OrgMaker Crash", MB_OK | MB_ICONERROR);
 
@@ -283,6 +286,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	iCast[0xDD]=51; //]
 	strMIDIFile = (char *)malloc(MAX_PATH);
 	gSelectedTheme = (char *)malloc(MAX_PATH);
+	gSelectedWave = (char*)malloc(MAX_PATH);
 
 	HACCEL Ac; //for shortcut keys
 
@@ -381,6 +385,16 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		if (dwAttrib == INVALID_FILE_ATTRIBUTES || !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY))
 			gSelectedTheme[0] = 0; // Theme is gone
 	}
+	GetApplicationPath(sDir);
+	strcat(sDir, "soundbanks");
+	CreateDirectory(sDir, NULL);
+
+	GetPrivateProfileString(MAIN_WINDOW, "CurrentWavePath", NULL, gSelectedWave, MAX_PATH, app_path); //2024.05.19
+	if (strlen(gSelectedWave) > 0) {
+		DWORD dwAttrib = GetFileAttributes(gSelectedWave);
+		if (dwAttrib == INVALID_FILE_ATTRIBUTES || dwAttrib & FILE_ATTRIBUTE_DIRECTORY)
+			gSelectedWave[0] = 0; // soundbank is gone
+	}
 
 //Image initialization //////////
 	StartGDI(hWnd);//GDI ready
@@ -388,8 +402,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	InitCursor();
 //Sound initialization ///////
 	InitDirectSound(hWnd);
-//	LoadWaveData100(); //Load from file "Wave.dat"
-	InitWaveData100(); //Load from registry "WAVE100"
+	LoadWaveData100(gSelectedWave); // Load the current soundbank, or the default
+	GenerateWaveGraphic(wave_data);
 	scr_data.InitScroll();
 	
 	hDlgPlayer = CreateDialog(hInst,"PLAYER",hWnd,DialogPlayer);
@@ -678,6 +692,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				break;
 			case IDM_DLGTHEMES:
 				DialogBox(hInst, "DLGTHEMES", hwnd, DialogTheme);
+				break;
+			case IDM_DLGWAVEDBS:
+				DialogBox(hInst, "DLGWAVEDBS", hwnd, DialogWaveDB);
 				break;
 			case IDM_DLGHELP://
 			case ID_AC_HELP:
@@ -1344,6 +1361,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		PostQuitMessage(0);
 		free(strMIDIFile); //2014.05.11
 		free(gSelectedTheme);
+		free(gSelectedWave);
 		FreeMessageStringBuffer();	// 2014.10.19 
 		break;
 	case WM_KEYDOWN://keyboard pressed
@@ -1652,6 +1670,7 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW, "SmoothScroll", num_buf, app_path);
 
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentThemePath", gSelectedTheme, app_path);
+	WritePrivateProfileString(MAIN_WINDOW, "CurrentWavePath", gSelectedWave, app_path);
 
 
 	GetWindowRect(hDlgTrack,(LPRECT)&WinRect);

@@ -34,6 +34,7 @@ int  Dw_PutBitmap_Head(long x,long y, RECT *rect, int bmp_no, int iNoteLength);
 void Dw_PutBitmap_Center(long x,long y, RECT *rect, int bmp_no); //2014.05.26 A
 
 void LoadSingleBitmap(HWND hdwnd, int item, int wdth, int hght, const char* name);
+void GenerateWaveGraphic(char *wave100);
 
 extern bool gIsDrawing;
 

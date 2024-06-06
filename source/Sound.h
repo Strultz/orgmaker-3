@@ -36,7 +36,7 @@ void ChangeOrganPan(unsigned char key, unsigned char pan,char track);//0Ç™Å©Ç≈6Ç
 void PlayOrganObject(unsigned char key, int mode,char track,DWORD freq);
 void PlayOrganObject2(unsigned char key, int mode,char track,DWORD freq);
 void PlayOrganKey(unsigned char key,char track,DWORD freq, int Nagasa = 80);
-BOOL LoadWaveData100(void);
+BOOL LoadWaveData100(const char *file);
 BOOL InitWaveData100(void);
 BOOL DeleteWaveData100(void);
 

@@ -26,7 +26,9 @@ extern HWND hDlgTrack;
 extern HWND hDlgPlayer;
 extern HWND hDlgEZCopy;
 extern char* gSelectedTheme;
+extern char* gSelectedWave;
 
+extern HBITMAP waveBmp; // azy
 
 typedef struct{
 	char name[20];
@@ -645,6 +647,11 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			else SetDlgItemText(hdwnd, j + IDC_LABEL_TRACK_1, strTrack[j]);
 		}
 		ChangeListBoxSize(hdwnd, iMeloDrumMode);
+
+		if (waveBmp != NULL) {
+			HBITMAP oldBmp = (HBITMAP)SendDlgItemMessage(hdwnd, IDC_WAVE100, STM_SETIMAGE, IMAGE_BITMAP, (long)waveBmp);
+			if (oldBmp != NULL) DeleteObject(oldBmp);
+		}
 		return 1;
 	case WM_COMMAND:
 		if((LOWORD(wParam) >= IDD_SETFREQx0 && LOWORD(wParam) <= IDD_SETFREQx7) && (HIWORD(wParam) == EN_SETFOCUS)){	// 2014.10.19 
@@ -944,6 +951,106 @@ BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 			GetApplicationPath(themePath);
 			strcat(themePath, "themes");
 			ShellExecute(NULL, "open", themePath, NULL, NULL, SW_SHOWDEFAULT);
+			break;
+		}
+		return 1;
+	}
+	}
+	return 0;
+}
+
+BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	MUSICINFO mi;
+	int i, j;
+	switch (message) {
+	case WM_INITDIALOG://ダイアログが呼ばれた
+	{
+		SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_ADDSTRING, 0, (LPARAM)"Organya (default)");
+
+		WIN32_FIND_DATA fdFile;
+		HANDLE hFind = NULL;
+
+		char sDir[MAX_PATH];
+		GetApplicationPath(sDir);
+		strcat(sDir, "noideayet");
+
+		char sPath[MAX_PATH];
+		sprintf(sPath, "%s\\*.wdb", sDir);
+
+		if ((hFind = FindFirstFile(sPath, &fdFile)) != INVALID_HANDLE_VALUE)
+		{
+			do
+			{
+				if (strcmp(fdFile.cFileName, ".") != 0
+					&& strcmp(fdFile.cFileName, "..") != 0)
+				{
+					sprintf(sPath, "%s\\%s", sDir, fdFile.cFileName);
+
+					if (!(fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) // It should be a .wdb file
+					{
+						SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_ADDSTRING, 0, (LPARAM)fdFile.cFileName);
+					}
+				}
+			} while (FindNextFile(hFind, &fdFile));
+
+			FindClose(hFind);
+		}
+
+		EnableDialogWindow(FALSE);
+		return 1;
+	}
+	case WM_COMMAND:
+	{
+		switch (LOWORD(wParam)) {
+		case IDOK:
+			gSelectedWave[0] = 0;
+
+			char sDir[MAX_PATH];
+			GetApplicationPath(sDir);
+
+			i = SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_GETCURSEL, 0, 0);
+			if (i != 0) {
+				j = SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_GETTEXTLEN, i, 0);
+				if (j != LB_ERR) {
+					char* nam = (char*)malloc(j + 1);
+					if (nam != NULL) {
+						memset(nam, '\0', sizeof(nam));
+						SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_GETTEXT, i, (LPARAM)nam);
+						strcat(sDir, "noideayet\\");
+						strcat(sDir, nam);
+						free(nam);
+					}
+				}
+
+				DWORD dwAttrib = GetFileAttributes(sDir);
+				if (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY))
+					strcpy(gSelectedWave, sDir);
+			}
+
+			LoadWaveData100(gSelectedWave);
+			GenerateWaveGraphic(wave_data);
+
+			org_data.GetMusicInfo(&mi);
+
+			for (j = 0; j < MAXMELODY; j++)
+				MakeOrganyaWave(j, mi.tdata[j].wave_no, mi.tdata[j].pipi);
+			for (j = MAXMELODY; j < MAXTRACK; j++) {
+				i = mi.tdata[j].wave_no;
+				InitDramObject(dram_name[i], j - MAXMELODY);
+			}
+
+			EnableDialogWindow(TRUE);
+			EndDialog(hdwnd, 0);
+			return 1;
+		case IDCANCEL:
+			EnableDialogWindow(TRUE);
+			EndDialog(hdwnd, 0);
+			return 1;
+		case IDC_OPNTHMFLD:
+			char wavePath[MAX_PATH];
+			GetApplicationPath(wavePath);
+			strcat(wavePath, "noideayet");
+			ShellExecute(NULL, "open", wavePath, NULL, NULL, SW_SHOWDEFAULT);
 			break;
 		}
 		return 1;

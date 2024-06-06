@@ -672,6 +672,17 @@ BEGIN
     PUSHBUTTON      "Open Theme Folder",IDC_OPNTHMFLD,7,155,80,14
 END
 
+DLGWAVEDBS DIALOGEX 0, 0, 309, 176
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
+CAPTION "Soundbanks"
+FONT 9, "MS PGothic", 0, 0, 0x1
+BEGIN
+DEFPUSHBUTTON   "OK", IDOK, 198, 155, 50, 14
+PUSHBUTTON      "Cancel", IDCANCEL, 252, 155, 50, 14
+LISTBOX         IDD_WAVEDBS, 4, 4, 301, 147, LBS_NOINTEGRALHEIGHT | LBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
+PUSHBUTTON      "Open Soundbank Folder", IDC_OPNTHMFLD, 7, 155, 80, 14
+END
+
 DLGWAVEXPORT DIALOG 0, 0, 135, 62
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
 CAPTION "WAV Export"
@@ -839,6 +850,21 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 169
     END
+
+    "DLGWAVEDBS", DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 169
+    END
+
+    "DLGWAVEXPORT", DIALOG
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 128
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 55
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -995,7 +1021,7 @@ BEGIN
         MENUITEM "  Zoom &Out\tF8",             IDM_LOUPE_MINUS
         MENUITEM "  Extend &Note Heads",        IDM_NOTE_ENLARGE
         MENUITEM "  Show &All Tracks\tCtrl+F9", IDM_DRAWDOUBLE
-        MENUITEM "  Slide Overlapping Notes\tShift+F9", IDM_SLIDEOVERLAPNOTES
+        MENUITEM "  S&lide Overlapping Notes\tShift+F9", IDM_SLIDEOVERLAPNOTES
         MENUITEM "  &Playback Smooth Scrolling", IDM_SMOOTHSCROLL
         MENUITEM SEPARATOR
         MENUITEM "Window Dialog",               IDM_DUMMY, INACTIVE
@@ -1020,6 +1046,7 @@ BEGIN
         MENUITEM "  &Auto Load/Save .pvi File", IDM_AUTOLOADPVI
         MENUITEM "  &Metronome",                IDM_METRONOME
         MENUITEM "  &Themes...",                IDM_DLGTHEMES
+        MENUITEM "  Sound&banks...",   IDM_DLGWAVEDBS
     END
     POPUP "&Help"
     BEGIN

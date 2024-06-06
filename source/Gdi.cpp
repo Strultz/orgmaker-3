@@ -12,6 +12,8 @@ HBITMAP hbWork;//いわゆるバックバッファ
 HBITMAP hbMparts;//楽譜用ワーク
 HBITMAP hbPan;//パンボリューム用ワーク
 
+HBITMAP waveBmp;
+
 extern int gDrawDouble;	//両方のトラックグループを描画する
 
 extern RECT WinRect; //ウィンドウサイズ保存用 A 2010.09.22
@@ -492,6 +494,49 @@ void LoadSingleBitmap(HWND hdwnd, int item, int wdth, int hght, const char* name
 	// Now set it
 	hBmp2 = (HBITMAP)SendDlgItemMessage(hdwnd, item, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp);
 	if (hBmp2 != NULL) DeleteObject(hBmp2);
+}
+
+void GenerateWaveGraphic(char *wave100) {
+	if (waveBmp != NULL) DeleteObject(waveBmp);
+
+	HBITMAP waveImg = (HBITMAP)LoadImage(hInst, "WAVE100", IMAGE_BITMAP, 377, 491, LR_DEFAULTCOLOR); // BG
+	if (waveImg == NULL) return;
+
+	HDC hdc = GetDC(hWnd);
+	waveBmp = CreateCompatibleBitmap(hdc, 377, 491);
+	if (waveBmp == NULL) {
+		ReleaseDC(hWnd, hdc);
+		return;
+	}
+
+	HDC toDC = CreateCompatibleDC(hdc);
+	HDC fromDC = CreateCompatibleDC(hdc);
+	HBITMAP toold = (HBITMAP)SelectObject(toDC, waveBmp);
+	HBITMAP fromold = (HBITMAP)SelectObject(fromDC, waveImg);
+
+	SelectObject(toDC, GetStockObject(DC_PEN));
+	SetDCPenColor(toDC, RGB(0x00, 0xFF, 0x00));
+
+	BitBlt(toDC, 0, 0, 377, 491, fromDC, 0, 0, SRCCOPY);
+	for (int i = 0; i < 100; ++i) {
+		int x = 8 + (i % 10) * 36 + ((i % 10) > 4 ? 4 : 0); // box position
+		int y = 16 + (i / 10) * 48 + ((i / 10) > 4 ? 4 : 0);
+
+		for (int j = 0; j < 256; ++j) {
+			int sample = wave100[i * 256 + j]; // Get the sample
+			if (j == 0)
+				MoveToEx(toDC, x + (j / 8), y + 16 + (-sample / 8), NULL);
+			else
+				LineTo(toDC, x + (j / 8), y + 16 + (-sample / 8)); // Draw line
+		}
+	}
+
+	SelectObject(toDC, toold);
+	SelectObject(fromDC, fromold);
+	DeleteDC(toDC);
+	DeleteDC(fromDC);
+	ReleaseDC(hWnd, hdc);
+	DeleteObject(waveImg);
 }
 
 

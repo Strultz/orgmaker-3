@@ -421,6 +421,7 @@
 #define IDE_SAMPLE_RATE                 1219
 #define IDE_LOOP_COUNT                  1220
 #define IDE_FADE_MSECONDS               1221
+#define IDD_WAVEDBS                     1213
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005
@@ -693,6 +694,7 @@
 #define ID_AC_SOCTDOWN                  40296
 #define IDM_EXPORT_WAV                  40297
 #define ID_AC_WAV                       40298
+#define IDM_DLGWAVEDBS                  40299
 
 // Next default values for new objects
 // 

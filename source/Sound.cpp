@@ -457,23 +457,28 @@ void ReleaseOrganyaObject(char track){
 char *wave_data = NULL;
 BOOL InitWaveData100(void)
 {
-	if(wave_data == NULL)wave_data = (char *)malloc(sizeof(char) * 256 * 256);
+	if (wave_data == NULL) wave_data = (char *)malloc(sizeof(char) * 256 * 100);
+	if (wave_data == NULL) return FALSE;
     HRSRC hrscr;
     DWORD *lpdword;//リソースのアドレス
     // リソースの検索
     if((hrscr = FindResource(NULL, "WAVE100", "WAVE")) == NULL)
                                                     return(FALSE);
     // リソースのアドレスを取得
-    lpdword = (DWORD*)LockResource(LoadResource(NULL, hrscr));
+    lpdword = (DWORD *)LockResource(LoadResource(NULL, hrscr));
 	memcpy(wave_data,lpdword,100*256);
 	return TRUE;
 }
-BOOL LoadWaveData100(void)
+BOOL LoadWaveData100(const char *file)
 {
-	if(wave_data == NULL)wave_data = (char *)malloc(sizeof(char) * 256 * 256);
-	FILE *fp;
-	if((fp=fopen("Wave.dat","rb"))==NULL){
-		return FALSE;
+	if (strlen(file) <= 0) {
+		return InitWaveData100(); // Init from resource
+	}
+	if (wave_data == NULL) wave_data = (char *)malloc(sizeof(char) * 256 * 100);
+	if (wave_data == NULL) return FALSE;
+	FILE *fp = fopen(file, "rb");
+	if (fp == NULL) {
+		return InitWaveData100(); // Init from resource
 	}
 //	wave_data = new char[100*256];
 	fread(wave_data, sizeof(char), 256*100, fp);

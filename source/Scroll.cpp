@@ -96,7 +96,7 @@ void ScrollData::PrintHorzPosition(void)
 	MUSICINFO mi;
 	org_data.GetMusicInfo(&mi);
 	
-	char str[10];
+	char str[12];
 	itoa(hpos / (mi.dot * mi.line),str,10);
 	SetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,str);
 	itoa(hpos % (mi.dot * mi.line),str,10);
