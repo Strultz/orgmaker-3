@@ -972,7 +972,7 @@ BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 
 		char sDir[MAX_PATH];
 		GetApplicationPath(sDir);
-		strcat(sDir, "noideayet");
+		strcat(sDir, "soundbanks");
 
 		char sPath[MAX_PATH];
 		sprintf(sPath, "%s\\*.wdb", sDir);
@@ -1016,7 +1016,7 @@ BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 					if (nam != NULL) {
 						memset(nam, '\0', sizeof(nam));
 						SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_GETTEXT, i, (LPARAM)nam);
-						strcat(sDir, "noideayet\\");
+						strcat(sDir, "soundbanks\\");
 						strcat(sDir, nam);
 						free(nam);
 					}
@@ -1031,7 +1031,7 @@ BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 			GenerateWaveGraphic(wave_data);
 
 			org_data.GetMusicInfo(&mi);
-
+			
 			for (j = 0; j < MAXMELODY; j++)
 				MakeOrganyaWave(j, mi.tdata[j].wave_no, mi.tdata[j].pipi);
 			for (j = MAXMELODY; j < MAXTRACK; j++) {
@@ -1049,7 +1049,7 @@ BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 		case IDC_OPNTHMFLD:
 			char wavePath[MAX_PATH];
 			GetApplicationPath(wavePath);
-			strcat(wavePath, "noideayet");
+			strcat(wavePath, "soundbanks");
 			ShellExecute(NULL, "open", wavePath, NULL, NULL, SW_SHOWDEFAULT);
 			break;
 		}
