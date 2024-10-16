@@ -850,12 +850,14 @@ BOOL LoadWaveData100(const char *file)
 	}
 //	wave_data = new char[100*256];
 	if (fread(wave_data, sizeof(char), 256 * 100, fp) == 0) {
+		fclose(fp);
 		return FALSE;
 	}
 
 	for (int i = 0; i < NUMDRAMITEM; ++i) {
 		if (fread(bytes, 4, 1, fp) == 0) {
 			memset(drumsData, 0, sizeof(drumsData));
+			fclose(fp);
 			return FALSE;
 		}
 
@@ -865,6 +867,7 @@ BOOL LoadWaveData100(const char *file)
 
 		if (drumsample == NULL) {
 			drumsData[i].data = NULL;
+			fclose(fp);
 			return FALSE;
 		}
 

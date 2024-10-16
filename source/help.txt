@@ -241,6 +241,17 @@ OrgMaker 3   Ver3.0.9   Simple Help
 
 # Revision History 
 
+  3.0.9  2024/10/16  Added soundbanks, which are like MIDI soundfonts but for
+                       Organya
+                     Added separate channel export option when exporting to .wav
+                     Added length options for volume decay commands
+                     Added decimals to BPM conversion in song properties
+                     Updated backend for rendering and audio, should hopefully be
+                       more stable now
+                     .wav exports are now more accurate to actual playback
+                     Fixed drum note lengths not updating properly (for volume
+                       decays)
+
   3.0.8  2024/05/07  Added exporting to .wav format
                      Fixed keyboard ignoring Freq. property
                      Fixed swap tracks crash
