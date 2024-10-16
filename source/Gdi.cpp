@@ -27,8 +27,6 @@ static RECT screenRect;
 
 HBITMAP waveBmp; // for dialog
 
-HBITMAP waveBmp;
-
 extern int gDrawDouble;	//両方のトラックグループを描画する
 
 extern RECT WinRect; //ウィンドウサイズ保存用 A 2010.09.22
