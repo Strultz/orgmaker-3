@@ -27,10 +27,7 @@ extern HWND hDlgPlayer;
 extern HWND hDlgEZCopy;
 extern char* gSelectedTheme;
 extern char* gSelectedWave;
-<<<<<<< HEAD
 
-extern HBITMAP waveBmp; // azy
-=======
 extern char TrackN[];
 
 extern HBITMAP waveBmp; // azy
@@ -38,7 +35,6 @@ extern HBITMAP waveBmp; // azy
 int volChangeLength = 10;
 bool volChangeUseNoteLength = true;
 bool volChangeSetNoteLength = false;
->>>>>>> ddraw
 
 typedef struct{
 	char name[20];
@@ -1051,20 +1047,12 @@ BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 			GenerateWaveGraphic(wave_data);
 
 			org_data.GetMusicInfo(&mi);
-<<<<<<< HEAD
-			
-=======
 
->>>>>>> ddraw
 			for (j = 0; j < MAXMELODY; j++)
 				MakeOrganyaWave(j, mi.tdata[j].wave_no, mi.tdata[j].pipi);
 			for (j = MAXMELODY; j < MAXTRACK; j++) {
 				i = mi.tdata[j].wave_no;
-<<<<<<< HEAD
-				InitDramObject(dram_name[i], j - MAXMELODY);
-=======
 				InitDramObject(i, j - MAXMELODY);
->>>>>>> ddraw
 			}
 
 			EnableDialogWindow(TRUE);
