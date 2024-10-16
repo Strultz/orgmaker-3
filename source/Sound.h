@@ -11,7 +11,7 @@ typedef struct {
 } OCTWAVE;
 
 extern OCTWAVE oct_wave[8];
-extern double freq_tbl[12];
+extern short freq_tbl[12];
 extern short pan_tbl[13];
 extern char *wave_data;
 
@@ -33,17 +33,16 @@ BOOL MakeSoundObject8(char *wavep,char track, char pipi);
 void ChangeOrganFrequency(unsigned char key,char track,DWORD a);//9999‚ªMAX‚Å2195?‚ªÉ°ÏÙ
 void ChangeOrganVolume(int no, long volume,char track);//300‚ªMAX‚Å300‚ªÉ°ÏÙ
 void ChangeOrganPan(unsigned char key, unsigned char pan,char track);//0‚ª©‚Å6‚ªÉ°ÏÙ11‚ª¨
-void PlayOrganObject(unsigned char key, int mode,char track,DWORD freq);
-void PlayOrganObject2(unsigned char key, int mode,char track,DWORD freq);
+void PlayOrganObject(unsigned char key, int mode,char track,DWORD freq, bool pipi);
 void PlayOrganKey(unsigned char key,char track,DWORD freq, int Nagasa = 80);
-BOOL LoadWaveData100(void);
+BOOL LoadWaveData100(const char *file);
 BOOL InitWaveData100(void);
 BOOL DeleteWaveData100(void);
 
 BOOL MakeOrganyaWave(char track,char wave_no, char pipi);
 
 //BOOL LoadDramObject(char *file_name, int no);
-BOOL InitDramObject(LPCSTR resname, int no);
+BOOL InitDramObject(char drum, int no);
 void ReleaseDramObject(char track);
 void ChangeDramFrequency(unsigned char key,char track);
 void ChangeDramPan(unsigned char pan,char track);//512‚ªMAX‚Å256‚ªÉ°ÏÙ
@@ -56,3 +55,8 @@ void Rxo_StopAllSoundNow(void);
 
 void Rxo_PlayKey(unsigned char key,char track,DWORD freq, int Phase);
 void Rxo_StopKey(unsigned char key,char track, int Phase);
+
+void S_SetOrganyaTimer(unsigned short timer);
+
+void ExportOrganyaBuffer(unsigned long sample_rate, float* output_stream, size_t frames_total, size_t fade_frames);
+void SetExportChannel(int track);

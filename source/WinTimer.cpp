@@ -6,9 +6,9 @@
 //
 
 #include <windows.h>  //Win32n API's
-#include <windowsx.h> //mmsystem.h
 #include "DefOrg.h"
 #include "OrgData.h"
+#include "Sound.h"
 
 //エラーチェックマクロ
 //#define MMInspect(ret)  if((ret) != TIMERR_NOERROR) return FALSE;
@@ -19,7 +19,7 @@
 
 BOOL InitMMTimer();
 BOOL StartTimer(DWORD dwTimer);
-VOID CALLBACK TimerProc(UINT uTID,UINT uMsg,DWORD dwUser,DWORD dwParam1,DWORD dwParam2);
+//VOID CALLBACK TimerProc(UINT uTID,UINT uMsg,DWORD dwUser,DWORD dwParam1,DWORD dwParam2);
 BOOL QuitMMTimer();
 
 /*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
@@ -34,7 +34,7 @@ static UINT TimerID     = NULL;
 /*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
 BOOL InitMMTimer()
 {
-	TIMECAPS tc;
+	/*TIMECAPS tc;
 	MMRESULT ret;
 
 	//タイマーの精度情報を取得する
@@ -44,6 +44,8 @@ BOOL InitMMTimer()
 	//この精度で初期化する
 	ret = timeBeginPeriod(ExactTime);
 	if(ret != TIMERR_NOERROR) return FALSE;
+	return TRUE;*/
+
 	return TRUE;
 }
 
@@ -53,24 +55,27 @@ BOOL InitMMTimer()
 /*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
 BOOL StartTimer(DWORD dwTimer)
 {
-	MMRESULT ret = NULL;
+	/*MMRESULT ret = NULL;
 	ExactTime = dwTimer;
 	//タイマーを生成する
 	TimerID = timeSetEvent
 	(
 		dwTimer,       //タイマー時間
-		10,             //許容できるタイマー精度
+		1,             //許容できるタイマー精度
 		(LPTIMECALLBACK)TimerProc, //コールバックプロシージャ
 		NULL,          //ユーザーがコールバック関数のdwUserに送る情報値
 		TIME_PERIODIC //タイマー時間毎にイベントを発生させる
 	);
 	if(ret != TIMERR_NOERROR) return FALSE;
+	return TRUE;*/
+
+	S_SetOrganyaTimer(dwTimer);
 	return TRUE;
 }
 /*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
 //タイマーのコールバック関数
 /*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
-VOID CALLBACK TimerProc(UINT uTID,UINT uMsg,DWORD dwUser,DWORD dwParam1,DWORD dwParam2)
+/*VOID CALLBACK TimerProc(UINT uTID,UINT uMsg,DWORD dwUser,DWORD dwParam1,DWORD dwParam2)
 {
 	DWORD dwNowTime;
 	dwNowTime = timeGetTime();
@@ -79,7 +84,7 @@ VOID CALLBACK TimerProc(UINT uTID,UINT uMsg,DWORD dwUser,DWORD dwParam1,DWORD dw
 	//基本的に関数を呼び出すだけで処理は他の関数でするべきだろう。
 	//===================================================================================
 	org_data.PlayData();
-}
+}*/
 
 /*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
 //タイマーリソースを開放する。
@@ -87,7 +92,7 @@ VOID CALLBACK TimerProc(UINT uTID,UINT uMsg,DWORD dwUser,DWORD dwParam1,DWORD dw
 /*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
 BOOL QuitMMTimer()
 {
-	MMRESULT ret;
+	/*MMRESULT ret;
 
 	if(TimerID != TIMERR_NOERROR)
 	{
@@ -98,5 +103,8 @@ BOOL QuitMMTimer()
 	//タイマーリソースを開放する
 	ret = timeEndPeriod(ExactTime);
 	if((ret) != TIMERR_NOERROR) return FALSE;
+	return TRUE;*/
+
+	S_SetOrganyaTimer(0);
 	return TRUE;
 }

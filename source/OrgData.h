@@ -113,7 +113,7 @@ typedef struct OrgData{
 		//以下は再生
 		void PlayData(void);
 		void SetPlayPointer(long x);//再生ポインターを指定の位置に設定
-		void GetPlayPos(long *playpos);
+		void GetPlayPos(long *playpos, long *oplaypos = NULL);
 		//以下はファイル関係
 		unsigned short GetNoteNumber(char track,NOTECOPY *nc);
 		BOOL OrgData::SaveMusicData(void);
@@ -124,7 +124,7 @@ typedef struct OrgData{
 		BOOL CopyNoteData(NOTECOPY *nc);
 		BOOL ChangePanData(PARCHANGE *pc);
 		BOOL ChangeTransData(PARCHANGE *pc);
-		BOOL ChangeVolumeData(PARCHANGE *pc);
+		BOOL ChangeVolumeData(PARCHANGE *pc, char mode);
 		BOOL CheckNoteTail(char track);
 
 		BOOL EnsureEmptyArea(PARCHANGE *pc, int Function); //[新]空白を埋める 2014.05.01

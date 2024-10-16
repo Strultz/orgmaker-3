@@ -97,7 +97,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>dsound.lib;winmm.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ddraw.lib;dsound.lib;winmm.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
@@ -135,7 +135,7 @@
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>dsound.lib;ddraw.lib;winmm.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ddraw.lib;ddraw.lib;winmm.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -151,7 +151,6 @@
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="OrgData.cpp" />
     <ClCompile Include="OrgEdit.cpp" />
-    <ClCompile Include="OrgExport.cpp" />
     <ClCompile Include="OrgFile.cpp" />
     <ClCompile Include="OrgFileMIDI.cpp" />
     <ClCompile Include="OrgPlay.cpp" />
@@ -169,9 +168,9 @@
     <ClInclude Include="DefOrg.h" />
     <ClInclude Include="Filer.h" />
     <ClInclude Include="Gdi.h" />
+    <ClInclude Include="miniaudio.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="OrgData.h" />
-    <ClInclude Include="OrgExport.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="rxoFunction.h" />
     <ClInclude Include="Scroll.h" />
@@ -264,6 +263,7 @@
     <Media Include="Wave\OrcDrm01.wav" />
     <Media Include="Wave\Per01.wav" />
     <Media Include="Wave\Per02.wav" />
+    <Media Include="Wave\Per03.wav" />
     <Media Include="Wave\Pesi01.wav" />
     <Media Include="Wave\Quick01.wav" />
     <Media Include="Wave\RevSym01.wav" />

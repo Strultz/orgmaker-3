@@ -86,8 +86,8 @@ void ChangeTrackPlus(HWND hdwnd, int iValue){
 
 	SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,TrackCode[org_data.track]);
 	//SetDlgItemText(hdwnd,IDE_VIEWTRACK,str);
-	org_data.PutMusic();
-	RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+	//org_data.PutMusic();
+	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 	SetFocus(hWnd);
 }
 
@@ -130,8 +130,8 @@ void ChangeTrack(HWND hdwnd, int iTrack){
 	}
 	SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,TrackCode[org_data.track]);
 	//SetDlgItemText(hdwnd,IDE_VIEWTRACK,str);
-	org_data.PutMusic();
-	RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+	//org_data.PutMusic();
+	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
 	SetFocus(hWnd);
 }

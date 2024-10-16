@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string>
 
 #include "Sound.h"
 #include "resource.h"
@@ -13,7 +14,6 @@
 #include <commctrl.h>
 #include "Mouse.h"
 #include "rxoFunction.h"
-#include "OrgExport.h"
 
 #define PI 3.14159265358979323846
 
@@ -26,7 +26,14 @@ extern HWND hDlgTrack;
 extern HWND hDlgPlayer;
 extern HWND hDlgEZCopy;
 extern char* gSelectedTheme;
+extern char* gSelectedWave;
+extern char TrackN[];
 
+extern HBITMAP waveBmp; // azy
+
+int volChangeLength = 10;
+bool volChangeUseNoteLength = true;
+bool volChangeSetNoteLength = false;
 
 typedef struct{
 	char name[20];
@@ -154,7 +161,7 @@ void InitSettingDialog(HWND hdwnd)
 	//再生ウエイトの初期化//////////////////
 	itoa(mi.wait,str,10);
 	SetDlgItemText(hdwnd,IDD_SETWAIT,str);
-	itoa((60000 / (mi.wait * mi.dot)),str,10);
+	snprintf(str, 128, "%.2f", (60000.0 / (double)(mi.wait * mi.dot)));
 	SetDlgItemText(hdwnd, IDC_BPM, str);
 	//ｸﾞﾘｯﾄﾞの初期化
 	TCHAR *q, *p;
@@ -370,7 +377,8 @@ BOOL SetPipiCheck(HWND hdwnd, MUSICINFO *mi)
 BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int i, j;
-	int iBPM, iWAIT;
+	double iBPM;
+	int iWAIT;
 	char str[128] = {NULL};
 	RECT rect = {64,0,WWidth,WHeight};//更新する領域
 	MUSICINFO mi,mg;
@@ -385,22 +393,24 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
 		case IDC_BTN1:
+			org_data.GetMusicInfo(&mi);
 			GetDlgItemText(hdwnd, IDC_BPM, str, 128);
-			iBPM = atoi(str);
+			iBPM = std::stod(str);
 			if(iBPM > 0){
 				SetGrid(hdwnd, &mg);
-				iWAIT = 60000 / iBPM / mg.dot;
-				itoa(iWAIT,str,10);
+				iWAIT = (int)round(60000.0 / iBPM / (double)mi.dot);
+				snprintf(str, 128, "%d", iWAIT);
 				SetDlgItemText(hdwnd, IDD_SETWAIT, str);
 			}
 			return 1;
 		case IDC_BTN2:
+			org_data.GetMusicInfo(&mi);
 			GetDlgItemText(hdwnd, IDD_SETWAIT, str, 128);
 			iWAIT = atoi(str);
 			if(iWAIT > 0){
 				SetGrid(hdwnd, &mg);
-				iBPM = 60000 / (iWAIT * mg.dot);
-				itoa(iBPM,str,10);
+				iBPM = 60000.0 / (double)(iWAIT * mi.dot);
+				snprintf(str, 128, "%.2f", iBPM);
 				SetDlgItemText(hdwnd, IDC_BPM, str);
 			}
 			return 1;
@@ -460,8 +470,8 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 			for(j = 0; j < MAXMELODY; j++)
 				MakeOrganyaWave(j,mi.tdata[j].wave_no,mi.tdata[j].pipi);
 			//再描画
-			org_data.PutMusic();
-			RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+			//org_data.PutMusic();
+			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			EndDialog(hdwnd,0);
 			EnableDialogWindow(TRUE);
 			ClearEZC_Message(); //EZメッセージと範囲を消す
@@ -521,15 +531,22 @@ char *dram_name[] = {
 
 	"Snare08",
 	"HiClose05",
+    //"Per03",        // 2024.08.24
 };
 
 //アルファベット順変換定義
-unsigned char Wave_no_to_List_no[]={
+unsigned char Wave_no_to_List_no[] = {
 	0,1,10,12,13,28,29,39,26,27,36,7,20,5,16,18,35,41,6,17,19,34,25,8,9,37,38,21,22,2,3,14,15,30,31,32,40,4,11,23,24,33
 };
-unsigned char List_no_to_Wave_no[]={
+unsigned char List_no_to_Wave_no[] = {
 	0,1,29,30,37,13,18,11,23,24,2,38,3,4,31,32,14,19,15,20,12,27,28,39,40,22,8,9,5,6,33,34,35,41,21,16,10,25,26,7,36,17
 };
+/*unsigned char Wave_no_to_List_no[]={
+	0,1,10,12,13,28,29,39,26,27,36,7,20,5,16,18,35,41,6,17,19,34,25,8,9,42,37,38,21,22,2,3,14,15,30,31,32,40,4,11,23,24,33
+};
+unsigned char List_no_to_Wave_no[]={
+	0,1,30,31,38,13,18,11,23,24,2,39,3,4,32,33,14,19,15,20,12,28,29,40,41,22,8,9,5,6,34,35,36,42,21,16,10,26,27,7,37,17,25
+};*/
 
 
 void Sl_Reset(HWND hdwnd)
@@ -645,6 +662,11 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			else SetDlgItemText(hdwnd, j + IDC_LABEL_TRACK_1, strTrack[j]);
 		}
 		ChangeListBoxSize(hdwnd, iMeloDrumMode);
+
+		if (waveBmp != NULL) {
+			HBITMAP oldBmp = (HBITMAP)SendDlgItemMessage(hdwnd, IDC_WAVE100, STM_SETIMAGE, IMAGE_BITMAP, (long)waveBmp);
+			if (oldBmp != NULL) DeleteObject(oldBmp);
+		}
 		return 1;
 	case WM_COMMAND:
 		if((LOWORD(wParam) >= IDD_SETFREQx0 && LOWORD(wParam) <= IDD_SETFREQx7) && (HIWORD(wParam) == EN_SETFOCUS)){	// 2014.10.19 
@@ -677,7 +699,7 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					MakeOrganyaWave(j, mi.tdata[j].wave_no ,mi.tdata[j].pipi);
 				}
 				for(j = MAXMELODY; j < MAXTRACK; j++){
-					InitDramObject(dram_name[ mi.tdata[j].wave_no ], j-MAXMELODY);
+					InitDramObject(mi.tdata[j].wave_no, j-MAXMELODY);
 				}
 				EndDialog(hdwnd,0);
 				EnableDialogWindow(TRUE);
@@ -696,7 +718,7 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			iMeloDrumMode = 0;
 			SendMessage(hdwnd, WM_INITDIALOG, 0, 0);
 			for(j = 0; j < MAXMELODY; j++)MakeOrganyaWave(j, mi.tdata[j].wave_no ,mi.tdata[j].pipi);
-			for(j = MAXMELODY; j < MAXTRACK; j++){InitDramObject(dram_name[ mi.tdata[j].wave_no ], j-MAXMELODY);}
+			for(j = MAXMELODY; j < MAXTRACK; j++){InitDramObject(mi.tdata[j].wave_no, j-MAXMELODY);}
 			SetDlgItemText(hdwnd, IDC_NOTE, "Note");
 
 			return 1;
@@ -739,7 +761,7 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					Rxo_StopAllSoundNow();
 					i = SendDlgItemMessage(hdwnd, freqbox[j],LB_GETCURSEL,0,0);//インデックスを得る
 					i = Wave_no_to_List_no[i]; //アルファベット順(List順)からWave順に変換する。これ重要。
-					InitDramObject(dram_name[i],j-MAXMELODY);
+					InitDramObject(i,j-MAXMELODY);
 					PlayOrganKey(SamplePlayHeight,j,1000,240);
 					//org_data.GetMusicInfo(&mi);
 					mi.tdata[j].wave_no = i;
@@ -952,6 +974,106 @@ BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 	return 0;
 }
 
+BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	MUSICINFO mi;
+	int i, j;
+	switch (message) {
+	case WM_INITDIALOG://ダイアログが呼ばれた
+	{
+		SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_ADDSTRING, 0, (LPARAM)"Organya (default)");
+
+		WIN32_FIND_DATA fdFile;
+		HANDLE hFind = NULL;
+
+		char sDir[MAX_PATH];
+		GetApplicationPath(sDir);
+		strcat(sDir, "soundbanks");
+
+		char sPath[MAX_PATH];
+		sprintf(sPath, "%s\\*.wdb", sDir);
+
+		if ((hFind = FindFirstFile(sPath, &fdFile)) != INVALID_HANDLE_VALUE)
+		{
+			do
+			{
+				if (strcmp(fdFile.cFileName, ".") != 0
+					&& strcmp(fdFile.cFileName, "..") != 0)
+				{
+					sprintf(sPath, "%s\\%s", sDir, fdFile.cFileName);
+
+					if (!(fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) // It should be a .wdb file
+					{
+						SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_ADDSTRING, 0, (LPARAM)fdFile.cFileName);
+					}
+				}
+			} while (FindNextFile(hFind, &fdFile));
+
+			FindClose(hFind);
+		}
+
+		EnableDialogWindow(FALSE);
+		return 1;
+	}
+	case WM_COMMAND:
+	{
+		switch (LOWORD(wParam)) {
+		case IDOK:
+			gSelectedWave[0] = 0;
+
+			char sDir[MAX_PATH];
+			GetApplicationPath(sDir);
+
+			i = SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_GETCURSEL, 0, 0);
+			if (i != 0) {
+				j = SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_GETTEXTLEN, i, 0);
+				if (j != LB_ERR) {
+					char* nam = (char*)malloc(j + 1);
+					if (nam != NULL) {
+						memset(nam, '\0', sizeof(nam));
+						SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_GETTEXT, i, (LPARAM)nam);
+						strcat(sDir, "soundbanks\\");
+						strcat(sDir, nam);
+						free(nam);
+					}
+				}
+
+				DWORD dwAttrib = GetFileAttributes(sDir);
+				if (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY))
+					strcpy(gSelectedWave, sDir);
+			}
+
+			LoadWaveData100(gSelectedWave);
+			GenerateWaveGraphic(wave_data);
+
+			org_data.GetMusicInfo(&mi);
+
+			for (j = 0; j < MAXMELODY; j++)
+				MakeOrganyaWave(j, mi.tdata[j].wave_no, mi.tdata[j].pipi);
+			for (j = MAXMELODY; j < MAXTRACK; j++) {
+				i = mi.tdata[j].wave_no;
+				InitDramObject(i, j - MAXMELODY);
+			}
+
+			EnableDialogWindow(TRUE);
+			EndDialog(hdwnd, 0);
+			return 1;
+		case IDCANCEL:
+			EnableDialogWindow(TRUE);
+			EndDialog(hdwnd, 0);
+			return 1;
+		case IDC_OPNTHMFLD:
+			char wavePath[MAX_PATH];
+			GetApplicationPath(wavePath);
+			strcat(wavePath, "soundbanks");
+			ShellExecute(NULL, "open", wavePath, NULL, NULL, SW_SHOWDEFAULT);
+			break;
+		}
+		return 1;
+	}
+	}
+	return 0;
+}
+
 BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 //	char str[10] = {NULL};
@@ -982,6 +1104,59 @@ static unsigned long sample_rate = 0;
 static unsigned long loop_count = 0;
 static unsigned long fade_mseconds = 0;
 
+#define WRITE_16_LE(p, v) \
+    do { \
+        *p++ = ((v) & 0xFF); \
+        *p++ = ((v) >> 8 & 0xFF); \
+    } while(0)
+
+#define WRITE_32_LE(p, v) \
+    do { \
+        *p++ = ((v) & 0xFF); \
+        *p++ = ((v) >> 8 & 0xFF); \
+        *p++ = ((v) >> 16 & 0xFF); \
+        *p++ = ((v) >> 24 & 0xFF); \
+    } while(0)
+
+bool ExportWave(unsigned int streamsize, unsigned int samples, const char *strPath) {
+	char* stream = (char*)malloc(44 + streamsize);
+	if (stream != NULL) {
+		char* p = stream;
+
+		WRITE_32_LE(p, 0x46464952); /* "RIFF" */
+		WRITE_32_LE(p, 36 + streamsize); /* "RIFF" length */
+		WRITE_32_LE(p, 0x45564157); /* "WAVE" */
+		WRITE_32_LE(p, 0x20746D66); /* "fmt " */
+		WRITE_32_LE(p, 0x10); /* "fmt " length */
+		WRITE_16_LE(p, 3); /* floating point PCM format */
+		WRITE_16_LE(p, 2); /* 2 channels for stereo */
+		WRITE_32_LE(p, sample_rate); /* Samples per second */
+		WRITE_32_LE(p, sample_rate * sizeof(float) * 2); /* Bytes per second */
+		WRITE_16_LE(p, 8); /* Bytes per sample */
+		WRITE_16_LE(p, 32); /* Bits per sample */
+		WRITE_32_LE(p, 0x61746164); /* "data" */
+		WRITE_32_LE(p, streamsize); /* "data" length */
+
+		memset(p, 0, streamsize);
+		ExportOrganyaBuffer(sample_rate, (float*)p, samples, (fade_mseconds * sample_rate / 1000));
+
+		FILE* fl = fopen(strPath, "wb");
+		if (fl != NULL) {
+			fwrite(stream, 1, 44 + streamsize, fl);
+			fclose(fl);
+		}
+		else {
+			free(stream);
+			return false;
+		}
+		free(stream);
+	}
+	else {
+		return false;
+	}
+	return true;
+}
+
 BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	MUSICINFO mi;
@@ -997,12 +1172,14 @@ BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lP
 		SetDlgItemText(hdwnd, IDE_LOOP_COUNT, str);
 		itoa(fade_mseconds, str, 10);
 		SetDlgItemText(hdwnd, IDE_FADE_MSECONDS, str);
+		CheckDlgButton(hdwnd, IDC_EXPORTSEPARATE, 0);
 		EnableDialogWindow(FALSE);
 		return 1;
 	}
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
+			bool separateChannels = IsDlgButtonChecked(hdwnd, IDC_EXPORTSEPARATE);
 			char str[10] = { NULL };
 			GetDlgItemText(hdwnd, IDE_SAMPLE_RATE, str, 7);
 			sample_rate = atol(str);
@@ -1027,45 +1204,84 @@ BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lP
 				if (msgbox(hdwnd, IDS_NOTIFY_OVERWRITE, IDS_INFO_SAME_FILE, MB_YESNO | MB_ICONEXCLAMATION) == IDNO) return 1;
 			}
 
-			org_data.GetMusicInfo(&mi);
-			unsigned int samples = ((mi.wait * sample_rate) / 1000) * (mi.end_x + ((mi.end_x - mi.repeat_x) * loop_count)) + (fade_mseconds * sample_rate / 1000);
-			unsigned int streamsize = samples * sizeof(short) * 2;
-			char* stream = (char*)malloc(44 + streamsize);
-			if (stream != NULL) {
-				// This code sucks but IDC pay me and I will fix it
-				ExportOrganyaBuffer(sample_rate, (short*)(stream + 44), samples, (fade_mseconds * sample_rate / 1000));
-				memset(stream, 0, 44);
-				const char* riff = "RIFF";
-				const char* fmt = "fmt ";
-				const char* wave = "WAVE";
-				const char* data = "data";
-				memcpy(stream, riff, 4);
-				unsigned int fullsize = 36 + streamsize;
-				memcpy(stream + 4, &fullsize, 4);
-				memcpy(stream + 8, wave, 4);
-				memcpy(stream + 12, fmt, 4);
-				stream[16] = 16;
-				stream[20] = 1;
-				stream[22] = 2;
-				memcpy(stream + 24, &sample_rate, 4);
-				unsigned int strangemath = sample_rate * sizeof(short) * 2;
-				memcpy(stream + 28, &strangemath, 4);
-				stream[32] = 4;
-				stream[34] = 16;
-				memcpy(stream + 36, data, 4);
-				memcpy(stream + 40, &streamsize, 4);
+			SetDlgItemText(hdwnd, IDC_EXPORTTEXT, "Exporting...");
 
-				FILE* fl = fopen(strPath, "wb");
-				if (fl != NULL) {
-					fwrite(stream, 1, 44 + streamsize, fl);
-					fclose(fl);
-				} else {
-					msgbox(hdwnd, IDS_STRING121, IDS_STRING120, MB_OK);
+			org_data.GetMusicInfo(&mi, 1);
+			unsigned int samples = ((mi.wait * sample_rate) / 1000) * (mi.end_x + ((mi.end_x - mi.repeat_x) * loop_count)) + (fade_mseconds * sample_rate / 1000);
+			unsigned int streamsize = samples * sizeof(float) * 2;
+			
+			if (separateChannels) {
+				for (int i = 0; i < MAXTRACK; ++i) {
+					if (mi.tdata[i].note_list == NULL) {
+						continue;
+					}
+
+					char* pC;
+					char tstr[15] = { NULL };
+					char chPath[MAX_PATH] = { NULL };
+
+					snprintf(chPath, MAX_PATH, "%s", strPath);
+					snprintf(tstr, 15, " - Track %c.wav", TrackN[i]);
+
+					pC = strrchr(chPath, '.');
+					if (pC != NULL) pC[0] = '\0';
+
+					strncat(chPath, tstr, MAX_PATH - 1);
+
+					SetExportChannel(i);
+					if (!ExportWave(streamsize, samples, chPath)) {
+						msgbox(hdwnd, IDS_STRING121, IDS_STRING120, MB_OK);
+						break;
+					}
 				}
-				free(stream);
-			} else {
+
+				SetExportChannel(-1);
+			}
+			
+			if (!ExportWave(streamsize, samples, strPath)) {
 				msgbox(hdwnd, IDS_STRING121, IDS_STRING120, MB_OK);
 			}
+
+			EnableDialogWindow(TRUE);
+			EndDialog(hdwnd, 0);
+			return 1;
+		}
+		case IDCANCEL:
+			EnableDialogWindow(TRUE);
+			EndDialog(hdwnd, 0);
+			return 1;
+		}
+		return 1;
+	}
+	return 0;
+}
+
+BOOL CALLBACK DialogDecayLength(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	MUSICINFO mi;
+	FILE* deez;
+	char res;
+	char strPath[MAX_PATH] = { NULL };
+	switch (message) {
+	case WM_INITDIALOG: {
+		char str[10] = { NULL };
+		itoa(volChangeLength, str, 10);
+		SetDlgItemText(hdwnd, IDE_VOL_LENGTH, str);
+		CheckDlgButton(hdwnd, IDC_VOL_USENOTELEN, volChangeUseNoteLength ? 1 : 0);
+		CheckDlgButton(hdwnd, IDC_VOL_SETNOTELEN, volChangeSetNoteLength ? 1 : 0);
+		EnableDialogWindow(FALSE);
+		return 1;
+	}
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK: {
+			char str[10] = { NULL };
+
+			GetDlgItemText(hdwnd, IDE_VOL_LENGTH, str, 7);
+			volChangeLength = atol(str);
+
+			volChangeUseNoteLength = IsDlgButtonChecked(hdwnd, IDC_VOL_USENOTELEN);
+			volChangeSetNoteLength = IsDlgButtonChecked(hdwnd, IDC_VOL_SETNOTELEN);
 
 			EnableDialogWindow(TRUE);
 			EndDialog(hdwnd, 0);

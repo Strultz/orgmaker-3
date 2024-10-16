@@ -25,8 +25,9 @@
 #define MODEDECAY   64  //2014.05.01 A
 
 
-//#define NUMDRAMITEM		39	//ÇPÇQÅ{ÇTÅ{ÇXÅ{ÇP(îL)Å{ÇPÇP	// 2011.10.17 D
+//#define NUMDRAMITEM		39	//ÇPÇQÅ{ÇTÅ{ÇXÅ{ÇP(îL)Å{ÇPÇP	    // 2011.10.17 D
 #define NUMDRAMITEM		42	//ÇPÇQÅ{ÇTÅ{ÇXÅ{ÇP(îL)Å{ÇPÇPÅ{ÇR	// 2011.10.17 A
+//#define NUMDRAMITEM		43	//ÇPÇQÅ{ÇTÅ{ÇXÅ{ÇP(îL)Å{ÇPÇPÅ{ÇRÅ{ÇP    // 2024.08.24 A
 
 #define MAXHORZMEAS	999 // Increased from 256 to 999
 

@@ -121,8 +121,8 @@ void EZ_Delete()
 		
 	}
 	//MessageBox(NULL,"コピーしました","通知",MB_OK);
-	org_data.PutMusic();
-	RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+	//org_data.PutMusic();
+	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 	lash = scr_h / (mi.dot * mi.line) + haba;
 	wsprintf(mss,MessageString[IDS_STRING68]);//"　消去しました。"
 
@@ -211,8 +211,8 @@ void EZ_DeleteAndTrim()
 	}
 
 	//MessageBox(NULL,"コピーしました","通知",MB_OK);
-	org_data.PutMusic();
-	RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+	//org_data.PutMusic();
+	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 	lash = scr_h / (mi.dot * mi.line) + haba;
 	wsprintf(mss,MessageString[IDS_STRING70]); //"　消去し、詰めました。"
 
@@ -299,8 +299,8 @@ void EZ_Insert()
 	}
 
 	//MessageBox(NULL,"コピーしました","通知",MB_OK);
-	org_data.PutMusic();
-	RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+	//org_data.PutMusic();
+	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 	lash = scr_h / (mi.dot * mi.line) + haba;
 	wsprintf(mss,MessageString[IDS_STRING71]);//"　後ろにずらしました。"
 
@@ -357,8 +357,8 @@ void EZ_Paste(int iNum)
 		
 	}
 	//MessageBox(NULL,"コピーしました","通知",MB_OK);
-	org_data.PutMusic();
-	RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+	//org_data.PutMusic();
+	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 	lash = scr_h / (mi.dot * mi.line) + haba;
 	//if(ful==1)wsprintf(mss,"　%d小節～%d小節に%d回コピーしました。",scr_h,lash,nc_Select.num);	// 2014.10.19 D
 	if(ful==1)wsprintf(mss,MessageString[IDS_STRING72],scr_h / (mi.dot * mi.line),lash,nc_Select.num);	// 2014.10.19 A
@@ -387,8 +387,8 @@ BOOL CALLBACK DialogEZCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 		return 1;
 	case WM_RBUTTONDOWN:
 		ClearEZC_Message();
-		org_data.PutMusic();
-		RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+		//org_data.PutMusic();
+		//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 		break;
 	case WM_MOUSEMOVE:
 		if(wParam & MK_LBUTTON){
@@ -425,8 +425,8 @@ BOOL CALLBACK DialogEZCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 				//else wsprintf(CpHelp,"全トラックの%d小節～%d小節までを",b,bb);	// 2014.10.19 D
 				else wsprintf(CpHelp,MessageString[IDS_STRING75],b,bb);	// 2014.10.19 A
 				PrintCpHelp();
-				org_data.PutMusic();
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//org_data.PutMusic();
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			}
 			switch(LOWORD(wParam)){
 			case IDC_PST1:

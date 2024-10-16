@@ -81,14 +81,14 @@ void ScrollData::SetIniFile()
 
 void ScrollData::SetHorzScroll(long x)
 {
-	RECT rect = {0,0,WWidth,WHeight};//更新する領域
+	//RECT rect = {0,0,WWidth,WHeight};//更新する領域
 	hpos = x;
 	if(hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
 	scr_info.fMask = SIF_POS;//nPosを有効に
 	scr_info.nPos = hpos;
 	SetScrollInfo(hWnd,SB_HORZ,&scr_info,1);
-	org_data.PutMusic();
-	RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+	//org_data.PutMusic();
+	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 }
 
 void ScrollData::PrintHorzPosition(void)
@@ -96,7 +96,7 @@ void ScrollData::PrintHorzPosition(void)
 	MUSICINFO mi;
 	org_data.GetMusicInfo(&mi);
 	
-	char str[10];
+	char str[12];
 	itoa(hpos / (mi.dot * mi.line),str,10);
 	SetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,str);
 	itoa(hpos % (mi.dot * mi.line),str,10);
@@ -148,8 +148,8 @@ void ScrollData::HorzScrollProc(WPARAM wParam){
 	scr_info.fMask = SIF_POS;//nPosを有効に
 	scr_info.nPos = hpos;
 	SetScrollInfo(hWnd,SB_HORZ,&scr_info,1);
-	org_data.PutMusic();
-	RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+	//org_data.PutMusic();
+	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 	//以下はテスト用
 //	char str[80];
 //	HDC hdc;
@@ -188,8 +188,8 @@ void ScrollData::VertScrollProc(WPARAM wParam){
 	scr_info.fMask = SIF_POS;//Enable nPos
 	scr_info.nPos = vpos;
 	SetScrollInfo(hWnd,SB_VERT,&scr_info,1);
-	org_data.PutMusic();
-	RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+	//org_data.PutMusic();
+	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 	//below is for testing
 //	char str[80];
 //	HDC hdc;
@@ -267,8 +267,8 @@ void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){
 	scr_info.nPos = hpos;
 	SetScrollInfo(hWnd,SB_HORZ,&scr_info,1);
 
-	org_data.PutMusic();
-	RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+	//org_data.PutMusic();
+	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
 
 }
@@ -303,8 +303,8 @@ void ScrollData::KeyScroll(int iDirection)
 	scr_info.nPos = hpos;
 	SetScrollInfo(hWnd,SB_HORZ,&scr_info,1);
 
-	org_data.PutMusic();
-	RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+	//org_data.PutMusic();
+	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
 }
 

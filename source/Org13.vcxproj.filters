@@ -81,9 +81,6 @@
     <ClCompile Include="WinTimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OrgExport.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Script1.rc">
@@ -127,7 +124,7 @@
     <ClInclude Include="Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OrgExport.h">
+    <ClInclude Include="miniaudio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -357,6 +354,9 @@
       <Filter>Resource Files\Wave</Filter>
     </Media>
     <Media Include="Wave\Per02.wav">
+      <Filter>Resource Files\Wave</Filter>
+    </Media>
+    <Media Include="Wave\Per03.wav">
       <Filter>Resource Files\Wave</Filter>
     </Media>
     <Media Include="Wave\Pesi01.wav">
