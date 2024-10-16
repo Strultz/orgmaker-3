@@ -566,9 +566,6 @@ void OrgData::PutMusic(void)
 	//ここ以降に楽譜表示を記述
 	x = (-(hpos % (info.dot * info.line)) * NoteWidth) + KEYWIDTH;
 
-<<<<<<< HEAD
-	for (j = 0; j < 8; j++) PutMusicParts(x, j * 144 + vpos);//楽譜
-=======
 	for (j = 0; j < 8; ++j) {
 		for (int i = 0; i < (WWidth / NoteWidth) + (info.line * info.dot) + 1; ++i) { // 15
 			if (i % (info.line * info.dot) == 0) {
@@ -593,7 +590,6 @@ void OrgData::PutMusic(void)
 	}
 
 	//for (j = 0; j < 8; j++) PutMusicParts(x, j * 144 + vpos);//楽譜
->>>>>>> ddraw
 	/*if (x < KEYWIDTH) {
 		for (j = 0; j < 8; j++)PutMusicParts(x + WWidth, j * 144 + vpos);//楽譜
 		PutPanParts(x + WWidth);//パンライン

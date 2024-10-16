@@ -805,11 +805,6 @@ BOOL InitWaveData100(void)
     // ƒŠƒ\[ƒX‚ÌŒŸõ
     if((hrscr = FindResource(NULL, "WAVE100", "WAVE")) == NULL)
                                                     return(FALSE);
-<<<<<<< HEAD
-    // ���\�[�X�̃A�h���X���擾
-    lpdword = (DWORD *)LockResource(LoadResource(NULL, hrscr));
-	memcpy(wave_data,lpdword,100*256);
-=======
     // ƒŠƒ\[ƒX‚ÌƒAƒhƒŒƒX‚ðŽæ“¾
 	bybuffer = (unsigned char *)LockResource(LoadResource(NULL, hrscr));
 
@@ -838,16 +833,12 @@ BOOL InitWaveData100(void)
 		drumsData[i].data = drumsample;
 	}
 
->>>>>>> ddraw
 	return TRUE;
 }
 BOOL LoadWaveData100(const char *file)
 {
-<<<<<<< HEAD
-=======
 	unsigned char bytes[4];
 
->>>>>>> ddraw
 	if (strlen(file) <= 0) {
 		return InitWaveData100(); // Init from resource
 	}

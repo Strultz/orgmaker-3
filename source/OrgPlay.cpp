@@ -16,11 +16,6 @@ extern int sMetronome;
 extern int NoteWidth;
 void OrgData::PlayData(void)
 {
-<<<<<<< HEAD
-	char str[12];
-	char oldstr[12];
-=======
->>>>>>> ddraw
 	char end_cnt = MAXTRACK;
 //	PlaySoundObject(1,1);
 	//メロディの再生
@@ -60,17 +55,6 @@ void OrgData::PlayData(void)
 		}
 	}
 	//プレイヤーに表示
-<<<<<<< HEAD
-	itoa(play_p/(info.dot*info.line),str,10);
-	GetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,oldstr,10);
-	if(strcmp(str, oldstr) != 0) SetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,str);
-
-	itoa(play_p%(info.dot*info.line),str,10);
-	GetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,oldstr,10);
-	if(strcmp(str, oldstr) != 0) SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,str);
-=======
-	
->>>>>>> ddraw
 	//自動スクロール
 	/*if(actApp){//アクティブの時だけ
 		
