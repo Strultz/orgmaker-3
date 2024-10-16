@@ -58,6 +58,7 @@ BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK DialogDecayLength(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void SetModified(bool mod);
 void CheckLoupeMenu(void);
@@ -90,6 +91,10 @@ extern int sACrnt;	//Range selection always on current track
 
 int sMetronome = 0;
 int sSmoothScroll = 0;
+
+extern int volChangeLength;
+extern bool volChangeUseNoteLength;
+extern bool volChangeSetNoteLength;
 
 extern void LoadTrackBitmaps(HWND hdwnd);
 extern void LoadPlayerBitmaps(HWND hdwnd);
@@ -148,6 +153,8 @@ char *strMIDIFile;
 
 char *gSelectedTheme;
 char *gSelectedWave;
+
+static HACCEL Ac;
 
 bool OpenDoSave(HWND hwnd, bool savenew) {
 	char res;
@@ -215,11 +222,11 @@ void ReloadBitmaps() {
 	LoadPlayerBitmaps(hDlgPlayer);
 	LoadTrackBitmaps(hDlgTrack);
 
-	MakeMusicParts(mi.line, mi.dot);
-	MakePanParts(mi.line, mi.dot);
+	//MakeMusicParts(mi.line, mi.dot);
+	//MakePanParts(mi.line, mi.dot);
 
-	org_data.PutMusic();
-	RedrawWindow(hWnd, &rect, NULL, RDW_INVALIDATE | RDW_ERASENOW);
+	//org_data.PutMusic();
+	//RedrawWindow(hWnd, &rect, NULL, RDW_INVALIDATE | RDW_ERASENOW);
 }
 
 void GetApplicationPath(char* path) {
@@ -241,7 +248,6 @@ LONG WINAPI OrgCrashHandler(EXCEPTION_POINTERS* ep) {
 
 int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile,int nCmdShow)
 {//main function
-	MSG msg;//Parameters used by this app	
 	WNDCLASSEX wc;
 //	MessageBox(hWnd,dropfile,"Drap",MB_OK);
 #ifndef _DEBUG
@@ -287,9 +293,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	strMIDIFile = (char *)malloc(MAX_PATH);
 	gSelectedTheme = (char *)malloc(MAX_PATH);
 	gSelectedWave = (char*)malloc(MAX_PATH);
-
-	HACCEL Ac; //for shortcut keys
-
+    
 	LoadString(GetModuleHandle(NULL), IDS_TITLE, lpszName, sizeof(lpszName) / sizeof(lpszName[0]));
 
 	wc.cbSize        = sizeof(WNDCLASSEX);
@@ -372,7 +376,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 //	DialogBox(hInst,"DLGFLASH",NULL,DialogFlash);
 
-	Ac=LoadAccelerators(hInstance,MAKEINTRESOURCE(IDR_ACCELERATOR1)); //ƒAƒNƒZƒXƒL[
+	Ac = LoadAccelerators(hInstance,MAKEINTRESOURCE(IDR_ACCELERATOR1)); //ƒAƒNƒZƒXƒL[
 
 	char sDir[MAX_PATH];
 	GetApplicationPath(sDir);
@@ -396,15 +400,39 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 			gSelectedWave[0] = 0; // soundbank is gone
 	}
 
+	GetApplicationPath(sDir);
+	strcat(sDir, "soundbanks");
+	CreateDirectory(sDir, NULL);
+
+	GetPrivateProfileString(MAIN_WINDOW, "CurrentWavePath", NULL, gSelectedWave, MAX_PATH, app_path); //2024.05.19
+	if (strlen(gSelectedWave) > 0) {
+		DWORD dwAttrib = GetFileAttributes(gSelectedWave);
+		if (dwAttrib == INVALID_FILE_ATTRIBUTES || dwAttrib & FILE_ATTRIBUTE_DIRECTORY)
+			gSelectedWave[0] = 0; // soundbank is gone
+	}
+
 //Image initialization //////////
-	StartGDI(hWnd);//GDI ready
+	if (!StartGDI(hWnd)) { //GDI ready
+		QuitMMTimer();
+		DestroyWindow(hWnd);
+		return 0;
+	}
+
 	InitBitmaps();
 	InitCursor();
 //Sound initialization ///////
-	InitDirectSound(hWnd);
+	if (!InitDirectSound(hWnd)) {
+		QuitMMTimer();
+		EndGDI();
+		DestroyWindow(hWnd);
+		return 0;
+	}
 	LoadWaveData100(gSelectedWave); // Load the current soundbank, or the default
 	GenerateWaveGraphic(wave_data);
 	scr_data.InitScroll();
+
+	InitSoundObject("METRO01", 1);
+	InitSoundObject("METRO02", 2);
 	
 	hDlgPlayer = CreateDialog(hInst,"PLAYER",hWnd,DialogPlayer);
 	hDlgTrack = CreateDialog(hInst,"TRACK",hWnd,DialogTrack);
@@ -439,8 +467,12 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	ChangeNoteEnlarge(GetPrivateProfileInt(MAIN_WINDOW,"NoteEnlarge",1,app_path)); //2014.05.28 Make note heads stand out when zoomed out
 	ChangeMetronomeMode(GetPrivateProfileInt(MAIN_WINDOW,"Metronome",0,app_path)); //2023.06.09
 	ChangeScrollMode(GetPrivateProfileInt(MAIN_WINDOW, "SmoothScroll", 1, app_path)); //2023.06.09
+
+	volChangeLength = GetPrivateProfileInt(MAIN_WINDOW, "VolChangeLength", 10, app_path);
+	volChangeUseNoteLength = GetPrivateProfileInt(MAIN_WINDOW, "VolChangeUseNoteLength", 1, app_path);
+	volChangeSetNoteLength = GetPrivateProfileInt(MAIN_WINDOW, "VolChangeSetNoteLength", 0, app_path);
 	
-	org_data.PutMusic();//View sheet music
+	//org_data.PutMusic();//View sheet music
 
 	if(GetPrivateProfileInt(MAIN_WINDOW,"WindowState",0,app_path)==1){
 		ShowWindow(hWnd,SW_MAXIMIZE);
@@ -492,7 +524,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 				SetDlgItemText(hDlgTrack, IDE_VIEWTRACK, "1");
 				ClearEZC_Message();
 				SelectReset();
-				org_data.PutMusic();
+				//org_data.PutMusic();
 			}
 			else {
 				//Because it was not an ORG format file //A 2010.9.25
@@ -532,8 +564,16 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		}*/
 	}
 	QuitMMTimer(); //A 2010.09.21
+
+	while (TRUE) {
+		org_data.PutMusic();
+		if (!RefleshScreen(hWnd)) {
+			break;
+		}
+	}
+
 	//Generate message loop (main loop)
-	while(GetMessage(&msg,NULL,0,0)){
+	/*while(GetMessage(&msg,NULL,0,0)){
 //		if(!TranslateAccelerator(hwnd,hAccel,&msg)){
 		//Unless the message is for a dialog
 		if(!TranslateAccelerator(hWnd,Ac,&msg))
@@ -551,11 +591,37 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 				//TranslateMessage(&msg);
 				//DispatchMessage(&msg);
         }
-	}
+	}*/
 	//MessageBox(NULL, "message loop exited", "OK", MB_OK);
 
-	DestroyAcceleratorTable (Ac);
-	return msg.wParam;//application ends here
+	DestroyAcceleratorTable(Ac);
+	return 0; //application ends here
+}
+
+BOOL SystemTask(void)
+{
+	MSG msg;
+
+	while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
+	{
+		if (!GetMessage(&msg, NULL, 0, 0))
+			return FALSE;
+
+		if (!TranslateAccelerator(hWnd, Ac, &msg)) {
+			if (!IsDialogMessage(hDlgPlayer, &msg)) {
+				if (!IsDialogMessage(hDlgTrack, &msg)) {
+					if (!IsDialogMessage(hDlgEZCopy, &msg)) {
+						if (!IsDialogMessage(hDlgHelp, &msg)) {
+							TranslateMessage(&msg);
+							DispatchMessage(&msg);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return TRUE;
 }
 
 //main procedure
@@ -620,8 +686,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
 				ClearEZC_Message();
 				SelectReset();
-				org_data.PutMusic();
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//org_data.PutMusic();
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
 				//for(i=0;i<8;i++)ucMIDIProgramChangeValue[i]=255;	// 2014.10.18 D
 				for(j=0;j<8;j++)ucMIDIProgramChangeValue[j]=255;	// 2014.10.18 A
@@ -741,6 +807,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case ID_AC_WAV:
 				DialogBox(hInst, "DLGWAVEXPORT", hwnd, DialogWavExport);
 				break;
+			case IDM_DCLEN:
+				DialogBox(hInst, "DLGDCLEN", hwnd, DialogDecayLength);
+				break;
 			case IDM_DUMMY_TATE_SEPARATOR: //do nothing
 				break;
 			case IDM_LOAD:
@@ -770,8 +839,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 				ClearEZC_Message();
 				SelectReset();
-				org_data.PutMusic();
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//org_data.PutMusic();
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
 				for(i=0;i<8;i++)ucMIDIProgramChangeValue[i]=255;
 				break;
@@ -804,8 +873,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				SetUndo();
 				org_data.EnlargeAllNotes(2);
 				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//“ªo‚µ
-				org_data.PutMusic();
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//org_data.PutMusic();
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				org_data.GetMusicInfo( &mi );
 				itoa(mi.wait,str,10);
 				SetDlgItemText(hDlgTrack,IDE_VIEWWAIT,str);
@@ -814,8 +883,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				SetUndo();
 				org_data.EnlargeAllNotes(3);
 				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//“ªo‚µ
-				org_data.PutMusic();
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//org_data.PutMusic();
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				org_data.GetMusicInfo( &mi );
 				itoa(mi.wait,str,10);
 				SetDlgItemText(hDlgTrack,IDE_VIEWWAIT,str);
@@ -824,8 +893,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				SetUndo();
 				org_data.ShortenAllNotes(2);
 				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//“ªo‚µ				
-				org_data.PutMusic();
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//org_data.PutMusic();
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				org_data.GetMusicInfo( &mi );
 				itoa(mi.wait,str,10);
 				SetDlgItemText(hDlgTrack,IDE_VIEWWAIT,str);
@@ -834,8 +903,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				SetUndo();
 				org_data.ShortenAllNotes(3);
 				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//“ªo‚µ				
-				org_data.PutMusic();
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//org_data.PutMusic();
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				org_data.GetMusicInfo( &mi );
 				itoa(mi.wait,str,10);
 				SetDlgItemText(hDlgTrack,IDE_VIEWWAIT,str);
@@ -859,7 +928,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_CT_L17:
 			case IDM_CT_L18:
 			case IDM_CT_L19:
-				SetUndo(); VolumeDecayEdit(1, -4, LOWORD(wParam) - IDM_CT_L1 + 1); //If the first argument is 0, it will be returned empty, so
+				SetUndo();
+				VolumeDecayEdit(1, -4, LOWORD(wParam) - IDM_CT_L1 + 1); //If the first argument is 0, it will be returned empty, so
 				break;
 			case IDM_CT_S0: 
 			case IDM_CT_S1: 
@@ -878,14 +948,16 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_CT_S14: 
 			case IDM_CT_S15: 
 			case IDM_CT_S16: 
-			case IDM_CT_S17: 
-			case IDM_CT_S18: 
+			case IDM_CT_S17:
+			case IDM_CT_S18:
 			case IDM_CT_S19: 
 			case IDM_CT_S20: //Clear
-				SetUndo(); VolumeDecayEdit(1, -4, LOWORD(wParam) - IDM_CT_S1 + 1 + 20);
+				SetUndo();
+				VolumeDecayEdit(1, -4, LOWORD(wParam) - IDM_CT_S1 + 1 + 20);
 				break;
 			case ID_AC_C0://Clear
-				SetUndo(); VolumeDecayEdit(1, -4, IDM_CT_S20     - IDM_CT_S1 + 1 + 20); 
+				SetUndo();
+				VolumeDecayEdit(1, -4, IDM_CT_S20     - IDM_CT_S1 + 1 + 20); 
 				break;
 			case ID_AC_C1: //Ctrl+1
 			case ID_AC_C2:
@@ -896,13 +968,15 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case ID_AC_C7:
 			case ID_AC_C8:
 			case ID_AC_C9:
-				SetUndo(); VolumeDecayEdit(1, -4, LOWORD(wParam) - ID_AC_C1 + 1 + 20);
+				SetUndo();
+				VolumeDecayEdit(1, -4, LOWORD(wParam) - ID_AC_C1 + 1 + 20);
 				break;
 			case ID_AC_CA0:
 			case ID_AC_CA1:
 			case ID_AC_CA2:
 			case ID_AC_CA3:
-				SetUndo(); VolumeDecayEdit(1, -4, LOWORD(wParam) - ID_AC_CA0 + 1 + 20 + 9);
+				SetUndo();
+				VolumeDecayEdit(1, -4, LOWORD(wParam) - ID_AC_CA0 + 1 + 20 + 9);
 				break;
 			case ID_AC_PRESS_LEFT: //instead of left click
 				ClickProcL(wParam, lParam);
@@ -932,7 +1006,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				break;
 			case IDM_CT_PAN_REVERSE: //PAN reversal
 			case ID_AC_PAN_REVERSE:
-				SetUndo(); PanEdit( 254, -4 );
+				SetUndo();
+				PanEdit( 254, -4 );
 				break;
 			case ID_AC_CT_KEY_UP:
 			case IDM_CT_TRANS_UP:
@@ -1005,8 +1080,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_UNDO:
 			case ID_AC_UNDO:
 				ReplaseUndo();
-				org_data.PutMusic();//View sheet music
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//org_data.PutMusic();//View sheet music
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				org_data.GetMusicInfo( &mi );
 				itoa(mi.wait,str,10);
 				SetDlgItemText(hDlgTrack,IDE_VIEWWAIT,str);
@@ -1014,8 +1089,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_REDO:
 			case ID_AC_REDO:
 				ReplaceRedo();
-				org_data.PutMusic();//View sheet music
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//org_data.PutMusic();//View sheet music
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				org_data.GetMusicInfo( &mi );
 				itoa(mi.wait,str,10);
 				SetDlgItemText(hDlgTrack,IDE_VIEWWAIT,str);
@@ -1044,18 +1119,18 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_ALWAYS_CURRENT:
 			case ID_AC_ALWAYS_CURRENT:
 				ChangeSelAlwaysCurrent();
-				org_data.PutMusic();//View sheet music
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//org_data.PutMusic();//View sheet music
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				break;
 			case ID_AC_DRAWDOUBLE:
 			case IDM_DRAWDOUBLE:
 				ChangeDrawDouble();
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				break;
 			case IDM_NOTE_ENLARGE: //&Make note heads stand out when zoomed out 2014.05.28
 				ChangeNoteEnlarge();
-				org_data.PutMusic();//View sheet music
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//org_data.PutMusic();//View sheet music
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				break;
 			case IDM_ENABLEPLAYING: //You can hit the keyboard while playing 2010.09.23 A
 				ChangeEnablePlaying();
@@ -1094,7 +1169,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_SLIDEOVERLAPNOTES: //2014.05.06 A
 			case ID_AC_SLIDEOVERLAPNOTES:
 				ChangeSlideOverlapNoteMode();
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				break;
 			case IDM_PRESSNOTE:
 			case ID_AC_PRESSNOTE:
@@ -1122,8 +1197,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				//MessageBox(hwnd,"initialized","Message",MB_OK);
 				ClearEZC_Message(); //Erase EZ messages and ranges
 				SelectReset();
-				org_data.PutMusic();
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//org_data.PutMusic();
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				for(i=0;i<8;i++)ucMIDIProgramChangeValue[i]=255;
 
 				break;
@@ -1131,8 +1206,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case ID_AC_SELECT_CLEAR: //Clear selection
 			case ID_AC_SELECT_CLEAR2: //Clear selection //2014.04.13
 				ClearEZC_Message();
-				org_data.PutMusic();
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//org_data.PutMusic();
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				break;
 			case ID_AC_SELECT_BACKDEL: //2014.04.13
 				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_DELETEBUTTON_2  , NULL);
@@ -1203,8 +1278,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case ID_AC_LOUPE_MINUS: // i hate this whole codebase so much i want to redo everything
 			NoteWidth -= 2; if(NoteWidth<4)NoteWidth=4;
 			org_data.PutBackGround();
-			org_data.PutMusic();//View sheet music
-			RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+			//org_data.PutMusic();//View sheet music
+			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			switch(NoteWidth){
 			case 4:		SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[25.%]"); break;
 			case 6:		SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[37.5%]"); break;
@@ -1220,8 +1295,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case ID_AC_LOUPE_PLUS:
 			NoteWidth += 2; if(NoteWidth>16)NoteWidth=16;
 			org_data.PutBackGround();
-			org_data.PutMusic();//View sheet music
-			RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+			//org_data.PutMusic();//View sheet music
+			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			switch(NoteWidth){
 			case 4:		SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[25%]"); break;
 			case 6:		SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[37.5%]"); break;
@@ -1303,9 +1378,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 //		MessageBox(hWnd,music_file,"",MB_OK);
 		org_data.InitOrgData();
 		org_data.LoadMusicData();
-		org_data.PutMusic();//View sheet music
+		//org_data.PutMusic();//View sheet music
 		//DetectPreciseMode();
-		RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+		//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 		//Show to Player
 		org_data.GetMusicInfo( &mi );
 		SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
@@ -1315,22 +1390,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
         gFileUnsaved = false;
 
 		break;
-	case WM_PAINT://display message
-	{
-		HDC hdc;
-		PAINTSTRUCT ps;
-
-		hdc = BeginPaint(hWnd, &ps);
-		RefleshScreen(hdc);
-
-		//static TCHAR strSize[128];
-		//wsprintf(strSize , "width = %d : height = %d" , WWidth , WHeight);
-		TextOut(hdc, 10, 10, strSize, lstrlen(strSize));
-		EndPaint(hWnd, &ps);
-
-
-		break;
-	}
 	case WM_CLOSE:
 		//if(iChangeFinish!=0){	// A 2010.09.22
 		//	char cc[512],*chn;
@@ -1352,7 +1411,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 	case WM_DESTROY://for post-processing
 		EndDirectSound();
 		org_data.ReleaseNote();
-		DeleteWaveData100(); //Added 20140401 Normally, it seems to be called in the order of WM_CLOSE -> WM_DESTROY -> WM_QUIT.
+		DeleteWaveData100(); //Added 20140401 Normally, it seems to be called in the order of WM_CLOSE E> WM_DESTROY E> WM_QUIT.
 		EndGDI();
 		if(!hDlgPlayer)DestroyWindow(hDlgPlayer);
 		if(!hDlgTrack)DestroyWindow(hDlgTrack);
@@ -1418,8 +1477,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				iCurrentPhase=-iCurrentPhase + 1;
 				Rxo_PlayKey(iCast[wParam] + iPushShift[0]*12 -iPushShift[1]*12 , org_data.track, mi.tdata[org_data.track].freq, iKeyPhase[iCast[wParam]]);
 				iKeyPushDown[iCast[wParam]+ iPushShift[0]*12 -iPushShift[1]*12] = 1;
-				org_data.PutMusic();//Redrawing sheet music
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//org_data.PutMusic();//Redrawing sheet music
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
 			}
 
@@ -1465,16 +1524,16 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				Rxo_StopKey(iCast[wParam]+ iPushShift[0]*12 -iPushShift[1]*12, org_data.track, iKeyPhase[iCast[wParam]]);
 				iKeyPhase[iCast[wParam]] = -1;
 				iKeyPushDown[iCast[wParam]+ iPushShift[0]*12 -iPushShift[1]*12] = 0;
-				org_data.PutMusic();//Redrawing sheet music
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//org_data.PutMusic();//Redrawing sheet music
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			}
 			break;
 		case VK_TAB:
 			if((timer_sw==0 || iChangeEnablePlaying!=0)){
 				iPushShift[0]=0;
 				for(i=0;i<256;i++)iKeyPushDown[i]=0;
-				org_data.PutMusic();//Redrawing sheet music
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//org_data.PutMusic();//Redrawing sheet music
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				Rxo_StopAllSoundNow();
 			}
 			break;
@@ -1482,8 +1541,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			if((timer_sw==0 || iChangeEnablePlaying!=0)){
 				iPushShift[1]=0;
 				for(i=0;i<256;i++)iKeyPushDown[i]=0;
-				org_data.PutMusic();//Redrawing sheet music
-				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+				//org_data.PutMusic();//Redrawing sheet music
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				Rxo_StopAllSoundNow();
 			}
 			break;
@@ -1507,7 +1566,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		break;
     case WM_RBUTTONUP://mouse (right) released
 		RButtonUP(wParam, lParam);
-		RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+		//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 		break;
 	case WM_HSCROLL:
 		scr_data.HorzScrollProc(wParam);
@@ -1546,12 +1605,12 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		rect.right = WWidth;		//A 2008/05/14
 		rect.bottom = WHeight;		//A 2008/05/14
 		if(!org_data.PutBackGround())break;
-		org_data.PutMusic();
+		//org_data.PutMusic();
 		
 //				wsprintf(strSize , "Height = %d" , (WHeight - 158)/12);
 //				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 		scr_data.ChangeVerticalRange(WHeight);
-		RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+		//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
 		break;
 	case WM_SIZING: //resizing
@@ -1668,6 +1727,12 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW,"Metronome",num_buf,app_path);
 	wsprintf(num_buf, "%d", sSmoothScroll);
 	WritePrivateProfileString(MAIN_WINDOW, "SmoothScroll", num_buf, app_path);
+	wsprintf(num_buf, "%d", volChangeLength);
+	WritePrivateProfileString(MAIN_WINDOW, "VolChangeLength", num_buf, app_path);
+	wsprintf(num_buf, "%d", volChangeUseNoteLength);
+	WritePrivateProfileString(MAIN_WINDOW, "VolChangeUseNoteLength", num_buf, app_path);
+	wsprintf(num_buf, "%d", volChangeSetNoteLength);
+	WritePrivateProfileString(MAIN_WINDOW, "VolChangeSetNoteLength", num_buf, app_path);
 
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentThemePath", gSelectedTheme, app_path);
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentWavePath", gSelectedWave, app_path);

@@ -74,8 +74,8 @@ BOOL CALLBACK DialogDelete(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 			//消去
 			org_data.DelateNoteData(&pc);
 			//表示
-			org_data.PutMusic();
-			RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+			//org_data.PutMusic();
+			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			//MessageBox(hdwnd,"消去しました","通知",MB_OK);	// 2014.10.18 D
 			msgbox(hdwnd,IDS_INFO_CLEAR ,IDS_NOTIFY_TITLE ,MB_OK);	// 2014.10.18 A
 			return 1;
@@ -201,8 +201,8 @@ BOOL CALLBACK DialogCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			org_data.CopyNoteData(&nc);
 			org_data.CheckNoteTail(nc.track2);
 			//表示
-			org_data.PutMusic();
-			RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+			//org_data.PutMusic();
+			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			//試しに表示
 //			sprintf(str,"%dトラックの%dから%dまでを、%dトラックの%dに%d回コピーしました",
 //			nc.track1,nc.x1_1,nc.x1_2,nc.track2,nc.x2,nc.num);
@@ -272,8 +272,8 @@ BOOL CALLBACK DialogPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SetUndo();
 			org_data.ChangePanData(&pc);
 			//表示
-			org_data.PutMusic();
-			RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+			//org_data.PutMusic();
+			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			//MessageBox(hdwnd,"指定範囲のパンを変更しました","通知",MB_OK);	// 2014.10.19 D
 			msgbox(hdwnd,IDS_CHANGE_PAN,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 			return 1;
@@ -340,8 +340,8 @@ BOOL CALLBACK DialogTrans(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 			SetUndo();
 			org_data.ChangeTransData(&pc);
 			//表示
-			org_data.PutMusic();
-			RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+			//org_data.PutMusic();
+			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			//MessageBox(hdwnd,"指定範囲のキーを変更しました","通知",MB_OK);	// 2014.10.19 D
 			msgbox(hdwnd,IDS_CHANGE_KEY,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 			return 1;
@@ -405,10 +405,10 @@ BOOL CALLBACK DialogVolume(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 				return 1;
 			}
 			SetUndo();
-			org_data.ChangeVolumeData(&pc);
+			org_data.ChangeVolumeData(&pc, 0);
 			//表示
-			org_data.PutMusic();
-			RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+			//org_data.PutMusic();
+			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			//MessageBox(hdwnd,"指定範囲のボリュームを変更しました","通知",MB_OK);	// 2014.10.19 D
 			msgbox(hdwnd,IDS_CHANGE_VOLUME,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 			return 1;
@@ -555,8 +555,8 @@ BOOL CALLBACK DialogCopy2(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 				}
 			}
 			//表示
-			org_data.PutMusic();
-			RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+			//org_data.PutMusic();
+			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			//MessageBox(hdwnd,"コピーしました","通知",MB_OK);	// 2014.10.19 D
 			msgbox(hdwnd,IDS_COPY,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 			return 1;
@@ -610,13 +610,13 @@ BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			org_data.GetMusicInfo(&mi);
 
 			if (nc.track1 < MAXMELODY) MakeOrganyaWave(nc.track1, mi.tdata[nc.track1].wave_no, mi.tdata[nc.track1].pipi);
-			else InitDramObject(dram_name[mi.tdata[nc.track1].wave_no], nc.track1 - MAXMELODY);
+			else InitDramObject(mi.tdata[nc.track1].wave_no, nc.track1 - MAXMELODY);
 
 			if (nc.track2 < MAXMELODY) MakeOrganyaWave(nc.track2, mi.tdata[nc.track2].wave_no, mi.tdata[nc.track2].pipi);
-			else InitDramObject(dram_name[mi.tdata[nc.track2].wave_no], nc.track2 - MAXMELODY);
+			else InitDramObject(mi.tdata[nc.track2].wave_no, nc.track2 - MAXMELODY);
 			//表示
-			org_data.PutMusic();
-			RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+			//org_data.PutMusic();
+			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			//MessageBox(hdwnd,"指定Trackを入れ替えました。","通知",MB_OK);	// 2014.10.19 D
 			msgbox(hdwnd,IDS_SWAP_TRACK,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 			return 1;

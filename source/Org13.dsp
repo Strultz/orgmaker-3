@@ -489,6 +489,10 @@ SOURCE=.\Wave\Per02.wav
 # End Source File
 # Begin Source File
 
+SOURCE=.\Wave\Per03.wav
+# End Source File
+# Begin Source File
+
 SOURCE=.\Wave\Pesi01.wav
 # End Source File
 # Begin Source File

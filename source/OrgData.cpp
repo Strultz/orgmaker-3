@@ -37,7 +37,7 @@ BOOL OrgData::NoteAlloc(unsigned short alloc)
 	for(j = 0; j < MAXMELODY; j++)
 		MakeOrganyaWave(j,info.tdata[j].wave_no, info.tdata[j].pipi);
 	for(j = 0; j < MAXDRAM; j++)
-		InitDramObject("Bass01",j);
+		InitDramObject(0,j);
 
 	track = 0;//////////今はここに書いておく
 	return TRUE;
@@ -74,8 +74,8 @@ unsigned short OrgData::GetWait(void) {
 
 bool OrgData::PutBackGround(void)
 {
-	if(!MakeMusicParts(info.line,info.dot))return false;//パーツを生成
-	MakePanParts(info.line,info.dot);
+	//if(!MakeMusicParts(info.line,info.dot))return false;//パーツを生成
+	//MakePanParts(info.line,info.dot);
 	//MessageBox(hWnd,"グリッド","",MB_OK);
 	return true;
 }
@@ -89,8 +89,8 @@ BOOL OrgData::SetMusicInfo(MUSICINFO *mi,unsigned long flag)
 		info.dot = mi->dot;
 		info.line = mi->line;
 		scr_data.ChangeHorizontalRange(info.dot * info.line * MAXHORZMEAS);
-		MakeMusicParts(info.line,info.dot);//パーツを生成
-		MakePanParts(info.line,info.dot);
+		//MakeMusicParts(info.line,info.dot);//パーツを生成
+		//MakePanParts(info.line,info.dot);
 //		MessageBox(hWnd,"グリッド","",MB_OK);
 
 	}
@@ -702,7 +702,7 @@ void OrgData::InitOrgData(void)
 	info.tdata[14].wave_no = 0;
 	info.tdata[15].wave_no = 0;
 	for(i = MAXMELODY; i < MAXTRACK; i++){
-		InitDramObject(dram_name[ info.tdata[i].wave_no ],i-MAXMELODY);
+		InitDramObject(info.tdata[i].wave_no,i-MAXMELODY);
 	}
 }
 void OrgData::GetNoteUsed(long *use,long*left,char track)
@@ -802,7 +802,7 @@ int OrgData::ReplaceFromUndoData()
 		MakeOrganyaWave(j, mi.tdata[j].wave_no, mi.tdata[j].pipi);
 	}
 	for (j = MAXMELODY; j < MAXTRACK; j++) {
-		InitDramObject(dram_name[mi.tdata[j].wave_no], j - MAXMELODY);
+		InitDramObject(mi.tdata[j].wave_no, j - MAXMELODY);
 	}
 	return r;
 }
@@ -831,7 +831,7 @@ int OrgData::ReplaceFromRedoData()
 		MakeOrganyaWave(j, mi.tdata[j].wave_no, mi.tdata[j].pipi);
 	}
 	for (j = MAXMELODY; j < MAXTRACK; j++) {
-		InitDramObject(dram_name[mi.tdata[j].wave_no], j - MAXMELODY);
+		InitDramObject(mi.tdata[j].wave_no, j - MAXMELODY);
 	}
 	return r;
 

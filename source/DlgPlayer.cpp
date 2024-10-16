@@ -8,6 +8,7 @@
 #include "Timer.h"
 #include "Sound.h"
 #include "Scroll.h"
+
 char timer_sw = 0;
 extern HWND hDlgTrack;
 extern HWND hWnd;
@@ -154,6 +155,10 @@ BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 					PlayOrganObject(NULL,2 ,i,NULL);
 					*/
 				timer_sw = 0;
+
+				long p;
+				org_data.GetPlayPos(&p);
+				org_data.SetPlayPointer(p);
 			}
 			SetFocus(hWnd);
 //			return 1;

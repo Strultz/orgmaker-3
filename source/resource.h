@@ -421,7 +421,16 @@
 #define IDE_SAMPLE_RATE                 1219
 #define IDE_LOOP_COUNT                  1220
 #define IDE_FADE_MSECONDS               1221
+<<<<<<< HEAD
 #define IDD_WAVEDBS                     1213
+=======
+#define IDD_WAVEDBS                     1222
+#define IDC_EXPORTTEXT                  1223
+#define IDC_EXPORTSEPARATE              1224
+#define IDE_VOL_LENGTH					1225
+#define IDC_VOL_USENOTELEN				1226
+#define IDC_VOL_SETNOTELEN				1227
+>>>>>>> ddraw
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005
@@ -695,14 +704,18 @@
 #define IDM_EXPORT_WAV                  40297
 #define ID_AC_WAV                       40298
 #define IDM_DLGWAVEDBS                  40299
+<<<<<<< HEAD
+=======
+#define IDM_DCLEN						40300
+>>>>>>> ddraw
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        239
-#define _APS_NEXT_COMMAND_VALUE         40299
-#define _APS_NEXT_CONTROL_VALUE         1221
+#define _APS_NEXT_COMMAND_VALUE         40301
+#define _APS_NEXT_CONTROL_VALUE         1228
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

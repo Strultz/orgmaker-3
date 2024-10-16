@@ -285,7 +285,7 @@ BOOL OrgData::LoadMusicData(void)
 		MakeOrganyaWave(j,info.tdata[j].wave_no, info.tdata[j].pipi);
 	for(j = MAXMELODY; j < MAXTRACK; j++){
 		i = info.tdata[j].wave_no;
-		InitDramObject(dram_name[i],j-MAXMELODY);
+		InitDramObject(i,j-MAXMELODY);
 	}
 	//プレイヤーに表示
 	char str[32];
@@ -297,8 +297,8 @@ BOOL OrgData::LoadMusicData(void)
 	SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,"0");
 
 	scr_data.ChangeHorizontalRange(info.dot * info.line * MAXHORZMEAS);
-	MakeMusicParts(info.line,info.dot);//パーツを生成
-	MakePanParts(info.line,info.dot);
+	//MakeMusicParts(info.line,info.dot);//パーツを生成
+	//MakePanParts(info.line,info.dot);
 	PutRecentFile(music_file);
 	//↓2014.05.06 A
 	if(SaveWithInitVolFile != 0){
@@ -400,7 +400,7 @@ void OrgData::SortNotes()
 	SetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,"0");
 	SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,"0");
 
-	MakeMusicParts(info.line,info.dot);//パーツを生成
-	MakePanParts(info.line,info.dot);
+	//MakeMusicParts(info.line,info.dot);//パーツを生成
+	//MakePanParts(info.line,info.dot);
 
 }

@@ -391,20 +391,20 @@ void EditNote(int AddNotes , int Track , int Function)
 	for(j=jmin;j<jmax;j++){
 		pc.track = j;
 		if(Function==0)org_data.ChangeTransData(&pc);
-		else if(Function==1)org_data.ChangeVolumeData(&pc);
+		else if(Function==1)org_data.ChangeVolumeData(&pc, 0);
 		else if(Function==2)org_data.ChangePanData(&pc);
 		else if(Function==10){
 			pc.mode = MODEMULTIPLY;
-			org_data.ChangeVolumeData(&pc);
+			org_data.ChangeVolumeData(&pc, 0);
 		}else if(Function>=MODEDECAY && Function<MODEDECAY+20){
 			pc.mode = (unsigned char)Function;
-			org_data.ChangeVolumeData(&pc);
+			org_data.ChangeVolumeData(&pc, 0);
 		}else if(Function>=MODEDECAY+20){
 			org_data.EnsureEmptyArea(&pc, Function - MODEDECAY - 20);
 		}
 	}
-	org_data.PutMusic();	//表示
-	RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+	//org_data.PutMusic();	//表示
+	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 	//MessageBox(hdwnd,"指定範囲のキーを変更しました","通知",MB_OK);
 	return;
 }
@@ -578,8 +578,8 @@ void ReplaseUndo()
 	if(org_data.ReplaceFromUndoData()>0){ //これ以上UNDO出来ない
 		EnableMenuItem(hMenu,IDM_UNDO,MF_BYCOMMAND|MF_GRAYED);
 	}
-	org_data.PutBackGround();
-	org_data.PutMusic();	//表示
+	//org_data.PutBackGround();
+	//org_data.PutMusic();	//表示
 	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 	//通常の状態に戻すには
 	EnableMenuItem(hMenu,IDM_REDO,MF_BYCOMMAND|MF_ENABLED);
@@ -640,8 +640,8 @@ void ReplaceRedo()
 	}
 	EnableMenuItem(hMenu,IDM_UNDO,MF_BYCOMMAND|MF_ENABLED);
 	DrawMenuBar(hWnd);//メニューを再描画
-	org_data.PutBackGround();
-	org_data.PutMusic();	//表示
+	//org_data.PutBackGround();
+	//org_data.PutMusic();	//表示
 	//RedrawWindow(hWnd,&rect1,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
 }
@@ -805,7 +805,7 @@ void ChangeDrawDouble(int iValue)
 	else
 		CheckMenuItem(hMenu,IDM_DRAWDOUBLE,(MF_BYCOMMAND|MFS_CHECKED));
 		//ModifyMenu(hMenu, IDM_DRAWDOUBLE, MF_BYCOMMAND|MF_STRING, IDM_DRAWDOUBLE, "おえ");
-	org_data.PutMusic();
+	//org_data.PutMusic();
 
 	ShowStatusMessage();
 }
@@ -822,7 +822,7 @@ void ChangeDragMode(int iValue)
 		CheckMenuItem(hMenu,IDM_DRAGMODE,(MF_BYCOMMAND|MFS_UNCHECKED));
 	else
 		CheckMenuItem(hMenu,IDM_DRAGMODE,(MF_BYCOMMAND|MFS_CHECKED));
-	org_data.PutMusic();
+	//org_data.PutMusic();
 	ShowStatusMessage();
 
 }
@@ -839,7 +839,7 @@ void ChangeSlideOverlapNoteMode(int iValue)
 		CheckMenuItem(hMenu,IDM_SLIDEOVERLAPNOTES,(MF_BYCOMMAND|MFS_UNCHECKED));
 	else
 		CheckMenuItem(hMenu,IDM_SLIDEOVERLAPNOTES,(MF_BYCOMMAND|MFS_CHECKED));
-	org_data.PutMusic();
+	//org_data.PutMusic();
 	ShowStatusMessage();
 
 }
@@ -856,7 +856,7 @@ void ChangePushStratchNOTE(int iValue)
 		CheckMenuItem(hMenu,IDM_PRESSNOTE,(MF_BYCOMMAND|MFS_UNCHECKED));
 	else
 		CheckMenuItem(hMenu,IDM_PRESSNOTE,(MF_BYCOMMAND|MFS_CHECKED));
-	org_data.PutMusic();
+	//org_data.PutMusic();
 	ShowStatusMessage();
 
 }
