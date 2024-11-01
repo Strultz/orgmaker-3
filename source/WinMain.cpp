@@ -433,6 +433,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	InitSoundObject("METRO01", 1);
 	InitSoundObject("METRO02", 2);
+	InitSoundObject("CAT", 3);
 	
 	hDlgPlayer = CreateDialog(hInst,"PLAYER",hWnd,DialogPlayer);
 	hDlgTrack = CreateDialog(hInst,"TRACK",hWnd,DialogTrack);
@@ -753,7 +754,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				DialogBox(hInst,"DLGSWAP",hwnd,DialogSwap);
 				break;
 			case IDM_DLGMEMO://
-				PlaySound( "CAT" , GetModuleHandle(NULL),SND_RESOURCE | SND_ASYNC); 
+				PlaySoundObject(3, 1);
 				DialogBox(hInst,"DLGMEMO",hwnd,DialogMemo);
 				break;
 			case IDM_DLGTHEMES:

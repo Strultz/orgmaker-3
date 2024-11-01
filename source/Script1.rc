@@ -1160,8 +1160,8 @@ ZZZ                     ICON                    "bitmap\\ffff.ico"
 //
 
 WAVE100                 WAVE                    "Wave\\WAVE100.wdb"
-/*
-TOM01                   WAVE                    "Wave\\Tom01.wav"
+
+/* TOM01                   WAVE                    "Wave\\Tom01.wav"
 
 BASS02                  WAVE                    "Wave\\Bass02.wav"
 
@@ -1245,11 +1245,13 @@ BASS08                  WAVE                    "Wave\\Bass08.wav"
 
 HICLOSE05               WAVE                    "Wave\\HiClose05.wav"
 
-SNARE08                 WAVE                    "Wave\\Snare08.wav"
-*/
+SNARE08                 WAVE                    "Wave\\Snare08.wav" */
+
 METRO01                 WAVE                    "Wave\\Metro01.wav"
 
 METRO02                 WAVE                    "Wave\\Metro02.wav"
+
+CAT                     WAVE                    "Wave\\Cat.wav"
 
 
 /////////////////////////////////////////////////////////////////////////////
