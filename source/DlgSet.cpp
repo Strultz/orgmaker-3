@@ -161,10 +161,13 @@ void InitSettingDialog(HWND hdwnd)
 //	itoa(org_data.track,str,10);
 //	SetDlgItemText(hdwnd,IDD_SETTRACK,str);
 	//再生ウエイトの初期化//////////////////
+
 	itoa(mi.wait,str,10);
 	SetDlgItemText(hdwnd,IDD_SETWAIT,str);
-	snprintf(str, 128, "%.2f", (60000.0 / (double)(mi.wait * mi.dot)));
+
+	snprintf(str, 128, "%.3f", ((mi.wait > 0 && mi.dot > 0) ? (60000.0 / (double)(mi.wait * mi.dot)) : 0));
 	SetDlgItemText(hdwnd, IDC_BPM, str);
+
 	//ｸﾞﾘｯﾄﾞの初期化
 	TCHAR *q, *p;
 	p = MessageString[IDS_GRID_STRING];
@@ -469,14 +472,15 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 				} catch (const std::out_of_range&) {
 				}
 
-				if (iBPM > 0) {
-					//SetGrid(hdwnd, &mg);
+				iWAIT = 0;
+				if (iBPM > 0 && mi.dot > 0) {
 					iWAIT = (int)round(60000.0 / iBPM / (double)mi.dot);
-					snprintf(str, 128, "%d", iWAIT);
-
-					updateWait = true;
-					SetDlgItemText(hdwnd, IDD_SETWAIT, str);
 				}
+
+				snprintf(str, 128, "%d", iWAIT);
+
+				updateWait = true;
+				SetDlgItemText(hdwnd, IDD_SETWAIT, str);
 			}
 
 			// Update BPM when wait is updated
@@ -491,19 +495,15 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 				GetDlgItemText(hdwnd, IDD_SETWAIT, str, 128);
 
 				iWAIT = atoi(str);
-
-				if (iWAIT > 0) {
-					//SetGrid(hdwnd, &mg);
+				iBPM = 0;
+				if (iWAIT > 0 && mi.dot > 0) {
 					iBPM = 60000.0 / (double)(iWAIT * mi.dot);
-					snprintf(str, 128, "%.3f", iBPM);
+				}
 
-					updateBPM = true;
-					SetDlgItemText(hdwnd, IDC_BPM, str);
-				}
-				else {
-					updateBPM = true;
-					SetDlgItemText(hdwnd, IDC_BPM, "0.000");
-				}
+				snprintf(str, 128, "%.3f", iBPM);
+
+				updateBPM = true;
+				SetDlgItemText(hdwnd, IDC_BPM, str);
 			}
 
 			// This is just to reformat it so it's consistent
