@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string>
+#include <stdexcept>
 
 #include "Sound.h"
 #include "resource.h"
@@ -377,6 +378,9 @@ BOOL SetPipiCheck(HWND hdwnd, MUSICINFO *mi)
 //曲の設定
 BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	static bool updateWait = false;
+	static bool updateBPM = false;
+
 	int i, j;
 	double iBPM;
 	int iWAIT;
@@ -385,6 +389,8 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 	MUSICINFO mi,mg;
 	switch(message){
 	case WM_INITDIALOG://ダイアログが呼ばれた
+		updateWait = true;
+		updateBPM = true;
 		InitSettingDialog(hdwnd);
 		EnableDialogWindow(FALSE);
 		return 1;
@@ -393,7 +399,7 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 		break;
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
-		case IDC_BTN1:
+		/*case IDC_BTN1:
 			org_data.GetMusicInfo(&mi);
 			GetDlgItemText(hdwnd, IDC_BPM, str, 128);
 			iBPM = std::stod(str);
@@ -414,7 +420,7 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 				snprintf(str, 128, "%.2f", iBPM);
 				SetDlgItemText(hdwnd, IDC_BPM, str);
 			}
-			return 1;
+			return 1;*/
 		case IDD_LB1:
 			if(HIWORD(wParam) == LBN_SELCHANGE){ //ﾘｽﾄﾎﾞｯｸｽでの選択変更
 				i = SendDlgItemMessage(hdwnd, IDD_LB1,LB_GETCURSEL,0,0);//インデックスを得る
@@ -442,10 +448,79 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 				SetDlgItemText(hdwnd, IDD_END_MEAS, str);
 			}
 			break;*/
-		case IDD_REP_MEAS: case IDD_END_MEAS: case IDD_REP_BEAT: case IDD_END_BEAT: case IDD_SETWAIT: case IDC_BPM:
+		case IDC_BPM:
+		case IDD_SETWAIT:
+			org_data.GetMusicInfo(&mi);
+
+			// Update wait when BPM is updated
+			if (LOWORD(wParam) == IDC_BPM && (HIWORD(wParam) == EN_UPDATE || HIWORD(wParam) == EN_KILLFOCUS))
+			{
+				if (updateBPM) {
+					updateBPM = false;
+					return -1;
+				}
+
+				GetDlgItemText(hdwnd, IDC_BPM, str, 128);
+
+				iBPM = 0;
+				try {
+					iBPM = std::stod(str);
+				} catch (const std::invalid_argument&) { // No
+				} catch (const std::out_of_range&) {
+				}
+
+				if (iBPM > 0) {
+					//SetGrid(hdwnd, &mg);
+					iWAIT = (int)round(60000.0 / iBPM / (double)mi.dot);
+					snprintf(str, 128, "%d", iWAIT);
+
+					updateWait = true;
+					SetDlgItemText(hdwnd, IDD_SETWAIT, str);
+				}
+			}
+
+			// Update BPM when wait is updated
+			if ((LOWORD(wParam) == IDD_SETWAIT && (HIWORD(wParam) == EN_UPDATE || HIWORD(wParam) == EN_KILLFOCUS))
+				|| (LOWORD(wParam) == IDC_BPM && HIWORD(wParam) == EN_KILLFOCUS))
+			{
+				if (updateWait) {
+					updateWait = false;
+					return -1;
+				}
+
+				GetDlgItemText(hdwnd, IDD_SETWAIT, str, 128);
+
+				iWAIT = atoi(str);
+
+				if (iWAIT > 0) {
+					//SetGrid(hdwnd, &mg);
+					iBPM = 60000.0 / (double)(iWAIT * mi.dot);
+					snprintf(str, 128, "%.3f", iBPM);
+
+					updateBPM = true;
+					SetDlgItemText(hdwnd, IDC_BPM, str);
+				}
+				else {
+					updateBPM = true;
+					SetDlgItemText(hdwnd, IDC_BPM, "0.000");
+				}
+			}
+
+			// This is just to reformat it so it's consistent
+			if (LOWORD(wParam) == IDD_SETWAIT && HIWORD(wParam) == EN_KILLFOCUS) {
+				GetDlgItemText(hdwnd, IDD_SETWAIT, str, 128);
+				iWAIT = atoi(str);
+				snprintf(str, 128, "%d", iWAIT);
+				updateWait = true;
+				SetDlgItemText(hdwnd, IDD_SETWAIT, str);
+			}
+
+			// Fallthrough
+		case IDD_REP_MEAS: case IDD_END_MEAS: case IDD_REP_BEAT: case IDD_END_BEAT:
 		case IDD_GRIDEDIT1: case IDD_GRIDEDIT2:
 		case IDD_SETFREQ0: case IDD_SETFREQ1: case IDD_SETFREQ2: case IDD_SETFREQ3: case IDD_SETFREQ4: case IDD_SETFREQ5: case IDD_SETFREQ6: case IDD_SETFREQ7:
-			if(HIWORD(wParam) == EN_SETFOCUS)PostMessage(GetDlgItem(hdwnd, LOWORD(wParam)), EM_SETSEL, 0, -1); //フォーカス時にテキストを全選択する
+			if(HIWORD(wParam) == EN_SETFOCUS)
+				PostMessage(GetDlgItem(hdwnd, LOWORD(wParam)), EM_SETSEL, 0, -1); //フォーカス時にテキストを全選択する
 			return -1;
 		case IDCANCEL:
 			EndDialog(hdwnd,0);
