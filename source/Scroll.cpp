@@ -49,6 +49,7 @@ void ScrollData::ChangeVerticalRange(int WindowHeight){ //ウィンドウサイズを元に
 
 		scr_info.nMax = 100 - ap;
 		vScrollMax = scr_info.nMax;
+		if (vScrollMax < 0) vScrollMax = 0;
 	}else{
 		scr_info.nMax = MAXVERTRANGE;
 
@@ -113,6 +114,7 @@ void ScrollData::HorzScrollProc(WPARAM wParam){
 	case SB_LINERIGHT://右へ
 		hpos++;
 		if(hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
+		if (hpos < 0)hpos = 0;
 		break;
 	case SB_LINELEFT://左へ
 		hpos--;
@@ -127,6 +129,7 @@ void ScrollData::HorzScrollProc(WPARAM wParam){
 	case SB_PAGERIGHT://右へ
 		hpos = (hpos / (mi.dot * mi.line) + 1) * (mi.dot * mi.line);
 		if(hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
+		if (hpos < 0)hpos = 0;
 		break;
 	case SB_PAGELEFT://左へ
 	{
@@ -164,6 +167,7 @@ void ScrollData::VertScrollProc(WPARAM wParam){
 	case SB_LINEDOWN://下へ
 		vpos++;
 		if(vpos > vScrollMax)vpos = vScrollMax;
+		if (vpos < 0)vpos = 0;
 		break;
 	case SB_LINEUP://上へ
 		vpos--;
@@ -178,6 +182,7 @@ void ScrollData::VertScrollProc(WPARAM wParam){
 	case SB_PAGEDOWN://下へ
 		vpos += 12;
 		if(vpos > vScrollMax)vpos = vScrollMax;
+		if (vpos < 0)vpos = 0;
 		break;
 	case SB_PAGEUP://上へ
 		vpos -= 12;
@@ -246,9 +251,11 @@ void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){
 		if(fwKeys && MK_CONTROL){
 			hpos += 4;
 			if (hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
+			if (hpos < 0)hpos = 0;
 		}else{
 			vpos+=4;
 			if(vpos > vScrollMax)vpos = vScrollMax;
+			if (vpos < 0)vpos = 0;
 		}
 	}else{
 		if(fwKeys && MK_CONTROL){

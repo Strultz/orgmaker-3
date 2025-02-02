@@ -566,7 +566,7 @@ void OrgData::PutMusic(void)
 	//ここ以降に楽譜表示を記述
 	x = (-(hpos % (info.dot * info.line)) * NoteWidth) + KEYWIDTH;
 
-	for (j = 0; j < 8; ++j) {
+	for (j = 0; j < (WHeight / 144) + 1; ++j) {
 		for (int i = 0; i < (WWidth / NoteWidth) + (info.line * info.dot) + 1; ++i) { // 15
 			if (i % (info.line * info.dot) == 0) {
 				brect = { 64, 0, 64 + NoteWidth, 144 };
@@ -616,13 +616,13 @@ void OrgData::PutMusic(void)
 		}
 		
 	}
-	for(j = 0; j < 8; j++) PutBitmap(0, j*144 + vpos, &msc_rect[0], BMPMUSIC);
+	for(j = 0; j < (WHeight / 144) + 1; j++) PutBitmap(0, j*144 + vpos, &msc_rect[0], BMPMUSIC);
 
 	//キーボード鍵盤（鍵盤部分）
 	for(j = 0; j < 96 ; j++){ // 2010.09.22 A
 		if(iKeyPushDown[j]!=0){
 			//A 2010.09.24
-			for(i = 0; i < 8; i++){
+			for(i = 0; i < (WHeight / 144) + 1; i++){
 				PutBitmap(0,  (95 - (j%12)- i*12 - vpos2)*12, &rc_PushKB3[j%12],BMPMUSIC);//オクターブ違い鍵盤
 			}
 			PutBitmap(0,  (95 - j - vpos2)*12, &rc_PushKB2[j%12],BMPMUSIC);//鍵盤

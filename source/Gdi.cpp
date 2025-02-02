@@ -35,8 +35,8 @@ extern int NoteEnlarge_Until_16px;
 extern char* gSelectedTheme;
 
 BOOL StartGDI(HWND hwnd) {
-	int nScreenWidth = GetSystemMetrics(SM_CXSCREEN);
-    int nScreenHeight = GetSystemMetrics(SM_CYSCREEN);
+	int nScreenWidth = GetSystemMetrics(SM_CXMAXTRACK);
+    int nScreenHeight = GetSystemMetrics(SM_CYMAXTRACK);
 
 	if (DirectDrawCreate(NULL, &directDraw, NULL) != DD_OK)
 		return FALSE;

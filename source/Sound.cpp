@@ -23,7 +23,8 @@ static struct S_Sound
 {
 	signed char* samples;
 	size_t frames;
-	float position;
+	long position;
+	float subPosition;
 	float advance_delta;
 	bool playing;
 	bool hasPlayedBefore;
@@ -137,6 +138,7 @@ static S_Sound* S_CreateSound(unsigned int frequency, const unsigned char* sampl
 	sound->playing = false;
 	sound->hasPlayedBefore = false;
 	sound->position = 0;
+	sound->subPosition = 0;
 
 	S_SetSoundFrequency(sound, frequency);
 	S_SetSoundVolume(sound, 0);
@@ -225,8 +227,8 @@ static void S_MixSounds(float* stream, size_t frames_total) {
 				}
 
 				// Perform lagrange interpolation
-				const float subsample = mmodf(sound->position, 1.0F);
-				const long sp = (long)sound->position;
+				const float subsample = sound->subPosition;
+				const long sp = sound->position;
 
 				float sample_a;
 				float sample_b;
@@ -258,7 +260,9 @@ static void S_MixSounds(float* stream, size_t frames_total) {
 				*stream_pointer++ += interpolated_sample * sound->volume_r;
 
 				// Increment sample
-				sound->position += sound->advance_delta;
+				sound->subPosition += sound->advance_delta;
+                sound->position += (long)sound->subPosition;
+                sound->subPosition = mmodf(sound->subPosition, 1.0F);
 
 				// Stop or loop sample once it's reached its end
 				if (sound->position >= sound->frames)
@@ -384,6 +388,8 @@ BOOL InitDirectSound(HWND hwnd)
 //	}
 //	dsbd.dwFlags = 0; //ƒZƒJƒ“ƒ_ƒŠƒoƒbƒtƒ@
 //	CapDev->CreateCaptureBuffer(&dsbd, &CapBuf, NULL);
+
+    sound_list_head = NULL;
 
 	ma_device_config config = ma_device_config_init(ma_device_type_playback);
 	config.playback.pDeviceID = NULL;
