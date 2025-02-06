@@ -43,17 +43,17 @@ typedef struct{
 	char dot;
 }GRID;
 GRID grid[NUMGRIDA] = {
-	{"™Ž©—RÝ’è",0,0},
-	{"‚S”F‚S•ªŠ„",4,4},
-	{"‚S”F‚R•ªŠ„",4,3},
-	{"‚R”F‚S•ªŠ„",3,4},
-	{"‚R”F‚R•ªŠ„",3,3},
-	{"‚S”F‚U•ªŠ„",4,6},
-	{"‚R”F‚U•ªŠ„",3,6},
-	{"‚S”F‚Q•ªŠ„",4,2},
-	{"‚S”F‚W•ªŠ„",4,8},
-	{"‚S”F12•ªŠ„",4,12},
-	{"‚T”F‚S•ªŠ„",5,4},
+	{"Custom",0,0},
+	{"4/4",4,4},
+	{"4/3",4,3},
+	{"3/4",3,4},
+	{"3/3",3,3},
+	{"4/6",4,6},
+	{"3/6",3,6},
+	{"4/2",4,2},
+	{"4/8",4,8},
+	{"4/12",4,12},
+	{"5/4",5,4},
 };
 //IDS_GRID_STRING‚É!‹æØ‚è‚Å’Ç‰Á‚·‚é‚±‚ÆB‚±‚±‚Ì•¶Žš—ñ‚ÍÀÞÐ°‚Å‚·B
 
@@ -966,6 +966,7 @@ BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 	switch (message) {
 	case WM_INITDIALOG://ƒ_ƒCƒAƒƒO‚ªŒÄ‚Î‚ê‚½
 	{
+		int cursel = 0;
 		SendDlgItemMessage(hdwnd, IDD_THEMES, LB_ADDSTRING, 0, (LPARAM)"OrgMaker 3 (default)");
 
 		WIN32_FIND_DATA fdFile;
@@ -978,6 +979,7 @@ BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 		char sPath[MAX_PATH];
 		sprintf(sPath, "%s\\*.*", sDir);
 
+		i = 0;
 		if ((hFind = FindFirstFile(sPath, &fdFile)) != INVALID_HANDLE_VALUE)
 		{
 			do
@@ -990,12 +992,18 @@ BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 					if (fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) // It should be a theme folder
 					{
 						SendDlgItemMessage(hdwnd, IDD_THEMES, LB_ADDSTRING, 0, (LPARAM)fdFile.cFileName);
+						++i;
+						if (strlen(gSelectedTheme) > 0 && strcmp(sPath, gSelectedTheme) == 0) {
+							cursel = i;
+						}
 					}
 				}
 			} while (FindNextFile(hFind, &fdFile));
 
 			FindClose(hFind);
 		}
+
+		SendDlgItemMessage(hdwnd, IDD_THEMES, LB_SETCURSEL, (WPARAM)cursel, 0);
 
 		EnableDialogWindow(FALSE);
 		return 1;
@@ -1056,6 +1064,7 @@ BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 	switch (message) {
 	case WM_INITDIALOG://ƒ_ƒCƒAƒƒO‚ªŒÄ‚Î‚ê‚½
 	{
+		int cursel = 0;
 		SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_ADDSTRING, 0, (LPARAM)"Organya (default)");
 
 		WIN32_FIND_DATA fdFile;
@@ -1068,6 +1077,7 @@ BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 		char sPath[MAX_PATH];
 		sprintf(sPath, "%s\\*.wdb", sDir);
 
+		i = 0;
 		if ((hFind = FindFirstFile(sPath, &fdFile)) != INVALID_HANDLE_VALUE)
 		{
 			do
@@ -1080,12 +1090,18 @@ BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 					if (!(fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) // It should be a .wdb file
 					{
 						SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_ADDSTRING, 0, (LPARAM)fdFile.cFileName);
+						++i;
+						if (strlen(gSelectedWave) > 0 && strcmp(sPath, gSelectedWave) == 0) {
+							cursel = i;
+						}
 					}
 				}
 			} while (FindNextFile(hFind, &fdFile));
 
 			FindClose(hFind);
 		}
+
+		SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_SETCURSEL, (WPARAM)cursel, 0);
 
 		EnableDialogWindow(FALSE);
 		return 1;

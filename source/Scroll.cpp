@@ -297,10 +297,10 @@ void ScrollData::KeyScroll(int iDirection)
 		hpos++;
 		break;
 	}
-	if(hpos < 0)hpos = 0;
-	if(vpos > vScrollMax)vpos = vScrollMax;
-	if(hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
-	if(vpos < 0)vpos = 0;
+	if (hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
+	if (vpos > vScrollMax)vpos = vScrollMax;
+	if (hpos < 0)hpos = 0;
+	if (vpos < 0)vpos = 0;
 
 	PrintHorzPosition();
 	scr_info.fMask = SIF_POS;//nPos‚ð—LŒø‚É
