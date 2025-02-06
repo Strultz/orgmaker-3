@@ -21,14 +21,20 @@
 
 static struct S_Sound
 {
-	signed char* samples;
+	signed char samples[4];
+	long ring;
+
+	signed char* buffer;
 	size_t frames;
 	long position;
-	float subPosition;
+	float sub_position;
 	float advance_delta;
+	long silence_count;
+
 	bool playing;
-	bool hasPlayedBefore;
+	long total_samples;
 	bool looping;
+
 	float volume;
 	float pan_l;
 	float pan_r;
@@ -84,7 +90,7 @@ static void S_SetSoundVolume(S_Sound* sound, long volume) {
 	sound->target_volume_l = sound->pan_l * sound->volume;
 	sound->target_volume_r = sound->pan_r * sound->volume;
 
-	if (!sound->playing || !sound->hasPlayedBefore) {
+	if (!sound->playing || sound->total_samples == 0) {
 		sound->volume_l = sound->target_volume_l;
 		sound->volume_r = sound->target_volume_r;
 		sound->vol_ticks = 0;
@@ -108,7 +114,7 @@ static void S_SetSoundPan(S_Sound* sound, long pan) {
 	sound->target_volume_l = sound->pan_l * sound->volume;
 	sound->target_volume_r = sound->pan_r * sound->volume;
 
-	if (!sound->playing || !sound->hasPlayedBefore) {
+	if (!sound->playing || sound->total_samples == 0) {
 		sound->volume_l = sound->target_volume_l;
 		sound->volume_r = sound->target_volume_r;
 		sound->vol_ticks = 0;
@@ -125,20 +131,23 @@ static S_Sound* S_CreateSound(unsigned int frequency, const unsigned char* sampl
 	if (sound == NULL)
 		return NULL;
 
-	sound->samples = (signed char*)malloc(length);
-	if (sound->samples == NULL) {
+	sound->buffer = (signed char*)malloc(length);
+	if (sound->buffer == NULL) {
 		free(sound);
 		return NULL;
 	}
 
 	for (size_t i = 0; i < length; ++i)
-		sound->samples[i] = samples[i] - 0x80;
+		sound->buffer[i] = samples[i] - 0x80;
+
+	memset(sound->samples, 0, 4);
 
 	sound->frames = length;
 	sound->playing = false;
-	sound->hasPlayedBefore = false;
+	sound->total_samples = 0;
 	sound->position = 0;
-	sound->subPosition = 0;
+	sound->sub_position = 0;
+	sound->silence_count = 0;
 
 	S_SetSoundFrequency(sound, frequency);
 	S_SetSoundVolume(sound, 0);
@@ -170,7 +179,7 @@ void S_DestroySound(S_Sound* sound)
 		}
 	}
 
-	free(sound->samples);
+	free(sound->buffer);
 	free(sound);
 
 	ma_mutex_unlock(&mutex);
@@ -181,6 +190,14 @@ static void S_PlaySound(S_Sound* sound, bool looping) {
 		return;
 
 	ma_mutex_lock(&mutex);
+
+	if (!sound->playing) {
+		sound->position = 0;
+
+		if (sound->silence_count == 0) {
+			sound->sub_position = 0;
+		}
+	}
 
 	sound->playing = true;
 	sound->looping = looping;
@@ -195,6 +212,7 @@ static void S_StopSound(S_Sound* sound) {
 	ma_mutex_lock(&mutex);
 
 	sound->playing = false;
+	sound->silence_count = 4;
 
 	ma_mutex_unlock(&mutex);
 }
@@ -212,10 +230,8 @@ static void S_RewindSound(S_Sound* sound) {
 
 static void S_MixSounds(float* stream, size_t frames_total) {
 	for (S_Sound* sound = sound_list_head; sound != NULL; sound = sound->next) {
-		if (sound->playing) {
+		if (sound->playing || sound->silence_count > 0) {
 			float* stream_pointer = stream;
-
-			sound->hasPlayedBefore = TRUE;
 
 			for (size_t frames_done = 0; frames_done < frames_total; ++frames_done) {
 				// Update volume ramp
@@ -227,26 +243,15 @@ static void S_MixSounds(float* stream, size_t frames_total) {
 				}
 
 				// Perform lagrange interpolation
-				const float subsample = sound->subPosition;
+				const float subsample = sound->sub_position;
 				const long sp = sound->position;
 
-				float sample_a;
-				float sample_b;
-				float sample_c;
-				float sample_d;
+				const long margin = sound->ring - 2;
 
-				if (sound->looping) {
-					sample_a = (float)sound->samples[mmodi(sp - 1, sound->frames)] / (float)(1 << 7);
-					sample_b = (float)sound->samples[sp] / (float)(1 << 7);
-					sample_c = (float)sound->samples[mmodi(sp + 1, sound->frames)] / (float)(1 << 7);
-					sample_d = (float)sound->samples[mmodi(sp + 2, sound->frames)] / (float)(1 << 7);
-				}
-				else {
-					sample_a = sp - 1 < 0 ? 0.0F : (float)sound->samples[sp - 1] / (float)(1 << 7);
-					sample_b = (float)sound->samples[sp] / (float)(1 << 7);
-					sample_c = sp + 1 >= sound->frames ? 0.0F : (float)sound->samples[sp + 1] / (float)(1 << 7);
-					sample_d = sp + 2 >= sound->frames ? 0.0F : (float)sound->samples[sp + 2] / (float)(1 << 7);
-				}
+				const float sample_a = (float)sound->samples[mmodi(margin - 1, 4)] / (float)(1 << 7);
+				const float sample_b = (float)sound->samples[mmodi(margin, 4)] / (float)(1 << 7);
+				const float sample_c = (float)sound->samples[mmodi(margin + 1, 4)] / (float)(1 << 7);
+				const float sample_d = (float)sound->samples[mmodi(margin + 2, 4)] / (float)(1 << 7);
 
 				const float c0 = sample_b;
 				const float c1 = sample_c - 1 / 3.0 * sample_a - 1 / 2.0 * sample_b - 1 / 6.0 * sample_d;
@@ -260,23 +265,51 @@ static void S_MixSounds(float* stream, size_t frames_total) {
 				*stream_pointer++ += interpolated_sample * sound->volume_r;
 
 				// Increment sample
-				sound->subPosition += sound->advance_delta;
-                sound->position += (long)sound->subPosition;
-                sound->subPosition = mmodf(sound->subPosition, 1.0F);
+				const long last_position = sound->position;
+
+				sound->sub_position += sound->advance_delta;
+                sound->position += (long)sound->sub_position;
+                sound->sub_position = mmodf(sound->sub_position, 1.0F);
+
+				if (sound->position > last_position) {
+					/* Update ring buffer position and write new sample(s) */
+					for (int i = 0; i < (sound->position - last_position); ++i) {
+						sound->ring = (sound->ring + 1) % 4;
+
+						if (sound->playing) {
+							if (sound->looping) {
+								sound->samples[sound->ring] = (signed long)sound->buffer[(last_position + i) % sound->frames];
+							}
+							else {
+								sound->samples[sound->ring] = (signed long)((last_position + i) >= sound->frames ? 0 : sound->buffer[(last_position + i)]);
+							}
+						}
+						else {
+							sound->samples[sound->ring] = 0;
+							--sound->silence_count;
+						}
+					}
+				}
+
+				++sound->total_samples;
 
 				// Stop or loop sample once it's reached its end
-				if (sound->position >= sound->frames)
-				{
-					if (sound->looping)
+				if (sound->playing) {
+					if (sound->position >= sound->frames)
 					{
-						sound->position = fmodf(sound->position, sound->frames);
+						if (sound->looping)
+						{
+							sound->position = sound->position % sound->frames;
+						}
+						else
+						{
+							sound->playing = FALSE;
+							sound->silence_count = 4;
+						}
 					}
-					else
-					{
-						sound->playing = FALSE;
-						sound->position = 0;
-						break;
-					}
+				}
+				else {
+					sound->position = 0;
 				}
 			}
 		}
