@@ -173,27 +173,28 @@ void LoadRecentFromIniFile(){
 
 void SetMenuRecent(int iMenuNumber, char *strText, int iDisable)
 {
-
-	if(iMenuNumber<0 || iMenuNumber>9)return;
+	int y, i;
+	char strCc[MAX_PATH + 2];
 	HMENU hMenu;
+
+	if (iMenuNumber<0 || iMenuNumber>9) return;
+
 	hMenu=GetMenu(hWnd);
-	char strCc[256];
-	strcpy(strCc,"  &&");
-	itoa((iMenuNumber+1)%10, &strCc[3], 10);
-	strCc[4]='\0';
-	strcat(strCc," ");
-	//strcat(strCc,strText);
-	int y,i;
+
 	y = strlen(strText);
-	for(i=y;i>0;i--)if(strText[i]=='\\'){i++;break;}
-	strcat(strCc,&strText[i]);
-	if(iMenuNumber==0){
-		strcat(strCc,"\tCtrl+Shift+Home");
+	for (i = y; i > 0; --i) {
+		if (strText[i] == '\\') {
+			++i;
+			break;
+		}
 	}
+
+	snprintf(strCc, MAX_PATH + 2, "&%d %s%s", (iMenuNumber + 1) % 10, &strText[i], (iMenuNumber == 0 ? "\tCtrl+Shift+Home" : ""));
+
 	ModifyMenu(hMenu, Menu_Recent[iMenuNumber], MF_BYCOMMAND|MF_STRING, Menu_Recent[iMenuNumber], strCc);
-	if(iDisable){
+	if (iDisable) {
 		EnableMenuItem(hMenu,Menu_Recent[iMenuNumber],MF_BYCOMMAND|MF_GRAYED);
-	}else{
+	} else {
 		EnableMenuItem(hMenu,Menu_Recent[iMenuNumber],MF_BYCOMMAND|MF_ENABLED);
 	}
 }

@@ -400,17 +400,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 			gSelectedWave[0] = 0; // soundbank is gone
 	}
 
-	GetApplicationPath(sDir);
-	strcat(sDir, "soundbanks");
-	CreateDirectory(sDir, NULL);
-
-	GetPrivateProfileString(MAIN_WINDOW, "CurrentWavePath", NULL, gSelectedWave, MAX_PATH, app_path); //2024.05.19
-	if (strlen(gSelectedWave) > 0) {
-		DWORD dwAttrib = GetFileAttributes(gSelectedWave);
-		if (dwAttrib == INVALID_FILE_ATTRIBUTES || dwAttrib & FILE_ATTRIBUTE_DIRECTORY)
-			gSelectedWave[0] = 0; // soundbank is gone
-	}
-
 //Image initialization //////////
 	if (!StartGDI(hWnd)) { //GDI ready
 		QuitMMTimer();
@@ -438,6 +427,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	hDlgPlayer = CreateDialog(hInst,"PLAYER",hWnd,DialogPlayer);
 	hDlgTrack = CreateDialog(hInst,"TRACK",hWnd,DialogTrack);
 	hDlgEZCopy = CreateDialog(hInst,"COPYBD",hWnd,DialogEZCopy);
+
+	HMENU hMenu;
+	hMenu = GetMenu(hWnd);
+
 	//hDlgShortCutList = CreateDialog(hInst,"DLGSHORTCUTINFO",hWnd,DialogShortCut);
 	WinRect.left=GetPrivateProfileInt(TRACK_WINDOW,"left",200,app_path);
 	WinRect.top=GetPrivateProfileInt(TRACK_WINDOW,"top",200,app_path);
@@ -449,7 +442,14 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	WinRect.top=GetPrivateProfileInt(COPY_WINDOW,"top",380,app_path);
 	SetWindowPos(hDlgEZCopy,NULL,WinRect.left,WinRect.top,0,0,SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);
 	EZCopyWindowState = GetPrivateProfileInt(COPY_WINDOW,"show",1,app_path);
-	if(EZCopyWindowState==0)ShowWindow(hDlgEZCopy, SW_HIDE);
+	if (EZCopyWindowState == 0) {
+		ShowWindow(hDlgEZCopy, SW_HIDE);
+		CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_UNCHECKED));
+	}
+	else {
+		ShowWindow(hDlgEZCopy, SW_SHOWNOACTIVATE);
+		CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_CHECKED));
+	}
 	SaveWithInitVolFile = GetPrivateProfileInt(INIT_DATA,"autosave",0,app_path);
 	ChangeAutoLoadMode(SaveWithInitVolFile);
 	org_data.InitOrgData();
@@ -635,6 +635,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 	RECT rect = {0,0,WWidth,WHeight};//Area to update (track change)
 	MUSICINFO mi;
 	MINMAXINFO *pmmi;
+	HMENU hMenu;
 
 	
 
@@ -656,13 +657,15 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		//return FALSE;
 		}
 		if(LOWORD(wParam)==IDM_EZCOPYVISIBLE || LOWORD(wParam)==ID_AC_SHOWEZCOPY){
+			hMenu = GetMenu(hWnd);
 			if(EZCopyWindowState==0){
 				EZCopyWindowState=1;
 				ShowWindow(hDlgEZCopy, SW_SHOWNOACTIVATE);
+				CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_CHECKED));
 			}else{
 				EZCopyWindowState=0;
 				ShowWindow(hDlgEZCopy, SW_HIDE);
-
+				CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_UNCHECKED));
 			}
 		}
 		for(i=0;i<10;i++){	//recently used files

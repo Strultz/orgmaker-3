@@ -104,12 +104,12 @@ BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 				EnableMenuItem(hmenu,0,MF_BYPOSITION|MF_DISABLED);
 				EnableMenuItem(hmenu,1,MF_BYPOSITION|MF_DISABLED);
 				EnableMenuItem(hmenu,2,MF_BYPOSITION|MF_DISABLED);
-				//EnableMenuItem(hmenu,5,MF_BYPOSITION|MF_DISABLED);
-				EnableMenuItem(hmenu,4,MF_BYPOSITION|MF_DISABLED);
 				EnableMenuItem(hmenu,3,MF_BYPOSITION|MF_DISABLED);
-				EnableMenuItem(hmenu,6,MF_BYPOSITION|MF_DISABLED);
-				EnableMenuItem(hmenu,7,MF_BYPOSITION|MF_DISABLED);
-				EnableMenuItem(hmenu,8,MF_BYPOSITION|MF_DISABLED);
+				EnableMenuItem(hmenu,4,MF_BYPOSITION|MF_DISABLED);
+				//EnableMenuItem(hmenu,5,MF_BYPOSITION|MF_DISABLED);
+				//EnableMenuItem(hmenu,6,MF_BYPOSITION|MF_DISABLED);
+				//EnableMenuItem(hmenu,7,MF_BYPOSITION|MF_DISABLED);
+				//EnableMenuItem(hmenu,8,MF_BYPOSITION|MF_DISABLED);
 				//DragAcceptFiles(hWnd,FALSE);//ドラッグ禁止
 				//トラック ミュート のチェック
 				for(i = 0; i < MAXTRACK; i++){
@@ -140,12 +140,12 @@ BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 				EnableMenuItem(hmenu,0,MF_BYPOSITION|MF_ENABLED);
 				EnableMenuItem(hmenu,1,MF_BYPOSITION|MF_ENABLED);
 				EnableMenuItem(hmenu,2,MF_BYPOSITION|MF_ENABLED);
-				//EnableMenuItem(hmenu,5,MF_BYPOSITION|MF_ENABLED);
-				EnableMenuItem(hmenu,4,MF_BYPOSITION|MF_ENABLED);
 				EnableMenuItem(hmenu,3,MF_BYPOSITION|MF_ENABLED);
-				EnableMenuItem(hmenu,6,MF_BYPOSITION|MF_ENABLED);
-				EnableMenuItem(hmenu,7,MF_BYPOSITION|MF_ENABLED);
-				EnableMenuItem(hmenu,8,MF_BYPOSITION|MF_ENABLED);
+				EnableMenuItem(hmenu,4,MF_BYPOSITION|MF_ENABLED);
+				//EnableMenuItem(hmenu,5,MF_BYPOSITION|MF_ENABLED);
+				//EnableMenuItem(hmenu,6,MF_BYPOSITION|MF_ENABLED);
+				//EnableMenuItem(hmenu,7,MF_BYPOSITION|MF_ENABLED);
+				//EnableMenuItem(hmenu,8,MF_BYPOSITION|MF_ENABLED);
 				//DragAcceptFiles(hWnd,TRUE);//ドラッグ許可
 				org_data.GetMusicInfo(&mi);
 				QuitMMTimer(); // Quit timer first
@@ -203,12 +203,12 @@ BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 				EnableMenuItem(hmenu, 0, MF_BYPOSITION | MF_ENABLED);
 				EnableMenuItem(hmenu, 1, MF_BYPOSITION | MF_ENABLED);
 				EnableMenuItem(hmenu, 2, MF_BYPOSITION | MF_ENABLED);
-				//EnableMenuItem(hmenu,5,MF_BYPOSITION|MF_ENABLED);
-				EnableMenuItem(hmenu, 4, MF_BYPOSITION | MF_ENABLED);
 				EnableMenuItem(hmenu, 3, MF_BYPOSITION | MF_ENABLED);
-				EnableMenuItem(hmenu, 6, MF_BYPOSITION | MF_ENABLED);
-				EnableMenuItem(hmenu, 7, MF_BYPOSITION | MF_ENABLED);
-				EnableMenuItem(hmenu, 8, MF_BYPOSITION | MF_ENABLED);
+				EnableMenuItem(hmenu, 4, MF_BYPOSITION | MF_ENABLED);
+				//EnableMenuItem(hmenu,5,MF_BYPOSITION|MF_ENABLED);
+				//EnableMenuItem(hmenu, 6, MF_BYPOSITION | MF_ENABLED);
+				//EnableMenuItem(hmenu, 7, MF_BYPOSITION | MF_ENABLED);
+				//EnableMenuItem(hmenu, 8, MF_BYPOSITION | MF_ENABLED);
 				DragAcceptFiles(hWnd, TRUE);//ドラッグ許可
 				org_data.GetMusicInfo(&mi);
 				QuitMMTimer(); // Quit timer first

@@ -741,7 +741,7 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		if (waveBmp != NULL) {
 			HBITMAP oldBmp = (HBITMAP)SendDlgItemMessage(hdwnd, IDC_WAVE100, STM_SETIMAGE, IMAGE_BITMAP, (long)waveBmp);
-			if (oldBmp != NULL) DeleteObject(oldBmp);
+			if (oldBmp != NULL && oldBmp != waveBmp) DeleteObject(oldBmp);
 		}
 		return 1;
 	case WM_COMMAND:
