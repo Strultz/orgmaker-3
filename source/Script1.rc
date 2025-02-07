@@ -906,7 +906,6 @@ BEGIN
     END
     POPUP "&Song"
     BEGIN
-        MENUITEM "&Instruments...\tF1",         IDM_DLGWAVE
         MENUITEM "Song &Properties...\tF2",     IDM_DLGSETTING
         MENUITEM "&Default Pan/Volume...\tF3",  IDM_DLGDEFAULT
         MENUITEM SEPARATOR
@@ -938,7 +937,7 @@ BEGIN
     END
     POPUP "&Help"
     BEGIN
-        MENUITEM "&Help...\tCtrl+Alt+H",        IDM_DLGHELP
+        MENUITEM "&Help...\tF1",        IDM_DLGHELP
         MENUITEM SEPARATOR
         MENUITEM "&About OrgMaker",             IDM_DLGMEMO
     END
@@ -1014,10 +1013,7 @@ B_LOUPE_PLUS            BITMAP                  "Bitmap\\Loupe_PLUS.bmp"
 
 B_LOUPE_MINUS           BITMAP                  "Bitmap\\Loupe_MINUS.bmp"
 
-FILE_TOOLBAR_ICONS      BITMAP                  "Bitmap\\FILE_TOOLBAR_ICONS.bmp"
-
-PLAYER_TOOLBAR_ICONS    BITMAP                  "Bitmap\\PLAYER_TOOLBAR_ICONS.bmp"
-
+TOOLBAR_ICONS           BITMAP                  "Bitmap\\TOOLBAR_ICONS.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

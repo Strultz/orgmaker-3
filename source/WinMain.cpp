@@ -1636,9 +1636,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		break;
 	}
 	case WM_SIZE:
-		SendMessage(hwndRebar, WM_SIZE, 0, 0);
-		rebarHeight = GetRebarHeight(hwndRebar);
 		WWidth = LOWORD(lParam);	//Client area size
+		MoveWindow(hwndRebar, 0, 0, WWidth, GetRebarHeight(hwndRebar), TRUE);
+		rebarHeight = GetRebarHeight(hwndRebar);
 		WHeight = HIWORD(lParam) - rebarHeight;
 		rect.right = WWidth;		//A 2008/05/14
 		rect.bottom = WHeight;		//A 2008/05/14
