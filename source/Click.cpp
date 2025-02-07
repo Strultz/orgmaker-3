@@ -178,6 +178,9 @@ void MouseDrag(WPARAM wParam, LPARAM lParam)
 	line = mi.line;
 	//マウスの座標を取得
 	mouse_data.GetMousePosition(&mouse_x,&mouse_y);
+
+	if (mouse_x < 0 || mouse_y < 0) return;
+
 	ptx = (mouse_x - KEYWIDTH)/NoteWidth + scr_h;
 	
 	long Ry;	// 2010.08.14 
@@ -363,6 +366,8 @@ void ClickProcL(WPARAM wParam, LPARAM lParam)
 	//マウスの座標を取得
 	mouse_data.GetMousePosition(&mouse_x,&mouse_y);
 
+	if (mouse_x < 0 || mouse_y < 0) return;
+
 	//Shiftが押されていたらSelect(範囲選択)扱い
 	if(shift_down == 1 && mouse_y < WHeight+288-WHNM+144){
 		mouse_y = WHeight+288-WHNM+144 + 8;
@@ -518,6 +523,8 @@ void ClickProcR(WPARAM wParam, LPARAM lParam)
 	//マウスの座標を取得
 	mouse_data.GetMousePosition(&mouse_x,&mouse_y);
 
+	if (mouse_x < 0 || mouse_y < 0) return;
+
 	if(GetKeyState(VK_TAB)<0){
 		mouse_y = WHeight+288-WHNM+144 + 8;
 	}
@@ -606,6 +613,8 @@ void ClickProcM(WPARAM wParam, LPARAM lParam)
 	line = mi.line;
 	//マウスの座標を取得
 	mouse_data.GetMousePosition(&mouse_x,&mouse_y);
+
+	if (mouse_x < 0 || mouse_y < 0) return;
 	if(mouse_x < 64)return;
 
 	if(mouse_y >= 0 && mouse_y < WHeight+288-WHNM){

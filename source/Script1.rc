@@ -63,62 +63,112 @@ CURSOR                  CURSOR                  "bitmap\\cursor.cur"
 // Dialog
 //
 
-DLGSETTING DIALOGEX 0, 0, 151, 223
-STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Song Properties"
-FONT 9, "MS PGothic", 0, 0, 0x1
+IDD_DLGSETTING DIALOGEX 0, 0, 213, 148
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_CHILD | WS_VISIBLE | WS_CAPTION
+CAPTION "General"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    GROUPBOX        "&Tempo",IDC_STATIC,4,1,140,46
-    RTEXT           "&Wait (ms.)",IDC_STATIC,16,13,29,10
-    EDITTEXT        IDD_SETWAIT,49,12,20,12,ES_RIGHT | ES_NUMBER
-    RTEXT           "&BPM",IDC_STATIC,79,13,14,10
-    EDITTEXT        IDC_BPM,97,12,34,12, ES_RIGHT
-    GROUPBOX        "Repeat &Range",IDC_STATIC,4,53,68,42
-    LTEXT           "Start",IDC_STATIC,13,67,20,8
-    EDITTEXT        IDD_REP_MEAS,34,65,16,12,ES_NUMBER
-    EDITTEXT        IDD_REP_BEAT,52,65,16,12,ES_NUMBER
-    LTEXT           "End",IDC_STATIC,13,80,20,8
-    EDITTEXT        IDD_END_MEAS,34,79,16,12,ES_NUMBER
-    EDITTEXT        IDD_END_BEAT,52,79,16,12,ES_NUMBER
-    GROUPBOX        "Display &Grid",IDC_STATIC,4,99,68,120
-    LISTBOX         IDD_LB1,10,110,58,78,LBS_NOINTEGRALHEIGHT | LBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Custom",IDC_STATIC,7,191,40,8
-    EDITTEXT        IDD_GRIDEDIT1,7,202,15,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Beat",IDC_STATIC,23,205,15,8
-    EDITTEXT        IDD_GRIDEDIT2,39,202,15,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Step",IDC_STATIC,56,205,15,8
-    GROUPBOX        "Freq. (1000)",IDC_STATIC,76,53,49,142
-    LTEXT           "1",IDC_STATIC,81,66,8,8
-    EDITTEXT        IDD_SETFREQ0,91,63,28,12,ES_RIGHT | ES_NUMBER
-    LTEXT           "2",IDC_STATIC,81,82,8,8
-    EDITTEXT        IDD_SETFREQ1,91,79,28,12,ES_RIGHT | ES_NUMBER
-    LTEXT           "3",IDC_STATIC,81,98,8,8
-    EDITTEXT        IDD_SETFREQ2,91,95,28,12,ES_RIGHT | ES_NUMBER
-    LTEXT           "4",IDC_STATIC,81,114,8,8
-    EDITTEXT        IDD_SETFREQ3,91,111,28,12,ES_RIGHT | ES_NUMBER
-    LTEXT           "5",IDC_STATIC,81,133,8,8
-    EDITTEXT        IDD_SETFREQ4,91,130,28,12,ES_RIGHT | ES_NUMBER
-    LTEXT           "6",IDC_STATIC,81,149,8,8
-    EDITTEXT        IDD_SETFREQ5,91,146,28,12,ES_RIGHT | ES_NUMBER
-    LTEXT           "7",IDC_STATIC,81,165,8,8
-    EDITTEXT        IDD_SETFREQ6,91,162,28,12,ES_RIGHT | ES_NUMBER
-    LTEXT           "8",IDC_STATIC,81,181,8,8
-    EDITTEXT        IDD_SETFREQ7,91,178,28,12,ES_RIGHT | ES_NUMBER
-    GROUPBOX        "Pi",IDC_STATIC,128,53,16,142
-    CONTROL         "",IDC_CHECK_PIPI0,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,65,8,8
-    CONTROL         "",IDC_CHECK_PIPI1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,81,8,8
-    CONTROL         "",IDC_CHECK_PIPI2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,97,8,8
-    CONTROL         "",IDC_CHECK_PIPI3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,113,8,8
-    CONTROL         "",IDC_CHECK_PIPI4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,132,8,8
-    CONTROL         "",IDC_CHECK_PIPI5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,148,8,8
-    CONTROL         "",IDC_CHECK_PIPI6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,164,8,8
-    CONTROL         "",IDC_CHECK_PIPI7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,180,8,8
-    DEFPUSHBUTTON   "OK",IDOK,76,201,39,18
-    PUSHBUTTON      "Cancel",IDCANCEL,117,201,29,18
-    LTEXT           "Enter wait value or beats per minute (BPM).\nBPM will be converted to a valid wait value.",IDC_STATIC,10,27,131,17
+    GROUPBOX        "&Tempo",IDC_STATIC,12,4,80,56
+    LTEXT           "&Wait (ms.)",IDC_STATIC,20,18,36,8
+    EDITTEXT        IDD_SETWAIT,56,16,28,12,ES_NUMBER
+    LTEXT           "&BPM",IDC_STATIC,20,42,16,8
+    EDITTEXT        IDC_BPM,36,40,48,12
+    GROUPBOX        "Display &Grid",IDC_STATIC,104,4,96,112
+    LISTBOX         IDD_LB1,112,16,80,76,LBS_NOINTEGRALHEIGHT | LBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDD_GRIDEDIT1,132,96,15,12,ES_NUMBER
+    LTEXT           "Beat",IDC_STATIC,112,98,16,8
+    EDITTEXT        IDD_GRIDEDIT2,176,96,16,12,ES_NUMBER
+    LTEXT           "Step",IDC_STATIC,156,98,16,8
+    GROUPBOX        "Repeat &Range",IDC_STATIC,12,68,80,48
+    LTEXT           "Start",IDC_STATIC,20,82,20,8
+    EDITTEXT        IDD_REP_MEAS,44,80,20,12,ES_RIGHT | ES_NUMBER
+    EDITTEXT        IDD_REP_BEAT,64,80,20,12,ES_NUMBER
+    LTEXT           "End",IDC_STATIC,20,98,16,8
+    EDITTEXT        IDD_END_MEAS,44,96,20,12,ES_RIGHT | ES_NUMBER
+    EDITTEXT        IDD_END_BEAT,64,96,20,12,ES_NUMBER
+    CTEXT           "- or -",IDC_STATIC,20,29,64,8
+    LTEXT           "Note: Entering a BPM value will automatically convert it to a valid Wait value.",IDC_STATIC,12,124,188,20
 END
-//PUSHBUTTON      "<",IDC_BTN1,64,12,11,12,0,WS_EX_STATICEDGE
-//PUSHBUTTON      ">",IDC_BTN2,75,12,11,12,0,WS_EX_STATICEDGE
+
+IDD_DLGWAVE DIALOGEX 0, 0, 213, 148
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_CHILD | WS_VISIBLE | WS_CAPTION
+CAPTION "Melody"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Wave-00",IDC_WAVE1,45,16,40,12
+    EDITTEXT        IDC_FREQ1,121,16,28,12,ES_NUMBER
+    CONTROL         "Pizzicato",IDC_PI1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,165,17,40,8
+    LTEXT           "Finetune",IDC_STATIC,89,17,32,8
+    CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_ARROWKEYS,149,16,11,12
+    LTEXT           "Channel &1",IDC_STATIC,9,17,36,8
+    PUSHBUTTON      "Wave-00",IDC_WAVE2,45,32,40,12
+    EDITTEXT        IDC_FREQ2,121,32,28,12,ES_NUMBER
+    CONTROL         "Pizzicato",IDC_PI2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,165,33,40,8
+    LTEXT           "Finetune",IDC_STATIC,89,33,32,8
+    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_ARROWKEYS,149,32,11,12
+    LTEXT           "Channel &2",IDC_STATIC,9,33,36,8
+    PUSHBUTTON      "Wave-00",IDC_WAVE3,45,48,40,12
+    EDITTEXT        IDC_FREQ3,121,48,28,12,ES_NUMBER
+    CONTROL         "Pizzicato",IDC_PI3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,165,49,40,8
+    LTEXT           "Finetune",IDC_STATIC,89,49,32,8
+    CONTROL         "",IDC_SPIN3,"msctls_updown32",UDS_ARROWKEYS,149,48,11,12
+    LTEXT           "Channel &3",IDC_STATIC,9,49,36,8
+    PUSHBUTTON      "Wave-00",IDC_WAVE4,45,64,40,12
+    EDITTEXT        IDC_FREQ4,121,64,28,12,ES_NUMBER
+    CONTROL         "Pizzicato",IDC_PI4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,165,65,40,8
+    LTEXT           "Finetune",IDC_STATIC,89,65,32,8
+    CONTROL         "",IDC_SPIN4,"msctls_updown32",UDS_ARROWKEYS,149,64,11,12
+    LTEXT           "Channel &4",IDC_STATIC,9,65,36,8
+    PUSHBUTTON      "Wave-00",IDC_WAVE5,45,80,40,12
+    EDITTEXT        IDC_FREQ5,121,80,28,12,ES_NUMBER
+    CONTROL         "Pizzicato",IDC_PI5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,165,81,40,8
+    LTEXT           "Finetune",IDC_STATIC,89,81,32,8
+    CONTROL         "",IDC_SPIN5,"msctls_updown32",UDS_ARROWKEYS,149,80,11,12
+    LTEXT           "Channel &5",IDC_STATIC,9,81,36,8
+    PUSHBUTTON      "Wave-00",IDC_WAVE9,45,96,40,12
+    EDITTEXT        IDC_FREQ6,121,96,28,12,ES_NUMBER
+    CONTROL         "Pizzicato",IDC_PI6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,165,97,40,8
+    LTEXT           "Finetune",IDC_STATIC,89,97,32,8
+    CONTROL         "",IDC_SPIN9,"msctls_updown32",UDS_ARROWKEYS,149,96,11,12
+    LTEXT           "Channel &6",IDC_STATIC,9,97,36,8
+    PUSHBUTTON      "Wave-00",IDC_WAVE10,45,112,40,12
+    EDITTEXT        IDC_FREQ7,121,112,28,12,ES_NUMBER
+    CONTROL         "Pizzicato",IDC_PI7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,165,113,40,8
+    LTEXT           "Finetune",IDC_STATIC,89,113,32,8
+    CONTROL         "",IDC_SPIN10,"msctls_updown32",UDS_ARROWKEYS,149,112,11,12
+    LTEXT           "Channel &7",IDC_STATIC,9,113,36,8
+    PUSHBUTTON      "Wave-00",IDC_WAVE11,45,128,40,12
+    EDITTEXT        IDC_FREQ8,121,128,28,12,ES_NUMBER
+    CONTROL         "Pizzicato",IDC_PI8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,165,129,40,8
+    LTEXT           "Finetune",IDC_STATIC,89,129,32,8
+    CONTROL         "",IDC_SPIN11,"msctls_updown32",UDS_ARROWKEYS,149,128,11,12
+    LTEXT           "Channel &8",IDC_STATIC,9,129,36,8
+    GROUPBOX        "Instruments",IDC_STATIC,4,4,204,140
+END
+
+IDD_DLGPERC DIALOGEX 0, 0, 213, 104
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_CHILD | WS_VISIBLE | WS_CAPTION
+CAPTION "Percussion"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Bass01",IDC_WAVEQ,56,16,44,12
+    LTEXT           "Channel &Q",IDC_STATIC,16,18,36,8
+    PUSHBUTTON      "Bass01",IDC_WAVEW,152,16,44,12
+    LTEXT           "Channel &W",IDC_STATIC,112,18,36,8
+    PUSHBUTTON      "Bass01",IDC_WAVEE,56,36,44,12
+    LTEXT           "Channel &E",IDC_STATIC,16,38,36,8
+    PUSHBUTTON      "Bass01",IDC_WAVER,152,36,44,12
+    LTEXT           "Channel &R",IDC_STATIC,112,38,36,8
+    PUSHBUTTON      "Bass01",IDC_WAVET,56,56,44,12
+    LTEXT           "Channel &T",IDC_STATIC,16,58,36,8
+    PUSHBUTTON      "Bass01",IDC_WAVEY,152,56,44,12
+    LTEXT           "Channel &Y",IDC_STATIC,112,58,36,8
+    PUSHBUTTON      "Bass01",IDC_WAVEU,56,76,44,12
+    LTEXT           "Channel &U",IDC_STATIC,16,78,36,8
+    PUSHBUTTON      "Bass01",IDC_WAVEI,152,76,44,12
+    LTEXT           "Channel &I",IDC_STATIC,112,78,36,8
+    GROUPBOX        "Instruments",IDC_STATIC,8,4,196,92
+END
 
 PLAYER DIALOGEX 405, 465, 209, 20
 STYLE DS_SETFONT | WS_POPUP | WS_VISIBLE | WS_BORDER
@@ -677,10 +727,10 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
 CAPTION "Soundbanks"
 FONT 9, "MS PGothic", 0, 0, 0x1
 BEGIN
-DEFPUSHBUTTON   "OK", IDOK, 198, 155, 50, 14
-PUSHBUTTON      "Cancel", IDCANCEL, 252, 155, 50, 14
-LISTBOX         IDD_WAVEDBS, 4, 4, 301, 147, LBS_NOINTEGRALHEIGHT | LBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
-PUSHBUTTON      "Open Soundbank Folder", IDC_OPNTHMFLD, 7, 155, 80, 14
+    DEFPUSHBUTTON   "OK",IDOK,198,155,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,252,155,50,14
+    LISTBOX         IDD_WAVEDBS,4,4,301,147,LBS_NOINTEGRALHEIGHT | LBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Open Soundbank Folder",IDC_OPNTHMFLD,7,155,80,14
 END
 
 DLGWAVEXPORT DIALOG 0, 0, 135, 76
@@ -688,16 +738,16 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
 CAPTION "WAV Export"
 FONT 9, "MS PGothic"
 BEGIN
-EDITTEXT        IDE_SAMPLE_RATE, 8, 14, 30, 12
-EDITTEXT        IDE_LOOP_COUNT, 48, 14, 30, 12
-EDITTEXT        IDE_FADE_MSECONDS, 88, 14, 30, 12
-DEFPUSHBUTTON   "OK", IDOK, 60, 58, 32, 14
-PUSHBUTTON      "Cancel", IDCANCEL, 96, 58, 32, 14
-LTEXT           "Sample Rate", IDC_STATIC, 7, 4, 70, 8
-LTEXT           "Loop Count", IDC_STATIC, 47, 4, 70, 8
-LTEXT           "Fade Out (ms)", IDC_STATIC, 87, 4, 70, 8
-LTEXT           "0 loops will play the song once.", IDC_EXPORTTEXT, 7, 30, 120, 8
-AUTOCHECKBOX    "Separate channel export", IDC_EXPORTSEPARATE, 9, 44, 86, 8
+    EDITTEXT        IDE_SAMPLE_RATE,8,14,30,12
+    EDITTEXT        IDE_LOOP_COUNT,48,14,30,12
+    EDITTEXT        IDE_FADE_MSECONDS,88,14,30,12
+    DEFPUSHBUTTON   "OK",IDOK,60,58,32,14
+    PUSHBUTTON      "Cancel",IDCANCEL,96,58,32,14
+    LTEXT           "Sample Rate",IDC_STATIC,7,4,70,8
+    LTEXT           "Loop Count",IDC_STATIC,47,4,70,8
+    LTEXT           "Fade Out (ms)",IDC_STATIC,87,4,70,8
+    LTEXT           "0 loops will play the song once.",IDC_EXPORTTEXT,7,30,120,8
+    CONTROL         "Separate channel export",IDC_EXPORTSEPARATE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,44,86,8
 END
 
 DLGDCLEN DIALOG 0, 0, 108, 68
@@ -705,182 +755,13 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
 CAPTION "Setup Decay Length"
 FONT 9, "MS PGothic"
 BEGIN
-EDITTEXT        IDE_VOL_LENGTH, 52, 4, 24, 12
-DEFPUSHBUTTON   "OK", IDOK, 30, 50, 32, 14
-PUSHBUTTON      "Cancel", IDCANCEL, 66, 50, 32, 14
-LTEXT           "Decay Length", IDC_STATIC, 7, 6, 40, 8
-AUTOCHECKBOX    "Use note length instead", IDC_VOL_USENOTELEN, 9, 21, 86, 8
-AUTOCHECKBOX    "Shorten notes if too long", IDC_VOL_SETNOTELEN, 9, 35, 94, 8
+    EDITTEXT        IDE_VOL_LENGTH,52,4,24,12
+    DEFPUSHBUTTON   "OK",IDOK,30,50,32,14
+    PUSHBUTTON      "Cancel",IDCANCEL,66,50,32,14
+    LTEXT           "Decay Length",IDC_STATIC,7,6,40,8
+    CONTROL         "Use note length instead",IDC_VOL_USENOTELEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,21,86,8
+    CONTROL         "Shorten notes if too long",IDC_VOL_SETNOTELEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,35,94,8
 END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
-BEGIN
-    "DLGSETTING", DIALOG
-    BEGIN
-        LEFTMARGIN, 4
-        RIGHTMARGIN, 144
-    END
-
-    "PLAYER", DIALOG
-    BEGIN
-        RIGHTMARGIN, 170
-        BOTTOMMARGIN, 18
-    END
-    
-    "TRACK", DIALOG
-    BEGIN
-        VERTGUIDE, 80
-        VERTGUIDE, 88
-        TOPMARGIN, 2
-        BOTTOMMARGIN, 35
-    END
-    
-    "DLGWAVE", DIALOG
-    BEGIN
-        LEFTMARGIN, 4
-        RIGHTMARGIN, 576
-        TOPMARGIN, 3
-        BOTTOMMARGIN, 402
-    END
-
-    "DLGDELETE", DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 71
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 44
-    END
-
-    "DLGCOPY", DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 111
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 94
-    END
-
-    "DLGPAN", DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 79
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 76
-    END
-
-    "DLGTRANS", DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 79
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 76
-    END
-
-    "DLGVOLUME", DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 79
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 76
-    END
-
-    "DLGUSED", DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 168
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 132
-    END
-
-    "DLGMEMO", DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 112
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 110
-    END
-
-    "DLGCOPY2", DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 168
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 138
-    END
-
-    "DLGDEFAULT", DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 164
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 260
-    END
-
-    "DLGHELP", DIALOG
-    BEGIN
-        RIGHTMARGIN, 362
-        TOPMARGIN, 1
-        BOTTOMMARGIN, 322
-    END
-
-    "COPYBD", DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 538
-        TOPMARGIN, 1
-        BOTTOMMARGIN, 27
-    END
-
-    IDD_DIALOGOPEN, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 262
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 164
-    END
-
-    "DLGSWAP", DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 92
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 38
-    END
-
-    IDD_MIDI, DIALOG
-    BEGIN
-    END
-
-    "DLGTHEMES", DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 302
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 169
-    END
-
-    "DLGWAVEDBS", DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 302
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 169
-    END
-
-    "DLGWAVEXPORT", DIALOG
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 128
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 55
-    END
-END
-#endif    // APSTUDIO_INVOKED
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -892,26 +773,26 @@ ORGANYAMENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "&New\tCtrl+Alt+I",            IDM_INIT
+        MENUITEM "&New\tCtrl+N",                IDM_INIT
         MENUITEM "&Open...\tCtrl+O",            IDM_LOAD
         POPUP "Open &Recent"
         BEGIN
-            MENUITEM "1", IDM_RECENT1
-            MENUITEM "2", IDM_RECENT2
-            MENUITEM "3", IDM_RECENT3
-            MENUITEM "4", IDM_RECENT4
-            MENUITEM "5", IDM_RECENT5
-            MENUITEM "6", IDM_RECENT6
-            MENUITEM "7", IDM_RECENT7
-            MENUITEM "8", IDM_RECENT8
-            MENUITEM "9", IDM_RECENT9
-            MENUITEM "0", IDM_RECENT0
-            MENUITEM "&Clear Recent Files", IDM_RECENT_CLEAR
+            MENUITEM "1",                           IDM_RECENT1
+            MENUITEM "2",                           IDM_RECENT2
+            MENUITEM "3",                           IDM_RECENT3
+            MENUITEM "4",                           IDM_RECENT4
+            MENUITEM "5",                           IDM_RECENT5
+            MENUITEM "6",                           IDM_RECENT6
+            MENUITEM "7",                           IDM_RECENT7
+            MENUITEM "8",                           IDM_RECENT8
+            MENUITEM "9",                           IDM_RECENT9
+            MENUITEM "0",                           IDM_RECENT0
+            MENUITEM "&Clear Recent Files",         IDM_RECENT_CLEAR
         END
         MENUITEM "&Save\tCtrl+S",               IDM_SAVEOVER
         MENUITEM "Save &As...\tCtrl+Shift+S",   IDM_SAVENEW
         MENUITEM SEPARATOR
-        MENUITEM "Export &WAV File (*.wav)...\tCtrl+Alt+W",  IDM_EXPORT_WAV
+        MENUITEM "Export &WAV File (*.wav)...\tCtrl+Alt+W", IDM_EXPORT_WAV
         MENUITEM "Export &MIDI File (*.mid)...\tCtrl+Alt+M", IDM_EXPORT_MIDI
         MENUITEM SEPARATOR
         MENUITEM "&Quit",                       IDM_EXIT
@@ -925,7 +806,7 @@ BEGIN
         MENUITEM "&Deselect\tCtrl+D",           IDM_SELECT_RESET
         MENUITEM "&Copy...\tCtrl+F2",           IDM_DLGCOPY
         MENUITEM "&Multi-Copy...\tCtrl+F3",     IDM_DLGCOPY2
-        MENUITEM "&Delete...\tCtrl+Del", IDM_DLGDELETE
+        MENUITEM "&Delete...\tCtrl+Del",        IDM_DLGDELETE
         MENUITEM SEPARATOR
         MENUITEM "&Pan...\tCtrl+F4",            IDM_DLGPAN
         MENUITEM "&Volume...\tF4",              IDM_DLGVOL
@@ -934,25 +815,25 @@ BEGIN
         MENUITEM SEPARATOR
         POPUP "&Note Volume (Existing Notes Only)"
         BEGIN
-            MENUITEM "(&1) Fade Out (very slow)", IDM_CT_L1
-            MENUITEM "(&2) Fade Out (slow)",      IDM_CT_L2
-            MENUITEM "(&3) Fade Out (linear)",    IDM_CT_L3
-            MENUITEM "(&4) Fade Out (fast)",      IDM_CT_L4
-            MENUITEM "(&5) Fade Out (very fast)", IDM_CT_L5
-            MENUITEM "(&6) Default Value",        IDM_CT_L6
-            MENUITEM "(&7) Fade Out (s-curve)",   IDM_CT_L7
+            MENUITEM "(&1) Fade Out (very slow)",   IDM_CT_L1
+            MENUITEM "(&2) Fade Out (slow)",        IDM_CT_L2
+            MENUITEM "(&3) Fade Out (linear)",      IDM_CT_L3
+            MENUITEM "(&4) Fade Out (fast)",        IDM_CT_L4
+            MENUITEM "(&5) Fade Out (very fast)",   IDM_CT_L5
+            MENUITEM "(&6) Default Value",          IDM_CT_L6
+            MENUITEM "(&7) Fade Out (s-curve)",     IDM_CT_L7
             MENUITEM "(&8) Fade Out (small, at end)", IDM_CT_L8
-            MENUITEM "(&9) Tremolo Decay",        IDM_CT_L9
+            MENUITEM "(&9) Tremolo Decay",          IDM_CT_L9
             MENUITEM SEPARATOR
-            MENUITEM "(&1) Random",               IDM_CT_L10
+            MENUITEM "(&1) Random",                 IDM_CT_L10
             MENUITEM "(&2) Fade From Start to End", IDM_CT_L11
-            MENUITEM "(&3) Fade In (slow)",       IDM_CT_L12
-            MENUITEM "(&4) Fade In (linear)",     IDM_CT_L13
-            MENUITEM "(&5) (none)",               IDM_CT_L14, GRAYED
-            MENUITEM "(&6) (none)",               IDM_CT_L15, GRAYED
-            MENUITEM "(&7) (none)",               IDM_CT_L16, GRAYED
-            MENUITEM "(&8) (none)",               IDM_CT_L17, GRAYED
-            MENUITEM "(&9) (none)",               IDM_CT_L18, GRAYED
+            MENUITEM "(&3) Fade In (slow)",         IDM_CT_L12
+            MENUITEM "(&4) Fade In (linear)",       IDM_CT_L13
+            MENUITEM "(&5) (none)",                 IDM_CT_L14, GRAYED
+            MENUITEM "(&6) (none)",                 IDM_CT_L15, GRAYED
+            MENUITEM "(&7) (none)",                 IDM_CT_L16, GRAYED
+            MENUITEM "(&8) (none)",                 IDM_CT_L17, GRAYED
+            MENUITEM "(&9) (none)",                 IDM_CT_L18, GRAYED
         END
         POPUP "Note Volume (Add Volume &Events)"
         BEGIN
@@ -961,32 +842,32 @@ BEGIN
             MENUITEM "(&3) Fade Out (linear)\tCtrl+3", IDM_CT_S3
             MENUITEM "(&4) Fade Out (fast)\tCtrl+4", IDM_CT_S4
             MENUITEM "(&5) Fade Out (very fast)\tCtrl+5", IDM_CT_S5
-            MENUITEM "(&6) Default Value\tCtrl+6", IDM_CT_S6
+            MENUITEM "(&6) Default Value\tCtrl+6",  IDM_CT_S6
             MENUITEM "(&7) Fade Out (s-curve)\tCtrl+7", IDM_CT_S7
             MENUITEM "(&8) Fade Out (small, at end)\tCtrl+8", IDM_CT_S8
-            MENUITEM "(&9) Tremolo Decay\tCtrl+9", IDM_CT_S9
+            MENUITEM "(&9) Tremolo Decay\tCtrl+9",  IDM_CT_S9
             MENUITEM SEPARATOR
-            MENUITEM "(&1) Random\tCtrl+Alt+0",   IDM_CT_S10
+            MENUITEM "(&1) Random\tCtrl+Alt+0",     IDM_CT_S10
             MENUITEM "(&2) Fade From Start to End\tCtrl+Alt+1", IDM_CT_S11
             MENUITEM "(&3) Fade In (slow)\tCtrl+Alt+2", IDM_CT_S12
             MENUITEM "(&4) Fade In (linear)\tCtrl+Alt+3", IDM_CT_S13
-            MENUITEM "(&5) (none)", IDM_CT_S14, GRAYED
-            MENUITEM "(&6) (none)", IDM_CT_S15, GRAYED
-            MENUITEM "(&7) (none)", IDM_CT_S16, GRAYED
-            MENUITEM "(&8) (none)", IDM_CT_S17, GRAYED
-            MENUITEM "(&9) (none)", IDM_CT_S18, GRAYED
+            MENUITEM "(&5) (none)",                 IDM_CT_S14, GRAYED
+            MENUITEM "(&6) (none)",                 IDM_CT_S15, GRAYED
+            MENUITEM "(&7) (none)",                 IDM_CT_S16, GRAYED
+            MENUITEM "(&8) (none)",                 IDM_CT_S17, GRAYED
+            MENUITEM "(&9) (none)",                 IDM_CT_S18, GRAYED
             MENUITEM SEPARATOR
             MENUITEM "Clear Volume Events\tCtrl+0", IDM_CT_S20
-            MENUITEM "Setup Decay Length...", IDM_DCLEN
+            MENUITEM "Setup Decay Length...",       IDM_DCLEN
         END
         MENUITEM SEPARATOR
         POPUP "Edit &Current Track"
         BEGIN
-            MENUITEM "Pan &Right\tShift+Ctrl+R",  IDM_CT_PAN_R
-            MENUITEM "Pan &Left\tShift+Ctrl+L",   IDM_CT_PAN_L
-            MENUITEM "Pan &Invert\tCtrl+Alt+R",   IDM_CT_PAN_REVERSE
-            MENUITEM "Volume &Up\tF11",           IDM_CT_VOL_PLUS
-            MENUITEM "Volume &Down\tF12",         IDM_CT_VOL_MINUS
+            MENUITEM "Pan &Right\tShift+Ctrl+R",    IDM_CT_PAN_R
+            MENUITEM "Pan &Left\tShift+Ctrl+L",     IDM_CT_PAN_L
+            MENUITEM "Pan &Invert\tCtrl+Alt+R",     IDM_CT_PAN_REVERSE
+            MENUITEM "Volume &Up\tF11",             IDM_CT_VOL_PLUS
+            MENUITEM "Volume &Down\tF12",           IDM_CT_VOL_MINUS
             MENUITEM "Volume &Up (12.5%)\tShift+Ctrl+F11", IDM_CT_VOLWARIAI_UP
             MENUITEM "Volume &Down (12.5%)\tShift+Ctrl+F12", IDM_CT_VOLWARIAI_DOWN
             MENUITEM "Transpose &Up\tShift+Ctrl+U", IDM_CT_TRANS_UP
@@ -996,24 +877,24 @@ BEGIN
         END
         POPUP "Edit &Melody Tracks"
         BEGIN
-            MENUITEM "Pan &Right",                IDM_ML_PAN_R
-            MENUITEM "Pan &Left",                 IDM_ML_PAN_L
-            MENUITEM "Volume &Up\tShift+F11",     IDM_ML_VOL_PLUS
-            MENUITEM "Volume &Down\tShift+F12",   IDM_ML_VOL_MINUS
+            MENUITEM "Pan &Right",                  IDM_ML_PAN_R
+            MENUITEM "Pan &Left",                   IDM_ML_PAN_L
+            MENUITEM "Volume &Up\tShift+F11",       IDM_ML_VOL_PLUS
+            MENUITEM "Volume &Down\tShift+F12",     IDM_ML_VOL_MINUS
             MENUITEM "Transpose &Up\tShift+Ctrl+H", IDM_ML_TRANS_UP
             MENUITEM "Transpose &Down\tShift+Ctrl+N", IDM_ML_TRANS_DOWN
         END
         POPUP "Edit Drum &Tracks"
         BEGIN
-            MENUITEM "Volume &Up\tCtrl+F11",      IDM_DR_VOL_PLUS
-            MENUITEM "Volume &Down\tCtrl+F12",    IDM_DR_VOL_MINUS
+            MENUITEM "Volume &Up\tCtrl+F11",        IDM_DR_VOL_PLUS
+            MENUITEM "Volume &Down\tCtrl+F12",      IDM_DR_VOL_MINUS
         END
         POPUP "Change Song &Resolution"
         BEGIN
-            MENUITEM "Increase to 2x",            IDM_2BAI
-            MENUITEM "Increase to 3x",            IDM_3BAI
-            MENUITEM "Reduce to 1/2x",            IDM_2BUNNO1
-            MENUITEM "Reduce to 1/3x",            IDM_3BUNNO1
+            MENUITEM "Increase to 2x",              IDM_2BAI
+            MENUITEM "Increase to 3x",              IDM_3BAI
+            MENUITEM "Reduce to 1/2x",              IDM_2BUNNO1
+            MENUITEM "Reduce to 1/3x",              IDM_3BUNNO1
         END
         MENUITEM SEPARATOR
         MENUITEM "Snap Selection to &Beat Grid\tCtrl+G", IDM_GRIDMODE
@@ -1021,45 +902,45 @@ BEGIN
         MENUITEM "&Drag Note to Extend\tCtrl+Alt+F9", IDM_DRAGMODE
         MENUITEM "&Click Note to Extend\tCtrl+Alt+F10", IDM_PRESSNOTE
         MENUITEM SEPARATOR
-        MENUITEM "Stop &All Sounds", IDM_STOPNOWALL
+        MENUITEM "Stop &All Sounds",            IDM_STOPNOWALL
     END
     POPUP "&Song"
     BEGIN
-        MENUITEM "&Instruments...\tF1", IDM_DLGWAVE
-        MENUITEM "Song &Properties...\tF2", IDM_DLGSETTING
-        MENUITEM "&Default Pan/Volume...\tF3", IDM_DLGDEFAULT
+        MENUITEM "&Instruments...\tF1",         IDM_DLGWAVE
+        MENUITEM "Song &Properties...\tF2",     IDM_DLGSETTING
+        MENUITEM "&Default Pan/Volume...\tF3",  IDM_DLGDEFAULT
         MENUITEM SEPARATOR
-        MENUITEM "&Memory Usage...", IDM_DLGUSED
-        MENUITEM "Rebuild Note &Memory", IDM_SORTMUSICNOTE
+        MENUITEM "&Memory Usage...",            IDM_DLGUSED
+        MENUITEM "Rebuild Note &Memory",        IDM_SORTMUSICNOTE
     END
     POPUP "&View"
     BEGIN
-        MENUITEM "Zoom &In\tF7", IDM_LOUPE_PLUS
-        MENUITEM "Zoom &Out\tF8", IDM_LOUPE_MINUS
-        MENUITEM "Extend &Note Heads", IDM_NOTE_ENLARGE
-        MENUITEM "Show &All Tracks\tCtrl+F9", IDM_DRAWDOUBLE
+        MENUITEM "Zoom &In\tF7",                IDM_LOUPE_PLUS
+        MENUITEM "Zoom &Out\tF8",               IDM_LOUPE_MINUS
+        MENUITEM "Extend &Note Heads",          IDM_NOTE_ENLARGE
+        MENUITEM "Show &All Tracks\tCtrl+F9",   IDM_DRAWDOUBLE
         MENUITEM "S&lide Overlapping Notes\tShift+F9", IDM_SLIDEOVERLAPNOTES
-        MENUITEM "&Playback Smooth Scrolling", IDM_SMOOTHSCROLL
+        MENUITEM "&Playback Smooth Scrolling",  IDM_SMOOTHSCROLL
         MENUITEM SEPARATOR
-        MENUITEM "&Edit Toolbar\tF9", IDM_EZCOPYVISIBLE
+        MENUITEM "&Quick Copy Toolbar\tF9",     IDM_EZCOPYVISIBLE
         MENUITEM SEPARATOR
         POPUP "&Preferences"
         BEGIN
-            MENUITEM "Confirm &Unsaved Changes", IDM_CHANGEFINISH
+            MENUITEM "Confirm &Unsaved Changes",    IDM_CHANGEFINISH
             MENUITEM "Allow Keyboard During &Playback", IDM_ENABLEPLAYING
-            MENUITEM "&Auto Load/Save .pvi File", IDM_AUTOLOADPVI
+            MENUITEM "&Auto Load/Save .pvi File",   IDM_AUTOLOADPVI
             MENUITEM SEPARATOR
-            MENUITEM "&Metronome", IDM_METRONOME
+            MENUITEM "&Metronome",                  IDM_METRONOME
             MENUITEM SEPARATOR
-            MENUITEM "&Themes...", IDM_DLGTHEMES
-            MENUITEM "Sound&banks...", IDM_DLGWAVEDBS
+            MENUITEM "&Themes...",                  IDM_DLGTHEMES
+            MENUITEM "Sound&banks...",              IDM_DLGWAVEDBS
         END
     END
     POPUP "&Help"
     BEGIN
         MENUITEM "&Help...\tCtrl+Alt+H",        IDM_DLGHELP
         MENUITEM SEPARATOR
-        MENUITEM "&About OrgMaker",              IDM_DLGMEMO
+        MENUITEM "&About OrgMaker",             IDM_DLGMEMO
     END
 END
 
@@ -1152,92 +1033,6 @@ ZZZ                     ICON                    "bitmap\\ffff.ico"
 //
 
 WAVE100                 WAVE                    "Wave\\WAVE100.wdb"
-
-/* TOM01                   WAVE                    "Wave\\Tom01.wav"
-
-BASS02                  WAVE                    "Wave\\Bass02.wav"
-
-BASS03                  WAVE                    "Wave\\Bass03.wav"
-
-HICLOSE                 WAVE                    "Wave\\HiClose.wav"
-
-HIOPEN                  WAVE                    "Wave\\HiOpen.wav"
-
-PER01                   WAVE                    "Wave\\Per01.wav"
-
-PER02                   WAVE                    "Wave\\Per02.wav"
-
-PER03                   WAVE                    "Wave\\Per03.wav"
-
-SNARE01                 WAVE                    "Wave\\Snare01.wav"
-
-SNARE02                 WAVE                    "Wave\\Snare02.wav"
-
-BASS01                  WAVE                    "Wave\\Bass01.wav"
-
-TOM02                   WAVE                    "Wave\\Tom02.wav"
-
-CRASH                   WAVE                    "Wave\\Crash.wav"
-
-BASS04                  WAVE                    "Wave\\Bass04.wav"
-
-SNARE03                 WAVE                    "Wave\\Snare03.wav"
-
-HIOPEN02                WAVE                    "Wave\\HiOpen2.wav"
-
-HICLOSE02               WAVE                    "Wave\\HiClose2.wav"
-
-TOM03                   WAVE                    "Wave\\Tom03.wav"
-
-ORCDRM01                WAVE                    "Wave\\OrcDrm01.wav"
-
-CRASH02                 WAVE                    "Wave\\Crash02.wav"
-
-HICLOSE03               WAVE                    "Wave\\HiClose03.wav"
-
-SNARE04                 WAVE                    "Wave\\Snare04.wav"
-
-HIOPEN03                WAVE                    "Wave\\HiOpen03.wav"
-
-RIDE01                  WAVE                    "Wave\\Ride01.wav"
-
-BASS05                  WAVE                    "Wave\\Bass05.wav"
-
-REVSYM01                WAVE                    "Wave\\RevSym01.wav"
-
-CAT                     WAVE                    "Wave\\cat.wav"
-
-TOM04                   WAVE                    "Wave\\Tom04.wav"
-
-BELL                    WAVE                    "Wave\\Bell.wav"
-
-SNARE06                 WAVE                    "Wave\\Snare06.wav"
-
-PESI01                  WAVE                    "Wave\\Pesi01.wav"
-
-TOM05                   WAVE                    "Wave\\Tom05.wav"
-
-SNARE07                 WAVE                    "Wave\\Snare07.wav"
-
-BASS06                  WAVE                    "Wave\\Bass06.wav"
-
-QUICK01                 WAVE                    "Wave\\Quick01.wav"
-
-BASS07                  WAVE                    "Wave\\Bass07.wav"
-
-CLAP01                  WAVE                    "Wave\\Clap01.wav"
-
-HIOPEN04                WAVE                    "Wave\\HiOpen04.wav"
-
-HICLOSE04               WAVE                    "Wave\\HiClose04.wav"
-
-SNARE05                 WAVE                    "Wave\\Snare05.wav"
-
-BASS08                  WAVE                    "Wave\\Bass08.wav"
-
-HICLOSE05               WAVE                    "Wave\\HiClose05.wav"
-
-SNARE08                 WAVE                    "Wave\\Snare08.wav" */
 
 METRO01                 WAVE                    "Wave\\Metro01.wav"
 
@@ -1335,18 +1130,15 @@ BEGIN
     "E",            ID_AC_E,                VIRTKEY, NOINVERT
     "E",            ID_AC_SE,               VIRTKEY, SHIFT, NOINVERT
     "G",            ID_AC_GRIDMODE,         VIRTKEY, CONTROL, NOINVERT
-    "H",            ID_AC_HELP,             VIRTKEY, CONTROL, ALT, NOINVERT
     "H",            ID_AC_ML_KEY_UP,        VIRTKEY, SHIFT, CONTROL, NOINVERT
     "I",            ID_AC_I,                VIRTKEY, NOINVERT
-    "I",            ID_AC_INIT,             VIRTKEY, CONTROL, ALT, NOINVERT
     "I",            ID_AC_SI,               VIRTKEY, SHIFT, NOINVERT
     "L",            ID_AC_CT_PAN_L,         VIRTKEY, SHIFT, CONTROL, NOINVERT
     "M",            ID_AC_MIDI,             VIRTKEY, CONTROL, ALT, NOINVERT
     "W",            ID_AC_WAV,              VIRTKEY, CONTROL, ALT, NOINVERT
+    "N",            ID_AC_INIT,             VIRTKEY, CONTROL, NOINVERT
     "N",            ID_AC_ML_KEY_DOWN,      VIRTKEY, SHIFT, CONTROL, NOINVERT
-    "O",            ID_AC_PRESS_RIGHT,      VIRTKEY, NOINVERT
     "O",            ID_AC_MENUOPEN,         VIRTKEY, CONTROL, NOINVERT
-    "P",            ID_AC_PRESS_LEFT,       VIRTKEY, NOINVERT
     "Q",            ID_AC_Q,                VIRTKEY, NOINVERT
     "Q",            ID_AC_SQ,               VIRTKEY, SHIFT, NOINVERT
     "R",            ID_AC_R,                VIRTKEY, NOINVERT
@@ -1368,7 +1160,7 @@ BEGIN
     VK_DELETE,      ID_AC_DELETEKEY,        VIRTKEY, NOINVERT
     VK_DELETE,      ID_AC_DELETE,           VIRTKEY, CONTROL, NOINVERT
     VK_ESCAPE,      ID_AC_SELECT_CLEAR2,    VIRTKEY, NOINVERT
-    VK_F1,          ID_AC_WAVESELECT,       VIRTKEY, NOINVERT
+    VK_F1,          ID_AC_HELP,             VIRTKEY, NOINVERT
     VK_F10,         ID_AC_PRESSNOTE,        VIRTKEY, CONTROL, ALT, NOINVERT
     VK_F11,         ID_AC_CT_VOL_UP,        VIRTKEY, NOINVERT
     VK_F11,         ID_AC_DR_VOL_UP,        VIRTKEY, CONTROL, NOINVERT
@@ -1380,18 +1172,16 @@ BEGIN
     VK_F12,         ID_AC_VOLWARIAI_DOWN,   VIRTKEY, SHIFT, CONTROL, NOINVERT
     VK_F2,          ID_AC_SETTEMPO,         VIRTKEY, NOINVERT
     VK_F2,          ID_AC_COPY,             VIRTKEY, CONTROL, NOINVERT
-    VK_F3,          ID_AC_DEFAULT,          VIRTKEY, NOINVERT
+    VK_F3,          ID_AC_WAVESELECT,       VIRTKEY, NOINVERT
     VK_F3,          ID_AC_COPY2,            VIRTKEY, CONTROL, NOINVERT
     VK_F4,          ID_AC_DLG_VOL,          VIRTKEY, NOINVERT
     VK_F4,          ID_AC_DLG_PAN,          VIRTKEY, CONTROL, NOINVERT
     VK_F4,          ID_AC_DLG_TRANS,        VIRTKEY, SHIFT, NOINVERT
-    VK_F4,          ID_AC_DLG_SWAP,         VIRTKEY, SHIFT, CONTROL, NOINVERT
     VK_F7,          ID_AC_LOUPE_PLUS,       VIRTKEY, NOINVERT
     VK_F8,          ID_AC_LOUPE_MINUS,      VIRTKEY, NOINVERT
     VK_F9,          ID_AC_SHOWEZCOPY,       VIRTKEY, NOINVERT
     VK_F9,          ID_AC_DRAWDOUBLE,       VIRTKEY, CONTROL, NOINVERT
     VK_F9,          ID_AC_DRAGMODE,         VIRTKEY, CONTROL, ALT, NOINVERT
-    VK_F9,          ID_AC_SLIDEOVERLAPNOTES, VIRTKEY, SHIFT, NOINVERT
     VK_HOME,        ID_AC_LOAD_MOST_RECENT, VIRTKEY, SHIFT, CONTROL, NOINVERT
     VK_INSERT,      ID_AC_SELECT_INSERT,    VIRTKEY, NOINVERT
     VK_LEFT,        ID_AC_HOMEBACK,         VIRTKEY, CONTROL, NOINVERT
@@ -1400,7 +1190,6 @@ BEGIN
     VK_RIGHT,       ID_AC_MEASNEXT,         VIRTKEY, SHIFT, NOINVERT
     VK_UP,          ID_AC_SOCTUP,           VIRTKEY, SHIFT, NOINVERT
     VK_DOWN,        ID_AC_SOCTDOWN,         VIRTKEY, SHIFT, NOINVERT
-    VK_LEFT,        ID_AC_STBACK,           VIRTKEY, ALT, NOINVERT
     VK_NUMPAD1,     ID_AC_NUM1,             VIRTKEY, NOINVERT
     VK_NUMPAD1,     ID_AC_C_NUM1,           VIRTKEY, CONTROL, NOINVERT
     VK_NUMPAD1,     ID_AC_S_NUM1,           VIRTKEY, SHIFT, NOINVERT
@@ -1428,7 +1217,6 @@ BEGIN
     VK_NUMPAD7,     ID_AC_NUM7,             VIRTKEY, NOINVERT
     VK_NUMPAD8,     ID_AC_NUM8,             VIRTKEY, NOINVERT
     VK_NUMPAD9,     ID_AC_NUM9,             VIRTKEY, NOINVERT
-    VK_RIGHT,       ID_AC_STPLAY,           VIRTKEY, ALT, NOINVERT
     VK_SPACE,       ID_ACCEL40136,          VIRTKEY, NOINVERT
     "W",            ID_AC_W,                VIRTKEY, NOINVERT
     "W",            ID_AC_SW,               VIRTKEY, SHIFT, NOINVERT
@@ -1456,6 +1244,57 @@ DLGTHEMES AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
+
+DLGSETTING AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_DLGWAVE AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_DLGSETTING AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_DLGPERC AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_DLGSETTING, DIALOG
+    BEGIN
+        RIGHTMARGIN, 212
+        BOTTOMMARGIN, 120
+    END
+
+    IDD_DLGWAVE, DIALOG
+    BEGIN
+        RIGHTMARGIN, 164
+        BOTTOMMARGIN, 136
+    END
+
+    IDD_DLGPERC, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 171
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 97
+    END
+END
+#endif    // APSTUDIO_INVOKED
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1618,6 +1457,13 @@ BEGIN
     IDS_STRING122           "Sample rate is not in range (1000-192000)."
     IDS_STRING123           "Loop count must be positive."
     IDS_STRING124           "WAV Export"
+    IDS_SP_TAB1             "General"
+    IDS_SP_TAB2             "Melody"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_SP_TAB3             "Percussion"
 END
 
 #endif    // English (United States) resources

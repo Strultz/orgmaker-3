@@ -81,6 +81,9 @@
     <ClCompile Include="WinTimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Toolbar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Script1.rc">
@@ -125,6 +128,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="miniaudio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Toolbar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -430,5 +436,8 @@
     <CustomBuild Include="Wave\Wave.dat">
       <Filter>Resource Files\Wave</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Wave\WAVE100.wdb" />
   </ItemGroup>
 </Project>

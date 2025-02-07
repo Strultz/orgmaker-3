@@ -203,8 +203,8 @@ void ClearRecentFile()
 {
 	int a;
 	//a = MessageBox(hWnd,"履歴を抹ッ消しますか？","「最近使ったファイル」のクリア",MB_OKCANCEL|MB_ICONQUESTION|MB_DEFBUTTON2);	// 2014.10.19 D
-	a = msgbox(hWnd,IDS_NOTIFY_RECENT_INITIALIZE,IDS_CLEAR_RECENT,MB_OKCANCEL|MB_ICONQUESTION|MB_DEFBUTTON2);	// 2014.10.19 A
-	if(a == IDOK){
+	a = msgbox(hWnd,IDS_NOTIFY_RECENT_INITIALIZE,IDS_CLEAR_RECENT,MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2);	// 2014.10.19 A
+	if(a == IDYES){
 		int i;
 		for(i=0;i<10;i++){
 			RecentFileName[i][0]='@';
@@ -212,11 +212,11 @@ void ClearRecentFile()
 		}
 		CreateMenuRecent();
 		//MessageBox(hWnd,"真っ白になったぜ。","通知",MB_OK);	// 2014.10.19 D
-		msgbox(hWnd,IDS_INFO_INITIALIZE,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
+		//msgbox(hWnd,IDS_INFO_INITIALIZE,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 
 	}else{
 		//MessageBox(hWnd,"キャンセルしました。","通知",MB_OK);	// 2014.10.19 D
-		msgbox(hWnd,IDS_CANCEL,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
+		//msgbox(hWnd,IDS_CANCEL,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 	}
 
 	
@@ -448,15 +448,15 @@ void SortMusicNote(void)
 {
 	int a;
 	//a = MessageBox(hWnd,"長時間の使用により、ノート（音符）がメモリ上に\n散乱してしまいます。（譜面順とメモリ順は異なっている）\nこの関数はノートを譜面の順番に\n並べ換えます。\n尚、データをロードし直しても同じ効果が得られます。\n実行しますか？","使い方と目的",MB_OKCANCEL|MB_ICONQUESTION|MB_DEFBUTTON2);	// 2014.10.19 D
-	a = msgbox(hWnd,IDS_INFO_MEMORY,IDS_USAGE,MB_OKCANCEL|MB_ICONQUESTION|MB_DEFBUTTON2);	// 2014.10.19 A
-	if(a == IDOK){
+	a = msgbox(hWnd,IDS_INFO_MEMORY,IDS_USAGE,MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2);	// 2014.10.19 A
+	if(a == IDYES){
 		org_data.SortNotes();
 		//MessageBox(hWnd,"並べ替え・再構築しました。","通知",MB_OK);	// 2014.10.19 D
-		msgbox(hWnd,IDS_INFO_NARABEKAE,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
+		//msgbox(hWnd,IDS_INFO_NARABEKAE,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 
 	}else{
 		//MessageBox(hWnd,"キャンセルしました。","通知",MB_OK);	// 2014.10.19 D
-		msgbox(hWnd,IDS_CANCEL,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
+		//msgbox(hWnd,IDS_CANCEL,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 	}
 }
 

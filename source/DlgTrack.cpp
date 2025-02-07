@@ -337,11 +337,11 @@ BOOL CALLBACK DialogTrack(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 			SetFocus(hWnd);		// 2010.11.30 A
 			break;
 		case IDC_TR_WAIT:
-			DialogBox(hInst,"DLGSETTING",hdwnd,DialogSetting);
+			//DialogBox(hInst,"DLGSETTING",hdwnd,DialogSetting);
 			SetFocus(hWnd);		// 2010.11.30 A
 			break;
 		case IDC_TR_TRACK: //トラックのTRボタン
-			DialogBox(hInst,"DLGWAVE",hdwnd,DialogWave);
+			//DialogBox(hInst,"DLGWAVE",hdwnd,DialogWave);
 			SetFocus(hWnd);		// 2010.11.30 A
 			break;
 

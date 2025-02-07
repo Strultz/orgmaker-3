@@ -220,7 +220,7 @@ void InitSettingDialog(HWND hdwnd)
 	itoa(a, str, 10);
 	SetDlgItemText(hdwnd, IDD_END_BEAT, str);
 	//の初期化//////////////////
-	a = mi.tdata[0].freq;
+	/*a = mi.tdata[0].freq;
 	itoa(a,str,10);
 	SetDlgItemText(hdwnd,IDD_SETFREQ0,str);
 	a = mi.tdata[1].freq;
@@ -248,7 +248,7 @@ void InitSettingDialog(HWND hdwnd)
 	for(i = 0; i < NUMGRID; i++){//pipiの初期化
 		if( mi.tdata[i].pipi )
 			CheckDlgButton( hdwnd, check_pipi[i], 1 );
-	}
+	}*/
 	//MessageBox(NULL, "メッセージループを抜けました", "OK", MB_OK);
 }
 
@@ -325,7 +325,7 @@ BOOL SetRepeat(HWND hdwnd, MUSICINFO *mi)
 	return TRUE;
 }
 //追加周波数の設定
-int freqbox[MAXTRACK] = {
+/*int freqbox[MAXTRACK] = {
 	IDD_SETFREQ0,
 	IDD_SETFREQ1,
 	IDD_SETFREQ2,
@@ -343,8 +343,8 @@ int freqbox[MAXTRACK] = {
 	IDD_SETFREQ13,
 	IDD_SETFREQ14,
 	IDD_SETFREQ15,
-};
-BOOL SetTrackFreq(HWND hdwnd, MUSICINFO *mi)
+};*/
+/*BOOL SetTrackFreq(HWND hdwnd, MUSICINFO* mi)
 {
 	char str[128] = {NULL};
 	unsigned short a;
@@ -376,11 +376,12 @@ BOOL SetPipiCheck(HWND hdwnd, MUSICINFO *mi)
 		else mi->tdata[i].pipi = 0;
 	}
 	return TRUE;
-}
+}*/
 
 //曲の設定
 BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	LPNMHDR lpnm;
 	static bool updateWait = false;
 	static bool updateBPM = false;
 
@@ -402,28 +403,6 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 		break;
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
-		/*case IDC_BTN1:
-			org_data.GetMusicInfo(&mi);
-			GetDlgItemText(hdwnd, IDC_BPM, str, 128);
-			iBPM = std::stod(str);
-			if(iBPM > 0){
-				SetGrid(hdwnd, &mg);
-				iWAIT = (int)round(60000.0 / iBPM / (double)mi.dot);
-				snprintf(str, 128, "%d", iWAIT);
-				SetDlgItemText(hdwnd, IDD_SETWAIT, str);
-			}
-			return 1;
-		case IDC_BTN2:
-			org_data.GetMusicInfo(&mi);
-			GetDlgItemText(hdwnd, IDD_SETWAIT, str, 128);
-			iWAIT = atoi(str);
-			if(iWAIT > 0){
-				SetGrid(hdwnd, &mg);
-				iBPM = 60000.0 / (double)(iWAIT * mi.dot);
-				snprintf(str, 128, "%.2f", iBPM);
-				SetDlgItemText(hdwnd, IDC_BPM, str);
-			}
-			return 1;*/
 		case IDD_LB1:
 			if(HIWORD(wParam) == LBN_SELCHANGE){ //ﾘｽﾄﾎﾞｯｸｽでの選択変更
 				i = SendDlgItemMessage(hdwnd, IDD_LB1,LB_GETCURSEL,0,0);//インデックスを得る
@@ -434,23 +413,9 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 					EnableWindow(GetDlgItem(hdwnd, IDD_GRIDEDIT1), FALSE);
 					EnableWindow(GetDlgItem(hdwnd, IDD_GRIDEDIT2), FALSE);
 				}
+				PropSheet_Changed(GetParent(hdwnd), hdwnd);
 			}
 			break;
-		/*case IDC_CHECK_PRECISELR:
-			i = preciselr;
-			if (IsDlgButtonChecked(hdwnd, IDC_CHECK_PRECISELR)) preciselr = true;
-			else preciselr = false;
-			if (preciselr != i) {
-				org_data.GetMusicInfo(&mi);
-
-				i = mi.repeat_x / (preciselr ? 1 : (mi.dot * mi.line));
-				itoa(i, str, 10);
-				SetDlgItemText(hdwnd, IDD_REP_MEAS, str);
-				i = mi.end_x / (preciselr ? 1 : (mi.dot * mi.line));
-				itoa(i, str, 10);
-				SetDlgItemText(hdwnd, IDD_END_MEAS, str);
-			}
-			break;*/
 		case IDC_BPM:
 		case IDD_SETWAIT:
 			org_data.GetMusicInfo(&mi);
@@ -518,10 +483,15 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 			// Fallthrough
 		case IDD_REP_MEAS: case IDD_END_MEAS: case IDD_REP_BEAT: case IDD_END_BEAT:
 		case IDD_GRIDEDIT1: case IDD_GRIDEDIT2:
-		case IDD_SETFREQ0: case IDD_SETFREQ1: case IDD_SETFREQ2: case IDD_SETFREQ3: case IDD_SETFREQ4: case IDD_SETFREQ5: case IDD_SETFREQ6: case IDD_SETFREQ7:
-			if(HIWORD(wParam) == EN_SETFOCUS)
-				PostMessage(GetDlgItem(hdwnd, LOWORD(wParam)), EM_SETSEL, 0, -1); //フォーカス時にテキストを全選択する
+		//case IDD_SETFREQ0: case IDD_SETFREQ1: case IDD_SETFREQ2: case IDD_SETFREQ3: case IDD_SETFREQ4: case IDD_SETFREQ5: case IDD_SETFREQ6: case IDD_SETFREQ7:
+			if (HIWORD(wParam) == EN_SETFOCUS) {
+				PostMessage(GetDlgItem(hdwnd, LOWORD(wParam)), EM_SETSEL, 0, -1);
+			}
+			else if (HIWORD(wParam) == EN_UPDATE) {
+				PropSheet_Changed(GetParent(hdwnd), hdwnd);
+			}
 			return -1;
+
 		case IDCANCEL:
 			EndDialog(hdwnd,0);
 			EnableDialogWindow(TRUE);
@@ -534,25 +504,58 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 			if(!SetWait(hdwnd, &mi))return 1;
 			if(!SetGrid(hdwnd,&mi))return 1;
 			if(!SetRepeat(hdwnd, &mi))return 1;
-			if(!SetTrackFreq(hdwnd, &mi))return 1;
-			SetPipiCheck( hdwnd, &mi );
+			//if(!SetTrackFreq(hdwnd, &mi))return 1;
+			//SetPipiCheck( hdwnd, &mi );
 
-			//プレイヤーに表示
 			itoa(mi.wait,str,10);
 			SetDlgItemText(hDlgTrack,IDE_VIEWWAIT,str);
-			//パラメータを設定
-			org_data.SetMusicInfo(&mi,SETGRID|SETWAIT|SETREPEAT|SETFREQ|SETPIPI);
-			//波形の作りなおし
-			for(j = 0; j < MAXMELODY; j++)
-				MakeOrganyaWave(j,mi.tdata[j].wave_no,mi.tdata[j].pipi);
-			//再描画
+			org_data.SetMusicInfo(&mi,SETGRID|SETWAIT|SETREPEAT);
+			/*for (j = 0; j < MAXMELODY; j++)
+				MakeOrganyaWave(j,mi.tdata[j].wave_no,mi.tdata[j].pipi);*/
 			//org_data.PutMusic();
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			EndDialog(hdwnd,0);
 			EnableDialogWindow(TRUE);
-			ClearEZC_Message(); //EZメッセージと範囲を消す
+			ClearEZC_Message();
 			return 1;
 		}
+		break;
+	case WM_NOTIFY: {
+		lpnm = (LPNMHDR)lParam;
+		switch (lpnm->code) {
+		case PSN_SETACTIVE:
+			PropSheet_SetWizButtons(GetParent(hdwnd), PSWIZB_BACK | PSWIZB_NEXT);
+		case PSN_KILLACTIVE: {
+			bool error = false;
+			if (!SetWait(hdwnd, &mi)) {
+				error = true;
+			}
+			if (!SetGrid(hdwnd, &mi)) {
+				error = true;
+			}
+			if (!SetRepeat(hdwnd, &mi)) {
+				error = true;
+			}
+			SetWindowLong(hdwnd, DWL_MSGRESULT, error);
+			return error;
+		}
+		case PSN_APPLY: {
+			bool error = false;
+			org_data.GetMusicInfo(&mi);
+			if (!SetWait(hdwnd, &mi)) error = true;
+			if (!SetGrid(hdwnd, &mi)) error = true;
+			if (!SetRepeat(hdwnd, &mi)) error = true;
+			if (error) {
+				SetWindowLong(hdwnd, DWL_MSGRESULT, PSNRET_INVALID);
+			}
+			else {
+				SetWindowLong(hdwnd, DWL_MSGRESULT, PSNRET_NOERROR);
+				org_data.SetMusicInfo(&mi, SETGRID | SETWAIT | SETREPEAT);
+			}
+			return error;
+		}
+		}
+	}
 	}
 	return 0;
 }
@@ -624,7 +627,7 @@ unsigned char List_no_to_Wave_no[]={
 	0,1,30,31,38,13,18,11,23,24,2,39,3,4,32,33,14,19,15,20,12,28,29,40,41,22,8,9,5,6,34,35,36,42,21,16,10,26,27,7,37,17,25
 };*/
 
-
+/*
 void Sl_Reset(HWND hdwnd)
 {
 	int i;
@@ -894,7 +897,73 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 1;
 	}
 	return 0;
+}*/
+
+
+BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	switch (message) {
+	case WM_INITDIALOG:
+		return 1;
+	case WM_NOTIFY:
+		break;
+	}
+	return 0;
 }
+
+BOOL CALLBACK DialogPerc(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	switch (message) {
+	case WM_INITDIALOG:
+		return 1;
+	case WM_NOTIFY:
+		break;
+	}
+	return 0;
+}
+
+void OpenSongProperties(HWND hwnd) {
+	PROPSHEETPAGE psp[3];
+    
+    PROPSHEETHEADER psh;
+    
+    psp[0].dwSize      = sizeof(PROPSHEETPAGE);
+    psp[0].dwFlags     = PSP_USETITLE;
+    psp[0].hInstance   = hInst;
+    psp[0].pszTemplate = MAKEINTRESOURCE(IDD_DLGSETTING);
+    psp[0].pfnDlgProc  = DialogSetting;
+	psp[0].pszTitle	   = MAKEINTRESOURCE(IDS_SP_TAB1);
+    psp[0].lParam      = 0;
+    psp[0].pfnCallback = NULL;
+    psp[1].dwSize = sizeof(PROPSHEETPAGE);
+    psp[1].dwFlags     = PSP_USETITLE;
+    psp[1].hInstance   = hInst;
+    psp[1].pszTemplate = MAKEINTRESOURCE(IDD_DLGWAVE);
+    psp[1].pfnDlgProc  = DialogWave;
+    psp[1].pszTitle    = MAKEINTRESOURCE(IDS_SP_TAB2);
+    psp[1].lParam      = 0;
+    psp[1].pfnCallback = NULL;
+    psp[2].dwSize = sizeof(PROPSHEETPAGE);
+    psp[2].dwFlags     = PSP_USETITLE;
+    psp[2].hInstance   = hInst;
+    psp[2].pszTemplate = MAKEINTRESOURCE(IDD_DLGPERC);
+    psp[2].pfnDlgProc  = DialogPerc;
+    psp[2].pszTitle    = MAKEINTRESOURCE(IDS_SP_TAB3);
+    psp[2].lParam      = 0;
+    psp[2].pfnCallback = NULL;
+    
+    psh.dwSize      = sizeof(PROPSHEETHEADER);
+    psh.dwFlags     = PSH_PROPSHEETPAGE | PSH_NOCONTEXTHELP;
+    psh.hwndParent  = hwnd;
+    psh.hInstance   = hInst;
+    psh.pszCaption  = "Song Properties";
+    psh.nPages      = sizeof(psp) / sizeof(PROPSHEETPAGE);
+    psh.nStartPage  = 0;
+    psh.ppsp        = (LPCPROPSHEETPAGE)&psp;
+	psh.pfnCallback = NULL;
+    
+    PropertySheet(&psh);
+}
+
+
 int usebox[MAXTRACK] = {
 	IDE_USE0,
 	IDE_USE1,

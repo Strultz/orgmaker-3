@@ -28,6 +28,7 @@ static RECT screenRect;
 HBITMAP waveBmp; // for dialog
 
 extern int gDrawDouble;	//両方のトラックグループを描画する
+extern int rebarHeight;
 
 extern RECT WinRect; //ウィンドウサイズ保存用 A 2010.09.22
 extern int NoteWidth;
@@ -274,7 +275,7 @@ BOOL RefleshScreen(HWND hwnd) {
 
 	ClientToScreen(hWnd, &pnt);
 	dst.left = pnt.x;
-	dst.top = pnt.y;
+	dst.top = pnt.y + rebarHeight;
 	dst.right = dst.left + WWidth;
 	dst.bottom = dst.top + WHeight;
 

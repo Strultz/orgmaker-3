@@ -17,6 +17,10 @@
 #define CDCD_EXIT 1
 #define CDCD_LOAD 2
 
+#pragma comment(linker,"\"/manifestdependency:type='win32' \
+name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
+processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+
 
 #include <windows.h>
 #include <winuser.h>
@@ -37,9 +41,13 @@
 #include "Sound.h"
 #include "Timer.h"
 
+#include "Toolbar.h"
+
 //main procedure
 LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam);
-BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+void OpenSongProperties(HWND hwnd);
+//BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogDefault(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogDelete(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -47,7 +55,7 @@ BOOL CALLBACK DialogCopy2(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 BOOL CALLBACK DialogPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogTrans(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogVolume(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
-BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+//BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogTrack(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogNoteUsed(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -118,6 +126,9 @@ CHAR *buf;
 CHAR app_path[BUF_SIZE];
 CHAR num_buf[BUF_SIZE];
 //to this point
+
+HWND hwndRebar = NULL;
+int rebarHeight;
 
 
 void SaveIniFile();
@@ -345,8 +356,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	char strauthtmp[128];
 	SYSTEMTIME stTime; GetLocalTime(&stTime); //stTime.wYear get a year in // 2014.10.18
-	strcpy(strauthtmp, "(C) AUTHOR xxxxx,                 ");
-	sprintf(strauthtmp + 18, "%d", stTime.wYear); //, put the year after
+	sprintf(strauthtmp, "(C) AUTHOR xxxxx, %d", stTime.wYear); //, put the year after
 
 	//GetPrivateProfileString(MIDI_EXPORT, "Author", "(C) AUTHOR xxxxx, 2014", strMIDI_AUTHOR, 255, app_path);	// 2045.01.18 D
 	GetPrivateProfileString(MIDI_EXPORT, "Author", strauthtmp, strMIDI_AUTHOR, 255, app_path);	// 2045.01.18 A
@@ -372,7 +382,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 			*/
 			WinRect.left, WinRect.top, WinRect.right, WinRect.bottom,
             NULL, NULL, hInst, NULL);
+
 	if(!hWnd) return FALSE;
+
+	hwndRebar = CreateRebar(hWnd);
+	rebarHeight = GetRebarHeight(hwndRebar);
 
 //	DialogBox(hInst,"DLGFLASH",NULL,DialogFlash);
 
@@ -709,7 +723,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				break;
 			case IDM_DLGSETTING://Show settings dialog
 			case ID_AC_SETTEMPO:
-				DialogBox(hInst,"DLGSETTING",hwnd,DialogSetting);
+				OpenSongProperties(hWnd);
+				//DialogBox(hInst,"DLGSETTING",hwnd,DialogSetting);
 				break;
 			case IDM_DLGDEFAULT://Show Default Dialog
 			case ID_AC_DEFAULT:
@@ -748,10 +763,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_DLGUSED://
 				DialogBox(hInst,"DLGUSED",hwnd,DialogNoteUsed);
 				break;
-			case IDM_DLGWAVE://Show settings dialog
-			case ID_AC_WAVESELECT:
-				DialogBox(hInst,"DLGWAVE",hwnd,DialogWave);
-				break;
+			//case IDM_DLGWAVE://Show settings dialog
+			//case ID_AC_WAVESELECT:
+				//DialogBox(hInst,"DLGWAVE",hwnd,DialogWave);
+				//break;
 			case IDM_DLGSWAP:
 			case ID_AC_DLG_SWAP:
 				DialogBox(hInst,"DLGSWAP",hwnd,DialogSwap);
@@ -1155,10 +1170,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				SendMessage(hDlgPlayer, WM_COMMAND, IDC_RIGHT, NULL);
 				break;
 			case ID_AC_SOCTUP:
-				scr_data.VertScrollProc(SB_PAGEDOWN);
+				scr_data.VertScrollProc(SB_PAGEUP);
 				break;
 			case ID_AC_SOCTDOWN:
-				scr_data.VertScrollProc(SB_PAGEUP);
+				scr_data.VertScrollProc(SB_PAGEDOWN);
 				break;
 			case IDM_RECENT_CLEAR:
 				ClearRecentFile();
@@ -1605,7 +1620,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		break;
 	case WM_SIZE:
 		WWidth = LOWORD(lParam);	//Client area size
-		WHeight = HIWORD(lParam);
+		WHeight = HIWORD(lParam) - rebarHeight;
 		rect.right = WWidth;		//A 2008/05/14
 		rect.bottom = WHeight;		//A 2008/05/14
 		if(!org_data.PutBackGround())break;
