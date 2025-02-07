@@ -481,6 +481,8 @@
 #define IDC_WAVEY                       1252
 #define IDC_WAVEU                       1253
 #define IDC_WAVEI                       1254
+#define IDC_PLAYPAUSE					1255
+#define IDC_PREFERENCES					1256
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005
@@ -762,7 +764,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        245
 #define _APS_NEXT_COMMAND_VALUE         40301
-#define _APS_NEXT_CONTROL_VALUE         1250
+#define _APS_NEXT_CONTROL_VALUE         1257
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

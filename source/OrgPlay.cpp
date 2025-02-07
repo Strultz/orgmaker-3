@@ -4,7 +4,11 @@
 #include "Sound.h"
 #include "resource.h"
 #include "Scroll.h"
+#include "Timer.h"
+#include "CommCtrl.h"
 
+extern HWND hwndToolbar;
+char timer_sw = 0;
 long oplay_p;
 long play_p;//現在再生位置（キャンバス）
 NOTELIST *np[MAXTRACK];//現在再生準備の音符
@@ -93,4 +97,26 @@ void OrgData::SetPlayPointer(long x)
 void OrgData::GetPlayPos(long* playpos, long *oplaypos) {
 	if (playpos != NULL) *playpos = play_p;
 	if (oplaypos != NULL) *oplaypos = oplay_p;
+}
+
+void StartPlayingSong(void) {
+	MUSICINFO mi;
+	long hp, vp;
+	if (!timer_sw) {
+		scr_data.GetScrollPosition(&hp, &vp);
+		org_data.SetPlayPointer(hp);
+		InitMMTimer();
+		org_data.GetMusicInfo(&mi);
+		StartTimer(mi.wait);
+		timer_sw = 1;
+		SendMessage(hwndToolbar, TB_CHANGEBITMAP, IDC_PLAYPAUSE, 13);
+	}
+}
+void StopPlayingSong(void) {
+	if (timer_sw) {
+		QuitMMTimer();
+		Rxo_StopAllSoundNow();
+		timer_sw = 0;
+		SendMessage(hwndToolbar, TB_CHANGEBITMAP, IDC_PLAYPAUSE, 12);
+	}
 }

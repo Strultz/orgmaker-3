@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include <commctrl.h>
 
+#include "resource.h"
 #include "Toolbar.h"
 
 extern HINSTANCE hInst;
@@ -55,7 +56,7 @@ static HWND CreateToolbar(HWND hwndRebar, const char *iconBitmap, int buttonCoun
     return hWndToolbar;
 }
 
-HWND CreateRebar(HWND hWnd)
+HWND CreateRebar(HWND hWnd, HWND *outHwndToolbar)
 {
     // Initialize common controls.
     INITCOMMONCONTROLSEX icex;
@@ -67,34 +68,33 @@ HWND CreateRebar(HWND hWnd)
         WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_BORDER | RBS_AUTOSIZE | RBS_BANDBORDERS | CCS_NODIVIDER,
         0, 0, 0, 0, hWnd, NULL, hInst, NULL);
 
-    TBBUTTON tbb[24] =
+    TBBUTTON tbb[23] =
     {
-        {0,0,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"New"},
-        {1,1,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Open"},
-        {2,2,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Save"},
-        {3,3,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Save As"},
-        {0,0,0,BTNS_SEP},
-        {4,4,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Song Properties"},
-        {0,0,0,BTNS_SEP},
-        {6,6,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Cut"},
-        {7,7,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Copy"},
-        {8,8,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Paste"},
-        {0,0,0,BTNS_SEP},
-        {9,9,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Song Start"},
-        {10,10,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Previous Measure"},
-        {11,11,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Backwards"},
-        {12,12,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Play"},
-        {13,13,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Pause"},
-        {14,14,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Forwards"},
-        {15,15,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Next Measure"},
-        {16,16,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Song End"},
-        {0,0,0,BTNS_SEP},
-        {17,17,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Zoom In"},
-        {18,18,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Zoom Out"},
-        {0,0,0,BTNS_SEP},
-        {5,5,TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Preferences"},
+        {0, IDM_INIT, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"New (Ctrl+N)"},
+        {1, IDM_LOAD, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Open (Ctrl+O)"},
+        {2, IDM_SAVEOVER, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Save (Ctrl+S)"},
+        {3, IDM_SAVENEW, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Save As (Ctrl+Shift+S)"},
+        {0, 0, 0,BTNS_SEP},
+        {4, IDM_DLGSETTING, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Song Properties (F2)"},
+        {0, 0, 0,BTNS_SEP},
+        {6, -0, 0,BTNS_BUTTON, {}, 0, (INT_PTR)"Cut (Ctrl+X)"},
+        {7, -0, 0,BTNS_BUTTON, {}, 0, (INT_PTR)"Copy (Ctrl+C)"},
+        {8, -0, 0, BTNS_BUTTON, {}, 0, (INT_PTR)"Paste (Ctrl+V)"},
+        {0, 0, 0, BTNS_SEP},
+        {9, IDC_START, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"To Song Start (Ctrl+Left)"},
+        {10, IDC_LEFT, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Previous Measure (Shift+Left)"},
+        {11, IDC_LEFTSTEP, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Backwards (Left)"},
+        {12, IDC_PLAYPAUSE, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Play/Pause (F5)"},
+        {14, IDC_RIGHTSTEP, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Forwards (Right)"},
+        {15, IDC_RIGHT, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Next Measure (Shift+Right)"},
+        {16, IDC_END, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"To Song End (Ctrl+Right)"},
+        {0, 0, 0,BTNS_SEP},
+        {17, IDM_LOUPE_PLUS, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Zoom In (F8)"},
+        {18, IDM_LOUPE_MINUS, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Zoom Out (F9)"},
+        {0, 0, 0,BTNS_SEP},
+        {5, IDC_PREFERENCES, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Preferences"},
     };
-    CreateToolbar(hwndRebar, "TOOLBAR_ICONS", 24, tbb);
+    *outHwndToolbar = CreateToolbar(hwndRebar, "TOOLBAR_ICONS", 23, tbb);
 
     RECT rcWindow;
     GetClientRect(hWnd, &rcWindow);

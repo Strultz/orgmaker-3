@@ -129,6 +129,7 @@ CHAR num_buf[BUF_SIZE];
 //to this point
 
 HWND hwndRebar = NULL;
+HWND hwndToolbar = NULL;
 int rebarHeight;
 
 
@@ -386,7 +387,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	if(!hWnd) return FALSE;
 
-	hwndRebar = CreateRebar(hWnd);
+	hwndRebar = CreateRebar(hWnd, &hwndToolbar);
 	rebarHeight = GetRebarHeight(hwndRebar);
 
 //	DialogBox(hInst,"DLGFLASH",NULL,DialogFlash);
@@ -721,11 +722,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_SORTMUSICNOTE: //to sort
 				SetUndo();
 				SortMusicNote();
-				break;
-			case IDM_DLGSETTING://Show settings dialog
-			case ID_AC_SETTEMPO:
-				OpenSongProperties(hWnd);
-				//DialogBox(hInst,"DLGSETTING",hwnd,DialogSetting);
 				break;
 			case IDM_DLGDEFAULT://Show Default Dialog
 			case ID_AC_DEFAULT:
@@ -1158,17 +1154,36 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_CHANGEFINISH: //Confirm when finished 2010.09.23 A
 				ChangeFinish();
 				break;
+			case IDC_START:
 			case ID_AC_HOMEBACK: //home
-				SendMessage(hDlgPlayer, WM_COMMAND, IDC_START, NULL);
+				StopPlayingSong();
+				scr_data.SetHorzScroll(0);
+				org_data.SetPlayPointer(0);
+				//SendMessage(hDlgPlayer, WM_COMMAND, IDC_START, NULL);
 				break;
+			case IDC_END:
 			case ID_AC_TOEND: //home
-				SendMessage(hDlgPlayer, WM_COMMAND, IDC_END, NULL);
+				StopPlayingSong();
+				org_data.GetMusicInfo(&mi);
+				scr_data.SetHorzScroll(mi.end_x);
+				org_data.SetPlayPointer(mi.end_x);
+				//SendMessage(hDlgPlayer, WM_COMMAND, IDC_END, NULL);
 				break;
+			case IDC_LEFT:
 			case ID_AC_MEASBACK:
-				SendMessage(hDlgPlayer, WM_COMMAND, IDC_LEFT, NULL);
+				scr_data.HorzScrollProc(SB_PAGELEFT);
+				//SendMessage(hDlgPlayer, WM_COMMAND, IDC_LEFT, NULL);
 				break;
+			case IDC_RIGHT:
 			case ID_AC_MEASNEXT:
-				SendMessage(hDlgPlayer, WM_COMMAND, IDC_RIGHT, NULL);
+				scr_data.HorzScrollProc(SB_PAGERIGHT);
+				//SendMessage(hDlgPlayer, WM_COMMAND, IDC_RIGHT, NULL);
+				break;
+			case IDC_LEFTSTEP:
+				scr_data.HorzScrollProc(SB_LINELEFT);
+				break;
+			case IDC_RIGHTSTEP:
+				scr_data.HorzScrollProc(SB_LINERIGHT);
 				break;
 			case ID_AC_SOCTUP:
 				scr_data.VertScrollProc(SB_PAGEUP);
@@ -1328,6 +1343,22 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			}
 			CheckLoupeMenu();
 			break;
+		case IDC_PLAYPAUSE:
+			if (timer_sw) {
+				StopPlayingSong();
+			} else {
+				StartPlayingSong();
+			}
+			break;
+		case IDC_PREFERENCES:
+			// TODO
+			break;
+		case IDM_DLGSETTING://Show settings dialog
+		case ID_AC_SETTEMPO:
+			OpenSongProperties(hWnd);
+			Rxo_StopAllSoundNow();
+			//DialogBox(hInst,"DLGSETTING",hwnd,DialogSetting);
+			break;
 		}
 
 		break;
@@ -1464,9 +1495,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			scr_data.KeyScroll(DIRECTION_RIGHT);
 			break;
 		case VK_F5:
-		case VK_NUMPAD0:
-			if(timer_sw == 0)SendMessage(hDlgPlayer , WM_COMMAND , IDC_PLAY , NULL);
-			else SendMessage(hDlgPlayer , WM_COMMAND , IDC_STOP , NULL);
+		//case VK_NUMPAD0:
+			if (timer_sw == 0) StartPlayingSong();
+			else StopPlayingSong();
 			break;
 		//case VK_HOME:
 		//	SendMessage(hDlgPlayer , WM_COMMAND , IDC_START , NULL);

@@ -136,3 +136,6 @@ typedef struct OrgData{
 	bool CopyNoteDataToCB(NOTECOPY *nc, int iTrack, int iFullTrack);
 }ORGDATA;
 extern ORGDATA org_data;
+
+void StartPlayingSong(void);
+void StopPlayingSong(void);
