@@ -7,11 +7,14 @@
 #include <string.h>//sprintfテスト用
 #include "rxoFunction.h"
 #include "resource.h"
+#include <CommCtrl.h>
 
 //クリックされた時の処理
 extern char timer_sw;//再生スイッチ
 extern void SetUndo();
 extern void ResetLastUndo(); //取りけし
+
+extern HWND hwndToolbar;
 
 extern NOTECOPY nc_Select; //選択範囲
 extern int tra, ful ,haba; 
@@ -54,6 +57,8 @@ void ClearDrag()
 
 void RedrawClick()
 {
+	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_SELECT_CUT, tra >= 0);
+	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_SELECT_COPY, tra >= 0);
 	//RECT rect = {64,0,WWidth,WHeight};
 	//org_data.PutMusic();//楽譜の再描画
 	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);

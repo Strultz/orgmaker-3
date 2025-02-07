@@ -1324,6 +1324,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 						t1 = t2 = tra;
 					}
 					org_data.GrabNoteData(&gClipboardData, t1, t2, nc_Select.x1_1, nc_Select.x1_2);
+					SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_SELECT_PASTE, TRUE);
 
 					if (LOWORD(wParam) == IDM_SELECT_CUT || LOWORD(wParam) == ID_AC_CUT) {
 						org_data.SetUndoData();

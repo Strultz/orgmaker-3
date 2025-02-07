@@ -8,6 +8,7 @@
 #include "Timer.h"
 #include "Sound.h"
 #include <string.h>
+#include "Click.h"
 #include "Scroll.h"
 #include "rxoFunction.h"
 #include <stdio.h>
@@ -71,6 +72,7 @@ void ClearEZC_Message()
 	CpHelp[0]=0;
 	tra=-256;
 	PrintCpHelp();
+	RedrawClick();
 }
 
 void EZ_Delete()
@@ -486,6 +488,8 @@ void ShowStatusMessage(void)
 	if(iDragMode)strcpy(Mess,"Drag");
 	else strcpy(Mess,"");
 	SetDlgItemText(hDlgEZCopy, IDC_STATUS3, Mess);
+
+	RedrawClick();
 
 
 	//SetDlgItemText(hDlgEZCopy, IDC_STATUS, Mess);

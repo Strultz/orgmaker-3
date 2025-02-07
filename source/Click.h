@@ -8,4 +8,5 @@ void LButtonUP(WPARAM wParam, LPARAM lParam);
 void RButtonUP(WPARAM wParam, LPARAM lParam);
 void SelectAll(int FullTrack);
 void SelectReset();
+void RedrawClick();
 
