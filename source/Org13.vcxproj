@@ -222,6 +222,7 @@
     <Image Include="Bitmap\Right.bmp" />
     <Image Include="Bitmap\Solo.bmp" />
     <Image Include="Bitmap\Stop.bmp" />
+    <Image Include="Bitmap\TOOLBAR_ICONS.bmp" />
     <Image Include="Bitmap\wave100.bmp" />
   </ItemGroup>
   <ItemGroup>

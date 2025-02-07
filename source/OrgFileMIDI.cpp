@@ -10,6 +10,8 @@
 #include "Scroll.h"
 #include "rxoFunction.h"
 
+// This is a deprecated legacy feature and this code will not be updated.
+
 char strMIDI_TITLE[256];
 char strMIDI_AUTHOR[256];
 unsigned char ucMIDIProgramChangeValue[MAXTRACK];

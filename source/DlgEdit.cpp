@@ -231,9 +231,13 @@ BOOL CALLBACK DialogPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if(tra<0){
 			SetDlgItemText(hdwnd,IDE_MEAS1,"");
 			SetDlgItemText(hdwnd,IDE_MEAS2,"");
+			SetDlgItemText(hdwnd,IDE_STEP1,"0");
+			SetDlgItemText(hdwnd,IDE_STEP2,"0");
 		}else{
 			SetDlgItemInt(hdwnd,IDE_MEAS1,GetSelectMeasBeat(GET_MEAS1),FALSE);
 			SetDlgItemInt(hdwnd,IDE_MEAS2,GetSelectMeasBeat(GET_MEAS2),FALSE);
+			SetDlgItemInt(hdwnd,IDE_STEP1,GetSelectMeasBeat(GET_BEAT1),FALSE);
+			SetDlgItemInt(hdwnd,IDE_STEP2,GetSelectMeasBeat(GET_BEAT2),FALSE);
 		}
 		SetDlgItemText(hdwnd,IDE_PAR,"1");
 		EnableWindow(hDlgPlayer,FALSE);
@@ -298,9 +302,13 @@ BOOL CALLBACK DialogTrans(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 		if(tra<0){
 			SetDlgItemText(hdwnd,IDE_MEAS1,"");
 			SetDlgItemText(hdwnd,IDE_MEAS2,"");
+			SetDlgItemText(hdwnd,IDE_STEP1,"0");
+			SetDlgItemText(hdwnd,IDE_STEP2,"0");
 		}else{
 			SetDlgItemInt(hdwnd,IDE_MEAS1,GetSelectMeasBeat(GET_MEAS1),FALSE);
 			SetDlgItemInt(hdwnd,IDE_MEAS2,GetSelectMeasBeat(GET_MEAS2),FALSE);
+			SetDlgItemInt(hdwnd,IDE_STEP1,GetSelectMeasBeat(GET_BEAT1),FALSE);
+			SetDlgItemInt(hdwnd,IDE_STEP2,GetSelectMeasBeat(GET_BEAT2),FALSE);
 		}
 		SetDlgItemText(hdwnd,IDE_PAR,"1");
 		EnableWindow(hDlgPlayer,FALSE);
@@ -366,9 +374,13 @@ BOOL CALLBACK DialogVolume(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 		if(tra<0){
 			SetDlgItemText(hdwnd,IDE_MEAS1,"");
 			SetDlgItemText(hdwnd,IDE_MEAS2,"");
+			SetDlgItemText(hdwnd,IDE_STEP1,"0");
+			SetDlgItemText(hdwnd,IDE_STEP2,"0");
 		}else{
 			SetDlgItemInt(hdwnd,IDE_MEAS1,GetSelectMeasBeat(GET_MEAS1),FALSE);
 			SetDlgItemInt(hdwnd,IDE_MEAS2,GetSelectMeasBeat(GET_MEAS2),FALSE);
+			SetDlgItemInt(hdwnd,IDE_STEP1,GetSelectMeasBeat(GET_BEAT1),FALSE);
+			SetDlgItemInt(hdwnd,IDE_STEP2,GetSelectMeasBeat(GET_BEAT2),FALSE);
 		}
 		SetDlgItemText(hdwnd,IDE_PAR,"1");
 		EnableWindow(hDlgPlayer,FALSE);

@@ -252,6 +252,8 @@
 #define IDE_BEAT2                       1023
 #define IDC_PANPOT12                    1023
 #define IDD_SETFREQx0                   1023
+#define IDE_MEAS3                       1023
+#define IDE_STEP2                       1023
 #define IDC_TRACK9                      1024
 #define IDC_USE11                       1024
 #define IDC_PANPOT13                    1024
@@ -296,6 +298,7 @@
 #define IDC_USE0                        1034
 #define IDC_MUTE7                       1034
 #define IDC_VOLUME15                    1034
+#define IDE_STEP1                       1034
 #define IDC_MUTE8                       1035
 #define IDC_VOLUME16                    1035
 #define IDC_MUTE9                       1036
@@ -481,8 +484,8 @@
 #define IDC_WAVEY                       1252
 #define IDC_WAVEU                       1253
 #define IDC_WAVEI                       1254
-#define IDC_PLAYPAUSE					1255
-#define IDC_PREFERENCES					1256
+#define IDC_PLAYPAUSE                   1255
+#define IDC_PREFERENCES                 1256
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005
@@ -762,7 +765,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        245
+#define _APS_NEXT_RESOURCE_VALUE        246
 #define _APS_NEXT_COMMAND_VALUE         40301
 #define _APS_NEXT_CONTROL_VALUE         1257
 #define _APS_NEXT_SYMED_VALUE           101

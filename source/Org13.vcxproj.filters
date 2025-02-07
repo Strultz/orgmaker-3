@@ -261,6 +261,9 @@
     <Image Include="bitmap\bitmap1.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Bitmap\TOOLBAR_ICONS.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Media Include="Wave\Bass01.wav">

@@ -693,7 +693,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				}
 
 				if (timer_sw != 0) // Stop playing song
-					SendMessage(hDlgPlayer, WM_COMMAND, IDC_STOP, NULL);
+					StopPlayingSong();
 
 				ClearUndo(); // 2023.06.10 Someone forgot to put this here
 				org_data.InitOrgData();
@@ -748,10 +748,12 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				DialogBox(hInst,"DLGTRANS",hwnd,DialogTrans);
 				break;
 			case ID_AC_STPLAY:
-				SendMessage(hDlgPlayer , WM_COMMAND , IDC_PLAY , NULL);
+				StartPlayingSong();
 				break;
 			case ID_AC_STBACK:
-				SendMessage(hDlgPlayer , WM_COMMAND , IDC_START , NULL);
+				StopPlayingSong();
+				scr_data.SetHorzScroll(0);
+				org_data.SetPlayPointer(0);
 				break;
 			case IDM_DLGVOL://
 			case ID_AC_DLG_VOL:
@@ -838,7 +840,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				if(GetFileNameLoad(hWnd,MessageString[IDS_STRING61]/*,i*/) != MSGLOADOK) break;//"Load song data"
 				
 				if (timer_sw != 0) // Stop playing song
-					SendMessage(hDlgPlayer, WM_COMMAND, IDC_STOP, NULL);
+					StopPlayingSong();
 				
 				ClearUndo();
 				org_data.InitOrgData();
@@ -1154,21 +1156,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_CHANGEFINISH: //Confirm when finished 2010.09.23 A
 				ChangeFinish();
 				break;
-			case IDC_START:
-			case ID_AC_HOMEBACK: //home
-				StopPlayingSong();
-				scr_data.SetHorzScroll(0);
-				org_data.SetPlayPointer(0);
-				//SendMessage(hDlgPlayer, WM_COMMAND, IDC_START, NULL);
-				break;
-			case IDC_END:
-			case ID_AC_TOEND: //home
-				StopPlayingSong();
-				org_data.GetMusicInfo(&mi);
-				scr_data.SetHorzScroll(mi.end_x);
-				org_data.SetPlayPointer(mi.end_x);
-				//SendMessage(hDlgPlayer, WM_COMMAND, IDC_END, NULL);
-				break;
 			case IDC_LEFT:
 			case ID_AC_MEASBACK:
 				scr_data.HorzScrollProc(SB_PAGELEFT);
@@ -1359,6 +1346,21 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			Rxo_StopAllSoundNow();
 			//DialogBox(hInst,"DLGSETTING",hwnd,DialogSetting);
 			break;
+		case IDC_START:
+		case ID_AC_HOMEBACK: //home
+			StopPlayingSong();
+			scr_data.SetHorzScroll(0);
+			org_data.SetPlayPointer(0);
+			//SendMessage(hDlgPlayer, WM_COMMAND, IDC_START, NULL);
+			break;
+		case IDC_END:
+		case ID_AC_TOEND: //home
+			StopPlayingSong();
+			org_data.GetMusicInfo(&mi);
+			scr_data.SetHorzScroll(mi.end_x);
+			org_data.SetPlayPointer(mi.end_x);
+			//SendMessage(hDlgPlayer, WM_COMMAND, IDC_END, NULL);
+			break;
 		}
 
 		break;
@@ -1423,7 +1425,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		strcpy(music_file, strMIDIFile);
 
 		if (timer_sw != 0) // Stop playing song
-			SendMessage(hDlgPlayer, WM_COMMAND, IDC_STOP, NULL);
+			StopPlayingSong();
 
 		ClearUndo();
 //		MessageBox(hWnd,music_file,"",MB_OK);
