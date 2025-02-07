@@ -132,6 +132,9 @@ HWND hwndRebar = NULL;
 HWND hwndToolbar = NULL;
 int rebarHeight;
 
+SAVEDNOTE gClipboardData;
+NOTECOPY nc_Select;
+int tra = -256, ful = 0, haba = 0;
 
 void SaveIniFile();
 
@@ -348,8 +351,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	WinRect.left=       GetPrivateProfileInt(MAIN_WINDOW,"left",0,app_path);
 	WinRect.top=        GetPrivateProfileInt(MAIN_WINDOW,"top",0,app_path);
-	WinRect.right=      GetPrivateProfileInt(MAIN_WINDOW,"right",560,app_path);
-	WinRect.bottom=     GetPrivateProfileInt(MAIN_WINDOW,"bottom",560,app_path);
+	WinRect.right=      GetPrivateProfileInt(MAIN_WINDOW,"right",640,app_path);
+	WinRect.bottom=     GetPrivateProfileInt(MAIN_WINDOW,"bottom",480,app_path);
 	CmnDialogWnd.left=	GetPrivateProfileInt(COMMON_WINDOW,"left",	20,app_path);
 	CmnDialogWnd.top=	GetPrivateProfileInt(COMMON_WINDOW,"top",	20,app_path);
 	CmnDialogWnd.right=	GetPrivateProfileInt(COMMON_WINDOW,"right",	550,app_path);
@@ -506,8 +509,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	//}
 
 	SetModified(false);//title name set
-	ClearVirtualCB(); //Initialize the virtual clipboard
+	//ClearVirtualCB(); //Initialize the virtual clipboard
 	ClearUndo();
+
+	memset(&gClipboardData, 0, sizeof(gClipboardData));
 
 			//Show to Player
 	MUSICINFO mi;
@@ -732,7 +737,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				DialogBox(hInst,"DLGDELETE",hwnd,DialogDelete);
 				break;
 			case IDM_DLGCOPY://
-			case ID_AC_COPY:
+			case ID_AC_COPYDLG:
 				DialogBox(hInst,"DLGCOPY",hwnd,DialogCopy);
 				break;
 			case IDM_DLGCOPY2://
@@ -771,7 +776,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				DialogBox(hInst,"DLGSWAP",hwnd,DialogSwap);
 				break;
 			case IDM_DLGMEMO://
-				PlaySoundObject(3, 1);
+				//PlaySoundObject(3, 1);
 				DialogBox(hInst,"DLGMEMO",hwnd,DialogMemo);
 				break;
 			case IDM_DLGTHEMES:
@@ -1289,6 +1294,63 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case ID_AC_DELETEKEY: //Add 2014/04/12
 				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_DELETEBUTTON , NULL);
 				break;
+			case ID_AC_CUT:
+			case IDM_SELECT_CUT:
+			case ID_AC_COPY:
+			case IDM_SELECT_COPY: {
+				if (tra >= 0) {
+					for (int i = 0; i < MAXTRACK; ++i) {
+						if (gClipboardData.data[i].data) {
+							free(gClipboardData.data[i].data);
+							gClipboardData.data[i].data = NULL;
+						}
+					}
+					long t1;
+					long t2;
+					if(ful==1){
+						if(sACrnt==0){
+							t1=0;
+							t2=MAXTRACK - 1;
+						}else{
+							if(org_data.track<MAXMELODY){
+								t1=0;
+								t2=MAXMELODY - 1;
+							}else{
+								t1=MAXMELODY;
+								t2=MAXTRACK - 1;
+							}
+						}
+					}else{
+						t1 = t2 = tra;
+					}
+					org_data.GrabNoteData(&gClipboardData, t1, t2, nc_Select.x1_1, nc_Select.x1_2);
+
+					if (LOWORD(wParam) == IDM_SELECT_CUT || LOWORD(wParam) == ID_AC_CUT) {
+						org_data.SetUndoData();
+						for (int i = t1; i <= t2; ++i) {
+							PARCHANGE pc;
+							pc.track = i;
+							pc.x1 = nc_Select.x1_1;
+							pc.x2 = nc_Select.x1_2;
+							org_data.DelateNoteData(&pc);
+						}
+						SelectReset();
+					}
+				}
+				break;
+			}
+			case ID_AC_PASTE:
+			case IDM_SELECT_PASTE: {
+				long x_scroll, y_scroll;
+				scr_data.GetScrollPosition(&x_scroll, &y_scroll);
+
+				org_data.SetUndoData();
+				org_data.PasteNoteData(&gClipboardData, org_data.track, tra >= 0 ? nc_Select.x1_1 : x_scroll, 1);
+				for (int i = gClipboardData.track1; i < gClipboardData.track2; ++i) {
+					org_data.CheckNoteTail(i);
+				}
+				break;
+			}
 			}
 		}else{
 			//only while playing

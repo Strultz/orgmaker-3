@@ -725,7 +725,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,198,155,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,252,155,50,14
     LISTBOX         IDD_THEMES,4,4,301,147,LBS_NOINTEGRALHEIGHT | LBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Open Theme Folder",IDC_OPNTHMFLD,7,155,80,14
+    PUSHBUTTON      "Open Theme Folder",IDC_OPNTHMFLD,7,155,82,14
 END
 
 DLGWAVEDBS DIALOGEX 0, 0, 309, 176
@@ -736,7 +736,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,198,155,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,252,155,50,14
     LISTBOX         IDD_WAVEDBS,4,4,301,147,LBS_NOINTEGRALHEIGHT | LBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Open Soundbank Folder",IDC_OPNTHMFLD,7,155,80,14
+    PUSHBUTTON      "Open Soundbank Folder",IDC_OPNTHMFLD,7,155,82,14
 END
 
 DLGWAVEXPORT DIALOG 0, 0, 135, 76
@@ -810,14 +810,19 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Select All\tCtrl+A",         IDM_SELECT_ALL
         MENUITEM "&Deselect\tCtrl+D",           IDM_SELECT_RESET
-        MENUITEM "&Copy...\tCtrl+F2",           IDM_DLGCOPY
-        MENUITEM "&Multi-Copy...\tCtrl+F3",     IDM_DLGCOPY2
-        MENUITEM "&Delete...\tCtrl+Del",        IDM_DLGDELETE
+        MENUITEM SEPARATOR
+        MENUITEM "&Cut\tCtrl+X",                IDM_SELECT_CUT
+        MENUITEM "&Copy\tCtrl+C",               IDM_SELECT_COPY
+        MENUITEM "&Paste\tCtrl+V",              IDM_SELECT_PASTE
         MENUITEM SEPARATOR
         MENUITEM "&Pan...\tCtrl+F4",            IDM_DLGPAN
         MENUITEM "&Volume...\tF4",              IDM_DLGVOL
         MENUITEM "&Transpose...\tShift+F4",     IDM_DLGTRANS
         MENUITEM "S&wap Tracks...\tShift+Ctrl+F4", IDM_DLGSWAP
+        MENUITEM SEPARATOR
+        MENUITEM "&Copy...\tCtrl+F2",           IDM_DLGCOPY
+        MENUITEM "&Multi-Copy...\tCtrl+F3",     IDM_DLGCOPY2
+        MENUITEM "&Delete...\tCtrl+Del",        IDM_DLGDELETE
         MENUITEM SEPARATOR
         POPUP "&Note Volume (Existing Notes Only)"
         BEGIN
@@ -1178,7 +1183,7 @@ BEGIN
     VK_F12,         ID_AC_ML_VOL_DOWN,      VIRTKEY, SHIFT, NOINVERT
     VK_F12,         ID_AC_VOLWARIAI_DOWN,   VIRTKEY, SHIFT, CONTROL, NOINVERT
     VK_F2,          ID_AC_SETTEMPO,         VIRTKEY, NOINVERT
-    VK_F2,          ID_AC_COPY,             VIRTKEY, CONTROL, NOINVERT
+    VK_F2,          ID_AC_COPYDLG,          VIRTKEY, CONTROL, NOINVERT
     VK_F3,          ID_AC_DEFAULT,          VIRTKEY, NOINVERT
     VK_F3,          ID_AC_COPY2,            VIRTKEY, CONTROL, NOINVERT
     VK_F4,          ID_AC_DLG_VOL,          VIRTKEY, NOINVERT
@@ -1233,6 +1238,9 @@ BEGIN
     "Y",            ID_AC_REDO,             VIRTKEY, CONTROL, NOINVERT
     "Y",            ID_AC_SY,               VIRTKEY, SHIFT, NOINVERT
     "Z",            ID_AC_UNDO,             VIRTKEY, CONTROL, NOINVERT
+    "X",            ID_AC_CUT,              VIRTKEY, CONTROL, NOINVERT
+    "C",            ID_AC_COPY,             VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_AC_PASTE,            VIRTKEY, CONTROL, NOINVERT
 END
 
 

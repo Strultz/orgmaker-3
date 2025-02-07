@@ -45,6 +45,19 @@ typedef struct MUSICINFO{
 	long end_x;//曲の終わり(リピートに戻る)
 	TRACKDATA tdata[16];
 }MUSICINFO;
+
+typedef struct {
+	long size;
+	NOTELIST* data;
+} SAVEDTRACK;
+
+typedef struct {
+	long track1;
+	long track2;
+	long length;
+	SAVEDTRACK data[16];
+} SAVEDNOTE;
+
 //メインクラス。このアプリケーションの中心。（クラスってやつを初めて使う）
 typedef struct OrgData{
 	OrgData();//コンストラクタ
@@ -115,7 +128,7 @@ typedef struct OrgData{
 		void SetPlayPointer(long x);//再生ポインターを指定の位置に設定
 		void GetPlayPos(long *playpos, long *oplaypos = NULL);
 		//以下はファイル関係
-		unsigned short GetNoteNumber(char track,NOTECOPY *nc);
+		unsigned short GetNoteNumber(char track, long x1, long x2);
 		BOOL OrgData::SaveMusicData(void);
 		BOOL OrgData::LoadMusicData(void);
 		int FileCheckBeforeLoad(char *checkfile); //ファイルがロード可能であれば0異常であれば1を返す。ﾃﾞｰﾀロードはされない。 2014.05.22
@@ -126,6 +139,9 @@ typedef struct OrgData{
 		BOOL ChangeTransData(PARCHANGE *pc);
 		BOOL ChangeVolumeData(PARCHANGE *pc, char mode);
 		BOOL CheckNoteTail(char track);
+
+		BOOL GrabNoteData(SAVEDNOTE* sn, char track1, char track2, long x1, long x2);
+		BOOL PasteNoteData(SAVEDNOTE* sn, char track, long x, long num);
 
 		BOOL EnsureEmptyArea(PARCHANGE *pc, int Function); //[新]空白を埋める 2014.05.01
 		BOOL SwapTrack(NOTECOPY *pc); //[新]トラックを入れ替える 2014.05.10

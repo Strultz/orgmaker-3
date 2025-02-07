@@ -24,7 +24,7 @@ extern void ShowMemoryState();
 extern void SortMusicNote(void); //âπïÑÇÃêÆóù
 
 
-extern void ClearVirtualCB(void);
+/*extern void ClearVirtualCB(void);
 extern void AddIntegerToVirtualCB(int iNum);
 extern void AddStartToVirtualCB(void);
 extern bool ReadStartFromVirtualCB(void);
@@ -32,7 +32,7 @@ extern int ReadIntegerFromVirtualCB(void);
 extern void SetClipBoardFromVCB(void);
 extern void GetClipBoardToVCB(void);
 extern void AddTrackSeparater(void);
-extern void AddStartToVirtualCB(void);
+extern void AddStartToVirtualCB(void);*/
 
 extern void ReplaseUndo();
 extern void SetUndo();

@@ -528,7 +528,7 @@
 #define ID_AC_SETTEMPO                  40044
 #define ID_AC_DEFAULT                   40045
 #define ID_AC_DELETE                    40046
-#define ID_AC_COPY                      40047
+#define ID_AC_COPYDLG                   40047
 #define ID_AC_COPY2                     40048
 #define IDM_CT_PAN_R                    40049
 #define IDM_CT_PAN_L                    40050
@@ -760,13 +760,19 @@
 #define ID_AC_WAV                       40298
 #define IDM_DLGWAVEDBS                  40299
 #define IDM_DCLEN                       40300
+#define IDM_SELECT_CUT                  40301
+#define IDM_SELECT_COPY                 40302
+#define IDM_SELECT_PASTE                40303
+#define ID_AC_CUT                       40304
+#define ID_AC_COPY                      40305
+#define ID_AC_PASTE                     40306
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        246
-#define _APS_NEXT_COMMAND_VALUE         40301
+#define _APS_NEXT_COMMAND_VALUE         40307
 #define _APS_NEXT_CONTROL_VALUE         1257
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

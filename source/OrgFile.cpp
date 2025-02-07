@@ -40,12 +40,12 @@ typedef struct{
 
 
 //そのトラックに使われている音符の数を検出
-unsigned short OrgData::GetNoteNumber(char track,NOTECOPY *nc)
+unsigned short OrgData::GetNoteNumber(char track, long x1, long x2)
 {
 	NOTELIST *np;
 	unsigned short num = 0;
 	np = info.tdata[track].note_list;
-	if(nc == NULL){
+	if(x1 == -1 && x2 == -1){
 		while(np != NULL){
 			num++;
 			np = np->to;
@@ -53,12 +53,12 @@ unsigned short OrgData::GetNoteNumber(char track,NOTECOPY *nc)
 		return num;
 	}else{
 		//範囲までとぶ
-		while(np != NULL && np->x < nc->x1_1){
+		while(np != NULL && np->x < x1){
 			np = np->to;
 		}
 		if(np == NULL)return 0;
 		//範囲を超えたら(最大Xが同じ物も検出)
-		while(np != NULL && np->x <= nc->x1_2){
+		while(np != NULL && np->x <= x2){
 			num++;
 			np = np->to;
 		}
@@ -82,7 +82,7 @@ BOOL OrgData::SaveMusicData(void)
 		org_data.tdata[i].freq = info.tdata[i].freq;
 		org_data.tdata[i].wave_no = info.tdata[i].wave_no;
 		org_data.tdata[i].pipi = info.tdata[i].pipi;
-		org_data.tdata[i].note_num = GetNoteNumber(i,NULL);
+		org_data.tdata[i].note_num = GetNoteNumber(i, -1, -1);
 	}
 	//｣｣｣｣｣｣｣｣｣｣｣｣｣｣｣セーブ
 	FILE *fp;
@@ -323,7 +323,7 @@ void OrgData::SortNotes()
 		org_data.tdata[i].freq = info.tdata[i].freq;
 		org_data.tdata[i].wave_no = info.tdata[i].wave_no;
 		org_data.tdata[i].pipi = info.tdata[i].pipi;
-		org_data.tdata[i].note_num = GetNoteNumber(i,NULL);
+		org_data.tdata[i].note_num = GetNoteNumber(i, -1, -1);
 	}
 
 	pNtls = new NOTELIST[4096]; //退避用

@@ -42,8 +42,8 @@ int Hni[]={
 	1,2,3,4,8,16,	
 };
 
-NOTECOPY nc_Select;
-int tra=-256, ful=0,haba=0;
+extern NOTECOPY nc_Select;
+extern int tra, ful, haba;
 int sGrid = 0;	//範囲選択はグリッド単位で
 int sACrnt = 0;	//範囲選択は常にｶﾚﾝﾄﾄﾗｯｸ
 

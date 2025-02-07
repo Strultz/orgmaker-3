@@ -452,7 +452,7 @@ void SortMusicNote(void)
 	if(a == IDYES){
 		org_data.SortNotes();
 		//MessageBox(hWnd,"並べ替え・再構築しました。","通知",MB_OK);	// 2014.10.19 D
-		//msgbox(hWnd,IDS_INFO_NARABEKAE,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
+		msgbox(hWnd,IDS_INFO_NARABEKAE,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 
 	}else{
 		//MessageBox(hWnd,"キャンセルしました。","通知",MB_OK);	// 2014.10.19 D
@@ -461,7 +461,7 @@ void SortMusicNote(void)
 }
 
 //仮想的にクリップボードを用意して、データのやり取りはこいつを介して行う。
-char VirtualCB[VIRTUAL_CB_SIZE];
+/*char VirtualCB[VIRTUAL_CB_SIZE];
 char *readVCB;
 
 void ClearVirtualCB(void)
@@ -568,7 +568,7 @@ void GetClipBoardToVCB(void)
 
 	CloseClipboard();
 	ReadStartFromVirtualCB();
-}
+}*/
 
 RECT rect1 = {0,0,WWidth,WHeight};//更新する領域
 

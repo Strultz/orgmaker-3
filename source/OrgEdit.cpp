@@ -100,29 +100,185 @@ BOOL OrgData::DelateNoteData(PARCHANGE *pc)
 	return TRUE;
 }
 
+BOOL OrgData::GrabNoteData(SAVEDNOTE* sn, char track1, char track2, long x1, long x2)
+{
+	int i, j;
+	NOTELIST* np;
+	NOTELIST* work;
+	NOTELIST* wp;
+	long ind_x;
+	long copy_num;
+
+	if (sn == NULL || x1 < 0 || x2 < x1) {
+		return FALSE;
+	}
+
+	sn->length = x2 + 1 - x1;
+	sn->track1 = track1;
+	sn->track2 = track2;
+
+	for (j = track1; j <= track2; ++j) {
+		copy_num = GetNoteNumber(j, x1, x2);
+		if (copy_num == 0) {
+			sn->data[j].data = NULL;
+			continue; // No notes here
+		}
+
+		wp = work = (NOTELIST*)malloc(sizeof(NOTELIST) * copy_num);
+		if (work == NULL) {
+			return FALSE;
+		}
+
+		ind_x = x1;
+		np = info.tdata[j].note_list;
+		while (np != NULL && np->x < x1) np = np->to;
+		if (np == NULL) {
+			free(work);
+			sn->data[j].data = NULL;
+			continue;
+		}
+
+		for (i = 0; i < copy_num; i++) {
+			wp->length = np->length;
+			wp->pan = np->pan;
+			wp->volume = np->volume;
+			wp->y = np->y;
+			wp->x = np->x - ind_x;
+			np = np->to;
+			wp++;
+		}
+
+		sn->data[j].size = copy_num;
+		sn->data[j].data = work;
+	}
+	return TRUE;
+}
+
+BOOL OrgData::PasteNoteData(SAVEDNOTE* sn, char track, long x, long num)
+{
+	int i, j, k;
+	PARCHANGE pc;
+	NOTELIST* np;
+	NOTELIST* p_list1, * p_list2;
+	NOTELIST* work;
+	NOTELIST* wp;
+	long copy_num;
+	SAVEDTRACK* st;
+
+	for (k = sn->track1; k <= sn->track2; ++k) {
+		st = &sn->data[k];
+
+		copy_num = st->size;
+		work = st->data;
+		if (work == NULL) {
+			continue;
+		}
+
+		if (sn->track1 != sn->track2) {
+			track = k;
+		}
+
+		pc.track = track;
+		pc.x1 = x;
+		pc.x2 = x + sn->length * num - 1;
+		DelateNoteData(&pc);
+
+		np = p_list1 = p_list2 = SearchNote(info.tdata[track].note_p);
+		if (np == NULL) {
+			return FALSE;
+		}
+		np->length = 1;
+		for (i = 1; i < copy_num * num; i++) {
+			np = SearchNote(info.tdata[track].note_p);
+			if (np == NULL) {
+				break;
+			}
+			np->length = 1;
+			p_list2->to = np;
+			np->from = p_list2;
+			p_list2 = np;
+		}
+
+		long index;
+		np = p_list1;
+		for (j = 0; j < num;j++) {
+			wp = work;
+			index = x + sn->length * j;
+			for (i = 0; i < copy_num; i++) {
+				np->length = wp->length;
+				np->pan = wp->pan;
+				np->volume = wp->volume;
+				np->y = wp->y;
+
+				np->x = wp->x + index;
+
+				np = np->to;
+				wp++;
+				if (np == NULL) break;
+			}
+			if (np == NULL) break;
+		}
+
+		np = info.tdata[track].note_list;
+		if (np == NULL) {
+			info.tdata[track].note_list = p_list1;
+			p_list1->from = NULL;
+			p_list2->to = NULL;
+		}
+		else {
+			if (np->x > p_list2->x) {
+				np->from = p_list2;
+				p_list2->to = np;
+				p_list1->from = NULL;
+				info.tdata[track].note_list = p_list1;
+				continue;
+			}
+			while (np->to != NULL && np->to->x < x)np = np->to;
+			if (np->to == NULL) {
+				np->to = p_list1;
+				p_list1->from = np;
+				p_list2->to = NULL;
+				continue;
+			}
+			else {
+				np->to->from = p_list2;
+				p_list2->to = np->to;
+				np->to = p_list1;
+				p_list1->from = np;
+				continue;
+			}
+
+		}
+	}
+	return TRUE;
+}
+
 BOOL OrgData::CopyNoteData(NOTECOPY *nc)
 {
 	int i,j;
-	PARCHANGE pc;//ペースト領域クリア用
+	PARCHANGE pc;
 	NOTELIST *np;
-//	NOTELIST *p_in1,*p_in2;//挿入すべき場所
-	NOTELIST *p_list1,*p_list2;//挿入すべきリスト
-	NOTELIST *work;//ワークエリア
-	NOTELIST *wp;//ワークポインタ
-	long ind_x;//インデックス値（x)
-	long copy_num;//コピーする音譜の数
-	if(nc->num == 0)return FALSE;//コピー回数０
-	copy_num = GetNoteNumber(nc->track1,nc);
-	if(copy_num == 0)return FALSE;
-	wp = work = (NOTELIST *)malloc(sizeof(NOTELIST)*copy_num);//ワーク用に領域を確保
+	NOTELIST *p_list1,*p_list2;
+	NOTELIST* work;
+	NOTELIST *wp;
+	long ind_x;
+	long copy_num;
+
+	if (nc->num == 0)
+		return FALSE;
+
+	copy_num = GetNoteNumber(nc->track1, nc->x1_1, nc->x1_2);
+	if (copy_num == 0)
+		return FALSE;
+
+	wp = work = (NOTELIST *)malloc(sizeof(NOTELIST)*copy_num);
 	ind_x = nc->x1_1;
 	
-	//ワーク領域にコピー
 	np = info.tdata[nc->track1].note_list;
 	while(np != NULL && np->x < nc->x1_1)np = np->to;
 	if(np == NULL){
 		free( work );
-		return TRUE;//コピー元に音譜無し(頭を検索中にOUT)
+		return TRUE;
 	}
 	for(i = 0; i < copy_num; i++){//１ペースト
 		wp->length = np->length;
@@ -232,7 +388,7 @@ BOOL OrgData::ChangePanData(PARCHANGE *pc)
 	//音譜の数を検出
 	nc.x1_1 = pc->x1;
 	nc.x1_2 = pc->x2;
-	num = GetNoteNumber(pc->track,&nc);
+	num = GetNoteNumber(pc->track, nc.x1_1, nc.x1_2);
 
 	np = info.tdata[pc->track].note_list;
 	if(np == NULL || num == 0)return FALSE;
@@ -274,7 +430,7 @@ BOOL OrgData::ChangeTransData(PARCHANGE *pc)
 	//音譜の数を検出
 	nc.x1_1 = pc->x1;
 	nc.x1_2 = pc->x2;
-	num = GetNoteNumber(pc->track,&nc);
+	num = GetNoteNumber(pc->track, nc.x1_1, nc.x1_2);
 
 	np = info.tdata[pc->track].note_list;
 	if(np == NULL || num == 0)return FALSE;
@@ -308,7 +464,7 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 	//音譜の数を検出
 	nc.x1_1 = pc->x1;
 	nc.x1_2 = pc->x2;
-	num = GetNoteNumber(pc->track, &nc);
+	num = GetNoteNumber(pc->track, nc.x1_1, nc.x1_2);
 
 	int vlen = volChangeLength;
 	if (volChangeUseNoteLength || mode != 1) {
@@ -780,7 +936,7 @@ BOOL OrgData::EnsureEmptyArea(PARCHANGE *pc, int Function)
 	NOTELIST *np, *p, *npnext;
 	PARCHANGE tmpc;
 
-	nc.x1_1 = pc->x1; nc.x1_2 = pc->x2; num = GetNoteNumber(pc->track,&nc);
+	nc.x1_1 = pc->x1; nc.x1_2 = pc->x2; num = GetNoteNumber(pc->track, nc.x1_1, nc.x1_2);
 	np = info.tdata[pc->track].note_list;
 	if(np == NULL || num == 0)return FALSE;
 	
