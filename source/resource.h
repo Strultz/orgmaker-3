@@ -479,8 +479,8 @@
 #define IDC_WAVER                       1250
 #define IDC_WAVET                       1251
 #define IDC_WAVEY                       1252
-#define IDC_WAVEI                       1254
 #define IDC_WAVEU                       1253
+#define IDC_WAVEI                       1254
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005
@@ -760,7 +760,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        244
+#define _APS_NEXT_RESOURCE_VALUE        245
 #define _APS_NEXT_COMMAND_VALUE         40301
 #define _APS_NEXT_CONTROL_VALUE         1250
 #define _APS_NEXT_SYMED_VALUE           101

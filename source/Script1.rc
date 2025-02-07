@@ -1014,6 +1014,10 @@ B_LOUPE_PLUS            BITMAP                  "Bitmap\\Loupe_PLUS.bmp"
 
 B_LOUPE_MINUS           BITMAP                  "Bitmap\\Loupe_MINUS.bmp"
 
+FILE_TOOLBAR_ICONS      BITMAP                  "Bitmap\\FILE_TOOLBAR_ICONS.bmp"
+
+PLAYER_TOOLBAR_ICONS    BITMAP                  "Bitmap\\PLAYER_TOOLBAR_ICONS.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

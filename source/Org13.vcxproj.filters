@@ -207,49 +207,58 @@
     <Image Include="Bitmap\wave100.bmp">
       <Filter>Resource Files\Bitmap</Filter>
     </Image>
+    <Image Include="Bitmap\org_next_step.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
     <Image Include="Bitmap\button_track_5.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Bitmap</Filter>
     </Image>
     <Image Include="Bitmap\button_track_6.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Bitmap</Filter>
     </Image>
     <Image Include="Bitmap\button_track_7.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Bitmap</Filter>
     </Image>
     <Image Include="Bitmap\button_track_8.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Bitmap\button_track_Q.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Bitmap\button_track_W.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Bitmap</Filter>
     </Image>
     <Image Include="Bitmap\button_track_E.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Bitmap\button_track_R.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Bitmap\button_track_T.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Bitmap\button_track_Y.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Bitmap\button_track_U.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Bitmap</Filter>
     </Image>
     <Image Include="Bitmap\button_track_I.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Bitmap</Filter>
     </Image>
-    <Image Include="Bitmap\org_end.bmp">
-      <Filter>Resource Files</Filter>
+    <Image Include="Bitmap\button_track_Q.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
     </Image>
-    <Image Include="Bitmap\org_next_step.bmp">
-      <Filter>Resource Files</Filter>
+    <Image Include="Bitmap\button_track_R.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="Bitmap\button_track_T.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="Bitmap\button_track_U.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="Bitmap\button_track_W.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="Bitmap\button_track_Y.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
     </Image>
     <Image Include="Bitmap\org_back_step.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="Bitmap\org_end.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="Bitmap\FILE_TOOLBAR_ICONS.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="Bitmap\PLAYER_TOOLBAR_ICONS.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="bitmap\bitmap1.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

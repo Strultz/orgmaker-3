@@ -24,6 +24,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #include <windows.h>
 #include <winuser.h>
+#include <CommCtrl.h>
 
 #include "Setting.h"
 #include "DefOrg.h"
@@ -1618,7 +1619,25 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		}
 		break;
+	case WM_NOTIFY: {
+		LPNMHDR nmh = (LPNMHDR)lParam;
+		switch (nmh->code) {
+		case RBN_HEIGHTCHANGE: {
+			int oldHeight = WHeight + rebarHeight;
+			rebarHeight = GetRebarHeight(hwndRebar);
+			WHeight = oldHeight - rebarHeight;
+			rect.right = WWidth;		//A 2008/05/14
+			rect.bottom = WHeight;		//A 2008/05/14
+			if (!org_data.PutBackGround())break;
+			scr_data.ChangeVerticalRange(WHeight);
+			break;
+		}
+		}
+		break;
+	}
 	case WM_SIZE:
+		SendMessage(hwndRebar, WM_SIZE, 0, 0);
+		rebarHeight = GetRebarHeight(hwndRebar);
 		WWidth = LOWORD(lParam);	//Client area size
 		WHeight = HIWORD(lParam) - rebarHeight;
 		rect.right = WWidth;		//A 2008/05/14

@@ -181,6 +181,7 @@
     <ClInclude Include="Toolbar.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="bitmap\bitmap1.bmp" />
     <Image Include="Bitmap\button_track_1.bmp" />
     <Image Include="Bitmap\button_track_2.bmp" />
     <Image Include="Bitmap\button_track_3.bmp" />
@@ -198,6 +199,7 @@
     <Image Include="Bitmap\button_track_W.bmp" />
     <Image Include="Bitmap\button_track_Y.bmp" />
     <Image Include="Bitmap\ffff.ico" />
+    <Image Include="Bitmap\FILE_TOOLBAR_ICONS.bmp" />
     <Image Include="Bitmap\Head.bmp" />
     <Image Include="Bitmap\icon1.ico" />
     <Image Include="Bitmap\Left.bmp" />
@@ -216,6 +218,7 @@
     <Image Include="Bitmap\org_stop.bmp" />
     <Image Include="Bitmap\Pan.bmp" />
     <Image Include="Bitmap\Play.bmp" />
+    <Image Include="Bitmap\PLAYER_TOOLBAR_ICONS.bmp" />
     <Image Include="Bitmap\Right.bmp" />
     <Image Include="Bitmap\Solo.bmp" />
     <Image Include="Bitmap\Stop.bmp" />
