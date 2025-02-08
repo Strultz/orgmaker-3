@@ -656,7 +656,7 @@
 #define ID_AC_NUM9                      40175
 #define ID_AC_NUMPLUS                   40176
 #define ID_AC_DELETEKEY                 40177
-#define ID_AC_SELECT_CLEAR2             40178
+#define ID_AC_KILLSOUND                 40178
 #define ID_AC_SELECT_BACKDEL            40179
 #define ID_AC_SELECT_INSERT             40180
 #define IDM_CT_VOLWARIAI_DOWN           40181

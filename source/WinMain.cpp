@@ -238,7 +238,7 @@ TCHAR strSize[128]; //for Debug	// 2010.08.14 A
 int iKeyPhase[128];
 int iCurrentPhase;
 int iCast[256];
-int iPushShift[2];
+int previewOctave = 2;
 
 int iKeyPushDown[256]; // 2010.09.22 A
 
@@ -350,8 +350,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	strSize[0]=0;	// 2010.08.14 A
 	for(int jjj=0;jjj<128;jjj++)iKeyPhase[jjj]=-1;
 	iCurrentPhase=0;
-	iPushShift[0]=0;
-	iPushShift[1]=0;
 	int i, vvv;
 	for(vvv=0;vvv<256;vvv++){
 		iCast[vvv]=0xFFFF;
@@ -364,25 +362,25 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	//initial file name
 	strcpy(music_file, MessageString[IDS_DEFAULT_ORG_FILENAME]);
 
-	iCast['Z']= 33;
-	iCast['S']= 34;
-	iCast['X']= 35;
-	iCast['C']= 36; //C c C sound
-	iCast['F']= 37;
-	iCast['V']= 38; //     D
-	iCast['G']= 39;
-	iCast['B']= 40; //     E
-	iCast['N']= 41; //     F
-	iCast['J']= 42;
-	iCast['M']= 43; //     G
-	iCast['K']= 44;
-	iCast[0xBC]=45; //,    A
-	iCast['L']= 46;
-	iCast[0xBE]=47; //.    B
-	iCast[0xBF]=48; //^   C
-	iCast[0xBA]=49; //:
-	iCast[0xE2]=50; //
-	iCast[0xDD]=51; //]
+	iCast['Z']= 9;
+	iCast['S']= 10;
+	iCast['X']= 11;
+	iCast['C']= 12; //C c C sound
+	iCast['F']= 13;
+	iCast['V']= 14; //     D
+	iCast['G']= 15;
+	iCast['B']= 16; //     E
+	iCast['N']= 17; //     F
+	iCast['J']= 18;
+	iCast['M']= 19; //     G
+	iCast['K']= 20;
+	iCast[0xBC]=21; //,    A
+	iCast['L']= 22;
+	iCast[0xBE]=23; //.    B
+	iCast[0xBF]=24; //^   C
+	iCast[0xBA]=25; //:
+	iCast[0xE2]=26; //
+	iCast[0xDD]=27; //]
 	strMIDIFile = (char *)malloc(MAX_PATH);
 	gSelectedTheme = (char *)malloc(MAX_PATH);
 	gSelectedWave = (char*)malloc(MAX_PATH);
@@ -753,7 +751,13 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				//SendDlgItemMessage(hDlgTrack , IDC_TRACK0 , BM_CLICK , 0, 0);
 			}
 			else if (LOWORD(wParam) == iChgTrackBtn[i]) {
-				if (GetKeyState(VK_CONTROL) & 0x8000) { // Solo
+				if (GetKeyState(VK_MENU) & 0x8000) { // Side
+					char d = (org_data.mute[i] == 0);
+					for (j = 0; j < 8; ++j) {
+						org_data.mute[j + (i < 8 ? 0 : 8)] = d;
+					}
+					UpdateToolbarStatus();
+				} else if (GetKeyState(VK_CONTROL) & 0x8000) { // Solo
 					bool un = true;
 					for (j = 0; j < 16; ++j) {
 						if (org_data.mute[j] != (i != j)) {
@@ -765,7 +769,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 						org_data.mute[j] = (!un && i != j);
 					}
 					UpdateToolbarStatus();
-				} else if(GetKeyState(VK_SHIFT) & 0x8000) { // Mute
+				} else if (GetKeyState(VK_SHIFT) & 0x8000) { // Mute
 					MuteTrack(i);
 				} else { // Select
 					ChangeTrack(i);
@@ -1165,8 +1169,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 							pc.x2 = nc_Select.x1_2;
 							org_data.DelateNoteData(&pc);
 						}
-						SelectReset();
 					}
+
+					SelectReset();
 				}
 				break;
 			}
@@ -1245,8 +1250,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_DLGSETTING://Show settings dialog
 		case ID_AC_SETTEMPO:
 			StopPlayingSong();
-			OpenSongProperties(hWnd);
 			Rxo_StopAllSoundNow();
+			OpenSongProperties(hWnd);
 			//DialogBox(hInst,"DLGSETTING",hwnd,DialogSetting);
 			break;
 		case IDC_START:
@@ -1479,6 +1484,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			ChangeFinish();
 			break;
 		case IDM_STOPNOWALL:
+		case ID_AC_KILLSOUND:
 			StopPlayingSong();
 			Rxo_StopAllSoundNow();
 			break;
@@ -1497,7 +1503,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 			//«	// 2010.12.01 A
 		case ID_AC_SELECT_CLEAR: //Clear selection
-		case ID_AC_SELECT_CLEAR2: //Clear selection //2014.04.13
 			ClearEZC_Message();
 			//org_data.PutMusic();
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
@@ -1709,24 +1714,37 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				org_data.GetMusicInfo(&mi);
 				iKeyPhase[iCast[wParam]]=iCurrentPhase;
 				iCurrentPhase=-iCurrentPhase + 1;
-				Rxo_PlayKey(iCast[wParam] + iPushShift[0]*12 -iPushShift[1]*12 , org_data.track, mi.tdata[org_data.track].freq, iKeyPhase[iCast[wParam]]);
-				iKeyPushDown[iCast[wParam]+ iPushShift[0]*12 -iPushShift[1]*12] = 1;
+
+				char key = iCast[wParam] + previewOctave * 12;
+				if (key < 0) break;
+				if (key > 95) break;
+
+				Rxo_PlayKey(key, org_data.track, mi.tdata[org_data.track].freq, iKeyPhase[iCast[wParam]]);
+				iKeyPushDown[key] = 1;
 				//org_data.PutMusic();//Redrawing sheet music
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
 			}
 
 			break;
-		case VK_TAB:
+		case VK_MULTIPLY:
 			if ((lParam & 0x40000000) == 0 && (timer_sw == 0 || iChangeEnablePlaying != 0)) {
-				iPushShift[0] = 1;
+				++previewOctave;
+				if (previewOctave > 6)
+					previewOctave = 6;
 				Rxo_StopAllSoundNow();
+				memset(iKeyPhase, -1, sizeof(iKeyPhase));
+				memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
 			}
 			break;
-		case VK_SHIFT:
+		case VK_DIVIDE:
 			if ((lParam & 0x40000000) == 0 && (timer_sw == 0 || iChangeEnablePlaying != 0)) {
-				iPushShift[1] = 1;
+				--previewOctave;
+				if (previewOctave < -1)
+					previewOctave = -1;
 				Rxo_StopAllSoundNow();
+				memset(iKeyPhase, -1, sizeof(iKeyPhase));
+				memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
 			}
 			break;
 		}
@@ -1755,29 +1773,19 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case 0xE2:
 		case 0xDD:
 			if((timer_sw==0 || iChangeEnablePlaying!=0)){
-				Rxo_StopKey(iCast[wParam]+ iPushShift[0]*12 -iPushShift[1]*12, org_data.track, iKeyPhase[iCast[wParam]]);
+				if (iKeyPhase[iCast[wParam]] == -1)
+					break;
+
+				char key = iCast[wParam] + previewOctave * 12;
+				if (key < 0) break;
+				if (key > 95) break;
+
+				Rxo_StopKey(key, org_data.track, iKeyPhase[iCast[wParam]]);
+				iKeyPushDown[key] = 0;
+
 				iKeyPhase[iCast[wParam]] = -1;
-				iKeyPushDown[iCast[wParam]+ iPushShift[0]*12 -iPushShift[1]*12] = 0;
 				//org_data.PutMusic();//Redrawing sheet music
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-			}
-			break;
-		case VK_TAB:
-			if((timer_sw==0 || iChangeEnablePlaying!=0)){
-				iPushShift[0]=0;
-				for(i=0;i<256;i++)iKeyPushDown[i]=0;
-				//org_data.PutMusic();//Redrawing sheet music
-				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				Rxo_StopAllSoundNow();
-			}
-			break;
-		case VK_SHIFT:
-			if((timer_sw==0 || iChangeEnablePlaying!=0)){
-				iPushShift[1]=0;
-				for(i=0;i<256;i++)iKeyPushDown[i]=0;
-				//org_data.PutMusic();//Redrawing sheet music
-				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				Rxo_StopAllSoundNow();
 			}
 			break;
 		}

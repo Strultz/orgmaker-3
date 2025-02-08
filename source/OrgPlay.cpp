@@ -103,13 +103,14 @@ void StartPlayingSong(void) {
 	MUSICINFO mi;
 	long hp, vp;
 	if (!timer_sw) {
+		Rxo_StopAllSoundNow();
 		scr_data.GetScrollPosition(&hp, &vp);
 		org_data.SetPlayPointer(hp);
 		InitMMTimer();
 		org_data.GetMusicInfo(&mi);
 		StartTimer(mi.wait);
-		timer_sw = 1;
 
+		timer_sw = 1;
 		UpdateToolbarStatus();
 	}
 }
@@ -117,8 +118,8 @@ void StopPlayingSong(void) {
 	if (timer_sw) {
 		QuitMMTimer();
 		Rxo_StopAllSoundNow();
-		timer_sw = 0;
 
+		timer_sw = 0;
 		UpdateToolbarStatus();
 	}
 }

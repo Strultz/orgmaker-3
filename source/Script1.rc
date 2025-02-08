@@ -1173,7 +1173,7 @@ BEGIN
     VK_DECIMAL,     ID_AC_SELECT_CLEAR,     VIRTKEY, NOINVERT
     VK_DELETE,      ID_AC_DELETEKEY,        VIRTKEY, NOINVERT
     VK_DELETE,      ID_AC_DELETE,           VIRTKEY, CONTROL, NOINVERT
-    VK_ESCAPE,      ID_AC_SELECT_CLEAR2,    VIRTKEY, NOINVERT
+    VK_ESCAPE,      ID_AC_KILLSOUND,        VIRTKEY, NOINVERT
     VK_F1,          ID_AC_HELP,             VIRTKEY, NOINVERT
     VK_F10,         ID_AC_PRESSNOTE,        VIRTKEY, CONTROL, ALT, NOINVERT
     VK_F11,         ID_AC_CT_VOL_UP,        VIRTKEY, NOINVERT
@@ -1395,10 +1395,10 @@ BEGIN
     IDS_NOTIFY_TITLE_LOAD   "Unsaved Changes"
     IDS_SWAP_TRACK          "Channels were swapped successfully."
     IDS_USAGE               "Usage"
-    IDS_VALUESET012         "Value must be within range (0-12)."
-    IDS_VALUESET0254        "Value must be within range (0-254)."
-    IDS_VALUESET1001900     "Recommended value is within range (100-1900)."
-    IDS_VALUESET12000       "Wait value must be within range (1-2000)."
+    IDS_VALUESET012         "Value must be within the range 0 to 12."
+    IDS_VALUESET0254        "Value must be within the range 0 to 254."
+    IDS_VALUESET1001900     "Recommended value is within the range 100 to 1900."
+    IDS_VALUESET12000       "Wait value must be within the range 1 to 2000."
     IDS_WARNING_ACCESS_FILE "Couldn't access file."
     IDS_WARNING_BUNKATSU    "The numbers for the division are invalid."
 END
@@ -1408,7 +1408,7 @@ BEGIN
     IDS_WARNING_COPY_HANI   "Invalid copy range"
     IDS_WARNING_COPY_KAISUU "Invalid copy count"
     IDS_WARNING_FROM_BEAT   "Invalid From Beat"
-    IDS_WARNING_FROM_TO     "Invalid head (head < end)"
+    IDS_WARNING_FROM_TO     "Invalid repeat range (start > end)"
     IDS_WARNING_FROM_TRACK  "Invalid From Track"
     IDS_WARNING_HANI        "Invalid range"
     IDS_WARNING_HYOUSHI     "Invalid beat values"
@@ -1472,7 +1472,7 @@ BEGIN
     IDS_STRING100           "What about clearing history (for development)?"
     IDS_STRING101           "Automatically save/load *.pvi in the same folder as *.org"
     IDS_STRING102           "*.chm help is tasteless because I spared the time to create it"
-    IDS_STRING103           ""
+    IDS_STRING103           "About"
     IDS_STRING104           "Channel %c"
     IDS_STRING105           " selection"
     IDS_STRING106           "Selection of all channels"
