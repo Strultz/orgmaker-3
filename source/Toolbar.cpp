@@ -37,7 +37,7 @@ static HWND CreateToolbar(HWND hwndRebar, const char *iconBitmap, int buttonCoun
     rbBand.cbSize = REBARBANDINFO_V3_SIZE;
     rbBand.fMask = RBBIM_STYLE | RBBIM_SIZE | RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_IDEALSIZE;
 
-    rbBand.fStyle = RBBS_BREAK;
+    rbBand.fStyle = RBBS_NOGRIPPER;
 
     SIZE s;
     if (!SendMessage(hWndToolbar, TB_GETMAXSIZE, 0, (LPARAM)&s)) {
@@ -45,10 +45,10 @@ static HWND CreateToolbar(HWND hwndRebar, const char *iconBitmap, int buttonCoun
     }
 
     rbBand.hwndChild = hWndToolbar;
-    rbBand.cxMinChild = s.cy;
+    rbBand.cxMinChild = s.cx;
     rbBand.cyMinChild = s.cy;
     rbBand.cxIdeal = s.cx;
-    rbBand.cx = s.cx;
+    rbBand.cx = 0;
 
     // Add the band
     SendMessage(hwndRebar, RB_INSERTBAND, (WPARAM)-1, (LPARAM)&rbBand);

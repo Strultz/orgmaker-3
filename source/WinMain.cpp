@@ -760,13 +760,13 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				//SendDlgItemMessage(hDlgTrack , IDC_TRACK0 , BM_CLICK , 0, 0);
 			}
 			else if (LOWORD(wParam) == iChgTrackBtn[i]) {
-				if (GetKeyState(VK_MENU) & 0x8000) { // Side
+				if (GetKeyState(VK_CONTROL) & 0x8000) { // Side
 					char d = (org_data.mute[i] == 0);
 					for (j = 0; j < 8; ++j) {
 						org_data.mute[j + (i < 8 ? 0 : 8)] = d;
 					}
 					UpdateToolbarStatus();
-				} else if (GetKeyState(VK_CONTROL) & 0x8000) { // Solo
+				} else if (GetKeyState(VK_MENU) & 0x8000) { // Solo
 					bool un = true;
 					for (j = 0; j < 16; ++j) {
 						if (org_data.mute[j] != (i != j)) {
@@ -1552,6 +1552,12 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_DLGDEFAULT://Show Default Dialog
 		case ID_AC_DEFAULT:
 			DialogBox(hInst, "DLGDEFAULT", hwnd, DialogDefault);
+			break;
+		case IDM_GITHUB:
+			ShellExecute(NULL, "open", "https://github.com/Strultz/orgmaker-3", NULL, NULL, SW_SHOWNORMAL);
+			break;
+		case IDM_CHECKUPD:
+			// TODO
 			break;
 		}
 

@@ -956,6 +956,9 @@ BEGIN
     BEGIN
         MENUITEM "&Help...\tF1",                IDM_DLGHELP
         MENUITEM SEPARATOR
+        MENUITEM "Open &GitHub Page",           IDM_GITHUB
+        MENUITEM SEPARATOR
+        MENUITEM "&Check for Updates",          IDM_CHECKUPD
         MENUITEM "&About OrgMaker",             IDM_DLGMEMO
     END
 END

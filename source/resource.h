@@ -788,13 +788,15 @@
 #define IDM_TRACKY                      40320
 #define IDM_TRACKU                      40321
 #define IDM_TRACKI                      40322
+#define IDM_GITHUB                      40323
+#define IDM_CHECKUPD                    40324
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        247
-#define _APS_NEXT_COMMAND_VALUE         40323
+#define _APS_NEXT_COMMAND_VALUE         40325
 #define _APS_NEXT_CONTROL_VALUE         1260
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
