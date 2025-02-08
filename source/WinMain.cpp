@@ -25,6 +25,8 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include <windows.h>
 #include <winuser.h>
 #include <CommCtrl.h>
+#include <wininet.h>
+#include <string>
 
 #include "Setting.h"
 #include "DefOrg.h"
@@ -43,6 +45,87 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include "Timer.h"
 
 #include "Toolbar.h"
+
+int CheckUpdate(bool act) {
+	// TODO: Put this on another thread
+	// Also TODO: Add an option to disable this check on startup
+
+	HINTERNET hSession = NULL, hConnect = NULL, hRequest = NULL;
+	BOOL bResult = FALSE;
+	DWORD dwBytesRead;
+	char buffer[1024];
+
+	hSession = InternetOpen("OrgMaker/3.x", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+	if (hSession == NULL) {
+		return 1;
+	}
+
+	hConnect = InternetConnect(hSession, "api.github.com", INTERNET_DEFAULT_HTTP_PORT, NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
+	if (hConnect == NULL) {
+		InternetCloseHandle(hSession);
+		if (act) MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
+		return 1;
+	}
+
+	hRequest = HttpOpenRequest(hConnect, "GET", "/repos/Strultz/orgmaker-3/releases/latest", NULL, NULL, NULL, 0, 0);
+	if (hRequest == NULL) {
+		InternetCloseHandle(hConnect);
+		InternetCloseHandle(hSession);
+		if (act) MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
+		return 1;
+	}
+
+	bResult = HttpSendRequest(hRequest, NULL, 0, NULL, 0);
+	if (!bResult) {
+		InternetCloseHandle(hRequest);
+		InternetCloseHandle(hConnect);
+		InternetCloseHandle(hSession);
+		if (act) MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
+		return 1;
+	}
+
+	std::string content;
+	while ((bResult = InternetReadFile(hRequest, buffer, sizeof(buffer), &dwBytesRead)) && dwBytesRead > 0) {
+		content.append(buffer, dwBytesRead);
+	}
+
+	InternetCloseHandle(hRequest);
+	InternetCloseHandle(hConnect);
+	InternetCloseHandle(hSession);
+
+	// I'm not adding some large ass json library so this is what you get
+	size_t f = content.find("\"tag_name\":");
+	if (f == std::string::npos) {
+		if (act) MessageBox(hWnd, "Recieved invalid response from server. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
+		return 2;
+	}
+
+	std::string s1 = content.substr(f + 12);
+	if (s1.substr(0, 1) == " ") s1 = s1.substr(1);
+
+	size_t nq = s1.find_first_of('\"');
+	if (f == std::string::npos) {
+		if (act) MessageBox(hWnd, "Recieved invalid response from server. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
+		return 2;
+	}
+
+	s1 = s1.substr(0, nq);
+
+	// Now we have the tag name
+	if (s1 == "3.1.0") {
+		if (act) MessageBox(hWnd, "No updates are available.", "OrgMaker Update", MB_ICONINFORMATION | MB_OK);
+	} else {
+		char msg[256];
+		snprintf(msg, 256, "Version %s is now available. Would you like to download it?", s1.c_str());
+		int h = MessageBox(hWnd, msg, "OrgMaker Update", MB_ICONINFORMATION | MB_YESNO);
+		if (h == IDYES) {
+			snprintf(msg, 256, "https://github.com/Strultz/orgmaker-3/releases/tag/%s", s1.c_str());
+			ShellExecute(NULL, "open", msg, NULL, NULL, SW_SHOWNORMAL);
+		}
+	}
+
+	return 0;
+}
 
 //main procedure
 LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam);
@@ -671,10 +754,15 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	QuitMMTimer(); //A 2010.09.21
 	UpdateToolbarStatus();
 
-	while (TRUE) {
-		org_data.PutMusic();
-		if (!RefleshScreen(hWnd)) {
-			break;
+	org_data.PutMusic();
+	if (RefleshScreen(hWnd)) {
+		CheckUpdate(false);
+
+		while (TRUE) {
+			org_data.PutMusic();
+			if (!RefleshScreen(hWnd)) {
+				break;
+			}
 		}
 	}
 
@@ -1557,7 +1645,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			ShellExecute(NULL, "open", "https://github.com/Strultz/orgmaker-3", NULL, NULL, SW_SHOWNORMAL);
 			break;
 		case IDM_CHECKUPD:
-			// TODO
+			CheckUpdate(true);
 			break;
 		}
 
