@@ -4,17 +4,35 @@
 #include "resource.h"
 #include "Toolbar.h"
 
-extern HINSTANCE hInst;
+static char szTbClassName[] = "OrgToolbar";
 
-static HWND CreateToolbar(HWND hwndRebar, const char *iconBitmap, int buttonCount, TBBUTTON tbb[]) {
-    if (hwndRebar == NULL) {
-        return NULL;
+extern HINSTANCE hInst;
+extern HWND hWnd;
+
+LRESULT CALLBACK ToolbarWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+    if (message == WM_COMMAND) {
+        SendMessage(hWnd, WM_COMMAND, wParam, lParam);
+        SetFocus(hWnd);
+    }
+    return DefWindowProc(hwnd, message, wParam, lParam);
+}
+
+static void CreateToolbar(HWND hwndRebar, const char *iconBitmap, int buttonCount, TBBUTTON tbb[], const char* toolbarName, HWND outHwnd[2]) {
+    bool rebar = true;
+    if (!hwndRebar) {
+        rebar = false;
+        hwndRebar = CreateWindow(szTbClassName, toolbarName, WS_VISIBLE | WS_POPUP | WS_BORDER | WS_CAPTION, 0, 0, 0, 0, hWnd, NULL, hInst, NULL);
+        if (!hwndRebar) {
+            return;
+        }
+
+        outHwnd[1] = hwndRebar;
     }
 
     // create toolbar
     HWND hWndToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, NULL,
         WS_CHILD | WS_CLIPSIBLINGS | TBSTYLE_TOOLTIPS | TBSTYLE_FLAT | TBSTYLE_LIST | WS_CLIPCHILDREN | CCS_NODIVIDER | CCS_NOPARENTALIGN,
-        0, 0, 0, 0, hwndRebar, (HMENU)0, hInst, NULL);
+        0, 0, 0, 0, hwndRebar, (HMENU)NULL, hInst, NULL);
 
     HIMAGELIST hImageList = ImageList_Create(16, 16, ILC_MASK | ILC_COLOR32, buttonCount, 0);
     HBITMAP hBmp = LoadBitmap(hInst, iconBitmap);
@@ -31,32 +49,42 @@ static HWND CreateToolbar(HWND hwndRebar, const char *iconBitmap, int buttonCoun
 
     SendMessage(hWndToolbar, TB_AUTOSIZE, 0, 0);
     ShowWindow(hWndToolbar, SW_SHOW);
-
-    // Initialize band info.
-    REBARBANDINFO rbBand = { sizeof(REBARBANDINFO) };
-    rbBand.cbSize = REBARBANDINFO_V3_SIZE;
-    rbBand.fMask = RBBIM_STYLE | RBBIM_SIZE | RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_IDEALSIZE;
-
-    rbBand.fStyle = RBBS_NOGRIPPER;
+    
+    outHwnd[0] = hWndToolbar;
 
     SIZE s;
     if (!SendMessage(hWndToolbar, TB_GETMAXSIZE, 0, (LPARAM)&s)) {
         s.cx = s.cy = 0;
     }
 
-    rbBand.hwndChild = hWndToolbar;
-    rbBand.cxMinChild = s.cx;
-    rbBand.cyMinChild = s.cy;
-    rbBand.cxIdeal = s.cx;
-    rbBand.cx = 0;
+    // Initialize band info.
+    if (rebar) {
+        REBARBANDINFO rbBand = { sizeof(REBARBANDINFO) };
+        rbBand.cbSize = REBARBANDINFO_V3_SIZE;
+        rbBand.fMask = RBBIM_STYLE | RBBIM_SIZE | RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_IDEALSIZE;
 
-    // Add the band
-    SendMessage(hwndRebar, RB_INSERTBAND, (WPARAM)-1, (LPARAM)&rbBand);
+        rbBand.fStyle = RBBS_NOGRIPPER;
 
-    return hWndToolbar;
+        rbBand.hwndChild = hWndToolbar;
+        rbBand.cxMinChild = s.cx;
+        rbBand.cyMinChild = s.cy;
+        rbBand.cxIdeal = s.cx;
+        rbBand.cx = 0;
+
+        // Add the band
+        SendMessage(hwndRebar, RB_INSERTBAND, (WPARAM)-1, (LPARAM)&rbBand);
+    } else {
+        RECT wr = { 0, 0, s.cx, s.cy };
+        AdjustWindowRect(&wr, WS_VISIBLE | WS_POPUP | WS_BORDER | WS_CAPTION, FALSE);
+        SetWindowPos(hwndRebar, HWND_TOP, 200, 200, wr.right - wr.left, wr.bottom - wr.top, 0);
+
+        SetWindowPos(hWndToolbar, HWND_TOP, 0, 0, s.cx, s.cy, 0);
+    }
+
+    return;
 }
 
-HWND CreateRebar(HWND hWnd, HWND *outHwndToolbar, HWND* outHwndTrackbar)
+HWND CreateRebar(HWND hWnd)
 {
     // Initialize common controls.
     INITCOMMONCONTROLSEX icex;
@@ -68,6 +96,29 @@ HWND CreateRebar(HWND hWnd, HWND *outHwndToolbar, HWND* outHwndTrackbar)
         WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_BORDER | RBS_AUTOSIZE | RBS_BANDBORDERS | CCS_NODIVIDER,
         0, 0, 0, 0, hWnd, NULL, hInst, NULL);
 
+    RECT rcWindow;
+    GetClientRect(hWnd, &rcWindow);
+    MoveWindow(hwndRebar, 0, 0, rcWindow.right - rcWindow.left, GetRebarHeight(hwndRebar), TRUE);
+
+    WNDCLASSEX ot;
+    ot.cbSize = sizeof(WNDCLASSEX);
+    ot.style = 0;
+    ot.lpfnWndProc = (WNDPROC)ToolbarWndProc;
+    ot.cbClsExtra = 0;
+    ot.cbWndExtra = 0;
+    ot.hInstance = hInst;
+    ot.hIcon = NULL;
+    ot.hIconSm = NULL;
+    ot.hCursor = LoadCursor(NULL, IDC_ARROW);
+    ot.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+    ot.lpszMenuName = NULL;
+    ot.lpszClassName = szTbClassName;
+    RegisterClassEx(&ot);
+
+    return hwndRebar;
+}
+
+void CreateToolbars(HWND hwndRebar, HWND outHwnd[4]) {
     TBBUTTON tbb1[26] =
     {
         {0, IDM_INIT, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"New (Ctrl+N)"},
@@ -97,7 +148,7 @@ HWND CreateRebar(HWND hWnd, HWND *outHwndToolbar, HWND* outHwndTrackbar)
         {0, 0, 0, BTNS_SEP},
         {5, IDC_PREFERENCES, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Preferences"},
     };
-    *outHwndToolbar = CreateToolbar(hwndRebar, "TOOLBAR_ICONS", 26, tbb1);
+    CreateToolbar(hwndRebar, "TOOLBAR_ICONS", 26, tbb1, "Main", outHwnd);
 
     TBBUTTON tbb2[17] =
     {
@@ -119,13 +170,7 @@ HWND CreateRebar(HWND hWnd, HWND *outHwndToolbar, HWND* outHwndTrackbar)
         {14, IDM_TRACKU, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Channel U (U)"},
         {15, IDM_TRACKI, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Channel I (I)"},
     };
-    *outHwndTrackbar = CreateToolbar(hwndRebar, "TRACKBAR_ICONS", 17, tbb2);
-
-    RECT rcWindow;
-    GetClientRect(hWnd, &rcWindow);
-    MoveWindow(hwndRebar, 0, 0, rcWindow.right - rcWindow.left, GetRebarHeight(hwndRebar), TRUE);
-
-    return hwndRebar;
+    CreateToolbar(hwndRebar, "TRACKBAR_ICONS", 17, tbb2, "Channels", &outHwnd[2]);
 }
 
 int GetRebarHeight(HWND hwndRebar) {

@@ -212,6 +212,8 @@ CHAR num_buf[BUF_SIZE];
 HWND hwndRebar = NULL;
 HWND hwndToolbar = NULL;
 HWND hwndTrackbar = NULL;
+HWND hwndToolbarPopup = NULL;
+HWND hwndTrackbarPopup = NULL;
 int rebarHeight;
 
 SAVEDNOTE gClipboardData;
@@ -379,11 +381,18 @@ int CancelDeleteCurrentData(int iMessagePattern = 1){
 	return 0;
 }
 
-/*void DetectPreciseMode() {
-	MUSICINFO mi;
-	org_data.GetMusicInfo(&mi);
-	preciselr = (mi.repeat_x % (mi.line * mi.dot) != 0) || (mi.end_x % (mi.line * mi.dot) != 0);
-}*/
+void UpdateToolbars(bool floating) {
+	if (hwndToolbar) DestroyWindow(hwndToolbar);
+	if (hwndToolbarPopup) DestroyWindow(hwndToolbar);
+	if (hwndTrackbar) DestroyWindow(hwndToolbar);
+	if (hwndTrackbarPopup) DestroyWindow(hwndToolbar);
+	HWND wnds[4] = { NULL,NULL,NULL,NULL };
+	CreateToolbars(floating ? NULL : hwndRebar, wnds);
+	hwndToolbar = wnds[0];
+	hwndToolbarPopup = wnds[1];
+	hwndTrackbar = wnds[2];
+	hwndTrackbarPopup = wnds[3];
+}
 
 void InitBitmaps() {
 	InitBitmap("MUSIC", BMPMUSIC);//piano roll
@@ -485,7 +494,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	wc.hCursor       = LoadCursor(hInst,"CURSOR");//default cursor
 	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);//window color
 	wc.lpszMenuName  = "ORGANYAMENU";//menu
-	wc.lpszClassName = lpszName;
+	wc.lpszClassName = "OrgMaker3";
 
 	int wnd_width;///Specify the width of the window here.
 	int wnd_height;
@@ -536,7 +545,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	ul = WS_CAPTION|WS_MINIMIZEBOX|WS_SYSMENU|WS_THICKFRAME|WS_MAXIMIZEBOX;
 
 	//Generate main window
-	hWnd = CreateWindow(lpszName,
+	hWnd = CreateWindow("OrgMaker3",
 			"OrgMaker 3",//Displayed "Name"
 			ul,
 			//WS_CAPTION|WS_MINIMIZEBOX|WS_SYSMENU|WS_THICKFRAME|WS_MAXIMIZEBOX,
@@ -552,7 +561,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	if(!hWnd) return FALSE;
 
-	hwndRebar = CreateRebar(hWnd, &hwndToolbar, &hwndTrackbar);
+	hwndRebar = CreateRebar(hWnd);
+
+	UpdateToolbars(false);
+
 	rebarHeight = GetRebarHeight(hwndRebar);
 
 //	DialogBox(hInst,"DLGFLASH",NULL,DialogFlash);
@@ -802,16 +814,16 @@ BOOL SystemTask(void)
 			return FALSE;
 
 		if (!TranslateAccelerator(hWnd, Ac, &msg)) {
-			//if (!IsDialogMessage(hDlgPlayer, &msg)) {
-			//if (!IsDialogMessage(hDlgTrack, &msg)) {
-			if (!IsDialogMessage(hDlgEZCopy, &msg)) {
-				if (!IsDialogMessage(hDlgHelp, &msg)) {
-					TranslateMessage(&msg);
-					DispatchMessage(&msg);
+			if (!hwndToolbarPopup || !IsDialogMessage(hwndToolbarPopup, &msg)) {
+				if (!hwndTrackbarPopup || !IsDialogMessage(hwndTrackbarPopup, &msg)) {
+					if (!hDlgEZCopy || !IsDialogMessage(hDlgEZCopy, &msg)) {
+						if (!hDlgHelp || !IsDialogMessage(hDlgHelp, &msg)) {
+							TranslateMessage(&msg);
+							DispatchMessage(&msg);
+						}
+					}
 				}
 			}
-			//}
-			//}
 		}
 	}
 
