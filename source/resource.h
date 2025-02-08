@@ -486,6 +486,12 @@
 #define IDC_WAVEI                       1254
 #define IDC_PLAYPAUSE                   1255
 #define IDC_PREFERENCES                 1256
+#define IDC_WAITSPIN                    1259
+#define IDC_BPMSPIN                     1260
+#define IDC_BPMSPIN2                    1261
+#define IDC_BPMSPIN3                    1262
+#define IDC_STARTSPIN                   1263
+#define IDC_ENDSPIN                     1264
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005
@@ -787,9 +793,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        246
+#define _APS_NEXT_RESOURCE_VALUE        247
 #define _APS_NEXT_COMMAND_VALUE         40323
-#define _APS_NEXT_CONTROL_VALUE         1257
+#define _APS_NEXT_CONTROL_VALUE         1260
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

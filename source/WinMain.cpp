@@ -181,6 +181,9 @@ void UpdateToolbarStatus() {
 	}
 
 	// special cases
+	EnableMenuItem(hMenu, IDM_SAVEOVER, MF_BYCOMMAND | (enabled && gFileModified ? MF_ENABLED : MF_GRAYED));
+	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_SAVEOVER, enabled && gFileModified);
+
 	EnableMenuItem(hMenu, IDM_UNDO, MF_BYCOMMAND | (enabled && org_data.UndoEnable ? MF_ENABLED : MF_GRAYED));
 	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_UNDO, enabled && org_data.UndoEnable);
 	EnableMenuItem(hMenu, IDM_REDO, MF_BYCOMMAND | (enabled && org_data.RedoEnable ? MF_ENABLED : MF_GRAYED));
@@ -1353,7 +1356,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		case IDM_SAVEOVER:
 		case ID_AC_MENUOVERSAVE:
-			OpenDoSave(hwnd, false);
+			if (gFileModified)
+				OpenDoSave(hwnd, false);
 			break;
 		case IDM_SAVENEW://Save As
 		case ID_AC_MENUNEWSAVE:
