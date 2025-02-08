@@ -334,8 +334,8 @@ int ReverseTrackCode(char *strTrack)
 
 void MuteTrack(int Track)
 {
-	SendDlgItemMessage(hDlgTrack , mute_name[Track] , BM_CLICK , 0, 0);
-	
+	org_data.mute[Track] = (org_data.mute[Track] == 0);
+	UpdateToolbarStatus();
 }
 
 void EditNote(int AddNotes , int Track , int Function)

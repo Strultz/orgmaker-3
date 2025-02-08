@@ -40,7 +40,7 @@ extern int MinimumGrid(int x);
 extern int MaximumGrid(int x);
 void ShowStatusMessage(void);
 
-extern void ChangeTrack(HWND hdwnd, int iTrack);
+extern void ChangeTrack(int iTrack);
 
 int iDragMode = 0;	//ﾄﾞﾗｯｸﾞで音符を伸ばす
 int alt_down = 0;
@@ -555,7 +555,7 @@ void ClickProcR(WPARAM wParam, LPARAM lParam)
 			//MessageBox(NULL,"l",NULL,NULL);
 			if(NextTrack>=0 && NextTrack!=org_data.track){
 				//トラック変更
-				ChangeTrack(hWnd, NextTrack);
+				ChangeTrack(NextTrack);
 			}
 		}
 		//org_data.PutMusic();//楽譜の再描画

@@ -74,7 +74,6 @@ void SetModified(bool mod);
 //Declare global variables here
 HINSTANCE hInst;//instance handle
 HWND hWnd;//main window handle
-HWND hDlgPlayer;
 HWND hDlgTrack;
 HWND hDlgEZCopy;
 HWND hDlgHelp = NULL;
@@ -106,8 +105,8 @@ extern bool volChangeSetNoteLength;
 
 extern void LoadTrackBitmaps(HWND hdwnd);
 extern void LoadPlayerBitmaps(HWND hdwnd);
-extern void ChangeTrack(HWND hdwnd, int iTrack);
-extern void ChangeTrackPlus(HWND hdwnd, int iValue);
+extern void ChangeTrack(int iTrack);
+extern void ChangeTrackPlus(int iValue);
 extern char timer_sw; //Playing?
 extern int EZCopyWindowState; //Easy copy status
 extern void ClearEZC_Message(); //Erase EZ messages and ranges
@@ -206,7 +205,12 @@ void UpdateToolbarStatus() {
 
 	for (int i = 0; i < MAXTRACK; ++i) {
 		SendMessage(hwndTrackbar, TB_CHECKBUTTON, iChgTrackBtn[i], org_data.track == i);
+		SendMessage(hwndTrackbar, TB_CHANGEBITMAP, iChgTrackBtn[i], org_data.mute[i] ? i + 16 : i);
 	}
+}
+
+void UpdateStatusBar() {
+	// TODO
 }
 
 void SaveIniFile();
@@ -308,7 +312,7 @@ void ReloadBitmaps() {
 	
 	InitBitmaps();
 	InitCursor();
-	LoadPlayerBitmaps(hDlgPlayer);
+	//LoadPlayerBitmaps(hDlgPlayer);
 	LoadTrackBitmaps(hDlgTrack);
 
 	//MakeMusicParts(mi.line, mi.dot);
@@ -516,7 +520,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	InitSoundObject("METRO02", 2);
 	InitSoundObject("CAT", 3);
 	
-	hDlgPlayer = CreateDialog(hInst,"PLAYER",hWnd,DialogPlayer);
+	//hDlgPlayer = CreateDialog(hInst,"PLAYER",hWnd,DialogPlayer);
 	hDlgTrack = CreateDialog(hInst,"TRACK",hWnd,DialogTrack);
 	hDlgEZCopy = CreateDialog(hInst,"COPYBD",hWnd,DialogEZCopy);
 
@@ -527,9 +531,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	WinRect.left=GetPrivateProfileInt(TRACK_WINDOW,"left",200,app_path);
 	WinRect.top=GetPrivateProfileInt(TRACK_WINDOW,"top",200,app_path);
 	SetWindowPos(hDlgTrack,NULL,WinRect.left,WinRect.top,0,0,SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);
-	WinRect.left=GetPrivateProfileInt(PLAY_WINDOW,"left",280,app_path);
+	/*WinRect.left = GetPrivateProfileInt(PLAY_WINDOW, "left", 280, app_path);
 	WinRect.top=GetPrivateProfileInt(PLAY_WINDOW,"top",280,app_path);
-	SetWindowPos(hDlgPlayer,NULL,WinRect.left,WinRect.top,0,0,SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);
+	SetWindowPos(hDlgPlayer,NULL,WinRect.left,WinRect.top,0,0,SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);*/
 	WinRect.left=GetPrivateProfileInt(COPY_WINDOW,"left",180,app_path);
 	WinRect.top=GetPrivateProfileInt(COPY_WINDOW,"top",380,app_path);
 	SetWindowPos(hDlgEZCopy,NULL,WinRect.left,WinRect.top,0,0,SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);
@@ -705,16 +709,16 @@ BOOL SystemTask(void)
 			return FALSE;
 
 		if (!TranslateAccelerator(hWnd, Ac, &msg)) {
-			if (!IsDialogMessage(hDlgPlayer, &msg)) {
-				if (!IsDialogMessage(hDlgTrack, &msg)) {
-					if (!IsDialogMessage(hDlgEZCopy, &msg)) {
-						if (!IsDialogMessage(hDlgHelp, &msg)) {
-							TranslateMessage(&msg);
-							DispatchMessage(&msg);
-						}
+			//if (!IsDialogMessage(hDlgPlayer, &msg)) {
+			if (!IsDialogMessage(hDlgTrack, &msg)) {
+				if (!IsDialogMessage(hDlgEZCopy, &msg)) {
+					if (!IsDialogMessage(hDlgHelp, &msg)) {
+						TranslateMessage(&msg);
+						DispatchMessage(&msg);
 					}
 				}
 			}
+			//}
 		}
 	}
 
@@ -743,14 +747,21 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 	switch(message){
 	case WM_COMMAND:
 		for(i=0;i<16;i++){
-			if(LOWORD(wParam) == iChgTrackKey[i] || LOWORD(wParam) == iChgTrackBtn[i]){
-				ChangeTrack(hDlgTrack,i);
+			if (LOWORD(wParam) == iChgTrackKey[i]){
+				ChangeTrack(i);
 				//return FALSE;
 				//SendDlgItemMessage(hDlgTrack , IDC_TRACK0 , BM_CLICK , 0, 0);
 			}
-		}
-		for(i=0;i<16;i++)if(LOWORD(wParam) == iMuteKey[i]){MuteTrack(i);
-		//return FALSE;
+			else if (LOWORD(wParam) == iChgTrackBtn[i]) {
+				if (GetKeyState(VK_SHIFT) & 0x8000) {
+					MuteTrack(i);
+				} else {
+					ChangeTrack(i);
+				}
+			}
+			else if (LOWORD(wParam) == iMuteKey[i]) {
+				MuteTrack(i);
+			}
 		}
 		if(LOWORD(wParam)==IDM_EZCOPYVISIBLE || LOWORD(wParam)==ID_AC_SHOWEZCOPY){
 			hMenu = GetMenu(hWnd);
@@ -1256,9 +1267,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			org_data.SetPlayPointer(0);
 			scr_data.SetHorzScroll(0);
 			//reflected in the player
-			SetDlgItemText(hDlgPlayer, IDE_VIEWWAIT, "128");
-			SetDlgItemText(hDlgPlayer, IDE_VIEWMEAS, "0");
-			SetDlgItemText(hDlgPlayer, IDE_VIEWXPOS, "0");
+			UpdateStatusBar();
+			//SetDlgItemText(hDlgPlayer, IDE_VIEWWAIT, "128");
+			//(hDlgPlayer, IDE_VIEWMEAS, "0");
+			//SetDlgItemText(hDlgPlayer, IDE_VIEWXPOS, "0");
 			SetModified(false);
 			gFileUnsaved = true;
 			//MessageBox(hwnd,"initialized","Message",MB_OK);
@@ -1286,7 +1298,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			EndDirectSound();
 			org_data.ReleaseNote();
 			EndGDI();
-			if (!hDlgPlayer)DestroyWindow(hDlgPlayer);
+			//if (!hDlgPlayer)DestroyWindow(hDlgPlayer);
 			if (!hDlgTrack)DestroyWindow(hDlgTrack);
 			if (!hDlgEZCopy)DestroyWindow(hDlgEZCopy);
 			if (!hDlgHelp)DestroyWindow(hDlgHelp);
@@ -1623,7 +1635,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		org_data.ReleaseNote();
 		DeleteWaveData100(); //Added 20140401 Normally, it seems to be called in the order of WM_CLOSE ÅE> WM_DESTROY ÅE> WM_QUIT.
 		EndGDI();
-		if(!hDlgPlayer)DestroyWindow(hDlgPlayer);
+		//if(!hDlgPlayer)DestroyWindow(hDlgPlayer);
 		if(!hDlgTrack)DestroyWindow(hDlgTrack);
 		if(!hDlgEZCopy)DestroyWindow(hDlgEZCopy);
 		if(!hwnd)DestroyWindow(hwnd);
@@ -1802,10 +1814,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		//MessageBox(hWnd,"Failed to read","Error(Load)",MB_OK);
 		switch HIWORD(wParam){
 		case 0x0001: //Å•
-			ChangeTrackPlus(hDlgTrack , 1);
+			ChangeTrackPlus(1);
 			break;
 		case 0x0002: //Å£
-			ChangeTrackPlus(hDlgTrack , -1);
+			ChangeTrackPlus(-1);
 			break;
 		}
 		break;
@@ -1906,6 +1918,26 @@ void SetTitlebarText()
 	SetWindowText(hWnd, &set_name[0]);
 }
 
+int GetCurrentMeasure() {
+	long x_scroll, y_scroll;
+	scr_data.GetScrollPosition(&x_scroll, &y_scroll);
+
+	MUSICINFO mi;
+	org_data.GetMusicInfo(&mi);
+
+	return x_scroll / (mi.dot * mi.line);
+}
+
+int GetCurrentStep() {
+	long x_scroll, y_scroll;
+	scr_data.GetScrollPosition(&x_scroll, &y_scroll);
+
+	MUSICINFO mi;
+	org_data.GetMusicInfo(&mi);
+
+	return x_scroll % (mi.dot * mi.line);
+}
+
 void SetModified(bool mod) {
 	gFileModified = mod;
 	SetTitlebarText();
@@ -1973,11 +2005,11 @@ void SaveIniFile()
 	wsprintf(num_buf,"%d",WinRect.top);
 	WritePrivateProfileString(TRACK_WINDOW,"top",num_buf,app_path);
 
-	GetWindowRect(hDlgPlayer,(LPRECT)&WinRect);
+	/*GetWindowRect(hDlgPlayer, (LPRECT)&WinRect);
 	wsprintf(num_buf,"%d",WinRect.left);
 	WritePrivateProfileString(PLAY_WINDOW,"left",num_buf,app_path);
 	wsprintf(num_buf,"%d",WinRect.top);
-	WritePrivateProfileString(PLAY_WINDOW,"top",num_buf,app_path);
+	WritePrivateProfileString(PLAY_WINDOW,"top",num_buf,app_path);*/
 	GetWindowRect(hDlgEZCopy,(LPRECT)&WinRect);
 	wsprintf(num_buf,"%d",WinRect.left);
 	WritePrivateProfileString(COPY_WINDOW,"left",num_buf,app_path);

@@ -17,7 +17,6 @@ extern int mute_name[];
 
 extern char timer_sw;
 extern HWND hWnd;
-extern HWND hDlgPlayer;
 extern HWND hDlgEZCopy;
 int EZCopyWindowState;
 extern int gDrawDouble;	//両方のトラックグループを描画する

@@ -11,7 +11,6 @@
 
 extern int sACrnt;	//îÕàÕëIëÇÕèÌÇ…∂⁄›ƒƒ◊Ø∏
 
-extern HWND hDlgPlayer;
 extern char timer_sw;
 extern int sSmoothScroll;
 
@@ -684,18 +683,19 @@ void OrgData::PutMusic(void)
 
 	if (timer_sw) {
 		long playPos;
-		char str[12];
-		char oldstr[12];
-
 		org_data.GetPlayPos(NULL, &playPos);
 
-		itoa(playPos / (info.dot * info.line), str, 10);
+		//char str[12];
+		//char oldstr[12];
+
+
+		/*itoa(playPos / (info.dot * info.line), str, 10);
 		GetDlgItemText(hDlgPlayer, IDE_VIEWMEAS, oldstr, 10);
 		if (strcmp(str, oldstr) != 0) SetDlgItemText(hDlgPlayer, IDE_VIEWMEAS, str);
 
 		itoa(playPos % (info.dot * info.line), str, 10);
 		GetDlgItemText(hDlgPlayer, IDE_VIEWXPOS, oldstr, 10);
-		if (strcmp(str, oldstr) != 0) SetDlgItemText(hDlgPlayer, IDE_VIEWXPOS, str);
+		if (strcmp(str, oldstr) != 0) SetDlgItemText(hDlgPlayer, IDE_VIEWXPOS, str);*/
 
 		/*if (sSmoothScroll) {
 			/*DWORD dwNowTime;

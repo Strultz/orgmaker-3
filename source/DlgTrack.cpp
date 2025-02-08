@@ -14,7 +14,6 @@
 
 extern HWND hDlgTrack;	//A 2008/05/13
 extern HINSTANCE hInst;//インスタンスハンドル 2010.09.23 A
-extern HWND hDlgPlayer;
 extern HWND hDlgTrack;
 extern BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 extern BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -50,7 +49,7 @@ extern void SetEZCWindowMessage(char *Mess);
 extern char TrackN[];
 extern char* gSelectedTheme;
 
-void ChangeTrackPlus(HWND hdwnd, int iValue){
+void ChangeTrackPlus(int iValue){
 	char str[8];
 
 	RECT rect = {64,0,WWidth,WHeight};//更新する領域(トラック変更)
@@ -84,15 +83,17 @@ void ChangeTrackPlus(HWND hdwnd, int iValue){
 		}
 	}
 
-	SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,TrackCode[org_data.track]);
+	//SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,TrackCode[org_data.track]);
 	//SetDlgItemText(hdwnd,IDE_VIEWTRACK,str);
 	//org_data.PutMusic();
 	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-	SetFocus(hWnd);
+	//SetFocus(hWnd);
+	UpdateToolbarStatus();
+	UpdateStatusBar();
 }
 
 
-void ChangeTrack(HWND hdwnd, int iTrack){
+void ChangeTrack(int iTrack){
 	char str[8];
 	int i;
 	RECT rect = {64,0,WWidth,WHeight};//更新する領域(トラック変更)
@@ -128,12 +129,13 @@ void ChangeTrack(HWND hdwnd, int iTrack){
 			}
 		}
 	}
-	SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,TrackCode[org_data.track]);
+	//SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,TrackCode[org_data.track]);
 	//SetDlgItemText(hdwnd,IDE_VIEWTRACK,str);
 	//org_data.PutMusic();
 	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
 	UpdateToolbarStatus();
+	UpdateStatusBar();
 	//SetFocus(hWnd);
 }
 
@@ -188,7 +190,7 @@ BOOL CALLBACK DialogTrack(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 		for(i = 0; i < MAXTRACK; i++){
 			if(track_name[i] == LOWORD(wParam)){
 				if (HIWORD(wParam) == BN_CLICKED) {
-					ChangeTrack(hdwnd , i);
+					ChangeTrack(i);
 					/*
 					org_data.track = i;
 					PlayOrganKey(36,i,1000);

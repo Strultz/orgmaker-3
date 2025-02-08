@@ -141,7 +141,6 @@ BOOL OrgData::SaveMusicData(void)
 }
 //曲データを読み込み
 extern char *dram_name[];
-extern HWND hDlgPlayer;
 
 //ファイルがロード可能であれば0異常であれば1を返す。ﾃﾞｰﾀロードはされない。 2014.05.22
 int OrgData::FileCheckBeforeLoad(char *checkfile)
@@ -292,9 +291,9 @@ BOOL OrgData::LoadMusicData(void)
 	SetPlayPointer(0);//頭出し
 	scr_data.SetHorzScroll(0);
 	itoa(info.wait,str,10);
-	SetDlgItemText(hDlgPlayer,IDE_VIEWWAIT,str);
+	/*SetDlgItemText(hDlgPlayer, IDE_VIEWWAIT, str);
 	SetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,"0");
-	SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,"0");
+	SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,"0");*/
 
 	scr_data.ChangeHorizontalRange(info.dot * info.line * MAXHORZMEAS);
 	//MakeMusicParts(info.line,info.dot);//パーツを生成
@@ -396,9 +395,9 @@ void OrgData::SortNotes()
 	SetPlayPointer(0);//頭出し
 	scr_data.SetHorzScroll(0);
 	itoa(info.wait,str,10);
-	SetDlgItemText(hDlgPlayer,IDE_VIEWWAIT,str);
+	/*SetDlgItemText(hDlgPlayer, IDE_VIEWWAIT, str);
 	SetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,"0");
-	SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,"0");
+	SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,"0");*/
 
 	//MakeMusicParts(info.line,info.dot);//パーツを生成
 	//MakePanParts(info.line,info.dot);

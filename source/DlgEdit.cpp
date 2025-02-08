@@ -8,7 +8,6 @@
 #include "Gdi.h"
 #include "rxoFunction.h"
 
-extern HWND hDlgPlayer;
 extern HWND hDlgTrack;
 extern NOTECOPY nc_Select; //選択範囲
 extern int tra, ful ,haba; 
@@ -25,7 +24,6 @@ BOOL CALLBACK DialogDelete(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 	PARCHANGE pc;
 	switch(message){
 	case WM_INITDIALOG://ダイアログが呼ばれた
-		EnableWindow(hDlgPlayer,FALSE);
 
 		//itoa(org_data.track,str,10);
 		//SetDlgItemText(hdwnd,IDE_DELTRACK,str);
@@ -45,7 +43,6 @@ BOOL CALLBACK DialogDelete(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 		switch(LOWORD(wParam)){
 		case IDCANCEL:
 			EndDialog(hdwnd,0);
-			EnableWindow(hDlgPlayer,TRUE);
 			return 1;
 		case IDOK:
 			GetDlgItemText(hdwnd,IDE_DELTRACK,str,4);
@@ -100,25 +97,15 @@ BOOL CALLBACK DialogCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if(tra<0){
 			SetDlgItemText(hdwnd,IDE_TRACK1,TrackCode[org_data.track]);
 			SetDlgItemText(hdwnd,IDE_TRACK2,TrackCode[org_data.track]);
-			SetDlgItemText(hdwnd,IDE_MEAS1_1,"");
-			{
-				char c[32];
-				GetDlgItemText(hDlgPlayer,IDE_VIEWMEAS, c , 32);
-				SetDlgItemText(hdwnd,IDE_MEAS1_1,c);
-			}
+			SetDlgItemInt(hdwnd,IDE_MEAS1_1,GetCurrentMeasure(),FALSE);
+			SetDlgItemInt(hdwnd,IDE_BEAT1_1,GetCurrentStep(),FALSE);
 			SetDlgItemText(hdwnd,IDE_MEAS1_2,"");
-			SetDlgItemText(hdwnd,IDE_BEAT1_1,"0");
 			SetDlgItemText(hdwnd,IDE_BEAT1_2,"0");
 			SetDlgItemText(hdwnd,IDE_MEAS2,"");
 			SetDlgItemText(hdwnd,IDE_BEAT2,"0");
 		}else{
 			SetDlgItemText(hdwnd,IDE_TRACK1,TrackCode[tra]);
 			SetDlgItemText(hdwnd,IDE_TRACK2,TrackCode[org_data.track]);
-			{
-				char c[32];
-				GetDlgItemText(hDlgPlayer,IDE_VIEWMEAS, c , 32);
-				SetDlgItemText(hdwnd,IDE_MEAS1_1,c);
-			}
 			SetDlgItemInt(hdwnd,IDE_MEAS1_1,GetSelectMeasBeat(GET_MEAS1),FALSE);
 			SetDlgItemInt(hdwnd,IDE_MEAS1_2,GetSelectMeasBeat(GET_MEAS2),FALSE);
 			SetDlgItemInt(hdwnd,IDE_BEAT1_1,GetSelectMeasBeat(GET_BEAT1),FALSE);
@@ -128,13 +115,11 @@ BOOL CALLBACK DialogCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			
 		}
 		SetDlgItemText(hdwnd,IDE_COPYNUM,"1");
-		EnableWindow(hDlgPlayer,FALSE);
 		return 1;
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
 		case IDCANCEL:
 			EndDialog(hdwnd,0);
-			EnableWindow(hDlgPlayer,TRUE);
 			return 1;
 		case IDOK:
 			//コピー回数のチェック
@@ -240,13 +225,11 @@ BOOL CALLBACK DialogPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SetDlgItemInt(hdwnd,IDE_STEP2,GetSelectMeasBeat(GET_BEAT2),FALSE);
 		}
 		SetDlgItemText(hdwnd,IDE_PAR,"1");
-		EnableWindow(hDlgPlayer,FALSE);
 		return 1;
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
 		case IDCANCEL:
 			EndDialog(hdwnd,0);
-			EnableWindow(hDlgPlayer,TRUE);
 			return 1;
 		case IDOK:
 			if(SendDlgItemMessage(hdwnd,IDR_ADD,BM_GETCHECK,0,0))
@@ -311,13 +294,11 @@ BOOL CALLBACK DialogTrans(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 			SetDlgItemInt(hdwnd,IDE_STEP2,GetSelectMeasBeat(GET_BEAT2),FALSE);
 		}
 		SetDlgItemText(hdwnd,IDE_PAR,"1");
-		EnableWindow(hDlgPlayer,FALSE);
 		return 1;
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
 		case IDCANCEL:
 			EndDialog(hdwnd,0);
-			EnableWindow(hDlgPlayer,TRUE);
 			return 1;
 		case IDOK:
 			if(SendDlgItemMessage(hdwnd,IDR_ADD,BM_GETCHECK,0,0))
@@ -383,13 +364,11 @@ BOOL CALLBACK DialogVolume(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 			SetDlgItemInt(hdwnd,IDE_STEP2,GetSelectMeasBeat(GET_BEAT2),FALSE);
 		}
 		SetDlgItemText(hdwnd,IDE_PAR,"1");
-		EnableWindow(hDlgPlayer,FALSE);
 		return 1;
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
 		case IDCANCEL:
 			EndDialog(hdwnd,0);
-			EnableWindow(hDlgPlayer,TRUE);
 			return 1;
 		case IDOK:
 			if(SendDlgItemMessage(hdwnd,IDR_ADD,BM_GETCHECK,0,0))
@@ -466,14 +445,9 @@ BOOL CALLBACK DialogCopy2(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 		//SendDlgItemMessage(hdwnd,cbox[org_data.track],BM_SETCHECK,1,0);
 		for(i=0;i<16;i++)SendDlgItemMessage(hdwnd,cbox[i],BM_SETCHECK,1,0);
 		if(tra<0){
-			SetDlgItemText(hdwnd,IDE_MEAS1_1,"");
-			{
-				char c[32];
-				GetDlgItemText(hDlgPlayer,IDE_VIEWMEAS, c , 32);
-				SetDlgItemText(hdwnd,IDE_MEAS1_1,c);
-			}
+			SetDlgItemInt(hdwnd,IDE_MEAS1_1,GetCurrentMeasure(),FALSE);
+			SetDlgItemInt(hdwnd,IDE_BEAT1_1,GetCurrentStep(),FALSE);
 			SetDlgItemText(hdwnd,IDE_MEAS1_2,"");
-			SetDlgItemText(hdwnd,IDE_BEAT1_1,"0");
 			SetDlgItemText(hdwnd,IDE_BEAT1_2,"0");
 		}else{
 			SetDlgItemInt(hdwnd,IDE_MEAS1_1,GetSelectMeasBeat(GET_MEAS1),FALSE);
@@ -484,7 +458,6 @@ BOOL CALLBACK DialogCopy2(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 		SetDlgItemText(hdwnd,IDE_MEAS2,"");
 		SetDlgItemText(hdwnd,IDE_BEAT2,"0");
 		SetDlgItemText(hdwnd,IDE_COPYNUM,"1");
-		EnableWindow(hDlgPlayer,FALSE);
 		return 1;
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
@@ -498,7 +471,6 @@ BOOL CALLBACK DialogCopy2(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 			return 1;
 		case IDCANCEL:
 			EndDialog(hdwnd,0);
-			EnableWindow(hDlgPlayer,TRUE);
 			return 1;
 		case IDOK:
 			//コピー回数のチェック
@@ -593,13 +565,11 @@ BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SetDlgItemText(hdwnd,IDE_TRACK1,TrackCode[tra]);
 			SetDlgItemText(hdwnd,IDE_TRACK2,TrackCode[org_data.track]);
 		}
-		EnableWindow(hDlgPlayer,FALSE);
 		return 1;
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
 		case IDCANCEL:
 			EndDialog(hdwnd,0);
-			EnableWindow(hDlgPlayer,TRUE);
 			return 1;
 		case IDOK:
 			//トラックのチェック

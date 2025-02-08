@@ -11,7 +11,6 @@
 #define MAIN_WINDOW "WINDOW"
 
 
-extern HWND hDlgPlayer;
 extern char timer_sw;
 
 extern CHAR app_path[BUF_SIZE];
@@ -88,20 +87,23 @@ void ScrollData::SetHorzScroll(long x)
 	scr_info.fMask = SIF_POS;//nPos‚ð—LŒø‚É
 	scr_info.nPos = hpos;
 	SetScrollInfo(hWnd,SB_HORZ,&scr_info,1);
+	UpdateStatusBar();
 	//org_data.PutMusic();
 	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 }
 
 void ScrollData::PrintHorzPosition(void)
 {
-	MUSICINFO mi;
+	/*MUSICINFO mi;
 	org_data.GetMusicInfo(&mi);
 	
 	char str[12];
 	itoa(hpos / (mi.dot * mi.line),str,10);
 	SetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,str);
 	itoa(hpos % (mi.dot * mi.line),str,10);
-	SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,str);
+	SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,str);*/
+
+	UpdateStatusBar();
 
 }
 

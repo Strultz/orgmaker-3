@@ -29,3 +29,7 @@ extern BOOL actApp;//ウインドウのアクティブ
 extern int  WWidth, WHeight;	//ウィンドウのサイズ
 
 void UpdateToolbarStatus();
+void UpdateStatusBar();
+
+int GetCurrentMeasure();
+int GetCurrentStep();
