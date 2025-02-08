@@ -12,7 +12,7 @@
 
 #define DEFVOLUME	200//255‚ÍVOLDUMMYBMAX‚Í254
 #define DEFPAN		6
-extern HWND hDlgTrack;
+
 extern char *dram_name[];
 extern int iKeyPushDown[];
 //Žw’è‚Ì”‚¾‚¯NoteData‚Ì—Ìˆæ‚ðŠm•Û(‰Šú‰»)
@@ -102,8 +102,6 @@ BOOL OrgData::SetMusicInfo(MUSICINFO *mi,unsigned long flag)
 	}
 	if(flag & SETWAIT){
 		info.wait = mi->wait;
-		itoa(mi->wait,str,10);
-		SetDlgItemText(hDlgTrack,IDE_VIEWWAIT,str);
 //		MessageBox(hWnd,"‚¤‚¦‚¢‚Æ","",MB_OK);
 	}
 	if(flag & SETREPEAT){
@@ -124,6 +122,9 @@ BOOL OrgData::SetMusicInfo(MUSICINFO *mi,unsigned long flag)
 		for(i = 0; i < MAXTRACK; i++)
 			info.tdata[i].pipi = mi->tdata[i].pipi;
 	}
+
+	UpdateToolbarStatus();
+	UpdateStatusBar();
 
 	return TRUE;
 }

@@ -74,7 +74,7 @@ void SetModified(bool mod);
 //Declare global variables here
 HINSTANCE hInst;//instance handle
 HWND hWnd;//main window handle
-HWND hDlgTrack;
+//HWND hDlgTrack;
 HWND hDlgEZCopy;
 HWND hDlgHelp = NULL;
 BOOL actApp;
@@ -177,6 +177,9 @@ void UpdateToolbarStatus() {
 			SendMessage(hwndToolbar, TB_ENABLEBUTTON, playbar_controls_toolbar[i], enabled);
 		}
 
+		// change icon to pause while playing
+		SendMessage(hwndToolbar, TB_CHANGEBITMAP, IDC_PLAYPAUSE, enabled ? 12 : 13);
+
 		lastUpdCheck = enabled;
 	}
 
@@ -189,6 +192,7 @@ void UpdateToolbarStatus() {
 	EnableMenuItem(hMenu, IDM_REDO, MF_BYCOMMAND | (enabled && org_data.RedoEnable ? MF_ENABLED : MF_GRAYED));
 	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_REDO, enabled && org_data.RedoEnable);
 
+	EnableMenuItem(hMenu, IDM_SELECT_RESET, MF_BYCOMMAND | (enabled && tra >= 0 ? MF_ENABLED : MF_GRAYED));
 	EnableMenuItem(hMenu, IDM_SELECT_CUT, MF_BYCOMMAND | (enabled && tra >= 0 ? MF_ENABLED : MF_GRAYED));
 	EnableMenuItem(hMenu, IDM_SELECT_COPY, MF_BYCOMMAND | (enabled && tra >= 0 ? MF_ENABLED : MF_GRAYED));
 	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_SELECT_CUT, enabled && tra >= 0);
@@ -196,9 +200,6 @@ void UpdateToolbarStatus() {
 
 	EnableMenuItem(hMenu, IDM_SELECT_PASTE, MF_BYCOMMAND | (enabled && gClipboardData.track1 != -1 ? MF_ENABLED : MF_GRAYED));
 	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_SELECT_PASTE, enabled && gClipboardData.track1 != -1);
-
-	// change icon to pause while playing
-	SendMessage(hwndToolbar, TB_CHANGEBITMAP, IDC_PLAYPAUSE, enabled ? 12 : 13);
 
 	// min/max zoom
 	EnableMenuItem(GetMenu(hWnd), IDM_LOUPE_MINUS, NoteWidth > 4 ? MF_ENABLED : MF_GRAYED);
@@ -316,7 +317,7 @@ void ReloadBitmaps() {
 	InitBitmaps();
 	InitCursor();
 	//LoadPlayerBitmaps(hDlgPlayer);
-	LoadTrackBitmaps(hDlgTrack);
+	//LoadTrackBitmaps(hDlgTrack);
 
 	//MakeMusicParts(mi.line, mi.dot);
 	//MakePanParts(mi.line, mi.dot);
@@ -522,16 +523,16 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	InitSoundObject("CAT", 3);
 	
 	//hDlgPlayer = CreateDialog(hInst,"PLAYER",hWnd,DialogPlayer);
-	hDlgTrack = CreateDialog(hInst,"TRACK",hWnd,DialogTrack);
+	//hDlgTrack = CreateDialog(hInst,"TRACK",hWnd,DialogTrack);
 	hDlgEZCopy = CreateDialog(hInst,"COPYBD",hWnd,DialogEZCopy);
 
 	HMENU hMenu;
 	hMenu = GetMenu(hWnd);
 
 	//hDlgShortCutList = CreateDialog(hInst,"DLGSHORTCUTINFO",hWnd,DialogShortCut);
-	WinRect.left=GetPrivateProfileInt(TRACK_WINDOW,"left",200,app_path);
+	/*WinRect.left = GetPrivateProfileInt(TRACK_WINDOW, "left", 200, app_path);
 	WinRect.top=GetPrivateProfileInt(TRACK_WINDOW,"top",200,app_path);
-	SetWindowPos(hDlgTrack,NULL,WinRect.left,WinRect.top,0,0,SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);
+	SetWindowPos(hDlgTrack,NULL,WinRect.left,WinRect.top,0,0,SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);*/
 	/*WinRect.left = GetPrivateProfileInt(PLAY_WINDOW, "left", 280, app_path);
 	WinRect.top=GetPrivateProfileInt(PLAY_WINDOW,"top",280,app_path);
 	SetWindowPos(hDlgPlayer,NULL,WinRect.left,WinRect.top,0,0,SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);*/
@@ -592,12 +593,14 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	memset(&gClipboardData, 0, sizeof(gClipboardData));
 	gClipboardData.track1 = -1;
 
-			//Show to Player
-	MUSICINFO mi;
-			org_data.GetMusicInfo( &mi );
-			SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
-			//SetDlgItemInt(hDlgTrack,IDE_VIEWTRACK,0,TRUE );
-			SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
+	//Show to Player
+	//MUSICINFO mi;
+	//org_data.GetMusicInfo( &mi );
+	//SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
+	//SetDlgItemInt(hDlgTrack,IDE_VIEWTRACK,0,TRUE );
+	//SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
+	UpdateStatusBar();
+
 	FILE *fp;
 	char kfn[MAX_PATH],gfn[MAX_PATH];
 	if(dropfile[0]!=0){
@@ -619,9 +622,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 				SetModified(false);//title name set
 				gFileUnsaved = false;
 				//DetectPreciseMode();
-				org_data.GetMusicInfo(&mi);
-				SetDlgItemInt(hDlgTrack, IDE_VIEWWAIT, mi.wait, TRUE);
-				SetDlgItemText(hDlgTrack, IDE_VIEWTRACK, "1");
+				//org_data.GetMusicInfo(&mi);
+				//SetDlgItemInt(hDlgTrack, IDE_VIEWWAIT, mi.wait, TRUE);
+				//SetDlgItemText(hDlgTrack, IDE_VIEWTRACK, "1");
+				UpdateStatusBar();
 				ClearEZC_Message();
 				SelectReset();
 				//org_data.PutMusic();
@@ -711,20 +715,22 @@ BOOL SystemTask(void)
 
 		if (!TranslateAccelerator(hWnd, Ac, &msg)) {
 			//if (!IsDialogMessage(hDlgPlayer, &msg)) {
-			if (!IsDialogMessage(hDlgTrack, &msg)) {
-				if (!IsDialogMessage(hDlgEZCopy, &msg)) {
-					if (!IsDialogMessage(hDlgHelp, &msg)) {
-						TranslateMessage(&msg);
-						DispatchMessage(&msg);
-					}
+			//if (!IsDialogMessage(hDlgTrack, &msg)) {
+			if (!IsDialogMessage(hDlgEZCopy, &msg)) {
+				if (!IsDialogMessage(hDlgHelp, &msg)) {
+					TranslateMessage(&msg);
+					DispatchMessage(&msg);
 				}
 			}
+			//}
 			//}
 		}
 	}
 
 	return TRUE;
 }
+
+void ShowStatusMessage(void);
 
 //main procedure
 LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
@@ -811,9 +817,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				SetModified(false);//title name set
                 gFileUnsaved = false;
 				//DetectPreciseMode();
-				org_data.GetMusicInfo( &mi );
-				SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
-				SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
+				//org_data.GetMusicInfo( &mi );
+				//SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
+				//SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
+				UpdateStatusBar();
 				ClearEZC_Message();
 				SelectReset();
 				//org_data.PutMusic();
@@ -872,9 +879,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//頭出し
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				org_data.GetMusicInfo( &mi );
-				itoa(mi.wait,str,10);
-				SetDlgItemText(hDlgTrack,IDE_VIEWWAIT,str);
+				UpdateStatusBar();
 				break;
 			case IDM_3BAI:
 				SetUndo();
@@ -882,9 +887,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//頭出し
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				org_data.GetMusicInfo( &mi );
-				itoa(mi.wait,str,10);
-				SetDlgItemText(hDlgTrack,IDE_VIEWWAIT,str);
+				UpdateStatusBar();
 				break;
 			case IDM_2BUNNO1:
 				SetUndo();
@@ -892,9 +895,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//頭出し				
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				org_data.GetMusicInfo( &mi );
-				itoa(mi.wait,str,10);
-				SetDlgItemText(hDlgTrack,IDE_VIEWWAIT,str);
+				UpdateStatusBar();
 				break;
 			case IDM_3BUNNO1:
 				SetUndo();
@@ -902,9 +903,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//頭出し				
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				org_data.GetMusicInfo( &mi );
-				itoa(mi.wait,str,10);
-				SetDlgItemText(hDlgTrack,IDE_VIEWWAIT,str);
+				UpdateStatusBar();
 				break;
 			case IDM_CT_L1: //Linear debility IDM_CT_L1 to 9 must be consecutive numbers!
 			case IDM_CT_L2: //Convex weakness
@@ -1079,18 +1078,14 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				ReplaseUndo();
 				//org_data.PutMusic();//View sheet music
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				org_data.GetMusicInfo( &mi );
-				itoa(mi.wait,str,10);
-				SetDlgItemText(hDlgTrack,IDE_VIEWWAIT,str);
+				UpdateStatusBar();
 				break;
 			case IDM_REDO:
 			case ID_AC_REDO:
 				ReplaceRedo();
 				//org_data.PutMusic();//View sheet music
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				org_data.GetMusicInfo( &mi );
-				itoa(mi.wait,str,10);
-				SetDlgItemText(hDlgTrack,IDE_VIEWWAIT,str);
+				UpdateStatusBar();
 				break;
 			case IDC_LEFT:
 			case ID_AC_MEASBACK:
@@ -1188,15 +1183,25 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				scr_data.GetScrollPosition(&x_scroll, &y_scroll);
 
 				org_data.SetUndoData();
-				org_data.PasteNoteData(&gClipboardData, org_data.track, tra >= 0 ? nc_Select.x1_1 : x_scroll, 1);
+
+				nc_Select.x1_1 = (tra >= 0 && nc_Select.x1_1 == nc_Select.x1_2) ? nc_Select.x1_1 : x_scroll;
+				nc_Select.x1_2 = nc_Select.x1_1 + gClipboardData.length - 1;
+				org_data.PasteNoteData(&gClipboardData, org_data.track, nc_Select.x1_1, 1);
+
 				if (gClipboardData.track1 == gClipboardData.track2) {
 					org_data.CheckNoteTail(org_data.track);
+					tra = org_data.track;
+					ful = 0;
 				}
 				else {
 					for (int i = gClipboardData.track1; i <= gClipboardData.track2; ++i) {
 						org_data.CheckNoteTail(i);
 					}
+					tra = gClipboardData.track1;
+					ful = 1;
 				}
+
+				ShowStatusMessage();
 				break;
 			}
 			}
@@ -1319,11 +1324,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			org_data.ReleaseNote();
 			EndGDI();
 			//if (!hDlgPlayer)DestroyWindow(hDlgPlayer);
-			if (!hDlgTrack)DestroyWindow(hDlgTrack);
-			if (!hDlgEZCopy)DestroyWindow(hDlgEZCopy);
-			if (!hDlgHelp)DestroyWindow(hDlgHelp);
+			//if (!hDlgTrack)DestroyWindow(hDlgTrack);
+			if (hDlgEZCopy) DestroyWindow(hDlgEZCopy);
+			if (hDlgHelp) DestroyWindow(hDlgHelp);
 
-			if (!hwnd)DestroyWindow(hwnd);
+			if (hwnd) DestroyWindow(hwnd);
 			PostQuitMessage(0);
 			break;
 		case IDM_DLGUSED://
@@ -1423,10 +1428,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			//DetectPreciseMode();
 
 			//Show to Player
-			org_data.GetMusicInfo(&mi);
-			SetDlgItemInt(hDlgTrack, IDE_VIEWWAIT, mi.wait, TRUE);
-			//SetDlgItemInt(hDlgTrack,IDE_VIEWTRACK,0,TRUE );
-			SetDlgItemText(hDlgTrack, IDE_VIEWTRACK, "1");
+			UpdateStatusBar();
 
 			ClearEZC_Message();
 			SelectReset();
@@ -1625,10 +1627,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		//DetectPreciseMode();
 		//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 		//Show to Player
-		org_data.GetMusicInfo( &mi );
-		SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
-		//SetDlgItemInt(hDlgTrack,IDE_VIEWTRACK,0,TRUE );
-		SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
+		UpdateStatusBar();
 		SetModified(false);//title name set
         gFileUnsaved = false;
 
@@ -1657,9 +1656,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		DeleteWaveData100(); //Added 20140401 Normally, it seems to be called in the order of WM_CLOSE ・> WM_DESTROY ・> WM_QUIT.
 		EndGDI();
 		//if(!hDlgPlayer)DestroyWindow(hDlgPlayer);
-		if(!hDlgTrack)DestroyWindow(hDlgTrack);
-		if(!hDlgEZCopy)DestroyWindow(hDlgEZCopy);
-		if(!hwnd)DestroyWindow(hwnd);
+		//if(!hDlgTrack)DestroyWindow(hDlgTrack);
+		if(hDlgEZCopy) DestroyWindow(hDlgEZCopy);
+		if(hwnd) DestroyWindow(hwnd);
 		PostQuitMessage(0);
 		free(strMIDIFile); //2014.05.11
 		free(gSelectedTheme);
@@ -2023,11 +2022,11 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentWavePath", gSelectedWave, app_path);
 
 
-	GetWindowRect(hDlgTrack,(LPRECT)&WinRect);
+	/*GetWindowRect(hDlgTrack, (LPRECT)&WinRect);
 	wsprintf(num_buf,"%d",WinRect.left);
 	WritePrivateProfileString(TRACK_WINDOW,"left",num_buf,app_path);
 	wsprintf(num_buf,"%d",WinRect.top);
-	WritePrivateProfileString(TRACK_WINDOW,"top",num_buf,app_path);
+	WritePrivateProfileString(TRACK_WINDOW,"top",num_buf,app_path);*/
 
 	/*GetWindowRect(hDlgPlayer, (LPRECT)&WinRect);
 	wsprintf(num_buf,"%d",WinRect.left);

@@ -23,7 +23,6 @@
 #define MAXWAVE		100
 #define maxx(a, b) ((a) > (b) ? (a) : (b))
 
-extern HWND hDlgTrack;
 extern HWND hDlgEZCopy;
 extern char* gSelectedTheme;
 extern char* gSelectedWave;
@@ -143,7 +142,7 @@ int GetText(HWND hdwnd, int ID_TEXTBOX)
 void EnableDialogWindow(int iValue = TRUE)
 {
 	//EnableWindow(hDlgPlayer,iValue);
-	EnableWindow(hDlgTrack,iValue);
+	//EnableWindow(hDlgTrack,iValue);
 	EnableWindow(hDlgEZCopy,iValue);
 
 }
