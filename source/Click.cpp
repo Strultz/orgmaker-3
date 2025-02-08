@@ -17,7 +17,7 @@ extern void ResetLastUndo(); //取りけし
 extern HWND hwndToolbar;
 
 extern NOTECOPY nc_Select; //選択範囲
-extern int tra, ful ,haba; 
+extern int tra, ful, haba; 
 extern void SetEZCWindowMessage(char *Mess);
 
 long Last_mouse_x = -99999;	//同位置の複数クリックはアンドゥとして記録しない。
@@ -57,8 +57,7 @@ void ClearDrag()
 
 void RedrawClick()
 {
-	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_SELECT_CUT, tra >= 0);
-	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_SELECT_COPY, tra >= 0);
+	UpdateToolbarStatus();
 	//RECT rect = {64,0,WWidth,WHeight};
 	//org_data.PutMusic();//楽譜の再描画
 	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
@@ -650,6 +649,7 @@ void ClickProcM(WPARAM wParam, LPARAM lParam)
 			ful = (wParam & MK_CONTROL)? 1 : 0;
 			PrintStatusMessage(0);
 			org_data.RedrawSelectArea();
+			RedrawClick();
 		}else{
 			//選択範囲のｸﾘｱ
 			tra=-256;

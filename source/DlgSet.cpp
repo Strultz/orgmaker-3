@@ -396,11 +396,8 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 		updateWait = true;
 		updateBPM = true;
 		InitSettingDialog(hdwnd);
-		EnableDialogWindow(FALSE);
+		//EnableDialogWindow(FALSE);
 		return 1;
-	case WM_CTLCOLOREDIT: //テキストが編集された。
-		
-		break;
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
 		case IDD_LB1:
@@ -492,7 +489,7 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 			}
 			return -1;
 
-		case IDCANCEL:
+		/*case IDCANCEL:
 			EndDialog(hdwnd,0);
 			EnableDialogWindow(TRUE);
 			return 1;
@@ -511,20 +508,18 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 			SetDlgItemText(hDlgTrack,IDE_VIEWWAIT,str);
 			org_data.SetMusicInfo(&mi,SETGRID|SETWAIT|SETREPEAT);
 			/*for (j = 0; j < MAXMELODY; j++)
-				MakeOrganyaWave(j,mi.tdata[j].wave_no,mi.tdata[j].pipi);*/
+				MakeOrganyaWave(j,mi.tdata[j].wave_no,mi.tdata[j].pipi);*//*
 			//org_data.PutMusic();
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			EndDialog(hdwnd,0);
 			EnableDialogWindow(TRUE);
 			ClearEZC_Message();
-			return 1;
+			return 1;*/
 		}
 		break;
 	case WM_NOTIFY: {
 		lpnm = (LPNMHDR)lParam;
 		switch (lpnm->code) {
-		case PSN_SETACTIVE:
-			PropSheet_SetWizButtons(GetParent(hdwnd), PSWIZB_BACK | PSWIZB_NEXT);
 		case PSN_KILLACTIVE: {
 			bool error = false;
 			if (!SetWait(hdwnd, &mi)) {
@@ -901,20 +896,62 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 
 BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	LPNMHDR lpnm;
+
 	switch (message) {
 	case WM_INITDIALOG:
 		return 1;
 	case WM_NOTIFY:
+		lpnm = (LPNMHDR)lParam;
+		switch (lpnm->code) {
+		case PSN_KILLACTIVE: {
+			bool error = false;
+			SetWindowLong(hdwnd, DWL_MSGRESULT, error);
+			return error;
+		}
+		case PSN_APPLY: {
+			bool error = false;
+			if (error) {
+				SetWindowLong(hdwnd, DWL_MSGRESULT, PSNRET_INVALID);
+			}
+			else {
+				SetWindowLong(hdwnd, DWL_MSGRESULT, PSNRET_NOERROR);
+				// set
+			}
+			return error;
+		}
+		}
 		break;
 	}
 	return 0;
 }
 
 BOOL CALLBACK DialogPerc(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	LPNMHDR lpnm;
+
 	switch (message) {
 	case WM_INITDIALOG:
 		return 1;
 	case WM_NOTIFY:
+		lpnm = (LPNMHDR)lParam;
+		switch (lpnm->code) {
+		case PSN_KILLACTIVE: {
+			bool error = false;
+			SetWindowLong(hdwnd, DWL_MSGRESULT, error);
+			return error;
+		}
+		case PSN_APPLY: {
+			bool error = false;
+			if (error) {
+				SetWindowLong(hdwnd, DWL_MSGRESULT, PSNRET_INVALID);
+			}
+			else {
+				SetWindowLong(hdwnd, DWL_MSGRESULT, PSNRET_NOERROR);
+				// set
+			}
+			return error;
+		}
+		}
 		break;
 	}
 	return 0;

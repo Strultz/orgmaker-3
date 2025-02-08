@@ -77,7 +77,7 @@ BOOL CALLBACK DialogDelete(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 			//org_data.PutMusic();
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			//MessageBox(hdwnd,"消去しました","通知",MB_OK);	// 2014.10.18 D
-			msgbox(hdwnd,IDS_INFO_CLEAR ,IDS_NOTIFY_TITLE ,MB_OK);	// 2014.10.18 A
+			//msgbox(hdwnd,IDS_INFO_CLEAR ,IDS_NOTIFY_TITLE ,MB_OK);	// 2014.10.18 A
 			return 1;
 		}
 	}
@@ -207,7 +207,7 @@ BOOL CALLBACK DialogCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 //			sprintf(str,"%dトラックの%dから%dまでを、%dトラックの%dに%d回コピーしました",
 //			nc.track1,nc.x1_1,nc.x1_2,nc.track2,nc.x2,nc.num);
 			//MessageBox(hdwnd,"コピーしました","通知",MB_OK);	// 2014.10.19 D
-			msgbox(hdwnd,IDS_COPY,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
+			//msgbox(hdwnd,IDS_COPY,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 			return 1;
 		}
 	}
@@ -279,7 +279,7 @@ BOOL CALLBACK DialogPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//org_data.PutMusic();
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			//MessageBox(hdwnd,"指定範囲のパンを変更しました","通知",MB_OK);	// 2014.10.19 D
-			msgbox(hdwnd,IDS_CHANGE_PAN,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
+			//msgbox(hdwnd,IDS_CHANGE_PAN,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 			return 1;
 		}
 	}
@@ -351,7 +351,7 @@ BOOL CALLBACK DialogTrans(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 			//org_data.PutMusic();
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			//MessageBox(hdwnd,"指定範囲のキーを変更しました","通知",MB_OK);	// 2014.10.19 D
-			msgbox(hdwnd,IDS_CHANGE_KEY,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
+			//msgbox(hdwnd,IDS_CHANGE_KEY,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 			return 1;
 		}
 	}
@@ -422,7 +422,7 @@ BOOL CALLBACK DialogVolume(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 			//org_data.PutMusic();
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			//MessageBox(hdwnd,"指定範囲のボリュームを変更しました","通知",MB_OK);	// 2014.10.19 D
-			msgbox(hdwnd,IDS_CHANGE_VOLUME,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
+			//msgbox(hdwnd,IDS_CHANGE_VOLUME,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 			return 1;
 		}
 	}
@@ -570,7 +570,7 @@ BOOL CALLBACK DialogCopy2(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 			//org_data.PutMusic();
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			//MessageBox(hdwnd,"コピーしました","通知",MB_OK);	// 2014.10.19 D
-			msgbox(hdwnd,IDS_COPY,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
+			//msgbox(hdwnd,IDS_COPY,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 			return 1;
 		}
 	}
@@ -630,7 +630,7 @@ BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//org_data.PutMusic();
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			//MessageBox(hdwnd,"指定Trackを入れ替えました。","通知",MB_OK);	// 2014.10.19 D
-			msgbox(hdwnd,IDS_SWAP_TRACK,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
+			//msgbox(hdwnd,IDS_SWAP_TRACK,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 			return 1;
 		}
 	}

@@ -766,13 +766,29 @@
 #define ID_AC_CUT                       40304
 #define ID_AC_COPY                      40305
 #define ID_AC_PASTE                     40306
+#define IDM_TRACK1                      40307
+#define IDM_TRACK2                      40308
+#define IDM_TRACK3                      40309
+#define IDM_TRACK4                      40310
+#define IDM_TRACK5                      40311
+#define IDM_TRACK6                      40312
+#define IDM_TRACK7                      40313
+#define IDM_TRACK8                      40314
+#define IDM_TRACKQ                      40315
+#define IDM_TRACKW                      40316
+#define IDM_TRACKE                      40317
+#define IDM_TRACKR                      40318
+#define IDM_TRACKT                      40319
+#define IDM_TRACKY                      40320
+#define IDM_TRACKU                      40321
+#define IDM_TRACKI                      40322
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        246
-#define _APS_NEXT_COMMAND_VALUE         40307
+#define _APS_NEXT_COMMAND_VALUE         40323
 #define _APS_NEXT_CONTROL_VALUE         1257
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

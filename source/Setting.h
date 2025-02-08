@@ -1,4 +1,6 @@
 #include <windows.h>
+#include "resource.h"
+
 //ウインドウの広さ(枠は省く)
 #define WINDOWWIDTH		1180
 #define WDWHEIGHTPLUS	0
@@ -25,3 +27,5 @@ extern HWND hWnd;//メインウィンドウハンドル
 extern BOOL actApp;//ウインドウのアクティブ
 
 extern int  WWidth, WHeight;	//ウィンドウのサイズ
+
+void UpdateToolbarStatus();

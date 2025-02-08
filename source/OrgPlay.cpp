@@ -109,7 +109,8 @@ void StartPlayingSong(void) {
 		org_data.GetMusicInfo(&mi);
 		StartTimer(mi.wait);
 		timer_sw = 1;
-		SendMessage(hwndToolbar, TB_CHANGEBITMAP, IDC_PLAYPAUSE, 13);
+
+		UpdateToolbarStatus();
 	}
 }
 void StopPlayingSong(void) {
@@ -117,6 +118,7 @@ void StopPlayingSong(void) {
 		QuitMMTimer();
 		Rxo_StopAllSoundNow();
 		timer_sw = 0;
-		SendMessage(hwndToolbar, TB_CHANGEBITMAP, IDC_PLAYPAUSE, 12);
+
+		UpdateToolbarStatus();
 	}
 }

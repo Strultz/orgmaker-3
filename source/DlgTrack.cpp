@@ -133,7 +133,8 @@ void ChangeTrack(HWND hdwnd, int iTrack){
 	//org_data.PutMusic();
 	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
-	SetFocus(hWnd);
+	UpdateToolbarStatus();
+	//SetFocus(hWnd);
 }
 
 void LoadTrackBitmaps(HWND hdwnd) {

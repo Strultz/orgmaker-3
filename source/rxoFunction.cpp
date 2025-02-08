@@ -577,19 +577,21 @@ void ReplaseUndo()
 	HMENU hMenu;
 	hMenu=GetMenu(hWnd);
 	if(org_data.ReplaceFromUndoData()>0){ //これ以上UNDO出来ない
-		EnableMenuItem(hMenu,IDM_UNDO,MF_BYCOMMAND|MF_GRAYED);
+		//EnableMenuItem(hMenu,IDM_UNDO,MF_BYCOMMAND|MF_GRAYED);
 	}
 	//org_data.PutBackGround();
 	//org_data.PutMusic();	//表示
 	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 	//通常の状態に戻すには
-	EnableMenuItem(hMenu,IDM_REDO,MF_BYCOMMAND|MF_ENABLED);
+	//EnableMenuItem(hMenu,IDM_REDO,MF_BYCOMMAND|MF_ENABLED);
 	DrawMenuBar(hWnd);//メニューを再描画
-	if(org_data.MinimumUndoCursor==0 && org_data.CurrentUndoCursor==0){
+	/*if (org_data.MinimumUndoCursor == 0 && org_data.CurrentUndoCursor == 0) {
 		SetModified(false);
 	}else{
 		SetModified(true);
-	}
+	}*/
+
+	SetModified(true);
 }
 
 void SetUndo()
@@ -598,8 +600,8 @@ void SetUndo()
 		HMENU hMenu;
 		hMenu=GetMenu(hWnd);
 		//通常の状態に戻すには
-		EnableMenuItem(hMenu,IDM_UNDO,MF_BYCOMMAND|MF_ENABLED);
-		EnableMenuItem(hMenu,IDM_REDO,MF_BYCOMMAND|MF_GRAYED);
+		//EnableMenuItem(hMenu,IDM_UNDO,MF_BYCOMMAND|MF_ENABLED);
+		//EnableMenuItem(hMenu,IDM_REDO,MF_BYCOMMAND|MF_GRAYED);
 		DrawMenuBar(hWnd);//メニューを再描画
 	}
 	SetModified(true);
@@ -611,8 +613,8 @@ void ResetLastUndo() //取りけし
 		HMENU hMenu;
 		hMenu=GetMenu(hWnd);
 		//通常の状態に戻すには
-		EnableMenuItem(hMenu,IDM_UNDO,MF_BYCOMMAND|MF_GRAYED);
-		EnableMenuItem(hMenu,IDM_REDO,MF_BYCOMMAND|MF_GRAYED);
+		//EnableMenuItem(hMenu,IDM_UNDO,MF_BYCOMMAND|MF_GRAYED);
+		//EnableMenuItem(hMenu,IDM_REDO,MF_BYCOMMAND|MF_GRAYED);
 		DrawMenuBar(hWnd);//メニューを再描画
 	}
 
@@ -623,8 +625,8 @@ void ClearUndo()
 	org_data.ClearUndoData();
 	HMENU hMenu;
 	hMenu=GetMenu(hWnd);
-	EnableMenuItem(hMenu,IDM_UNDO,MF_BYCOMMAND|MF_GRAYED);
-	EnableMenuItem(hMenu,IDM_REDO,MF_BYCOMMAND|MF_GRAYED);
+	//EnableMenuItem(hMenu,IDM_UNDO,MF_BYCOMMAND|MF_GRAYED);
+	//EnableMenuItem(hMenu,IDM_REDO,MF_BYCOMMAND|MF_GRAYED);
 	//通常の状態に戻すには
 	//EnableMenuItem(hMenu,IDM_UNDO,MF_BYCOMMAND|MF_ENABLED);
 	DrawMenuBar(hWnd);//メニューを再描画
@@ -637,10 +639,11 @@ void ReplaceRedo()
 	hMenu=GetMenu(hWnd);
 	if(org_data.ReplaceFromRedoData()>0){
 		//通常の状態に戻すには
-		EnableMenuItem(hMenu,IDM_REDO,MF_BYCOMMAND|MF_GRAYED);
+		//EnableMenuItem(hMenu,IDM_REDO,MF_BYCOMMAND|MF_GRAYED);
 	}
-	EnableMenuItem(hMenu,IDM_UNDO,MF_BYCOMMAND|MF_ENABLED);
+	//EnableMenuItem(hMenu,IDM_UNDO,MF_BYCOMMAND|MF_ENABLED);
 	DrawMenuBar(hWnd);//メニューを再描画
+	SetModified(true);
 	//org_data.PutBackGround();
 	//org_data.PutMusic();	//表示
 	//RedrawWindow(hWnd,&rect1,NULL,RDW_INVALIDATE|RDW_ERASENOW);

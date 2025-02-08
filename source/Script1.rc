@@ -70,14 +70,14 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     GROUPBOX        "&Tempo",IDC_STATIC,12,4,80,56
     LTEXT           "&Wait (ms.)",IDC_STATIC,20,18,36,8
-    EDITTEXT        IDD_SETWAIT,56,16,28,12,ES_NUMBER
+    EDITTEXT        IDD_SETWAIT,56,16,28,12, ES_RIGHT | ES_NUMBER
     LTEXT           "&BPM",IDC_STATIC,20,42,16,8
-    EDITTEXT        IDC_BPM,36,40,48,12
+    EDITTEXT        IDC_BPM,36,40,48,12, ES_RIGHT
     GROUPBOX        "Display &Grid",IDC_STATIC,104,4,96,112
     LISTBOX         IDD_LB1,112,16,80,76,LBS_NOINTEGRALHEIGHT | LBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
-    EDITTEXT        IDD_GRIDEDIT1,132,96,15,12,ES_NUMBER
+    EDITTEXT        IDD_GRIDEDIT1,132,96,15,12, ES_RIGHT | ES_NUMBER
     LTEXT           "Beat",IDC_STATIC,112,98,16,8
-    EDITTEXT        IDD_GRIDEDIT2,176,96,16,12,ES_NUMBER
+    EDITTEXT        IDD_GRIDEDIT2,176,96,16,12, ES_RIGHT | ES_NUMBER
     LTEXT           "Step",IDC_STATIC,156,98,16,8
     GROUPBOX        "Repeat &Range",IDC_STATIC,12,68,80,48
     LTEXT           "Start",IDC_STATIC,20,82,20,8
@@ -1357,14 +1357,14 @@ BEGIN
     IDS_ERROR_FILE          "The file is corrupt or in an invalid format."
     IDS_ERROR_HYOUSHI       "Error"
     IDS_ERROR_LOAD          "Load Error"
-    IDS_ERROR_L_TRACK       "Left Track Error"
+    IDS_ERROR_L_TRACK       "Left Channel Error"
 END
 
 STRINGTABLE
 BEGIN
     IDS_ERROR_PAN           "Error"
     IDS_ERROR_REPERT        "Error"
-    IDS_ERROR_R_TRACK       "Right Track Error"
+    IDS_ERROR_R_TRACK       "Right Channel Error"
     IDS_ERROR_SAVE          "Error"
     IDS_ERROR_SWAP          "Error"
     IDS_ERROR_TRACK         "Error"
@@ -1391,12 +1391,12 @@ BEGIN
     IDS_NOTIFY_TITLE_UNSAVED "Unsaved Changes"
     IDS_NOTIFY_TITLE_INITALIZE "Unsaved Changes"
     IDS_NOTIFY_TITLE_LOAD   "Unsaved Changes"
-    IDS_SWAP_TRACK          "Replaced the designated Track."
+    IDS_SWAP_TRACK          "Channels were swapped successfully."
     IDS_USAGE               "Usage"
-    IDS_VALUESET012         "Value must be in range (0-12)."
-    IDS_VALUESET0254        "Value must be in range (0-254)."
-    IDS_VALUESET1001900     "Recommended value is in range (100-1900)."
-    IDS_VALUESET12000       "Value must be in range (1-2000)."
+    IDS_VALUESET012         "Value must be within range (0-12)."
+    IDS_VALUESET0254        "Value must be within range (0-254)."
+    IDS_VALUESET1001900     "Recommended value is within range (100-1900)."
+    IDS_VALUESET12000       "Wait value must be within range (1-2000)."
     IDS_WARNING_ACCESS_FILE "Couldn't access file."
     IDS_WARNING_BUNKATSU    "The numbers for the division are invalid."
 END
@@ -1412,7 +1412,7 @@ BEGIN
     IDS_WARNING_HYOUSHI     "Invalid beat values"
     IDS_WARNING_TO_BEAT     "Invalid To Beat"
     IDS_WARNING_TO_TRACK    "Invalid To Track"
-    IDS_WARNING_TRACK       "Invalid Track"
+    IDS_WARNING_TRACK       "Invalid Channel"
     IDS_ERROR               "Error"
     IDS_MODIFIED            "File modified"
     IDS_DEFAULT_MIDI_TITLE  "Untitled Organya Symphony No. 1 1st Movement ""Yasagure Sanitizer"""
@@ -1432,9 +1432,9 @@ BEGIN
     IDS_STRING70            " removed."
     IDS_STRING71            " inserted."
     IDS_STRING72            " copied %d times in %d measures-%d measures."
-    IDS_STRING73            " copied %d times to measure %d-%d of track %c."
-    IDS_STRING74            "Track %c from measure %d-%d"
-    IDS_STRING75            "All tracks from measure %d-%d"
+    IDS_STRING73            " copied %d times to measure %d-%d of channel %c."
+    IDS_STRING74            "Channel %c from measure %d-%d"
+    IDS_STRING75            "All channels from measure %d-%d"
     IDS_STRING76            "(none)"
     IDS_DEFAULT_ORG_FILENAME "Untitled"
     IDS_STRING78            "*Please be careful when using it."
@@ -1448,17 +1448,17 @@ BEGIN
     IDS_STRING82            "Goodbye!"
     IDS_STRING83            "Waveform and frequency can be selected."
     IDS_STRING84            "You can select the tempo, repeat range, beat, and frequency of the song."
-    IDS_STRING85            "Pan and Vol default values can be set for each track."
+    IDS_STRING85            "Pan and Vol default values can be set for each channel."
     IDS_STRING86            "Manipulates the Vol of each existing note in the selected range."
     IDS_STRING87            "Add a dummy note for the length of the note in the selection."
     IDS_STRING88            "Displays the remaining amount of note (including dummies)."
-    IDS_STRING89            "The drum track is dimmed when editing the melody track."
+    IDS_STRING89            "The drum channel is dimmed when editing the melody channel."
     IDS_STRING90            "Shift one dot so that overlapping notes can be displayed (subtle)."
     IDS_STRING91            "Expands the display area."
     IDS_STRING92            "Reduces the display area."
     IDS_STRING93            "The behavior changes when you click on the head of a note."
     IDS_STRING94            "The range selection is always in beats per minute."
-    IDS_STRING95            "Always align the range selection track with the edit track."
+    IDS_STRING95            "Always align the range selection channel with the edit channel."
 END
 
 STRINGTABLE
@@ -1470,10 +1470,10 @@ BEGIN
     IDS_STRING100           "What about clearing history (for development)?"
     IDS_STRING101           "Automatically save/load *.pvi in the same folder as *.org"
     IDS_STRING102           "*.chm help is tasteless because I spared the time to create it"
-    IDS_STRING103           "Meow!"
-    IDS_STRING104           "Track %c"
+    IDS_STRING103           ""
+    IDS_STRING104           "Channel %c"
     IDS_STRING105           " selection"
-    IDS_STRING106           "Selection of all tracks"
+    IDS_STRING106           "Selection of all channels"
     IDS_GRID_STRING         "Custom Setting!4 Beat:4 Step!4 Beat:3 Step!3 Beat:4 Step!3 Beat:3 Step!4 Beat:6 Step!3 Beat:6 Step!4 Beat:2 Step!4 Beat:8 Step!4 Beat:12 Step!5 Beat:4 Step!!"
     IDS_STRING108           "Default Pan/Volume Data (*.pvi)!*.pvi!All Files (*.*)!*.*!!"
     IDS_STRING109           "Organya Data (*.org)!*.org!All Files (*.*)!*.*!!"
@@ -1487,13 +1487,13 @@ BEGIN
     IDS_STRING113           "[1]![2]![3]![4]![5]![6]![7]![8]![Q]![W]![E]![R]![T]![Y]![U]![I]!!"
     IDS_STRING114           "Created with OrgMaker 3"
     IDS_STRING115           " from beginning to end"
-    IDS_STRING116           "All tracks from beginning to end"
+    IDS_STRING116           "All channels from beginning to end"
     IDS_STRING117           "Wave-%02d*"
     IDS_STRING118           "Wave-%02d"
     IDS_STRING119           "WAV File (*.wav)!*.wav!All Files (*.*)!*.*!!"
     IDS_STRING120           "Export Failed"
     IDS_STRING121           "An error occurred while saving the file."
-    IDS_STRING122           "Sample rate is not in range (1000-192000)."
+    IDS_STRING122           "Sample rate must be within range (1000-192000)."
     IDS_STRING123           "Loop count must be positive."
     IDS_STRING124           "WAV Export"
     IDS_SP_TAB1             "General"

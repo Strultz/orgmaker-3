@@ -70,7 +70,6 @@ BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 BOOL CALLBACK DialogDecayLength(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void SetModified(bool mod);
-void CheckLoupeMenu(void);
 
 //Declare global variables here
 HINSTANCE hInst;//instance handle
@@ -130,11 +129,85 @@ CHAR num_buf[BUF_SIZE];
 
 HWND hwndRebar = NULL;
 HWND hwndToolbar = NULL;
+HWND hwndTrackbar = NULL;
 int rebarHeight;
 
 SAVEDNOTE gClipboardData;
 NOTECOPY nc_Select;
 int tra = -256, ful = 0, haba = 0;
+
+static const int playbar_controls_menu[70] = {
+	IDM_SORTMUSICNOTE, IDM_DLGDELETE, IDM_DLGCOPY, IDM_DLGCOPY2, IDM_DLGPAN,
+	IDM_DLGTRANS, IDM_DLGVOL, IDM_DLGSWAP, IDM_2BAI, IDM_3BAI,
+	IDM_2BUNNO1, IDM_3BUNNO1, IDM_CT_L1, IDM_CT_L2, IDM_CT_L3,
+	IDM_CT_L4, IDM_CT_L5, IDM_CT_L6, IDM_CT_L7, IDM_CT_L8,
+	IDM_CT_L9, IDM_CT_L10, IDM_CT_L11, IDM_CT_L12, IDM_CT_L13,
+	IDM_CT_L14, IDM_CT_L15, IDM_CT_L16, IDM_CT_L17, IDM_CT_L18,
+	IDM_CT_L19, IDM_CT_S1, IDM_CT_S2, IDM_CT_S3, IDM_CT_S4,
+	IDM_CT_S5, IDM_CT_S6, IDM_CT_S7, IDM_CT_S8, IDM_CT_S9,
+	IDM_CT_S10, IDM_CT_S11, IDM_CT_S12, IDM_CT_S13, IDM_CT_S14,
+	IDM_CT_S15, IDM_CT_S16, IDM_CT_S17, IDM_CT_S18, IDM_CT_S19,
+	IDM_CT_S20, IDM_CT_OCT_DOWN, IDM_CT_OCT_UP, IDM_CT_PAN_R, IDM_CT_PAN_L,
+	IDM_CT_PAN_REVERSE, IDM_CT_TRANS_UP, IDM_CT_TRANS_DOWN, IDM_CT_VOL_PLUS, IDM_CT_VOL_MINUS,
+	IDM_CT_VOLWARIAI_UP, IDM_CT_VOLWARIAI_DOWN, IDM_ML_PAN_R, IDM_ML_PAN_L, IDM_ML_TRANS_UP,
+	IDM_ML_TRANS_DOWN, IDM_ML_VOL_PLUS, IDM_ML_VOL_MINUS, IDM_DR_VOL_PLUS, IDM_DR_VOL_MINUS,
+};
+
+static const int playbar_controls_toolbar[4] = {
+	IDC_LEFT, IDC_RIGHT, IDC_LEFTSTEP, IDC_RIGHTSTEP
+};
+
+static const int iChgTrackBtn[16] = {
+	IDM_TRACK1, IDM_TRACK2, IDM_TRACK3, IDM_TRACK4, IDM_TRACK5, IDM_TRACK6, IDM_TRACK7, IDM_TRACK8,
+	IDM_TRACKQ, IDM_TRACKW, IDM_TRACKE, IDM_TRACKR, IDM_TRACKT, IDM_TRACKY, IDM_TRACKU, IDM_TRACKI,
+};
+
+static bool lastUpdCheck = false;
+void UpdateToolbarStatus() {
+	HMENU hMenu;
+	hMenu = GetMenu(hWnd);
+
+	// disable editor features while song is playing
+	bool enabled = timer_sw == 0;
+	if (lastUpdCheck != enabled) {
+		for (int i = 0; i < 70; ++i) {
+			EnableMenuItem(hMenu, playbar_controls_menu[i], MF_BYCOMMAND | (enabled ? MF_ENABLED : MF_GRAYED));
+		}
+
+		for (int i = 0; i < 4; ++i) {
+			SendMessage(hwndToolbar, TB_ENABLEBUTTON, playbar_controls_toolbar[i], enabled);
+		}
+
+		lastUpdCheck = enabled;
+	}
+
+	// special cases
+	EnableMenuItem(hMenu, IDM_UNDO, MF_BYCOMMAND | (enabled && org_data.UndoEnable ? MF_ENABLED : MF_GRAYED));
+	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_UNDO, enabled && org_data.UndoEnable);
+	EnableMenuItem(hMenu, IDM_REDO, MF_BYCOMMAND | (enabled && org_data.RedoEnable ? MF_ENABLED : MF_GRAYED));
+	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_REDO, enabled && org_data.RedoEnable);
+
+	EnableMenuItem(hMenu, IDM_SELECT_CUT, MF_BYCOMMAND | (enabled && tra >= 0 ? MF_ENABLED : MF_GRAYED));
+	EnableMenuItem(hMenu, IDM_SELECT_COPY, MF_BYCOMMAND | (enabled && tra >= 0 ? MF_ENABLED : MF_GRAYED));
+	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_SELECT_CUT, enabled && tra >= 0);
+	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_SELECT_COPY, enabled && tra >= 0);
+
+	EnableMenuItem(hMenu, IDM_SELECT_PASTE, MF_BYCOMMAND | (enabled && gClipboardData.track1 != -1 ? MF_ENABLED : MF_GRAYED));
+	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_SELECT_PASTE, enabled && gClipboardData.track1 != -1);
+
+	// change icon to pause while playing
+	SendMessage(hwndToolbar, TB_CHANGEBITMAP, IDC_PLAYPAUSE, enabled ? 12 : 13);
+
+	// min/max zoom
+	EnableMenuItem(GetMenu(hWnd), IDM_LOUPE_MINUS, NoteWidth > 4 ? MF_ENABLED : MF_GRAYED);
+	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_LOUPE_MINUS, NoteWidth > 4);
+	EnableMenuItem(GetMenu(hWnd), IDM_LOUPE_PLUS, NoteWidth < 16 ? MF_ENABLED : MF_GRAYED);
+	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_LOUPE_PLUS, NoteWidth < 16);
+
+	for (int i = 0; i < MAXTRACK; ++i) {
+		SendMessage(hwndTrackbar, TB_CHECKBUTTON, iChgTrackBtn[i], org_data.track == i);
+	}
+}
 
 void SaveIniFile();
 
@@ -390,7 +463,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	if(!hWnd) return FALSE;
 
-	hwndRebar = CreateRebar(hWnd, &hwndToolbar);
+	hwndRebar = CreateRebar(hWnd, &hwndToolbar, &hwndTrackbar);
 	rebarHeight = GetRebarHeight(hwndRebar);
 
 //	DialogBox(hInst,"DLGFLASH",NULL,DialogFlash);
@@ -474,7 +547,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	org_data.InitOrgData();
 
 	
-	CheckLoupeMenu();
 	LoadRecentFromIniFile();
 	ChangeGridMode(GetPrivateProfileInt(MAIN_WINDOW,"GridMode",0,app_path));
 	ChangeSelAlwaysCurrent(GetPrivateProfileInt(MAIN_WINDOW,"AlwaysCurrent",0,app_path));
@@ -513,6 +585,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	ClearUndo();
 
 	memset(&gClipboardData, 0, sizeof(gClipboardData));
+	gClipboardData.track1 = -1;
 
 			//Show to Player
 	MUSICINFO mi;
@@ -585,7 +658,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 			}
 		}*/
 	}
+
 	QuitMMTimer(); //A 2010.09.21
+	UpdateToolbarStatus();
 
 	while (TRUE) {
 		org_data.PutMusic();
@@ -668,7 +743,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 	switch(message){
 	case WM_COMMAND:
 		for(i=0;i<16;i++){
-			if(LOWORD(wParam) == iChgTrackKey[i]){
+			if(LOWORD(wParam) == iChgTrackKey[i] || LOWORD(wParam) == iChgTrackBtn[i]){
 				ChangeTrack(hDlgTrack,i);
 				//return FALSE;
 				//SendDlgItemMessage(hDlgTrack , IDC_TRACK0 , BM_CLICK , 0, 0);
@@ -721,16 +796,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		}
 		if(timer_sw==0){ //no while playing
 			switch(LOWORD(wParam)){
-			case ID_AC_LOAD_MOST_RECENT:
-				SendMessage(hWnd, WM_COMMAND, Menu_Recent[0],0);
-				break;
 			case IDM_SORTMUSICNOTE: //to sort
 				SetUndo();
 				SortMusicNote();
-				break;
-			case IDM_DLGDEFAULT://Show Default Dialog
-			case ID_AC_DEFAULT:
-				DialogBox(hInst,"DLGDEFAULT",hwnd,DialogDefault);
 				break;
 			case IDM_DLGDELETE://
 			case ID_AC_DELETE:
@@ -752,20 +820,12 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case ID_AC_DLG_TRANS:
 				DialogBox(hInst,"DLGTRANS",hwnd,DialogTrans);
 				break;
-			case ID_AC_STPLAY:
-				StartPlayingSong();
-				break;
-			case ID_AC_STBACK:
-				StopPlayingSong();
-				scr_data.SetHorzScroll(0);
-				org_data.SetPlayPointer(0);
-				break;
 			case IDM_DLGVOL://
 			case ID_AC_DLG_VOL:
 				DialogBox(hInst,"DLGVOLUME",hwnd,DialogVolume);
 				break;
-			case IDM_DLGUSED://
-				DialogBox(hInst,"DLGUSED",hwnd,DialogNoteUsed);
+			case ID_AC_STPLAY:
+				StartPlayingSong();
 				break;
 			//case IDM_DLGWAVE://Show settings dialog
 			//case ID_AC_WAVESELECT:
@@ -775,123 +835,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case ID_AC_DLG_SWAP:
 				DialogBox(hInst,"DLGSWAP",hwnd,DialogSwap);
 				break;
-			case IDM_DLGMEMO://
-				//PlaySoundObject(3, 1);
-				DialogBox(hInst,"DLGMEMO",hwnd,DialogMemo);
-				break;
-			case IDM_DLGTHEMES:
-				DialogBox(hInst, "DLGTHEMES", hwnd, DialogTheme);
-				break;
-			case IDM_DLGWAVEDBS:
-				DialogBox(hInst, "DLGWAVEDBS", hwnd, DialogWaveDB);
-				break;
-			case IDM_DLGHELP://
-			case ID_AC_HELP:
-				//LoadFromResource(IDR_HELPHTML);
-				if(!hDlgHelp){
-					hDlgHelp = CreateDialog(hInst,"DLGHELP",hwnd,DialogHelp);
-				}
-				ShowWindow(hDlgHelp, SW_SHOWNOACTIVATE);
-				//DialogBox(hInst,"DLGHELP",hwnd,DialogHelp);
-				break;
-			case IDM_SAVEOVER:
-			case ID_AC_MENUOVERSAVE:
-				OpenDoSave(hwnd, false);
-				break;							  
-			case IDM_SAVENEW://Save As
-			case ID_AC_MENUNEWSAVE:
-				OpenDoSave(hwnd, true);
-				/*res = GetFileNameSave(hwnd,MessageString[IDS_STRING62]); //"Save As"
-				if(res == MSGCANCEL)break;
-				if(res == MSGEXISFILE){
-					//if(MessageBox(hwnd,"Do you want to overwrite?","There is a file with the same name",MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 D
-					if(msgbox(hwnd,IDS_NOTIFY_OVERWRITE,IDS_INFO_SAME_FILE,MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 A
-						==IDNO)break;
-				}
-				org_data.SaveMusicData();
-				SetModified(false);//title name set
-                gFileUnsaved = false;*/
-				break;
-			case IDM_EXPORT_MIDI: //Export 2014.05.11
-			case ID_AC_MIDI:
-				
-				res = GetFileNameMIDI(hwnd,MessageString[IDS_STRING63], strMIDIFile );//"Export in standard MIDI format"
-				if(res == MSGCANCEL)break;
-				if(res == MSGEXISFILE){
-					//if(MessageBox(hwnd,"Do you want to overwrite?","There is a file with the same name",MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 D
-					if(msgbox(hwnd,IDS_NOTIFY_OVERWRITE,IDS_INFO_SAME_FILE,MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 A
-						==IDNO)break;
-				}
-				org_data.ExportMIDIData(strMIDIFile, iDlgRepeat);
-				//SetTitlebarText();//title name set
-				//ResetTitlebarChange();
-				break;
-			case IDM_EXPORT_WAV:
-			case ID_AC_WAV:
-				DialogBox(hInst, "DLGWAVEXPORT", hwnd, DialogWavExport);
-				break;
-			case IDM_DCLEN:
-				DialogBox(hInst, "DLGDCLEN", hwnd, DialogDecayLength);
-				break;
-			case IDM_DUMMY_TATE_SEPARATOR: //do nothing
-				break;
-			case IDM_LOAD:
-			case ID_AC_MENUOPEN:
-			    //case IDM_LOAD2:
-			    //case ID_AC_LOAD2:
-				if(CancelDeleteCurrentData(CDCD_LOAD)) break;
-				/*i = 0;
-				if(LOWORD(wParam)==IDM_LOAD2 || LOWORD(wParam)==ID_AC_LOAD2)i=1; */
-				if(GetFileNameLoad(hWnd,MessageString[IDS_STRING61]/*,i*/) != MSGLOADOK) break;//"Load song data"
-				
-				if (timer_sw != 0) // Stop playing song
-					StopPlayingSong();
-				
-				ClearUndo();
-				org_data.InitOrgData();
-				org_data.LoadMusicData();
-				SetModified(false);//title name set
-                gFileUnsaved = false;
-				//DetectPreciseMode();
-
-				//Show to Player
-				org_data.GetMusicInfo( &mi );
-				SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
-				//SetDlgItemInt(hDlgTrack,IDE_VIEWTRACK,0,TRUE );
-				SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
-
-				ClearEZC_Message();
-				SelectReset();
-				//org_data.PutMusic();
-				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-
-				for(i=0;i<8;i++)ucMIDIProgramChangeValue[i]=255;
-				break;
-			case IDM_EXIT:
-				//if(iChangeFinish!=0){	// A 2010.09.22
-				//	char cc[512],*chn;
-				//	GetWindowText(hWnd,cc,512);
-				//	chn = strstr(cc, HENKOU_NO_SHIRUSHI);
-				//	if(chn!=NULL){
-				//		//Confirm the end when there is a change. // A 2010.09.22
-				//		if(MessageBox(hwnd,"Any unsaved content will be discarded. Are you sure you want to quit?","End confirmation",MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)break;
-				//	}
-				//}
-				if(CancelDeleteCurrentData(CDCD_EXIT))break;
-				SaveIniFile();
-				QuitMMTimer();
-				PostQuitMessage(0);
-				EndDirectSound();
-				org_data.ReleaseNote();
-				EndGDI();
-				if(!hDlgPlayer)DestroyWindow(hDlgPlayer);
-				if(!hDlgTrack)DestroyWindow(hDlgTrack);
-				if(!hDlgEZCopy)DestroyWindow(hDlgEZCopy);
-				if(!hDlgHelp)DestroyWindow(hDlgHelp);
-				
-				if(!hwnd)DestroyWindow(hwnd);
-				PostQuitMessage(0);
-				break;
+			
 			case IDM_2BAI:
 				SetUndo();
 				org_data.EnlargeAllNotes(2);
@@ -1118,49 +1062,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				itoa(mi.wait,str,10);
 				SetDlgItemText(hDlgTrack,IDE_VIEWWAIT,str);
 				break;
-			case IDM_SELECT_ALL:
-			case ID_AC_SELECT_ALL:
-				SelectAll(0);
-				break;
-			case IDM_SELECT_RESET:
-			case ID_AC_SELECT_RESET:
-				SelectReset();
-				break;
-			case IDM_GRIDMODE:
-			case ID_AC_GRIDMODE:
-				ChangeGridMode();
-				break;
-			case IDM_AUTOLOADPVI:
-				ChangeAutoLoadMode();
-				break;
-			case IDM_METRONOME:
-				ChangeMetronomeMode();
-				break;
-			case IDM_SMOOTHSCROLL:
-				ChangeScrollMode();
-				break;
-			case IDM_ALWAYS_CURRENT:
-			case ID_AC_ALWAYS_CURRENT:
-				ChangeSelAlwaysCurrent();
-				//org_data.PutMusic();//View sheet music
-				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				break;
-			case ID_AC_DRAWDOUBLE:
-			case IDM_DRAWDOUBLE:
-				ChangeDrawDouble();
-				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				break;
-			case IDM_NOTE_ENLARGE: //&Make note heads stand out when zoomed out 2014.05.28
-				ChangeNoteEnlarge();
-				//org_data.PutMusic();//View sheet music
-				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				break;
-			case IDM_ENABLEPLAYING: //You can hit the keyboard while playing 2010.09.23 A
-				ChangeEnablePlaying();
-				break;
-			case IDM_CHANGEFINISH: //Confirm when finished 2010.09.23 A
-				ChangeFinish();
-				break;
 			case IDC_LEFT:
 			case ID_AC_MEASBACK:
 				scr_data.HorzScrollProc(SB_PAGELEFT);
@@ -1177,65 +1078,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDC_RIGHTSTEP:
 				scr_data.HorzScrollProc(SB_LINERIGHT);
 				break;
-			case ID_AC_SOCTUP:
-				scr_data.VertScrollProc(SB_PAGEUP);
-				break;
-			case ID_AC_SOCTDOWN:
-				scr_data.VertScrollProc(SB_PAGEDOWN);
-				break;
-			case IDM_RECENT_CLEAR:
-				ClearRecentFile();
-				break;
-			case IDM_STOPNOWALL:
-				Rxo_StopAllSoundNow();
-				break;
-			case ID_AC_DRAGMODE:
-			case IDM_DRAGMODE:
-				ChangeDragMode();
-				break;
-			case IDM_SLIDEOVERLAPNOTES: //2014.05.06 A
-			case ID_AC_SLIDEOVERLAPNOTES:
-				ChangeSlideOverlapNoteMode();
-				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				break;
-			case IDM_PRESSNOTE:
-			case ID_AC_PRESSNOTE:
-				ChangePushStratchNOTE();
-				break;
-			case IDM_INIT:
-			case ID_AC_INIT:
-				//if(MessageBox(hwnd,"Any unsaved content will be discarded. Initialize?","Initialization confirmation",MB_OKCANCEL)==IDCANCEL)break; //2010.09.25 A
-				if(CancelDeleteCurrentData(CDCD_INIT))break;
-				ClearUndo();
-				memset(music_file, 0 , MAX_PATH);
-				strcpy(music_file, MessageString[IDS_DEFAULT_ORG_FILENAME]);
-				//for(i = 0; i < 12; i++){
-				//	music_file[i] = name[i];
-				//}
-				org_data.InitOrgData();
-				org_data.SetPlayPointer(0);
-				scr_data.SetHorzScroll(0);
-				//reflected in the player
-				SetDlgItemText(hDlgPlayer,IDE_VIEWWAIT,"128");
-				SetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,"0");
-				SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,"0");
-				SetModified(false);
-                gFileUnsaved = true;
-				//MessageBox(hwnd,"initialized","Message",MB_OK);
-				ClearEZC_Message(); //Erase EZ messages and ranges
-				SelectReset();
-				//org_data.PutMusic();
-				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				for(i=0;i<8;i++)ucMIDIProgramChangeValue[i]=255;
-
-				break;
-				//«	// 2010.12.01 A
-			case ID_AC_SELECT_CLEAR: //Clear selection
-			case ID_AC_SELECT_CLEAR2: //Clear selection //2014.04.13
-				ClearEZC_Message();
-				//org_data.PutMusic();
-				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				break;
 			case ID_AC_SELECT_BACKDEL: //2014.04.13
 				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_DELETEBUTTON_2  , NULL);
 				break;
@@ -1243,42 +1085,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_INSERTBUTTON  , NULL);
 				break;
 			//Range selection operation using the numeric keypad
-			case ID_AC_NUM1:
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_CTB1 , NULL);
-				break;
-			case ID_AC_NUM2:
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_CTB2 , NULL);
-				break;
-			case ID_AC_NUM3:
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_CTB3 , NULL);
-				break;
-			case ID_AC_NUM4:
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_CTB4 , NULL);
-				break;
-			case ID_AC_NUM5:
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_CTB5 , NULL);
-				break;
-			case ID_AC_NUM6:
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_CTB6 , NULL);
-				break;
-			case ID_AC_C_NUM1:
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_CTB7 , NULL);
-				break;
-			case ID_AC_C_NUM2:
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_CTB8 , NULL);
-				break;
-			case ID_AC_C_NUM3:
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_CTB9 , NULL);
-				break;
-			case ID_AC_C_NUM4:
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_CTB10 , NULL);
-				break;
-			case ID_AC_C_NUM5:
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_CTB11 , NULL);
-				break;
-			case ID_AC_C_NUM6:
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_CTB12 , NULL);
-				break;
+			//Paste
 			case ID_AC_NUM7:
 				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_PST1 , NULL);
 				break;
@@ -1324,7 +1131,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 						t1 = t2 = tra;
 					}
 					org_data.GrabNoteData(&gClipboardData, t1, t2, nc_Select.x1_1, nc_Select.x1_2);
-					SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_SELECT_PASTE, TRUE);
+					UpdateToolbarStatus();
 
 					if (LOWORD(wParam) == IDM_SELECT_CUT || LOWORD(wParam) == ID_AC_CUT) {
 						org_data.SetUndoData();
@@ -1342,13 +1149,22 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			}
 			case ID_AC_PASTE:
 			case IDM_SELECT_PASTE: {
+				if (gClipboardData.track1 == -1) {
+					break;
+				}
+
 				long x_scroll, y_scroll;
 				scr_data.GetScrollPosition(&x_scroll, &y_scroll);
 
 				org_data.SetUndoData();
 				org_data.PasteNoteData(&gClipboardData, org_data.track, tra >= 0 ? nc_Select.x1_1 : x_scroll, 1);
-				for (int i = gClipboardData.track1; i < gClipboardData.track2; ++i) {
-					org_data.CheckNoteTail(i);
+				if (gClipboardData.track1 == gClipboardData.track2) {
+					org_data.CheckNoteTail(org_data.track);
+				}
+				else {
+					for (int i = gClipboardData.track1; i <= gClipboardData.track2; ++i) {
+						org_data.CheckNoteTail(i);
+					}
 				}
 				break;
 			}
@@ -1374,7 +1190,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case 14:	SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[87.5%]"); break;
 			case 16:	SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[100%]"); break;
 			}
-			CheckLoupeMenu();
+			UpdateToolbarStatus();
 			break;
 		case IDM_LOUPE_PLUS:
 		case ID_AC_LOUPE_PLUS:
@@ -1391,7 +1207,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case 14:	SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[87.5%]"); break;
 			case 16:	SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[100%]"); break;
 			}
-			CheckLoupeMenu();
+			UpdateToolbarStatus();
 			break;
 		case IDC_PLAYPAUSE:
 			if (timer_sw) {
@@ -1405,6 +1221,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		case IDM_DLGSETTING://Show settings dialog
 		case ID_AC_SETTEMPO:
+			StopPlayingSong();
 			OpenSongProperties(hWnd);
 			Rxo_StopAllSoundNow();
 			//DialogBox(hInst,"DLGSETTING",hwnd,DialogSetting);
@@ -1423,6 +1240,283 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			scr_data.SetHorzScroll(mi.end_x);
 			org_data.SetPlayPointer(mi.end_x);
 			//SendMessage(hDlgPlayer, WM_COMMAND, IDC_END, NULL);
+			break;
+		case IDM_INIT:
+		case ID_AC_INIT:
+			StopPlayingSong();
+			//if(MessageBox(hwnd,"Any unsaved content will be discarded. Initialize?","Initialization confirmation",MB_OKCANCEL)==IDCANCEL)break; //2010.09.25 A
+			if (CancelDeleteCurrentData(CDCD_INIT))break;
+			ClearUndo();
+			memset(music_file, 0, MAX_PATH);
+			strcpy(music_file, MessageString[IDS_DEFAULT_ORG_FILENAME]);
+			//for(i = 0; i < 12; i++){
+			//	music_file[i] = name[i];
+			//}
+			org_data.InitOrgData();
+			org_data.SetPlayPointer(0);
+			scr_data.SetHorzScroll(0);
+			//reflected in the player
+			SetDlgItemText(hDlgPlayer, IDE_VIEWWAIT, "128");
+			SetDlgItemText(hDlgPlayer, IDE_VIEWMEAS, "0");
+			SetDlgItemText(hDlgPlayer, IDE_VIEWXPOS, "0");
+			SetModified(false);
+			gFileUnsaved = true;
+			//MessageBox(hwnd,"initialized","Message",MB_OK);
+			ClearEZC_Message(); //Erase EZ messages and ranges
+			SelectReset();
+			//org_data.PutMusic();
+			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+			for (i = 0;i < 8;i++)ucMIDIProgramChangeValue[i] = 255;
+
+			break;
+		case IDM_EXIT:
+			//if(iChangeFinish!=0){	// A 2010.09.22
+			//	char cc[512],*chn;
+			//	GetWindowText(hWnd,cc,512);
+			//	chn = strstr(cc, HENKOU_NO_SHIRUSHI);
+			//	if(chn!=NULL){
+			//		//Confirm the end when there is a change. // A 2010.09.22
+			//		if(MessageBox(hwnd,"Any unsaved content will be discarded. Are you sure you want to quit?","End confirmation",MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)break;
+			//	}
+			//}
+			if (CancelDeleteCurrentData(CDCD_EXIT))break;
+			SaveIniFile();
+			QuitMMTimer();
+			PostQuitMessage(0);
+			EndDirectSound();
+			org_data.ReleaseNote();
+			EndGDI();
+			if (!hDlgPlayer)DestroyWindow(hDlgPlayer);
+			if (!hDlgTrack)DestroyWindow(hDlgTrack);
+			if (!hDlgEZCopy)DestroyWindow(hDlgEZCopy);
+			if (!hDlgHelp)DestroyWindow(hDlgHelp);
+
+			if (!hwnd)DestroyWindow(hwnd);
+			PostQuitMessage(0);
+			break;
+		case IDM_DLGUSED://
+			DialogBox(hInst, "DLGUSED", hwnd, DialogNoteUsed);
+			break;
+		case IDM_DLGMEMO://
+			//PlaySoundObject(3, 1);
+			DialogBox(hInst, "DLGMEMO", hwnd, DialogMemo);
+			break;
+		case IDM_DLGTHEMES:
+			DialogBox(hInst, "DLGTHEMES", hwnd, DialogTheme);
+			break;
+		case IDM_DLGWAVEDBS:
+			StopPlayingSong();
+			DialogBox(hInst, "DLGWAVEDBS", hwnd, DialogWaveDB);
+			break;
+		case ID_AC_STBACK:
+			StopPlayingSong();
+			scr_data.SetHorzScroll(0);
+			org_data.SetPlayPointer(0);
+			break;
+		case IDM_DLGHELP://
+		case ID_AC_HELP:
+			//LoadFromResource(IDR_HELPHTML);
+			if (!hDlgHelp) {
+				hDlgHelp = CreateDialog(hInst, "DLGHELP", hwnd, DialogHelp);
+			}
+			ShowWindow(hDlgHelp, SW_SHOWNOACTIVATE);
+			//DialogBox(hInst,"DLGHELP",hwnd,DialogHelp);
+			break;
+		case IDM_SAVEOVER:
+		case ID_AC_MENUOVERSAVE:
+			OpenDoSave(hwnd, false);
+			break;
+		case IDM_SAVENEW://Save As
+		case ID_AC_MENUNEWSAVE:
+			OpenDoSave(hwnd, true);
+			/*res = GetFileNameSave(hwnd,MessageString[IDS_STRING62]); //"Save As"
+			if(res == MSGCANCEL)break;
+			if(res == MSGEXISFILE){
+				//if(MessageBox(hwnd,"Do you want to overwrite?","There is a file with the same name",MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 D
+				if(msgbox(hwnd,IDS_NOTIFY_OVERWRITE,IDS_INFO_SAME_FILE,MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 A
+					==IDNO)break;
+			}
+			org_data.SaveMusicData();
+			SetModified(false);//title name set
+			gFileUnsaved = false;*/
+			break;
+		case IDM_EXPORT_MIDI: //Export 2014.05.11
+		case ID_AC_MIDI:
+			StopPlayingSong();
+
+			res = GetFileNameMIDI(hwnd, MessageString[IDS_STRING63], strMIDIFile);//"Export in standard MIDI format"
+			if (res == MSGCANCEL)break;
+			if (res == MSGEXISFILE) {
+				//if(MessageBox(hwnd,"Do you want to overwrite?","There is a file with the same name",MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 D
+				if (msgbox(hwnd, IDS_NOTIFY_OVERWRITE, IDS_INFO_SAME_FILE, MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 A
+					== IDNO)break;
+			}
+			org_data.ExportMIDIData(strMIDIFile, iDlgRepeat);
+			//SetTitlebarText();//title name set
+			//ResetTitlebarChange();
+			break;
+		case IDM_EXPORT_WAV:
+		case ID_AC_WAV:
+			StopPlayingSong();
+			DialogBox(hInst, "DLGWAVEXPORT", hwnd, DialogWavExport);
+			break;
+		case ID_AC_LOAD_MOST_RECENT:
+			StopPlayingSong();
+			SendMessage(hWnd, WM_COMMAND, Menu_Recent[0], 0);
+			break;
+		case IDM_DCLEN:
+			DialogBox(hInst, "DLGDCLEN", hwnd, DialogDecayLength);
+			break;
+		case IDM_DUMMY_TATE_SEPARATOR: //do nothing
+			break;
+		case IDM_LOAD:
+		case ID_AC_MENUOPEN:
+			StopPlayingSong();
+			//case IDM_LOAD2:
+			//case ID_AC_LOAD2:
+			if (CancelDeleteCurrentData(CDCD_LOAD)) break;
+			/*i = 0;
+			if(LOWORD(wParam)==IDM_LOAD2 || LOWORD(wParam)==ID_AC_LOAD2)i=1; */
+			if (GetFileNameLoad(hWnd, MessageString[IDS_STRING61]/*,i*/) != MSGLOADOK) break;//"Load song data"
+
+			if (timer_sw != 0) // Stop playing song
+				StopPlayingSong();
+
+			ClearUndo();
+			org_data.InitOrgData();
+			org_data.LoadMusicData();
+			SetModified(false);//title name set
+			gFileUnsaved = false;
+			//DetectPreciseMode();
+
+			//Show to Player
+			org_data.GetMusicInfo(&mi);
+			SetDlgItemInt(hDlgTrack, IDE_VIEWWAIT, mi.wait, TRUE);
+			//SetDlgItemInt(hDlgTrack,IDE_VIEWTRACK,0,TRUE );
+			SetDlgItemText(hDlgTrack, IDE_VIEWTRACK, "1");
+
+			ClearEZC_Message();
+			SelectReset();
+			//org_data.PutMusic();
+			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+
+			for (i = 0;i < 8;i++)ucMIDIProgramChangeValue[i] = 255;
+			break;
+		case IDM_SELECT_ALL:
+		case ID_AC_SELECT_ALL:
+			SelectAll(0);
+			break;
+		case IDM_SELECT_RESET:
+		case ID_AC_SELECT_RESET:
+			SelectReset();
+			break;
+		case ID_AC_SOCTUP:
+			scr_data.VertScrollProc(SB_PAGEUP);
+			break;
+		case ID_AC_SOCTDOWN:
+			scr_data.VertScrollProc(SB_PAGEDOWN);
+			break;
+		case IDM_RECENT_CLEAR:
+			ClearRecentFile();
+			break;
+		case IDM_GRIDMODE:
+		case ID_AC_GRIDMODE:
+			ChangeGridMode();
+			break;
+		case IDM_AUTOLOADPVI:
+			ChangeAutoLoadMode();
+			break;
+		case IDM_METRONOME:
+			ChangeMetronomeMode();
+			break;
+		case IDM_SMOOTHSCROLL:
+			ChangeScrollMode();
+			break;
+		case IDM_ALWAYS_CURRENT:
+		case ID_AC_ALWAYS_CURRENT:
+			ChangeSelAlwaysCurrent();
+			//org_data.PutMusic();//View sheet music
+			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+			break;
+		case ID_AC_DRAWDOUBLE:
+		case IDM_DRAWDOUBLE:
+			ChangeDrawDouble();
+			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+			break;
+		case IDM_NOTE_ENLARGE: //&Make note heads stand out when zoomed out 2014.05.28
+			ChangeNoteEnlarge();
+			//org_data.PutMusic();//View sheet music
+			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+			break;
+		case IDM_ENABLEPLAYING: //You can hit the keyboard while playing 2010.09.23 A
+			ChangeEnablePlaying();
+			break;
+		case IDM_CHANGEFINISH: //Confirm when finished 2010.09.23 A
+			ChangeFinish();
+			break;
+		case IDM_STOPNOWALL:
+			StopPlayingSong();
+			Rxo_StopAllSoundNow();
+			break;
+		case ID_AC_DRAGMODE:
+		case IDM_DRAGMODE:
+			ChangeDragMode();
+			break;
+		case IDM_SLIDEOVERLAPNOTES: //2014.05.06 A
+		case ID_AC_SLIDEOVERLAPNOTES:
+			ChangeSlideOverlapNoteMode();
+			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+			break;
+		case IDM_PRESSNOTE:
+		case ID_AC_PRESSNOTE:
+			ChangePushStratchNOTE();
+			break;
+			//«	// 2010.12.01 A
+		case ID_AC_SELECT_CLEAR: //Clear selection
+		case ID_AC_SELECT_CLEAR2: //Clear selection //2014.04.13
+			ClearEZC_Message();
+			//org_data.PutMusic();
+			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+			break;
+		case ID_AC_NUM1:
+			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB1, NULL);
+			break;
+		case ID_AC_NUM2:
+			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB2, NULL);
+			break;
+		case ID_AC_NUM3:
+			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB3, NULL);
+			break;
+		case ID_AC_NUM4:
+			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB4, NULL);
+			break;
+		case ID_AC_NUM5:
+			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB5, NULL);
+			break;
+		case ID_AC_NUM6:
+			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB6, NULL);
+			break;
+		case ID_AC_C_NUM1:
+			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB7, NULL);
+			break;
+		case ID_AC_C_NUM2:
+			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB8, NULL);
+			break;
+		case ID_AC_C_NUM3:
+			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB9, NULL);
+			break;
+		case ID_AC_C_NUM4:
+			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB10, NULL);
+			break;
+		case ID_AC_C_NUM5:
+			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB11, NULL);
+			break;
+		case ID_AC_C_NUM6:
+			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB12, NULL);
+			break;
+		case IDM_DLGDEFAULT://Show Default Dialog
+		case ID_AC_DEFAULT:
+			DialogBox(hInst, "DLGDEFAULT", hwnd, DialogDefault);
 			break;
 		}
 
@@ -1815,6 +1909,7 @@ void SetTitlebarText()
 void SetModified(bool mod) {
 	gFileModified = mod;
 	SetTitlebarText();
+	UpdateToolbarStatus();
 }
 
 void SaveIniFile()
@@ -1950,18 +2045,3 @@ BOOL CALLBACK DialogFlash(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 */
-
-void CheckLoupeMenu(void)
-{
-	if(NoteWidth == 4){
-		EnableMenuItem(GetMenu(hWnd), IDM_LOUPE_MINUS, MF_GRAYED);
-	}else{
-		EnableMenuItem(GetMenu(hWnd), IDM_LOUPE_MINUS, MF_ENABLED);
-	}
-	if(NoteWidth == 16){
-		EnableMenuItem(GetMenu(hWnd), IDM_LOUPE_PLUS, MF_GRAYED);
-	}else{
-		EnableMenuItem(GetMenu(hWnd), IDM_LOUPE_PLUS, MF_ENABLED);
-	}
-
-}
