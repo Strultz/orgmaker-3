@@ -1026,6 +1026,8 @@ B_LOUPE_MINUS           BITMAP                  "Bitmap\\Loupe_MINUS.bmp"
 
 TOOLBAR_ICONS           BITMAP                  "Bitmap\\TOOLBAR_ICONS.bmp"
 
+TRACKBAR_ICONS          BITMAP                  "Bitmap\\TRACKBAR_ICONS.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

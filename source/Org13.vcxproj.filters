@@ -252,17 +252,11 @@
     <Image Include="Bitmap\org_end.bmp">
       <Filter>Resource Files\Bitmap</Filter>
     </Image>
-    <Image Include="Bitmap\FILE_TOOLBAR_ICONS.bmp">
+    <Image Include="Bitmap\TRACKBAR_ICONS.bmp">
       <Filter>Resource Files\Bitmap</Filter>
-    </Image>
-    <Image Include="Bitmap\PLAYER_TOOLBAR_ICONS.bmp">
-      <Filter>Resource Files\Bitmap</Filter>
-    </Image>
-    <Image Include="bitmap\bitmap1.bmp">
-      <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Bitmap\TOOLBAR_ICONS.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Bitmap</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

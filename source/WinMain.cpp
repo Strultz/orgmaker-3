@@ -753,9 +753,21 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				//SendDlgItemMessage(hDlgTrack , IDC_TRACK0 , BM_CLICK , 0, 0);
 			}
 			else if (LOWORD(wParam) == iChgTrackBtn[i]) {
-				if (GetKeyState(VK_SHIFT) & 0x8000) {
+				if (GetKeyState(VK_CONTROL) & 0x8000) { // Solo
+					bool un = true;
+					for (j = 0; j < 16; ++j) {
+						if (org_data.mute[j] != (i != j)) {
+							un = false;
+							break;
+						}
+					}
+					for (j = 0; j < 16; ++j) {
+						org_data.mute[j] = (!un && i != j);
+					}
+					UpdateToolbarStatus();
+				} else if(GetKeyState(VK_SHIFT) & 0x8000) { // Mute
 					MuteTrack(i);
-				} else {
+				} else { // Select
 					ChangeTrack(i);
 				}
 			}
