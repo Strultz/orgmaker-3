@@ -139,6 +139,7 @@
 #define IDD_MIDI                        232
 #define IDD_DIALOG1                     236
 #define IDD_DLGPERC                     242
+#define IDD_DLGPREFSG                   247
 #define IDD_LB1                         1001
 #define IDM_DIALOG1                     1002
 #define IDM_DLGGRID                     1002
@@ -463,17 +464,11 @@
 #define IDC_WAVE5                       1238
 #define IDC_SPIN5                       1239
 #define IDC_SCROLLBAR2                  1240
-#define IDC_WAVE9                       1240
 #define IDC_WAVE6                       1241
-#define IDC_SPIN9                       1241
 #define IDC_SPIN6                       1242
-#define IDC_WAVE10                      1242
 #define IDC_WAVE7                       1243
-#define IDC_SPIN10                      1243
 #define IDC_SPIN7                       1244
-#define IDC_WAVE11                      1244
 #define IDC_WAVE8                       1245
-#define IDC_SPIN11                      1245
 #define IDC_SPIN8                       1246
 #define IDC_WAVEQ                       1247
 #define IDC_WAVEW                       1248
@@ -795,7 +790,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        247
+#define _APS_NEXT_RESOURCE_VALUE        248
 #define _APS_NEXT_COMMAND_VALUE         40325
 #define _APS_NEXT_CONTROL_VALUE         1260
 #define _APS_NEXT_SYMED_VALUE           101

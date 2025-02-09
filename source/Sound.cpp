@@ -198,9 +198,10 @@ static void S_PlaySound(S_Sound* sound, bool looping) {
 		if (sound->silence_count == 0) {
 			sound->sub_position = 0;
 		}
+
+		sound->playing = true;
 	}
 
-	sound->playing = true;
 	sound->looping = looping;
 
 	ma_mutex_unlock(&mutex);
@@ -212,8 +213,10 @@ static void S_StopSound(S_Sound* sound) {
 
 	ma_mutex_lock(&mutex);
 
-	sound->playing = false;
-	sound->silence_count = 4;
+	if (sound->playing) {
+		sound->playing = false;
+		sound->silence_count = 4;
+	}
 
 	ma_mutex_unlock(&mutex);
 }
@@ -259,6 +262,8 @@ static void S_MixSounds(float* stream, size_t frames_total) {
 		if (sound->playing || sound->silence_count > 0) {
 			float* stream_pointer = stream;
 
+			sound->played_before = true;
+
 			for (size_t frames_done = 0; frames_done < frames_total; ++frames_done) {
 				// Update volume ramp
 				if (sound->vol_ticks > 0) {
@@ -294,8 +299,8 @@ static void S_MixSounds(float* stream, size_t frames_total) {
 				const long last_position = sound->position;
 
 				sound->sub_position += sound->advance_delta;
-                sound->position += (long)sound->sub_position;
-                sound->sub_position = mmodf(sound->sub_position, 1.0F);
+				sound->position += (long)sound->sub_position;
+				sound->sub_position = mmodf(sound->sub_position, 1.0F);
 
 				if (sound->position > last_position) {
 					/* Update ring buffer position and write new sample(s) */
@@ -336,8 +341,6 @@ static void S_MixSounds(float* stream, size_t frames_total) {
 					sound->position = 0;
 				}
 			}
-
-			sound->played_before = true;
 		}
 	}
 }

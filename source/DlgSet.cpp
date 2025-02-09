@@ -53,17 +53,26 @@ GRID grid[NUMGRIDA] = {
 	{"4/12",4,12},
 	{"5/4",5,4},
 };
-//IDS_GRID_STRINGに!区切りで追加すること。ここの文字列はﾀﾞﾐｰです。
 
-int check_pipi[NUMGRID] ={
-	IDC_CHECK_PIPI0,
-	IDC_CHECK_PIPI1,
-	IDC_CHECK_PIPI2,
-	IDC_CHECK_PIPI3,
-	IDC_CHECK_PIPI4,
-	IDC_CHECK_PIPI5,
-	IDC_CHECK_PIPI6,
-	IDC_CHECK_PIPI7,
+int btn_wave[NUMGRID] = {
+	IDC_WAVE1, IDC_WAVE2, IDC_WAVE3, IDC_WAVE4,
+	IDC_WAVE5, IDC_WAVE6, IDC_WAVE7, IDC_WAVE8,
+};
+int txt_freq[NUMGRID] = {
+	IDC_FREQ1, IDC_FREQ2, IDC_FREQ3, IDC_FREQ4,
+	IDC_FREQ5, IDC_FREQ6, IDC_FREQ7, IDC_FREQ8,
+};
+int spin_freq[NUMGRID] = {
+	IDC_SPIN1, IDC_SPIN2, IDC_SPIN3, IDC_SPIN4,
+	IDC_SPIN5, IDC_SPIN6, IDC_SPIN7, IDC_SPIN8,
+};
+int check_pipi[NUMGRID] = {
+	IDC_PI1, IDC_PI2, IDC_PI3, IDC_PI4,
+	IDC_PI5, IDC_PI6, IDC_PI7, IDC_PI8,
+};
+int dd_drambox[NUMGRID] = {
+	IDC_WAVEQ, IDC_WAVEW, IDC_WAVEE, IDC_WAVER,
+	IDC_WAVET, IDC_WAVEY, IDC_WAVEU, IDC_WAVEI,
 };
 
 int txt_Pan[]={
@@ -155,10 +164,6 @@ void InitSettingDialog(HWND hdwnd)
 	long i,a;
 	MUSICINFO mi;
 	org_data.GetMusicInfo(&mi);
-//	//編集トラック情報の初期化//////////////////
-//	itoa(org_data.track,str,10);
-//	SetDlgItemText(hdwnd,IDD_SETTRACK,str);
-	//再生ウエイトの初期化//////////////////
 
 	itoa(mi.wait,str,10);
 	SetDlgItemText(hdwnd,IDD_SETWAIT,str);
@@ -166,20 +171,20 @@ void InitSettingDialog(HWND hdwnd)
 	snprintf(str, 128, "%.3f", ((mi.wait > 0 && mi.dot > 0) ? (60000.0 / (double)(mi.wait * mi.dot)) : 0));
 	SetDlgItemText(hdwnd, IDC_BPM, str);
 
-	//ｸﾞﾘｯﾄﾞの初期化
 	TCHAR *q, *p;
 	p = MessageString[IDS_GRID_STRING];
 	for(i = 0; i < NUMGRIDA; i++){
-		for(q = grid[i].name; *p != 0; p++, q++)*q = *p; //実質strcpy
-		*q = 0; p++; //ポインタを'\0'の次に
+		for(q = grid[i].name; *p != 0; p++, q++)*q = *p;
+		*q = 0; p++;
 	}
 
-	//表示グリッドの初期化//////////////////
-	for(i = 0; i < NUMGRIDA; i++)//リストボックスの初期化
+	for(i = 0; i < NUMGRIDA; i++)
 		SendDlgItemMessage(hdwnd,IDD_LB1,LB_ADDSTRING,0,(LPARAM)grid[i].name);
-	for(i = 0; i < NUMGRIDA; i++)//現在使用中のグリッドを検索
+
+	for(i = 0; i < NUMGRIDA; i++)
 		if(mi.line == grid[i].line && mi.dot == grid[i].dot)break;
-	if(i == NUMGRIDA)i = 0;//無ければ０を設定
+
+	if(i == NUMGRIDA) i = 0;
 	
 	if(i > 0){
 		a = grid[i].line;
@@ -188,10 +193,10 @@ void InitSettingDialog(HWND hdwnd)
 		a = grid[i].dot;
 		itoa(a,str,10);
 		SetDlgItemText(hdwnd,IDD_GRIDEDIT2,str);
-		EnableWindow(GetDlgItem(hdwnd, IDD_GRIDEDIT1), FALSE); //自由設定テキスト無効化
+		EnableWindow(GetDlgItem(hdwnd, IDD_GRIDEDIT1), FALSE);
 		EnableWindow(GetDlgItem(hdwnd, IDD_GRIDEDIT2), FALSE);
 	}else{
-		EnableWindow(GetDlgItem(hdwnd, IDD_GRIDEDIT1), TRUE); //自由設定テキスト有効化
+		EnableWindow(GetDlgItem(hdwnd, IDD_GRIDEDIT1), TRUE);
 		EnableWindow(GetDlgItem(hdwnd, IDD_GRIDEDIT2), TRUE);
 		a = mi.line;
 		itoa(a,str,10);
@@ -202,8 +207,6 @@ void InitSettingDialog(HWND hdwnd)
 	}
 
 	SendDlgItemMessage(hdwnd,IDD_LB1,LB_SETCURSEL,i,0);
-	//リピート範囲の初期化//////////////////
-	//CheckDlgButton(hdwnd, IDC_CHECK_PRECISELR, preciselr ? 1 : 0);
 	a = mi.repeat_x / (mi.dot * mi.line);
 	itoa(a,str,10);
 	SetDlgItemText(hdwnd,IDD_REP_MEAS,str);
@@ -217,37 +220,6 @@ void InitSettingDialog(HWND hdwnd)
 	a = mi.end_x % (mi.dot * mi.line);
 	itoa(a, str, 10);
 	SetDlgItemText(hdwnd, IDD_END_BEAT, str);
-	//の初期化//////////////////
-	/*a = mi.tdata[0].freq;
-	itoa(a,str,10);
-	SetDlgItemText(hdwnd,IDD_SETFREQ0,str);
-	a = mi.tdata[1].freq;
-	itoa(a,str,10);
-	SetDlgItemText(hdwnd,IDD_SETFREQ1,str);
-	a = mi.tdata[2].freq;
-	itoa(a,str,10);
-	SetDlgItemText(hdwnd,IDD_SETFREQ2,str);
-	a = mi.tdata[3].freq;
-	itoa(a,str,10);
-	SetDlgItemText(hdwnd,IDD_SETFREQ3,str);
-	a = mi.tdata[4].freq;
-	itoa(a,str,10);
-	SetDlgItemText(hdwnd,IDD_SETFREQ4,str);
-	a = mi.tdata[5].freq;
-	itoa(a,str,10);
-	SetDlgItemText(hdwnd,IDD_SETFREQ5,str);
-	a = mi.tdata[6].freq;
-	itoa(a,str,10);
-	SetDlgItemText(hdwnd,IDD_SETFREQ6,str);
-	a = mi.tdata[7].freq;
-	itoa(a,str,10);
-	SetDlgItemText(hdwnd,IDD_SETFREQ7,str);
-
-	for(i = 0; i < NUMGRID; i++){//pipiの初期化
-		if( mi.tdata[i].pipi )
-			CheckDlgButton( hdwnd, check_pipi[i], 1 );
-	}*/
-	//MessageBox(NULL, "メッセージループを抜けました", "OK", MB_OK);
 }
 
 //ウエイトの設定
@@ -259,7 +231,7 @@ BOOL SetWait(HWND hdwnd, MUSICINFO *mi)
 	a = atol(str);
 	if(a > 2000 || a < 1){
 		//MessageBox(hdwnd,"1～2000にしてください","ERROR(ウエイト)",MB_OK);	// 2014.10.19 D
-		msgbox(hdwnd,IDS_VALUESET12000,IDS_ERROR_WAIT,MB_OK);	// 2014.10.19 A
+		msgbox(hdwnd,IDS_VALUESET12000,IDS_ERROR_WAIT,MB_OK | MB_ICONWARNING);	// 2014.10.19 A
 		return FALSE;
 	}
 	mi->wait = (unsigned short)a;
@@ -283,14 +255,14 @@ BOOL SetGrid(HWND hdwnd,MUSICINFO *mi)
 		a = atol(str);
 		if(a<=0 || a>=128){
 			//MessageBox(hdwnd,"拍子の数値がおかしいです。","ERROR(拍子)",MB_OK);	// 2014.10.19 D
-			msgbox(hdwnd,IDS_WARNING_HYOUSHI,IDS_ERROR_HYOUSHI,MB_OK);	// 2014.10.19 A
+			msgbox(hdwnd,IDS_WARNING_HYOUSHI,IDS_ERROR_HYOUSHI,MB_OK | MB_ICONWARNING);	// 2014.10.19 A
 			return FALSE;
 		}
 		GetDlgItemText(hdwnd,IDD_GRIDEDIT2,str,3);
 		b = atol(str);
 		if(b<=0 || b>=128){
 			//MessageBox(hdwnd,"分割の数値がおかしいです。","ERROR(分割)",MB_OK);	// 2014.10.19 D
-			msgbox(hdwnd,IDS_WARNING_BUNKATSU,IDS_ERROR_BUNKATSU,MB_OK);	// 2014.10.19 A
+			msgbox(hdwnd,IDS_WARNING_BUNKATSU,IDS_ERROR_BUNKATSU,MB_OK | MB_ICONWARNING);	// 2014.10.19 A
 			return FALSE;
 		}
 
@@ -317,7 +289,7 @@ BOOL SetRepeat(HWND hdwnd, MUSICINFO *mi)
 	mi->end_x = (unsigned short)a * (mi->dot * mi->line) + b;
 	if(mi->end_x <= mi->repeat_x){
 		//MessageBox(hdwnd,"あたま＜おわり に設定してください","ERROR(リピート範囲)",MB_OK);	// 2014.10.19 D
-		msgbox(hdwnd,IDS_WARNING_FROM_TO,IDS_ERROR_REPERT,MB_OK);	// 2014.10.19 A
+		msgbox(hdwnd,IDS_WARNING_FROM_TO,IDS_ERROR_REPERT,MB_OK | MB_ICONWARNING);	// 2014.10.19 A
 		return FALSE;
 	}
 	return TRUE;
@@ -399,12 +371,13 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
 		case IDD_LB1:
-			if(HIWORD(wParam) == LBN_SELCHANGE){ //ﾘｽﾄﾎﾞｯｸｽでの選択変更
-				i = SendDlgItemMessage(hdwnd, IDD_LB1,LB_GETCURSEL,0,0);//インデックスを得る
-				if(i == 0){
+			if (HIWORD(wParam) == LBN_SELCHANGE) { //ﾘｽﾄﾎﾞｯｸｽでの選択変更
+				i = SendDlgItemMessage(hdwnd, IDD_LB1, LB_GETCURSEL, 0, 0);//インデックスを得る
+				if (i == 0) {
 					EnableWindow(GetDlgItem(hdwnd, IDD_GRIDEDIT1), TRUE);
 					EnableWindow(GetDlgItem(hdwnd, IDD_GRIDEDIT2), TRUE);
-				}else{
+				}
+				else {
 					EnableWindow(GetDlgItem(hdwnd, IDD_GRIDEDIT1), FALSE);
 					EnableWindow(GetDlgItem(hdwnd, IDD_GRIDEDIT2), FALSE);
 				}
@@ -420,7 +393,7 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 			{
 				if (updateBPM) {
 					updateBPM = false;
-					return -1;
+					break;
 				}
 
 				GetDlgItemText(hdwnd, IDC_BPM, str, 128);
@@ -449,7 +422,7 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 			{
 				if (updateWait) {
 					updateWait = false;
-					return -1;
+					break;
 				}
 
 				GetDlgItemText(hdwnd, IDD_SETWAIT, str, 128);
@@ -478,41 +451,12 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 			// Fallthrough
 		case IDD_REP_MEAS: case IDD_END_MEAS: case IDD_REP_BEAT: case IDD_END_BEAT:
 		case IDD_GRIDEDIT1: case IDD_GRIDEDIT2:
-		//case IDD_SETFREQ0: case IDD_SETFREQ1: case IDD_SETFREQ2: case IDD_SETFREQ3: case IDD_SETFREQ4: case IDD_SETFREQ5: case IDD_SETFREQ6: case IDD_SETFREQ7:
 			if (HIWORD(wParam) == EN_SETFOCUS) {
 				PostMessage(GetDlgItem(hdwnd, LOWORD(wParam)), EM_SETSEL, 0, -1);
-			}
-			else if (HIWORD(wParam) == EN_UPDATE) {
+			} else if (HIWORD(wParam) == EN_UPDATE) {
 				PropSheet_Changed(GetParent(hdwnd), hdwnd);
 			}
-			return -1;
-
-		/*case IDCANCEL:
-			EndDialog(hdwnd,0);
-			EnableDialogWindow(TRUE);
-			return 1;
-		case IDOK:
-			org_data.GetMusicInfo( &mi );
-
-			SetUndo();
-
-			if(!SetWait(hdwnd, &mi))return 1;
-			if(!SetGrid(hdwnd,&mi))return 1;
-			if(!SetRepeat(hdwnd, &mi))return 1;
-			//if(!SetTrackFreq(hdwnd, &mi))return 1;
-			//SetPipiCheck( hdwnd, &mi );
-
-			itoa(mi.wait,str,10);
-			SetDlgItemText(hDlgTrack,IDE_VIEWWAIT,str);
-			org_data.SetMusicInfo(&mi,SETGRID|SETWAIT|SETREPEAT);
-			/*for (j = 0; j < MAXMELODY; j++)
-				MakeOrganyaWave(j,mi.tdata[j].wave_no,mi.tdata[j].pipi);*//*
-			//org_data.PutMusic();
-			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-			EndDialog(hdwnd,0);
-			EnableDialogWindow(TRUE);
-			ClearEZC_Message();
-			return 1;*/
+			break;
 		}
 		break;
 	case WM_NOTIFY: {
@@ -894,11 +838,74 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 
 BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	char bfr[256];
+	int i;
+	MUSICINFO mi;
 	LPNMHDR lpnm;
 
 	switch (message) {
 	case WM_INITDIALOG:
+		org_data.GetMusicInfo(&mi);
+		for (i = 0; i < MAXMELODY; ++i) {
+			snprintf(bfr, 256, "Wave-%02d", mi.tdata[i].wave_no);
+			SetDlgItemText(hdwnd, btn_wave[i], bfr);
+			SetDlgItemInt(hdwnd, txt_freq[i], mi.tdata[i].freq, FALSE);
+			CheckDlgButton(hdwnd, check_pipi[i], mi.tdata[i].pipi);
+
+			HWND w = GetDlgItem(hdwnd, spin_freq[i]);
+			SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(2000, 0));
+			SendMessage(w, UDM_SETPOS, 0, mi.tdata[i].freq);
+		}
 		return 1;
+	case WM_COMMAND:
+		switch (HIWORD(wParam)) {
+		case EN_UPDATE:
+		case EN_SETFOCUS:
+			switch (LOWORD(wParam)) {
+			case IDC_FREQ1:
+			case IDC_FREQ2:
+			case IDC_FREQ3:
+			case IDC_FREQ4:
+			case IDC_FREQ5:
+			case IDC_FREQ6:
+			case IDC_FREQ7:
+			case IDC_FREQ8:
+				if (HIWORD(wParam) == EN_UPDATE) {
+					PropSheet_Changed(GetParent(hdwnd), hdwnd);
+				} else {
+					PostMessage(GetDlgItem(hdwnd, LOWORD(wParam)), EM_SETSEL, 0, -1);
+				}
+				break;
+			}
+			break;
+		case BN_CLICKED:
+			switch (LOWORD(wParam)) {
+			case IDC_WAVE1: i = 0; break;
+			case IDC_WAVE2: i = 1; break;
+			case IDC_WAVE3: i = 2; break;
+			case IDC_WAVE4: i = 3; break;
+			case IDC_WAVE5: i = 4; break;
+			case IDC_WAVE6: i = 5; break;
+			case IDC_WAVE7: i = 6; break;
+			case IDC_WAVE8: i = 7; break;
+			case IDC_PI1:
+			case IDC_PI2:
+			case IDC_PI3:
+			case IDC_PI4:
+			case IDC_PI5:
+			case IDC_PI6:
+			case IDC_PI7:
+			case IDC_PI8:
+				PropSheet_Changed(GetParent(hdwnd), hdwnd);
+			default: i = -1; break;
+			}
+
+			if (i >= 0) {
+
+			}
+			break;
+		}
+		break;
 	case WM_NOTIFY:
 		lpnm = (LPNMHDR)lParam;
 		switch (lpnm->code) {
@@ -909,14 +916,43 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		case PSN_APPLY: {
 			bool error = false;
+
+			org_data.GetMusicInfo(&mi);
+			for (i = 0; i < MAXMELODY; ++i) {
+				int v = GetDlgItemInt(hdwnd, txt_freq[i], NULL, FALSE);
+				if (v < 0 || v > 65535) {
+					v = 1000;
+				}
+				mi.tdata[i].freq = v;
+				mi.tdata[i].pipi = IsDlgButtonChecked(hdwnd, check_pipi[i]);
+			}
+
 			if (error) {
 				SetWindowLong(hdwnd, DWL_MSGRESULT, PSNRET_INVALID);
 			}
 			else {
 				SetWindowLong(hdwnd, DWL_MSGRESULT, PSNRET_NOERROR);
-				// set
+				org_data.SetMusicInfo(&mi, SETFREQ | SETPIPI | SETWAVE);
 			}
 			return error;
+		}
+		case UDN_DELTAPOS: {
+			LPNMUPDOWN lud = (LPNMUPDOWN)lParam;
+			HWND buddy = (HWND)SendMessage(lpnm->hwndFrom, UDM_GETBUDDY, 0, 0);
+			if (buddy) {
+				int v = GetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), NULL, FALSE);
+				v += lud->iDelta * 10;
+
+				if (v < 0) v = 0;
+				if (v > 2000) v = 2000;
+
+				SetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), v, FALSE);
+				SendMessage(lpnm->hwndFrom, UDM_SETPOS, 0, v);
+
+				PropSheet_Changed(GetParent(hdwnd), hdwnd);
+				return 0;
+			}
+			return 1;
 		}
 		}
 		break;
@@ -925,29 +961,96 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 BOOL CALLBACK DialogPerc(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	int i, j;
+	MUSICINFO mi;
 	LPNMHDR lpnm;
 
 	switch (message) {
 	case WM_INITDIALOG:
+		org_data.GetMusicInfo(&mi);
+		for (i = 0; i < MAXDRAM; ++i) {
+			HWND cc = GetDlgItem(hdwnd, dd_drambox[i]);
+			SendMessage(cc, WM_SETREDRAW, 0, 0);
+			SendMessage(cc, CB_RESETCONTENT, 0, 0);
+			for (j = 0; j < NUMDRAMITEM; ++j) {
+				SendMessage(cc, CB_ADDSTRING, 0, (LPARAM)dram_name[Wave_no_to_List_no[j]]);
+			}
+			SendMessage(cc, WM_SETREDRAW, 1, 0);
+			SendMessage(cc, CB_SETCURSEL, List_no_to_Wave_no[mi.tdata[i + MAXMELODY].wave_no], 0);
+		}
 		return 1;
+	case WM_COMMAND:
+		switch (HIWORD(wParam)) {
+		case CBN_SELCHANGE:
+			switch (LOWORD(wParam)) {
+			case IDC_WAVEQ: i = 8; break;
+			case IDC_WAVEW: i = 9; break;
+			case IDC_WAVEE: i = 10; break;
+			case IDC_WAVER: i = 11; break;
+			case IDC_WAVET: i = 12; break;
+			case IDC_WAVEY: i = 13; break;
+			case IDC_WAVEU: i = 14; break;
+			case IDC_WAVEI: i = 15; break;
+			default: i = -1; break;
+			}
+
+			if (i >= 0) {
+				int ndx = SendMessage((HWND)lParam, CB_GETCURSEL, 0, 0);
+				InitDramObject(Wave_no_to_List_no[ndx], i - MAXMELODY);
+				PlayOrganKey(36, i, 1000, 240);
+			}
+			
+			PropSheet_Changed(GetParent(hdwnd), hdwnd);
+			break;
+		}
+		break;
 	case WM_NOTIFY:
 		lpnm = (LPNMHDR)lParam;
 		switch (lpnm->code) {
 		case PSN_KILLACTIVE: {
 			bool error = false;
+
+			for (i = 0; i < MAXDRAM; ++i) {
+				HWND cc = GetDlgItem(hdwnd, dd_drambox[i]);
+				int ndx = SendMessage(cc, CB_GETCURSEL, 0, 0);
+				if (ndx < 0 || ndx >= NUMDRAMITEM) {
+					MessageBox(hdwnd, "Invalid instrument", "Error", MB_ICONWARNING | MB_OK);
+					error = true;
+				}
+			}
+
 			SetWindowLong(hdwnd, DWL_MSGRESULT, error);
 			return error;
 		}
 		case PSN_APPLY: {
 			bool error = false;
+
+			org_data.GetMusicInfo(&mi);
+			for (i = 0; i < MAXDRAM; ++i) {
+				HWND cc = GetDlgItem(hdwnd, dd_drambox[i]);
+				int ndx = SendMessage(cc, CB_GETCURSEL, 0, 0);
+				if (ndx < 0 || ndx >= NUMDRAMITEM) {
+					MessageBox(hdwnd, "Invalid instrument", "Error", MB_ICONWARNING | MB_OK);
+					error = true;
+				}
+				mi.tdata[i + MAXMELODY].wave_no = Wave_no_to_List_no[ndx];
+			}
+
 			if (error) {
 				SetWindowLong(hdwnd, DWL_MSGRESULT, PSNRET_INVALID);
 			}
 			else {
 				SetWindowLong(hdwnd, DWL_MSGRESULT, PSNRET_NOERROR);
-				// set
+				org_data.SetMusicInfo(&mi, SETWAVE);
 			}
 			return error;
+		}
+		case PSN_QUERYCANCEL: {
+			org_data.GetMusicInfo(&mi);
+			for (i = 0; i < MAXDRAM; ++i) {
+				InitDramObject(mi.tdata[i + MAXMELODY].wave_no, i);
+			}
+			break;
 		}
 		}
 		break;
