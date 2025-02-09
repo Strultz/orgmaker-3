@@ -807,6 +807,7 @@ BEGIN
             MENUITEM "8",                           IDM_RECENT8
             MENUITEM "9",                           IDM_RECENT9
             MENUITEM "0",                           IDM_RECENT0
+            MENUITEM SEPARATOR
             MENUITEM "&Clear Recent Files",         IDM_RECENT_CLEAR
         END
         MENUITEM "&Save\tCtrl+S",               IDM_SAVEOVER
@@ -822,45 +823,22 @@ BEGIN
         MENUITEM "&Undo\tCtrl+Z",               IDM_UNDO, GRAYED
         MENUITEM "&Redo\tCtrl+Y",               IDM_REDO, GRAYED
         MENUITEM SEPARATOR
-        MENUITEM "&Select All\tCtrl+A",         IDM_SELECT_ALL
+        MENUITEM "&Cut\tCtrl+X", IDM_SELECT_CUT
+        MENUITEM "&Copy\tCtrl+C", IDM_SELECT_COPY
+        MENUITEM "&Paste\tCtrl+V", IDM_SELECT_PASTE
+        MENUITEM "Select &All\tCtrl+A",         IDM_SELECT_ALL
         MENUITEM "&Deselect\tCtrl+D",           IDM_SELECT_RESET
         MENUITEM SEPARATOR
-        MENUITEM "&Cut\tCtrl+X",                IDM_SELECT_CUT
-        MENUITEM "&Copy\tCtrl+C",               IDM_SELECT_COPY
-        MENUITEM "&Paste\tCtrl+V",              IDM_SELECT_PASTE
-        MENUITEM SEPARATOR
+        MENUITEM "&Volume...\tF4", IDM_DLGVOL
         MENUITEM "&Pan...\tCtrl+F4",            IDM_DLGPAN
-        MENUITEM "&Volume...\tF4",              IDM_DLGVOL
         MENUITEM "&Transpose...\tShift+F4",     IDM_DLGTRANS
-        MENUITEM "S&wap Tracks...\tShift+Ctrl+F4", IDM_DLGSWAP
-        MENUITEM SEPARATOR
-        MENUITEM "&Copy...\tCtrl+F2",           IDM_DLGCOPY
-        MENUITEM "&Multi-Copy...\tCtrl+F3",     IDM_DLGCOPY2
         MENUITEM "&Delete...\tCtrl+Del",        IDM_DLGDELETE
+        MENUITEM "&Swap Channels...\tShift+Ctrl+F4", IDM_DLGSWAP
         MENUITEM SEPARATOR
-        POPUP "&Note Volume (Existing Notes Only)"
-        BEGIN
-            MENUITEM "(&1) Fade Out (very slow)",   IDM_CT_L1
-            MENUITEM "(&2) Fade Out (slow)",        IDM_CT_L2
-            MENUITEM "(&3) Fade Out (linear)",      IDM_CT_L3
-            MENUITEM "(&4) Fade Out (fast)",        IDM_CT_L4
-            MENUITEM "(&5) Fade Out (very fast)",   IDM_CT_L5
-            MENUITEM "(&6) Default Value",          IDM_CT_L6
-            MENUITEM "(&7) Fade Out (s-curve)",     IDM_CT_L7
-            MENUITEM "(&8) Fade Out (small, at end)", IDM_CT_L8
-            MENUITEM "(&9) Tremolo Decay",          IDM_CT_L9
-            MENUITEM SEPARATOR
-            MENUITEM "(&1) Random",                 IDM_CT_L10
-            MENUITEM "(&2) Fade From Start to End", IDM_CT_L11
-            MENUITEM "(&3) Fade In (slow)",         IDM_CT_L12
-            MENUITEM "(&4) Fade In (linear)",       IDM_CT_L13
-            MENUITEM "(&5) (none)",                 IDM_CT_L14, GRAYED
-            MENUITEM "(&6) (none)",                 IDM_CT_L15, GRAYED
-            MENUITEM "(&7) (none)",                 IDM_CT_L16, GRAYED
-            MENUITEM "(&8) (none)",                 IDM_CT_L17, GRAYED
-            MENUITEM "(&9) (none)",                 IDM_CT_L18, GRAYED
-        END
-        POPUP "Note Volume (Add Volume &Events)"
+        MENUITEM "&Copy (old)...\tCtrl+F2", IDM_DLGCOPY
+        MENUITEM "&Multi-Copy (old)...\tCtrl+F3", IDM_DLGCOPY2
+        MENUITEM SEPARATOR
+        POPUP "&Note Volume (Add Volume Events)"
         BEGIN
             MENUITEM "(&1) Fade Out (very slow)\tCtrl+1", IDM_CT_S1
             MENUITEM "(&2) Fade Out (slow)\tCtrl+2", IDM_CT_S2
@@ -885,8 +863,30 @@ BEGIN
             MENUITEM "Clear Volume Events\tCtrl+0", IDM_CT_S20
             MENUITEM "Setup Decay Length...",       IDM_DCLEN
         END
+        POPUP "Note Volume (&Existing Notes Only)"
+        BEGIN
+            MENUITEM "(&1) Fade Out (very slow)",   IDM_CT_L1
+            MENUITEM "(&2) Fade Out (slow)",        IDM_CT_L2
+            MENUITEM "(&3) Fade Out (linear)",      IDM_CT_L3
+            MENUITEM "(&4) Fade Out (fast)",        IDM_CT_L4
+            MENUITEM "(&5) Fade Out (very fast)",   IDM_CT_L5
+            MENUITEM "(&6) Default Value",          IDM_CT_L6
+            MENUITEM "(&7) Fade Out (s-curve)",     IDM_CT_L7
+            MENUITEM "(&8) Fade Out (small, at end)", IDM_CT_L8
+            MENUITEM "(&9) Tremolo Decay",          IDM_CT_L9
+            MENUITEM SEPARATOR
+            MENUITEM "(&1) Random",                 IDM_CT_L10
+            MENUITEM "(&2) Fade From Start to End", IDM_CT_L11
+            MENUITEM "(&3) Fade In (slow)",         IDM_CT_L12
+            MENUITEM "(&4) Fade In (linear)",       IDM_CT_L13
+            MENUITEM "(&5) (none)",                 IDM_CT_L14, GRAYED
+            MENUITEM "(&6) (none)",                 IDM_CT_L15, GRAYED
+            MENUITEM "(&7) (none)",                 IDM_CT_L16, GRAYED
+            MENUITEM "(&8) (none)",                 IDM_CT_L17, GRAYED
+            MENUITEM "(&9) (none)",                 IDM_CT_L18, GRAYED
+        END
         MENUITEM SEPARATOR
-        POPUP "Edit &Current Track"
+        POPUP "Edit &Current Channel"
         BEGIN
             MENUITEM "Pan &Right\tShift+Ctrl+R",    IDM_CT_PAN_R
             MENUITEM "Pan &Left\tShift+Ctrl+L",     IDM_CT_PAN_L
@@ -900,7 +900,7 @@ BEGIN
             MENUITEM "Transpose &Up (Octave)\tCtrl+Alt+U", IDM_CT_OCT_UP
             MENUITEM "Transpose &Down (Octave)\tCtrl+Alt+D", IDM_CT_OCT_DOWN
         END
-        POPUP "Edit &Melody Tracks"
+        POPUP "Edit &Melody Channels"
         BEGIN
             MENUITEM "Pan &Right",                  IDM_ML_PAN_R
             MENUITEM "Pan &Left",                   IDM_ML_PAN_L
@@ -909,7 +909,7 @@ BEGIN
             MENUITEM "Transpose &Up\tShift+Ctrl+H", IDM_ML_TRANS_UP
             MENUITEM "Transpose &Down\tShift+Ctrl+N", IDM_ML_TRANS_DOWN
         END
-        POPUP "Edit Drum &Tracks"
+        POPUP "Edit Pe&rcussion Channels"
         BEGIN
             MENUITEM "Volume &Up\tCtrl+F11",        IDM_DR_VOL_PLUS
             MENUITEM "Volume &Down\tCtrl+F12",      IDM_DR_VOL_MINUS
@@ -923,7 +923,7 @@ BEGIN
         END
         MENUITEM SEPARATOR
         MENUITEM "Snap Selection to &Beat Grid\tCtrl+G", IDM_GRIDMODE
-        MENUITEM "A&lways Select Current Track\tCtrl+T", IDM_ALWAYS_CURRENT
+        MENUITEM "A&lways Select Current Channel\tCtrl+T", IDM_ALWAYS_CURRENT
         MENUITEM "&Drag Note to Extend\tCtrl+Alt+F9", IDM_DRAGMODE
         MENUITEM "&Click Note to Extend\tCtrl+Alt+F10", IDM_PRESSNOTE
         MENUITEM SEPARATOR
@@ -932,19 +932,14 @@ BEGIN
     POPUP "&Song"
     BEGIN
         MENUITEM "Song &Properties...\tF2",     IDM_DLGSETTING
-        MENUITEM "&Default Pan/Volume...\tF3",  IDM_DLGDEFAULT
+        MENUITEM "&Default Volume/Panning...\tF3",  IDM_DLGDEFAULT
         MENUITEM SEPARATOR
-        MENUITEM "&Memory Usage...",            IDM_DLGUSED
-        MENUITEM "Rebuild Note &Memory",        IDM_SORTMUSICNOTE
+        MENUITEM "&Event Usage...",            IDM_DLGUSED
     END
     POPUP "&View"
     BEGIN
         MENUITEM "Zoom &In\tF7",                IDM_LOUPE_PLUS
         MENUITEM "Zoom &Out\tF8",               IDM_LOUPE_MINUS
-        MENUITEM "Extend &Note Heads",          IDM_NOTE_ENLARGE
-        MENUITEM "Show &All Tracks\tCtrl+F9",   IDM_DRAWDOUBLE
-        MENUITEM "S&lide Overlapping Notes\tShift+F9", IDM_SLIDEOVERLAPNOTES
-        MENUITEM "&Playback Smooth Scrolling",  IDM_SMOOTHSCROLL
         MENUITEM SEPARATOR
         MENUITEM "&Quick Copy Toolbar\tF9",     IDM_EZCOPYVISIBLE
         MENUITEM SEPARATOR
@@ -953,6 +948,10 @@ BEGIN
             MENUITEM "Confirm &Unsaved Changes",    IDM_CHANGEFINISH
             MENUITEM "Allow Keyboard During &Playback", IDM_ENABLEPLAYING
             MENUITEM "&Auto Load/Save .pvi File",   IDM_AUTOLOADPVI
+            MENUITEM "&Playback Smooth Scrolling", IDM_SMOOTHSCROLL
+            MENUITEM "Extend &Note Heads", IDM_NOTE_ENLARGE
+            MENUITEM "S&lide Overlapping Notes", IDM_SLIDEOVERLAPNOTES
+            MENUITEM "Show &All Tracks", IDM_DRAWDOUBLE
             MENUITEM SEPARATOR
             MENUITEM "&Metronome",                  IDM_METRONOME
             MENUITEM SEPARATOR
@@ -1212,9 +1211,7 @@ BEGIN
     VK_F7,          ID_AC_LOUPE_PLUS,       VIRTKEY, NOINVERT
     VK_F8,          ID_AC_LOUPE_MINUS,      VIRTKEY, NOINVERT
     VK_F9,          ID_AC_SHOWEZCOPY,       VIRTKEY, NOINVERT
-    VK_F9,          ID_AC_DRAWDOUBLE,       VIRTKEY, CONTROL, NOINVERT
     VK_F9,          ID_AC_DRAGMODE,         VIRTKEY, CONTROL, ALT, NOINVERT
-    VK_F9,          ID_AC_SLIDEOVERLAPNOTES, VIRTKEY, SHIFT, NOINVERT
     VK_HOME,        ID_AC_LOAD_MOST_RECENT, VIRTKEY, SHIFT, CONTROL, NOINVERT
     VK_INSERT,      ID_AC_SELECT_INSERT,    VIRTKEY, NOINVERT
     VK_LEFT,        ID_AC_HOMEBACK,         VIRTKEY, CONTROL, NOINVERT

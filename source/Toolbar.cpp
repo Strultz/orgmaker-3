@@ -98,7 +98,7 @@ HWND CreateRebar(HWND hWnd)
 
     RECT rcWindow;
     GetClientRect(hWnd, &rcWindow);
-    MoveWindow(hwndRebar, 0, 0, rcWindow.right - rcWindow.left, GetRebarHeight(hwndRebar), TRUE);
+    MoveWindow(hwndRebar, 0, 0, rcWindow.right - rcWindow.left, GetBarHeight(hwndRebar), TRUE);
 
     WNDCLASSEX ot;
     ot.cbSize = sizeof(WNDCLASSEX);
@@ -141,12 +141,12 @@ void CreateToolbars(HWND hwndRebar, HWND outHwnd[4]) {
         {9, IDC_START, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"To Song Start (Ctrl+Left)"},
         {10, IDC_LEFT, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Previous Measure (Shift+Left)"},
         {11, IDC_LEFTSTEP, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Backwards (Left)"},
-        {12, IDC_PLAYPAUSE, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Play/Pause (F5)"},
+        {12, IDM_PLAYPAUSE, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Play/Pause (F5)"},
         {14, IDC_RIGHTSTEP, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Forwards (Right)"},
         {15, IDC_RIGHT, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Next Measure (Shift+Right)"},
         {16, IDC_END, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"To Song End (Ctrl+Right)"},
         {0, 0, 0, BTNS_SEP},
-        {5, IDC_PREFERENCES, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Preferences"},
+        {5, IDM_PREFERENCES, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Preferences"},
     };
     CreateToolbar(hwndRebar, "TOOLBAR_ICONS", 26, tbb1, "Main", outHwnd);
 
@@ -173,13 +173,24 @@ void CreateToolbars(HWND hwndRebar, HWND outHwnd[4]) {
     CreateToolbar(hwndRebar, "TRACKBAR_ICONS", 17, tbb2, "Channels", &outHwnd[2]);
 }
 
-int GetRebarHeight(HWND hwndRebar) {
+int GetBarHeight(HWND hwndBar) {
     // check the rebar size
     WINDOWPLACEMENT wp;
-    GetWindowPlacement(hwndRebar, &wp);
+    GetWindowPlacement(hwndBar, &wp);
     return wp.rcNormalPosition.bottom - wp.rcNormalPosition.top;
 }
 
 HWND CreateStatusBar(HWND hWnd) {
-    return NULL;
+    HWND hwndStatus = CreateWindowEx(0, STATUSCLASSNAME, NULL,
+        SBARS_SIZEGRIP | WS_CHILD | WS_VISIBLE,
+        0, 0, 0, 0, hWnd, NULL, hInst, NULL);
+    
+    int swidths[] = { 340, 440, 540, -1 };
+    SendMessage(hwndStatus, SB_SETPARTS, sizeof(swidths) / sizeof(int), (LPARAM)swidths);
+    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Press F1 for help");
+    SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Test1");
+    SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)"Test2");
+    SendMessage(hwndStatus, SB_SETTEXT, 3, (LPARAM)"Test3");
+
+    return hwndStatus;
 }

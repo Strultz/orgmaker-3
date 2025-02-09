@@ -2,6 +2,6 @@
 
 HWND CreateRebar(HWND hWnd);
 void CreateToolbars(HWND hwndRebar, HWND outHwnd[4]);
-int GetRebarHeight(HWND hwndRebar);
+int GetBarHeight(HWND hwndBar);
 
 HWND CreateStatusBar(HWND hWnd);

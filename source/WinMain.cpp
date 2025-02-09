@@ -128,7 +128,8 @@ int CheckUpdate(bool act) {
 }
 
 //main procedure
-LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam);
+LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK AreaWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void OpenSongProperties(HWND hwnd);
 //BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -169,6 +170,11 @@ bool gFileUnsaved = true;
 long MAXHORZRANGE = MAXHORZMEAS * 16;
 
 int WWidth = WINDOWWIDTH, WHeight = WINDOWHEIGHT;
+int realWidth = WINDOWWIDTH;
+int realHeight = WINDOWHEIGHT;
+
+static const char szClassName[] = "OrgMaker3";
+static const char szAreaClass[] = "OrgArea";
 
 char lpszName[MAX_PATH+20];// = "Organya 2 - ";//Name to register on Windows
 
@@ -209,12 +215,18 @@ CHAR app_path[BUF_SIZE];
 CHAR num_buf[BUF_SIZE];
 //to this point
 
+HWND hwndArea = NULL;
 HWND hwndRebar = NULL;
+HWND hwndStatus = NULL;
+
 HWND hwndToolbar = NULL;
 HWND hwndTrackbar = NULL;
 HWND hwndToolbarPopup = NULL;
 HWND hwndTrackbarPopup = NULL;
+
 int rebarHeight;
+
+char selmsg[512];
 
 SAVEDNOTE gClipboardData;
 NOTECOPY nc_Select;
@@ -263,7 +275,7 @@ void UpdateToolbarStatus() {
 		}
 
 		// change icon to pause while playing
-		SendMessage(hwndToolbar, TB_CHANGEBITMAP, IDC_PLAYPAUSE, enabled ? 12 : 13);
+		SendMessage(hwndToolbar, TB_CHANGEBITMAP, IDM_PLAYPAUSE, enabled ? 12 : 13);
 
 		lastUpdCheck = enabled;
 	}
@@ -299,7 +311,7 @@ void UpdateToolbarStatus() {
 }
 
 void UpdateStatusBar() {
-	// TODO
+	SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)selmsg);
 }
 
 void SaveIniFile();
@@ -383,9 +395,9 @@ int CancelDeleteCurrentData(int iMessagePattern = 1){
 
 void UpdateToolbars(bool floating) {
 	if (hwndToolbar) DestroyWindow(hwndToolbar);
-	if (hwndToolbarPopup) DestroyWindow(hwndToolbar);
-	if (hwndTrackbar) DestroyWindow(hwndToolbar);
-	if (hwndTrackbarPopup) DestroyWindow(hwndToolbar);
+	if (hwndToolbarPopup) DestroyWindow(hwndToolbarPopup);
+	if (hwndTrackbar) DestroyWindow(hwndTrackbar);
+	if (hwndTrackbarPopup) DestroyWindow(hwndTrackbarPopup);
 	HWND wnds[4] = { NULL,NULL,NULL,NULL };
 	CreateToolbars(floating ? NULL : hwndRebar, wnds);
 	hwndToolbar = wnds[0];
@@ -494,7 +506,19 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	wc.hCursor       = LoadCursor(hInst,"CURSOR");//default cursor
 	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);//window color
 	wc.lpszMenuName  = "ORGANYAMENU";//menu
-	wc.lpszClassName = "OrgMaker3";
+	wc.lpszClassName = szClassName;
+	if (!RegisterClassEx(&wc)) return FALSE;
+
+	wc.cbSize = sizeof(WNDCLASSEX);
+	wc.lpfnWndProc = (WNDPROC)AreaWndProc;
+	wc.hInstance = hInst = hInstance;
+	wc.hIcon = NULL;
+	wc.hIconSm = NULL;
+	wc.hCursor = LoadCursor(hInst, "CURSOR");
+	wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+	wc.lpszMenuName = NULL;
+	wc.lpszClassName = szAreaClass;
+	if (!RegisterClassEx(&wc)) return FALSE;
 
 	int wnd_width;///Specify the width of the window here.
 	int wnd_height;
@@ -507,8 +531,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		GetSystemMetrics(SM_CYVSCROLL)+//scrollbar height
 		WHeight;
 
-	if(!RegisterClassEx(&wc)) return FALSE;
-	
 	GetModuleFileName(hInstance, app_path,BUF_SIZE - 1);
 	buf=app_path + lstrlen(app_path) - 4;
 	if(lstrcmpi(buf,".exe")==0){
@@ -545,7 +567,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	ul = WS_CAPTION|WS_MINIMIZEBOX|WS_SYSMENU|WS_THICKFRAME|WS_MAXIMIZEBOX;
 
 	//Generate main window
-	hWnd = CreateWindow("OrgMaker3",
+	hWnd = CreateWindow(szClassName,
 			"OrgMaker 3",//Displayed "Name"
 			ul,
 			//WS_CAPTION|WS_MINIMIZEBOX|WS_SYSMENU|WS_THICKFRAME|WS_MAXIMIZEBOX,
@@ -562,10 +584,15 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	if(!hWnd) return FALSE;
 
 	hwndRebar = CreateRebar(hWnd);
+	hwndStatus = CreateStatusBar(hWnd);
 
 	UpdateToolbars(false);
 
-	rebarHeight = GetRebarHeight(hwndRebar);
+	rebarHeight = GetBarHeight(hwndRebar);
+
+	hwndArea = CreateWindow(szAreaClass, "", WS_CHILD | WS_VISIBLE, 0,
+		rebarHeight, WinRect.right - WinRect.left, WinRect.bottom - WinRect.top - rebarHeight - GetBarHeight(hwndStatus),
+		hWnd, NULL, hInst, NULL);
 
 //	DialogBox(hInst,"DLGFLASH",NULL,DialogFlash);
 
@@ -594,8 +621,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	}
 
 //Image initialization //////////
-	if (!StartGDI(hWnd)) { //GDI ready
+	if (!StartGDI(hwndArea)) { //GDI ready
 		QuitMMTimer();
+		DestroyWindow(hwndRebar);
+		DestroyWindow(hwndStatus);
+		DestroyWindow(hwndArea);
 		DestroyWindow(hWnd);
 		return 0;
 	}
@@ -606,6 +636,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	if (!InitDirectSound(hWnd)) {
 		QuitMMTimer();
 		EndGDI();
+		DestroyWindow(hwndRebar);
+		DestroyWindow(hwndStatus);
+		DestroyWindow(hwndArea);
 		DestroyWindow(hWnd);
 		return 0;
 	}
@@ -831,6 +864,33 @@ BOOL SystemTask(void)
 }
 
 void ShowStatusMessage(void);
+
+LRESULT CALLBACK AreaWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message) {
+	case WM_SIZE:
+		WWidth = LOWORD(lParam);	//Client area size
+		WHeight = HIWORD(lParam);
+		return 0;
+	case WM_MOUSEMOVE:
+	case WM_LBUTTONDOWN:
+	case WM_LBUTTONUP:
+	case WM_RBUTTONDOWN:
+	case WM_RBUTTONUP:
+	case WM_MBUTTONDOWN:
+	case WM_MBUTTONUP:
+	case WM_MOUSEWHEEL:
+	case WM_HSCROLL:
+	case WM_VSCROLL:
+	case WM_KEYDOWN:
+	case WM_KEYUP:
+	case WM_COMMAND:
+	case WM_DROPFILES:
+		SendMessage(hWnd, message, wParam, lParam);
+		return 0;
+	}
+	return DefWindowProc(hwnd, message, wParam, lParam);
+}
 
 //main procedure
 LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
@@ -1345,14 +1405,14 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			}
 			UpdateToolbarStatus();
 			break;
-		case IDC_PLAYPAUSE:
+		case IDM_PLAYPAUSE:
 			if (timer_sw) {
 				StopPlayingSong();
 			} else {
 				StartPlayingSong();
 			}
 			break;
-		case IDC_PREFERENCES:
+		case IDM_PREFERENCES:
 			// TODO
 			break;
 		case IDM_DLGSETTING://Show settings dialog
@@ -1593,6 +1653,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case ID_AC_KILLSOUND:
 			StopPlayingSong();
 			Rxo_StopAllSoundNow();
+			memset(iKeyPhase, -1, sizeof(iKeyPhase));
+			memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
 			break;
 		case ID_AC_DRAGMODE:
 		case IDM_DRAGMODE:
@@ -1665,47 +1727,90 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 	case WM_ACTIVATEAPP:
 		actApp = wParam;
 		break;
+	case WM_ENTERMENULOOP:
+		SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"");
+		break;
+	case WM_EXITMENULOOP:
+		SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Press F1 for help");
+		break;
 	case WM_MENUSELECT:
-
 		switch(LOWORD(wParam)){
-		default: SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, ""); break;
-		case ID_MENUITEM40265:      SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING78]); break;
-		case IDM_EXPORT_MIDI:       SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING79]); break;
-		case IDM_LOAD2:             SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING80]); break;
-		case IDM_SAVEOVER:          SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, music_file); break; 
-		case IDM_SAVENEW:           SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING81]); break; 
-		case IDM_RECENT1:           SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, RecentFileName[0]); break;
-		case IDM_RECENT2:           SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, RecentFileName[1]); break;
-		case IDM_RECENT3:           SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, RecentFileName[2]); break;
-		case IDM_RECENT4:           SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, RecentFileName[3]); break;
-		case IDM_RECENT5:           SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, RecentFileName[4]); break;
-		case IDM_RECENT6:           SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, RecentFileName[5]); break;
-		case IDM_RECENT7:           SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, RecentFileName[6]); break;
-		case IDM_RECENT8:           SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, RecentFileName[7]); break;
-		case IDM_RECENT9:           SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, RecentFileName[8]); break;
-		case IDM_RECENT0:           SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, RecentFileName[9]); break;
-		case IDM_EXIT:              SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING82]); break;
-		case IDM_DLGWAVE:           SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING83]); break;
-		case IDM_DLGSETTING:        SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING84]); break;
-		case IDM_DLGDEFAULT:        SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING85]); break;
-		case IDM_CT_L0:             SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING86]); break;
-		case IDM_CT_S0:             SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING87]); break;
-		case IDM_DLGUSED:           SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING88]); break;
-		case IDM_DRAWDOUBLE:        SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING89]); break;
-		case IDM_SLIDEOVERLAPNOTES: SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING90]); break;
-		case IDM_LOUPE_PLUS:        SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING91]); break;
-		case IDM_LOUPE_MINUS:       SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING92]); break;
-		case IDM_PRESSNOTE:         SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING93]); break;
-		case IDM_GRIDMODE:          SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING94]); break;
-		case IDM_ALWAYS_CURRENT:    SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING95]); break;
-		case IDM_DRAGMODE:          SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING96]); break;
-		case IDM_ENABLEPLAYING:     SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING97]); break;
-		case IDM_SORTMUSICNOTE:     SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING98]); break;
-		case IDM_STOPNOWALL:        SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING99]); break;
-		case IDM_RECENT_CLEAR:      SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING100]); break;
-		case IDM_AUTOLOADPVI:       SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING101]); break;
-		case IDM_DLGHELP:           SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING102]); break;
-		case IDM_DLGMEMO:           SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING103]); break;		}
+		default: SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)""); break;
+		case IDM_INIT:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Create a new document"); break;
+		case IDM_LOAD:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open an existing document"); break;
+		case IDM_RECENT1:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)RecentFileName[0]); break;
+		case IDM_RECENT2:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)RecentFileName[1]); break;
+		case IDM_RECENT3:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)RecentFileName[2]); break;
+		case IDM_RECENT4:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)RecentFileName[3]); break;
+		case IDM_RECENT5:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)RecentFileName[4]); break;
+		case IDM_RECENT6:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)RecentFileName[5]); break;
+		case IDM_RECENT7:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)RecentFileName[6]); break;
+		case IDM_RECENT8:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)RecentFileName[7]); break;
+		case IDM_RECENT9:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)RecentFileName[8]); break;
+		case IDM_RECENT0:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)RecentFileName[9]); break;
+		case IDM_RECENT_CLEAR:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Clear the recent file list"); break;
+		case IDM_SAVEOVER:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Save the active document"); break;
+		case IDM_SAVENEW:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Save the active document with a new name"); break;
+		case IDM_EXPORT_MIDI:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Export the active document to a MIDI file"); break;
+		case IDM_EXPORT_WAV:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Export the active document to a WAV file"); break;
+		case IDM_EXIT:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Exit OrgMaker"); break;
+
+		case IDM_UNDO:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Undo the last action"); break;
+		case IDM_REDO:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Redo the previously undone action"); break;
+		case IDM_SELECT_CUT:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Cut the selection and put it on the Clipboard"); break;
+		case IDM_SELECT_COPY:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Copy the selection and put it on the Clipboard"); break;
+		case IDM_SELECT_PASTE:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Insert Clipboard contents"); break;
+		case IDM_SELECT_ALL:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select the entire document"); break;
+		case IDM_SELECT_RESET:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Clear the current selection"); break;
+		case IDM_DLGVOL:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Modify volume within a range"); break;
+		case IDM_DLGPAN:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Modify panning within a range"); break;
+		case IDM_DLGTRANS:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Transpose notes within a range"); break;
+		case IDM_DLGSWAP:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Swap the data of two channels"); break;
+		case IDM_DLGDELETE:         SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Delete data within a range"); break;
+		case IDM_CT_S20:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Clear all volume change events in the selection/channel"); break;
+		case IDM_DCLEN:             SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Edit note decay length and settings"); break;
+		case IDM_CT_PAN_R:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Pan the selection/channel to the right"); break;
+		case IDM_CT_PAN_L:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Pan the selection/channel to the left"); break;
+		case IDM_CT_PAN_REVERSE:    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Invert the panning of selection/channel"); break;
+		case IDM_CT_VOL_PLUS:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Increase the volume of the selection/channel"); break;
+		case IDM_CT_VOL_MINUS:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Decrease the volume of the selection/channel"); break;
+		case IDM_CT_VOLWARIAI_UP:   SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Increase the volume of the selection/channel by 12.5%"); break;
+		case IDM_CT_VOLWARIAI_DOWN: SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Decrease the volume of the selection/channel by 12.5%"); break;
+		case IDM_CT_TRANS_UP:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Transpose the selection/channel up by one semitone"); break;
+		case IDM_CT_TRANS_DOWN:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Transpose the selection/channel down by one semitone"); break;
+		case IDM_CT_OCT_UP:         SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Transpose the selection/channel up by one octave"); break;
+		case IDM_CT_OCT_DOWN:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Transpose the selection/channel down by one octave"); break;
+		case IDM_ML_PAN_R:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Pan all melody channels to the right"); break;
+		case IDM_ML_PAN_L:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Pan all melody channels to the left"); break;
+		case IDM_ML_VOL_PLUS:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Increase the volume of all melody channels"); break;
+		case IDM_ML_VOL_MINUS:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Decrease the volume of all melody channels"); break;
+		case IDM_ML_TRANS_UP:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Transpose all melody channels up by one semitone"); break;
+		case IDM_ML_TRANS_DOWN:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Transpose all melody channels down by one semitone"); break;
+		case IDM_DR_VOL_PLUS:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Increase the volume of all percussion channels"); break;
+		case IDM_DR_VOL_MINUS:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Decrease the volume of all percussion channels"); break;
+		case IDM_2BAI:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Expand song by 2x"); break;
+		case IDM_3BAI:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Expand song by 3x"); break;
+		case IDM_2BUNNO1:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Shrink song by 1/2x"); break;
+		case IDM_3BUNNO1:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Shrink song by 1/3x"); break;
+		case IDM_GRIDMODE:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Snap the selection to the beat grid"); break;
+		case IDM_ALWAYS_CURRENT:    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Always select the current channel"); break;
+		case IDM_DRAGMODE:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Extend notes when dragging from their head"); break;
+		case IDM_PRESSNOTE:         SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Extend notes when clicking on their head"); break;
+		case IDM_STOPNOWALL:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Stop all playing sounds"); break;
+
+		case IDM_DLGSETTING:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Configure the active document"); break;
+		case IDM_DLGDEFAULT:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Modify default volume/panning values"); break;
+		case IDM_DLGUSED:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"View how many events this song uses"); break;
+
+		case IDM_LOUPE_PLUS:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Zoom the piano roll in"); break;
+		case IDM_LOUPE_MINUS:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Zoom the piano roll out"); break;
+		case IDM_PREFERENCES:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open OrgMaker preferences"); break;
+
+		case IDM_DLGHELP:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open the Help menu"); break;
+		case IDM_GITHUB:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open the GitHub page for OrgMaker 3"); break;
+		case IDM_CHECKUPD:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Check for a new version of OrgMaker"); break;
+		case IDM_DLGMEMO:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"About OrgMaker"); break;
+		}
 		break;
 	case WM_DROPFILES://file drop
 		//SetWindowPos(hWnd, HWND_TOP, 0,0,0,0, SWP_NOMOVE | SWP_NOSIZE );
@@ -1954,11 +2059,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		LPNMHDR nmh = (LPNMHDR)lParam;
 		switch (nmh->code) {
 		case RBN_HEIGHTCHANGE: {
-			int oldHeight = WHeight + rebarHeight;
-			rebarHeight = GetRebarHeight(hwndRebar);
-			WHeight = oldHeight - rebarHeight;
-			rect.right = WWidth;		//A 2008/05/14
-			rect.bottom = WHeight;		//A 2008/05/14
+			rebarHeight = GetBarHeight(hwndRebar);
+			SetWindowPos(hwndArea, HWND_TOP, 0, rebarHeight, realWidth, realHeight - rebarHeight - GetBarHeight(hwndStatus), 0);
+
 			if (!org_data.PutBackGround())break;
 			scr_data.ChangeVerticalRange(WHeight);
 			break;
@@ -1966,22 +2069,29 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		}
 		break;
 	}
-	case WM_SIZE:
-		WWidth = LOWORD(lParam);	//Client area size
-		MoveWindow(hwndRebar, 0, 0, WWidth, GetRebarHeight(hwndRebar), TRUE);
-		rebarHeight = GetRebarHeight(hwndRebar);
-		WHeight = HIWORD(lParam) - rebarHeight;
-		rect.right = WWidth;		//A 2008/05/14
-		rect.bottom = WHeight;		//A 2008/05/14
-		if(!org_data.PutBackGround())break;
+	case WM_SIZE: {
+		SendMessage(hwndRebar, WM_SIZE, 0, 0);
+		SendMessage(hwndStatus, WM_SIZE, 0, 0);
+		rebarHeight = GetBarHeight(hwndRebar);
+
+		realWidth = LOWORD(lParam);
+		realHeight = HIWORD(lParam);
+		SetWindowPos(hwndArea, HWND_TOP, 0, rebarHeight, realWidth, realHeight - rebarHeight - GetBarHeight(hwndStatus), 0);
+
+		int swidths[] = { realWidth - 300, realWidth - 200, realWidth - 100, -1 };
+		SendMessage(hwndStatus, SB_SETPARTS, sizeof(swidths) / sizeof(int), (LPARAM)swidths);
+
+
+		if (!org_data.PutBackGround())break;
 		//org_data.PutMusic();
-		
+
 //				wsprintf(strSize , "Height = %d" , (WHeight - 158)/12);
 //				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 		scr_data.ChangeVerticalRange(WHeight);
 		//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
 		break;
+	}
 	case WM_SIZING: //resizing
 		//org_data.PutBackGround();
 		//org_data.PutMusic();

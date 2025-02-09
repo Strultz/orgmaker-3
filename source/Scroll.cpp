@@ -10,7 +10,6 @@
 #define BUF_SIZE 256
 #define MAIN_WINDOW "WINDOW"
 
-
 extern char timer_sw;
 
 extern CHAR app_path[BUF_SIZE];
@@ -23,12 +22,12 @@ BOOL ScrollData::InitScroll(void)
 	scr_info.nMin = 0;
 	scr_info.nMax = MAXHORZRANGE;
 	scr_info.nPage = 4;
-	SetScrollInfo(hWnd,SB_HORZ,&scr_info,1);//横
+	SetScrollInfo(hwndArea,SB_HORZ,&scr_info,1);//横
 	scr_info.cbSize = sizeof(SCROLLINFO);
 	scr_info.fMask = SIF_RANGE | SIF_PAGE;
 	scr_info.nMax = MAXVERTRANGE;
 	scr_info.nPage = 4;
-	SetScrollInfo(hWnd,SB_VERT,&scr_info,1);//縦
+	SetScrollInfo(hwndArea,SB_VERT,&scr_info,1);//縦
 	hpos = 0;//水平スクロール値
 	//vpos = MAXVERTRANGE-27;//垂直初期値
 	//vpos = GetPrivateProfileInt(MAIN_WINDOW,"VPOS",MAXVERTRANGE-27,app_path);
@@ -37,7 +36,7 @@ BOOL ScrollData::InitScroll(void)
 	//以下はvposを有効にする処理
 	scr_info.fMask = SIF_POS;
 	scr_info.nPos = vpos;
-	SetScrollInfo(hWnd,SB_VERT,&scr_info,1);
+	SetScrollInfo(hwndArea,SB_VERT,&scr_info,1);
 
 	return TRUE;
 }
@@ -55,7 +54,7 @@ void ScrollData::ChangeVerticalRange(int WindowHeight){ //ウィンドウサイズを元に
 	}
 	scr_info.cbSize = sizeof(SCROLLINFO);
 	scr_info.fMask = SIF_RANGE;
-	SetScrollInfo(hWnd, SB_VERT, &scr_info, TRUE);//縦
+	SetScrollInfo(hwndArea, SB_VERT, &scr_info, TRUE);//縦
 	return;
 }
 void ScrollData::ChangeHorizontalRange(int range) { //ウィンドウサイズを元にスクロール可能域を設定
@@ -66,7 +65,7 @@ void ScrollData::ChangeHorizontalRange(int range) { //ウィンドウサイズを元にスク
 	scr_info.nMin = 0;
 	scr_info.nMax = MAXHORZRANGE;
 	scr_info.nPage = 4;
-	SetScrollInfo(hWnd, SB_HORZ, &scr_info, 1);
+	SetScrollInfo(hwndArea, SB_HORZ, &scr_info, 1);
 }
 void ScrollData::AttachScroll(void)
 {
@@ -86,7 +85,7 @@ void ScrollData::SetHorzScroll(long x)
 	if(hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
 	scr_info.fMask = SIF_POS;//nPosを有効に
 	scr_info.nPos = hpos;
-	SetScrollInfo(hWnd,SB_HORZ,&scr_info,1);
+	SetScrollInfo(hwndArea,SB_HORZ,&scr_info,1);
 	UpdateStatusBar();
 	//org_data.PutMusic();
 	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
@@ -152,7 +151,7 @@ void ScrollData::HorzScrollProc(WPARAM wParam){
 	}
 	scr_info.fMask = SIF_POS;//nPosを有効に
 	scr_info.nPos = hpos;
-	SetScrollInfo(hWnd,SB_HORZ,&scr_info,1);
+	SetScrollInfo(hwndArea,SB_HORZ,&scr_info,1);
 	//org_data.PutMusic();
 	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 	//以下はテスト用
@@ -194,7 +193,7 @@ void ScrollData::VertScrollProc(WPARAM wParam){
 	PrintHorzPosition();
 	scr_info.fMask = SIF_POS;//Enable nPos
 	scr_info.nPos = vpos;
-	SetScrollInfo(hWnd,SB_VERT,&scr_info,1);
+	SetScrollInfo(hwndArea,SB_VERT,&scr_info,1);
 	//org_data.PutMusic();
 	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 	//below is for testing
@@ -271,10 +270,10 @@ void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){
 	PrintHorzPosition();
 	scr_info.fMask = SIF_POS;//nPosを有効に
 	scr_info.nPos = vpos;
-	SetScrollInfo(hWnd,SB_VERT,&scr_info,1);
+	SetScrollInfo(hwndArea,SB_VERT,&scr_info,1);
 	scr_info.fMask = SIF_POS;//nPosを有効に
 	scr_info.nPos = hpos;
-	SetScrollInfo(hWnd,SB_HORZ,&scr_info,1);
+	SetScrollInfo(hwndArea,SB_HORZ,&scr_info,1);
 
 	//org_data.PutMusic();
 	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
@@ -299,18 +298,18 @@ void ScrollData::KeyScroll(int iDirection)
 		hpos++;
 		break;
 	}
-	if (hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
-	if (vpos > vScrollMax)vpos = vScrollMax;
-	if (hpos < 0)hpos = 0;
-	if (vpos < 0)vpos = 0;
+	if (hpos > MAXHORZRANGE) hpos = MAXHORZRANGE;
+	if (vpos > vScrollMax) vpos = vScrollMax;
+	if (hpos < 0) hpos = 0;
+	if (vpos < 0) vpos = 0;
 
 	PrintHorzPosition();
 	scr_info.fMask = SIF_POS;//nPosを有効に
 	scr_info.nPos = vpos;
-	SetScrollInfo(hWnd,SB_VERT,&scr_info,1);
+	SetScrollInfo(hwndArea,SB_VERT,&scr_info,1);
 	scr_info.fMask = SIF_POS;//nPosを有効に
 	scr_info.nPos = hpos;
-	SetScrollInfo(hWnd,SB_HORZ,&scr_info,1);
+	SetScrollInfo(hwndArea,SB_HORZ,&scr_info,1);
 
 	//org_data.PutMusic();
 	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);

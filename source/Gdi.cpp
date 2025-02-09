@@ -42,7 +42,7 @@ BOOL StartGDI(HWND hwnd) {
 	if (DirectDrawCreate(NULL, &directDraw, NULL) != DD_OK)
 		return FALSE;
 
-	directDraw->SetCooperativeLevel(hWnd, DDSCL_NORMAL);
+	directDraw->SetCooperativeLevel(hwnd, DDSCL_NORMAL);
 
 	memset(bitmapMeta, 0, sizeof(bitmapMeta));
 
@@ -269,11 +269,11 @@ BOOL RefleshScreen(HWND hwnd) {
 	static RECT dst;
 	static POINT pnt;
 
-	GetClientRect(hWnd, &dst);
+	GetClientRect(hwnd, &dst);
 	pnt.x = dst.left;
 	pnt.y = dst.top;
 
-	ClientToScreen(hWnd, &pnt);
+	ClientToScreen(hwnd, &pnt);
 	dst.left = pnt.x;
 	dst.top = pnt.y + rebarHeight;
 	dst.right = dst.left + WWidth;

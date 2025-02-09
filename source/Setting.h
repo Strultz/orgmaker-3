@@ -24,6 +24,7 @@
 extern char music_file[];
 extern HINSTANCE hInst;//インスタンスハンドル
 extern HWND hWnd;//メインウィンドウハンドル
+extern HWND hwndArea;
 extern BOOL actApp;//ウインドウのアクティブ
 
 extern int  WWidth, WHeight;	//ウィンドウのサイズ
