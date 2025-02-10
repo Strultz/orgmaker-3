@@ -1095,7 +1095,7 @@ BEGIN
         BEGIN
             VALUE "Comments", "Please ignore the rough parts."
             VALUE "CompanyName", "No extra taste."
-            VALUE "FileDescription", "OrgMaker"
+            VALUE "FileDescription", "OrgMaker 3"
             VALUE "FileVersion", "3.1.0"
             VALUE "LegalCopyright", "Copyright (C) 2005-2025 Pixel and Rxo Inverse"
             VALUE "OriginalFilename", "OrgMaker.exe"

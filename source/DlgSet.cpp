@@ -449,7 +449,8 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 			}
 
 			// Fallthrough
-		case IDD_REP_MEAS: case IDD_END_MEAS: case IDD_REP_BEAT: case IDD_END_BEAT:
+		case IDD_REP_MEAS: case IDD_END_MEAS:
+		case IDD_REP_BEAT: case IDD_END_BEAT:
 		case IDD_GRIDEDIT1: case IDD_GRIDEDIT2:
 			if (HIWORD(wParam) == EN_SETFOCUS) {
 				PostMessage(GetDlgItem(hdwnd, LOWORD(wParam)), EM_SETSEL, 0, -1);
@@ -488,8 +489,102 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 			else {
 				SetWindowLong(hdwnd, DWL_MSGRESULT, PSNRET_NOERROR);
 				org_data.SetMusicInfo(&mi, SETGRID | SETWAIT | SETREPEAT);
+
+				// update the bpm
+				HWND sw = GetDlgItem(hdwnd, IDD_SETWAIT);
+				SendMessage(sw, WM_COMMAND, MAKEWPARAM(IDD_SETWAIT, EN_KILLFOCUS), (LPARAM)sw);
 			}
 			return error;
+		}
+		case UDN_DELTAPOS: {
+			LPNMUPDOWN lud = (LPNMUPDOWN)lParam;
+			HWND buddy = (HWND)SendMessage(lpnm->hwndFrom, UDM_GETBUDDY, 0, 0);
+			if (buddy) {
+				if (lpnm->idFrom != IDC_BPMSPIN) {
+					int v = GetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), NULL, FALSE);
+					v += lud->iDelta;
+
+					switch (lpnm->idFrom) {
+					case IDC_WAITSPIN:
+						if (v < 1) v = 1;
+						if (v > 2000) v = 2000;
+						break;
+					case IDC_BPMSPIN2:
+					case IDC_BPMSPIN3:
+						if (v < 1) v = 1;
+						if (v > 99) v = 99;
+						break;
+					case IDC_STARTSPIN:
+					case IDC_ENDSPIN: {
+						org_data.GetMusicInfo(&mi);
+
+						int relid = lpnm->idFrom == IDC_STARTSPIN ? IDD_REP_MEAS : IDD_END_MEAS;
+						int m = GetDlgItemInt(hdwnd, relid, NULL, TRUE);
+						if (m == 999 && lud->iDelta > 0) {
+							v = 0;
+							break;
+						}
+
+						while (v < 0 && mi.dot * mi.line != 0) {
+							v += mi.dot * mi.line;
+
+							m -= 1;
+							if (m < 0) {
+								m = 0;
+								v = 0;
+							}
+
+							SetDlgItemInt(hdwnd, relid, m, TRUE);
+						}
+
+						while (v >= mi.dot * mi.line && mi.dot * mi.line != 0) {
+							v -= mi.dot * mi.line;
+
+							m += 1;
+							if (m >= 999) {
+								m = 999;
+								v = 0;
+							}
+
+							SetDlgItemInt(hdwnd, relid, m, TRUE);
+						}
+
+						if (v < 0) v = 0;
+						break;
+					}
+					}
+
+					SetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), v, FALSE);
+					SendMessage(lpnm->hwndFrom, UDM_SETPOS, 0, v);
+				}
+				else {
+					GetDlgItemText(hdwnd, IDC_BPM, str, 128);
+
+					iBPM = 0;
+					try {
+						iBPM = std::stod(str);
+					} catch (const std::invalid_argument&) { // No
+					} catch (const std::out_of_range&) {
+					}
+
+					iBPM += lud->iDelta;
+
+					org_data.GetMusicInfo(&mi);
+					if (mi.dot > 0) {
+						iWAIT = (int)round(60000.0 / iBPM / (double)mi.dot);
+						if (iWAIT < 1) iBPM = 60000.0 / (double)(1 * mi.dot);
+						if (iWAIT > 2000) iBPM = 60000.0 / (double)(2000 * mi.dot);
+					}
+
+					snprintf(str, 128, "%.3f", iBPM);
+					SetDlgItemText(hdwnd, IDC_BPM, str);
+					SendMessage(lpnm->hwndFrom, UDM_SETPOS, 0, (int)iBPM);
+				}
+
+				PropSheet_Changed(GetParent(hdwnd), hdwnd);
+				return 0;
+			}
+			return 1;
 		}
 		}
 	}
