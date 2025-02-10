@@ -365,7 +365,7 @@ TCHAR strSize[128]; //for Debug	// 2010.08.14 A
 int iKeyPhase[128];
 int iCurrentPhase;
 int iCast[256];
-int previewOctave = 2;
+int previewOctave = 3;
 
 int iKeyPushDown[256]; // 2010.09.22 A
 
@@ -496,25 +496,23 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	//initial file name
 	strcpy(music_file, MessageString[IDS_DEFAULT_ORG_FILENAME]);
 
-	iCast['Z']= 9;
-	iCast['S']= 10;
-	iCast['X']= 11;
-	iCast['C']= 12; //C c C sound
-	iCast['F']= 13;
-	iCast['V']= 14; //     D
-	iCast['G']= 15;
-	iCast['B']= 16; //     E
-	iCast['N']= 17; //     F
-	iCast['J']= 18;
-	iCast['M']= 19; //     G
-	iCast['K']= 20;
-	iCast[0xBC]=21; //,    A
-	iCast['L']= 22;
-	iCast[0xBE]=23; //.    B
-	iCast[0xBF]=24; //^   C
-	iCast[0xBA]=25; //:
-	iCast[0xE2]=26; //
-	iCast[0xDD]=27; //]
+	iCast['Z']= 0;
+	iCast['S']= 1;
+	iCast['X']= 2;
+	iCast['D'] = 3;
+	iCast['C']= 4; //C c C sound
+	iCast['V']= 5; //     D
+	iCast['G']= 6;
+	iCast['B']= 7; //     E
+	iCast['H'] = 8;
+	iCast['N']= 9; //     F
+	iCast['J']= 10;
+	iCast['M']= 11; //     G
+	iCast[VK_OEM_COMMA]=12; //,    A
+	iCast['L']= 13;
+	iCast[VK_OEM_PERIOD]=14; //.    B
+	iCast[VK_OEM_1]=15; //^   C
+	iCast[VK_OEM_2]=16; //:
 	strMIDIFile = (char *)malloc(MAX_PATH);
 	gSelectedTheme = (char *)malloc(MAX_PATH);
 	gSelectedWave = (char*)malloc(MAX_PATH);
@@ -1924,10 +1922,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			scr_data.KeyScroll(DIRECTION_DOWN);
 			break;
 		case VK_LEFT:
-			scr_data.KeyScroll(DIRECTION_LEFT);
+			if (timer_sw == 0) scr_data.KeyScroll(DIRECTION_LEFT);
 			break;
 		case VK_RIGHT:
-			scr_data.KeyScroll(DIRECTION_RIGHT);
+			if (timer_sw == 0) scr_data.KeyScroll(DIRECTION_RIGHT);
 			break;
 		case VK_F5:
 		//case VK_NUMPAD0:
@@ -1940,22 +1938,20 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case 'Z':
 		case 'S':
 		case 'X':
+		case 'D':
 		case 'C':
-		case 'F':
 		case 'V':
 		case 'G':
 		case 'B':
+		case 'H':
 		case 'N':
 		case 'J':
 		case 'M':
-		case 'K':
-		case 0xBC:
+		case VK_OEM_COMMA:
 		case 'L':
-		case 0xBE:
-		case 0xBF:
-		case 0xBA:
-		case 0xE2:
-		case 0xDD:
+		case VK_OEM_PERIOD:
+		case VK_OEM_1:
+		case VK_OEM_2:
 
 			if((lParam & 0x40000000) ==0 && (timer_sw==0 || iChangeEnablePlaying!=0)){
 				org_data.GetMusicInfo(&mi);
@@ -1977,8 +1973,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case VK_MULTIPLY:
 			if ((lParam & 0x40000000) == 0 && (timer_sw == 0 || iChangeEnablePlaying != 0)) {
 				++previewOctave;
-				if (previewOctave > 6)
-					previewOctave = 6;
+				if (previewOctave > 7)
+					previewOctave = 7;
 				Rxo_StopAllSoundNow();
 				memset(iKeyPhase, -1, sizeof(iKeyPhase));
 				memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
@@ -1987,8 +1983,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case VK_DIVIDE:
 			if ((lParam & 0x40000000) == 0 && (timer_sw == 0 || iChangeEnablePlaying != 0)) {
 				--previewOctave;
-				if (previewOctave < -1)
-					previewOctave = -1;
+				if (previewOctave < 0)
+					previewOctave = 0;
 				Rxo_StopAllSoundNow();
 				memset(iKeyPhase, -1, sizeof(iKeyPhase));
 				memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
@@ -2003,22 +1999,20 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case 'Z':
 		case 'S':
 		case 'X':
+		case 'D':
 		case 'C':
-		case 'F':
 		case 'V':
 		case 'G':
 		case 'B':
+		case 'H':
 		case 'N':
 		case 'J':
 		case 'M':
-		case 'K':
-		case 0xBC:
+		case VK_OEM_COMMA:
 		case 'L':
-		case 0xBE:
-		case 0xBF:
-		case 0xBA:
-		case 0xE2:
-		case 0xDD:
+		case VK_OEM_PERIOD:
+		case VK_OEM_1:
+		case VK_OEM_2:
 			if((timer_sw==0 || iChangeEnablePlaying!=0)){
 				if (iKeyPhase[iCast[wParam]] == -1)
 					break;
