@@ -488,6 +488,9 @@
 #define IDC_STARTSPIN                   1263
 #define IDC_ENDSPIN                     1264
 #define IDC_MAIN_STATUS                 1265
+#define fuckyou                         1265
+#define IDC_STARTMEASSPIN               1265
+#define IDC_ENDMEASSPIN                 1266
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005

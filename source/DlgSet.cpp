@@ -514,6 +514,15 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 						if (v < 1) v = 1;
 						if (v > 99) v = 99;
 						break;
+					case IDC_STARTMEASSPIN:
+					case IDC_ENDMEASSPIN:
+						if (v < 0) v = 0;
+						if (v >= 999) {
+							v = 999;
+							int relid = lpnm->idFrom == IDC_STARTMEASSPIN ? IDD_REP_BEAT : IDD_END_BEAT;
+							SetDlgItemInt(hdwnd, relid, 0, TRUE);
+						}
+						break;
 					case IDC_STARTSPIN:
 					case IDC_ENDSPIN: {
 						org_data.GetMusicInfo(&mi);
