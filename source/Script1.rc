@@ -931,7 +931,7 @@ BEGIN
     END
     POPUP "&Song"
     BEGIN
-        MENUITEM "Song &Properties...\tF2",     IDM_DLGSETTING
+        MENUITEM "&Properties...\tF2",     IDM_DLGSETTING
         MENUITEM "&Default Volume/Panning...\tF3",  IDM_DLGDEFAULT
         MENUITEM SEPARATOR
         MENUITEM "&Event Usage...",            IDM_DLGUSED
@@ -1095,11 +1095,11 @@ BEGIN
         BEGIN
             VALUE "Comments", "Please ignore the rough parts."
             VALUE "CompanyName", "No extra taste."
-            VALUE "FileDescription", "OrgMaker 3"
+            VALUE "FileDescription", "OrgMaker"
             VALUE "FileVersion", "3.1.0"
             VALUE "LegalCopyright", "Copyright (C) 2005-2025 Pixel and Rxo Inverse"
             VALUE "OriginalFilename", "OrgMaker.exe"
-            VALUE "ProductName", "OrgMaker 3"
+            VALUE "ProductName", "OrgMaker"
             VALUE "ProductVersion", "3.1.0"
         END
     END
@@ -1411,7 +1411,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_STRING1             "Currently, messages are grouped into a StringTable for easy multilingual support."
-    IDS_TITLE               " - OrgMaker 3"
+    IDS_TITLE               " - OrgMaker 3.1.0"
     IDS_CANCEL              "Canceled."
     IDS_CHANGE_KEY          "Changed the key for the specified range."
     IDS_CHANGE_PAN          "Changed the pan for the specified range."

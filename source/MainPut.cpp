@@ -213,85 +213,51 @@ void OrgData::PutNumber(void)
 {
 	MUSICINFO mi;
 	long scr_h,scr_v;
-	long scalepos;
-	int off, x;
-	short k1000,k100,k10,k1;
-	short i,j;
-	short k = info.dot*info.line;
-	short rr = 0;
 	GetMusicInfo(&mi);
 	scr_data.GetScrollPosition(&scr_h, &scr_v);
-	j = (WWidth/NoteWidth)/k + (scr_h % k != 0 ? 1 : 0);
-	//小節を表示
-	for(i = 0; i <= j; i++){
-		scalepos = scr_h / (mi.dot * mi.line);
-		scalepos += i;
-		if (scalepos < 0) continue;
 
-		k1000 = k100 = k10 = k1 = 0;
-		while (scalepos >= 1000) {
-			k1000++;
-			scalepos -= 1000;
+	int k = info.dot * info.line;
+	int v = (WWidth / NoteWidth) / k + (scr_h % k != 0 ? 1 : 0);
+
+	int off = (-(scr_h % k) * NoteWidth);
+
+	for (int i = 0; i <= v; i++) {
+		long scalepos = scr_h / (mi.dot * mi.line);
+		scalepos += i;
+		if (scalepos < 0 || scalepos > 0x7FFFFFFF) continue;
+
+		int digits = 3;
+		int max = 1000;
+		while (scalepos >= max) {
+			max *= 10;
+			digits++;
 		}
-		while(scalepos >= 100){
-			k100++;
-			scalepos -= 100;
-		}
-		while(scalepos >= 10){
-			k10++;
-			scalepos -= 10;
-		}
-		
-		off = (-(scr_h % (info.dot * info.line)) * NoteWidth);
-		if (k1000 > 0) {
-			x = k * i * NoteWidth + 0 + KEYWIDTH + 1 + off;
-			if (x >= KEYWIDTH)
-				PutBitmap(x, 0, &num_rect[k1000], BMPNUMBER);
-			rr = 8;
-		}
-		x = k * i * NoteWidth + 0 + rr + KEYWIDTH + 1 + off;
-		if (x >= KEYWIDTH)
-			PutBitmap(x, 0, &num_rect[k100], BMPNUMBER);
-		x = k * i * NoteWidth + 8 + rr + KEYWIDTH + 1 + off;
-		if (x >= KEYWIDTH)
-			PutBitmap(x, 0, &num_rect[k10], BMPNUMBER);
-		x = k * i * NoteWidth + 16 + rr + KEYWIDTH + 1 + off;
-		if (x >= KEYWIDTH)
-			PutBitmap(x, 0, &num_rect[scalepos], BMPNUMBER);
-		if(WHeight>550){
-			rr = 0;
-			if (k1000 > 0) {
-				x = k * i * NoteWidth + 0 + KEYWIDTH + 1 + off;
-				if (x >= KEYWIDTH)
-					PutBitmap(x, WHeight + 288 - WHNM - 12, &num_rect[k1000], BMPNUMBER);
-				rr = 8;
+
+		for (int j = 0; j < digits; ++j) {
+			max /= 10;
+			int num = scalepos / max;
+			scalepos -= num * max;
+
+			int x = k * i * NoteWidth + (j * 8) + KEYWIDTH + 1 + off;
+			if (x >= 0) {
+				PutBitmap(x, 0, &num_rect[num], BMPNUMBER);
+				if (WHeight > 550) {
+					PutBitmap(x, WHeight + 288 - WHNM - 12, &num_rect[num], BMPNUMBER);
+				}
 			}
-			x = k * i * NoteWidth + 0 + rr + KEYWIDTH + 1 + off;
-			if (x >= KEYWIDTH)
-				PutBitmap(x, WHeight + 288 - WHNM - 12, &num_rect[k100], BMPNUMBER);
-			x = k * i * NoteWidth + 8 + rr + KEYWIDTH + 1 + off;
-			if (x >= KEYWIDTH)
-				PutBitmap(x, WHeight + 288 - WHNM - 12, &num_rect[k10], BMPNUMBER);
-			x = k * i * NoteWidth + 16 + rr + KEYWIDTH + 1 + off;
-			if (x >= KEYWIDTH)
-				PutBitmap(x, WHeight + 288 - WHNM - 12, &num_rect[scalepos], BMPNUMBER);
 		}
-	}
-	//キーを表示
-	for(i = 0; i <  8; i++){
-		PutBitmap(55,(95 - scr_v - i*12)*12,&num_rect[i+10],BMPNUMBER);
 	}
 }
 void OrgData::PutRepeat(void)
 {
-	long scr_h,scr_v;
+	long scr_h;
 	long x;
-	scr_data.GetScrollPosition(&scr_h,&scr_v);
+	scr_data.GetScrollPosition(&scr_h, NULL);
 	x = (info.repeat_x - scr_h)*NoteWidth + KEYWIDTH;
-	if (x >= KEYWIDTH)
+	if (x >= 0)
 		PutBitmap(x, WHeight + 276 - WHNM - (WHeight > 550 ? 12 : 0), &note_rect[5], BMPNOTE);
 	x = (info.end_x - scr_h)*NoteWidth + KEYWIDTH;
-	if (x >= KEYWIDTH)
+	if (x >= 0)
 		PutBitmap(x,WHeight+276-WHNM-(WHeight > 550 ? 12 : 0),&note_rect[6],BMPNOTE);
 }
 
@@ -615,6 +581,10 @@ void OrgData::PutMusic(void)
 		}
 		
 	}
+
+	PutNumber();
+	PutRepeat();
+
 	for(j = 0; j < (WHeight / 144) + 1; j++) PutBitmap(0, j*144 + vpos, &msc_rect[0], BMPMUSIC);
 
 	//キーボード鍵盤（鍵盤部分）
@@ -628,10 +598,11 @@ void OrgData::PutMusic(void)
 		}
 	}
 
-	PutNumber();
-	PutRepeat();
+	for (i = 0; i < 8; i++) {
+		PutBitmap(55, (95 - vpos2 - i * 12) * 12, &num_rect[i + 11], BMPNUMBER);
+	}
 
-	for (int i = 0; i < (WWidth / NoteWidth) + (info.line * info.dot) + 1; i++) { // 15
+	for (i = 0; i < (WWidth / NoteWidth) + (info.line * info.dot) + 1; i++) { // 15
 		if (i % (info.line * info.dot) == 0){
 			brect = { 64, 0, 64 + NoteWidth, 144 + 16 };
 			PutBitmap(x + i * NoteWidth, WHeight + 288 - WHNM, &brect, BMPPAN);

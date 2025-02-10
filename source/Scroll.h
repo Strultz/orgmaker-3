@@ -13,8 +13,8 @@ typedef struct ScrollData{
 	public:
 		void SetIniFile();
 		BOOL InitScroll(void);//初期化
-		void VertScrollProc(WPARAM wParam);//スクロールさせた時の処理
-		void HorzScrollProc(WPARAM wParam);
+		void VertScrollProc(short mode, long scroll);//スクロールさせた時の処理
+		void HorzScrollProc(short mode, long scroll);
 		void WheelScrollProc(LPARAM lParam, WPARAM wParam); //ホイールを...
 		void GetScrollPosition(long *hp,long *vp);
 		void SetHorzScroll(long x);

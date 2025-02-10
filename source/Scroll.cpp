@@ -58,12 +58,12 @@ void ScrollData::ChangeVerticalRange(int WindowHeight){ //ウィンドウサイズを元に
 	return;
 }
 void ScrollData::ChangeHorizontalRange(int range) { //ウィンドウサイズを元にスクロール可能域を設定
-	MAXHORZRANGE = range;
+	//MAXHORZRANGE = range;
 	if (hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
 	scr_info.cbSize = sizeof(SCROLLINFO);
 	scr_info.fMask = SIF_RANGE | SIF_PAGE;
 	scr_info.nMin = 0;
-	scr_info.nMax = MAXHORZRANGE;
+	scr_info.nMax = range;
 	scr_info.nPage = 4;
 	SetScrollInfo(hwndArea, SB_HORZ, &scr_info, 1);
 }
@@ -106,12 +106,18 @@ void ScrollData::PrintHorzPosition(void)
 
 }
 
-void ScrollData::HorzScrollProc(WPARAM wParam){
+void ScrollData::HorzScrollProc(short mode, long scroll){
 	RECT rect = {0,0,WWidth,WHeight};//更新する領域
 	MUSICINFO mi;
 	org_data.GetMusicInfo(&mi);
 
-	switch(LOWORD(wParam)){
+	switch(mode){
+	case SB_LEFT:
+		hpos = 0;
+		break;
+	case SB_RIGHT:
+		hpos = mi.end_x;
+		break;
 	case SB_LINERIGHT://右へ
 		hpos++;
 		if(hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
@@ -122,10 +128,10 @@ void ScrollData::HorzScrollProc(WPARAM wParam){
 		if(hpos < 0)hpos = 0;
 		break;
 	case SB_THUMBPOSITION:
-		hpos = HIWORD(wParam);//現在位置を取得
+		hpos = scroll;//現在位置を取得
 		break;
 	case SB_THUMBTRACK:
-		hpos = HIWORD(wParam);//現在位置を取得
+		hpos = scroll;//現在位置を取得
 		break;
 	case SB_PAGERIGHT://右へ
 		hpos = (hpos / (mi.dot * mi.line) + 1) * (mi.dot * mi.line);
@@ -162,9 +168,16 @@ void ScrollData::HorzScrollProc(WPARAM wParam){
 //	TextOut(hdc,200,1,str,strlen(str));
 //	ReleaseDC(hWnd,hdc);
 }
-void ScrollData::VertScrollProc(WPARAM wParam){
+void ScrollData::VertScrollProc(short mode, long scroll){
 	RECT rect = {0,0,WWidth,WHeight};//更新する領域
-	switch(LOWORD(wParam)){
+	switch(mode){
+	case SB_TOP:
+		vpos = 0;
+		break;
+	case SB_BOTTOM:
+		vpos = vScrollMax;
+		if (vpos < 0) vpos = 0;
+		break;
 	case SB_LINEDOWN://下へ
 		vpos++;
 		if(vpos > vScrollMax)vpos = vScrollMax;
@@ -175,10 +188,10 @@ void ScrollData::VertScrollProc(WPARAM wParam){
 		if(vpos < 0)vpos = 0;
 		break;
 	case SB_THUMBPOSITION:
-		vpos = HIWORD(wParam);//現在位置を取得
+		vpos = scroll;//現在位置を取得
 		break;
 	case SB_THUMBTRACK:
-		vpos = HIWORD(wParam);//現在位置を取得
+		vpos = scroll;//現在位置を取得
 		break;
 	case SB_PAGEDOWN://下へ
 		vpos += 12;

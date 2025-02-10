@@ -295,7 +295,7 @@ BOOL OrgData::LoadMusicData(void)
 	SetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,"0");
 	SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,"0");*/
 
-	scr_data.ChangeHorizontalRange(info.dot * info.line * MAXHORZMEAS);
+	scr_data.ChangeHorizontalRange(info.end_x);
 	//MakeMusicParts(info.line,info.dot);//ÉpÅ[ÉcÇê∂ê¨
 	//MakePanParts(info.line,info.dot);
 	PutRecentFile(music_file);

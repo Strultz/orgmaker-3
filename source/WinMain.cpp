@@ -167,7 +167,7 @@ bool gIsDrawing = false;
 bool gFileModified = false;
 bool gFileUnsaved = true;
 
-long MAXHORZRANGE = MAXHORZMEAS * 16;
+long MAXHORZRANGE = 0x7FFFFFFF;
 
 int WWidth = WINDOWWIDTH, WHeight = WINDOWHEIGHT;
 int realWidth = WINDOWWIDTH;
@@ -929,6 +929,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 	MUSICINFO mi;
 	MINMAXINFO *pmmi;
 	HMENU hMenu;
+	SCROLLINFO si;
 
 	
 
@@ -1275,19 +1276,19 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				break;
 			case IDC_LEFT:
 			case ID_AC_MEASBACK:
-				scr_data.HorzScrollProc(SB_PAGELEFT);
+				scr_data.HorzScrollProc(SB_PAGELEFT, 0);
 				//SendMessage(hDlgPlayer, WM_COMMAND, IDC_LEFT, NULL);
 				break;
 			case IDC_RIGHT:
 			case ID_AC_MEASNEXT:
-				scr_data.HorzScrollProc(SB_PAGERIGHT);
+				scr_data.HorzScrollProc(SB_PAGERIGHT, 0);
 				//SendMessage(hDlgPlayer, WM_COMMAND, IDC_RIGHT, NULL);
 				break;
 			case IDC_LEFTSTEP:
-				scr_data.HorzScrollProc(SB_LINELEFT);
+				scr_data.HorzScrollProc(SB_LINELEFT, 0);
 				break;
 			case IDC_RIGHTSTEP:
-				scr_data.HorzScrollProc(SB_LINERIGHT);
+				scr_data.HorzScrollProc(SB_LINERIGHT, 0);
 				break;
 			case ID_AC_SELECT_BACKDEL: //2014.04.13
 				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_DELETEBUTTON_2  , NULL);
@@ -1632,10 +1633,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			SelectReset();
 			break;
 		case ID_AC_SOCTUP:
-			scr_data.VertScrollProc(SB_PAGEUP);
+			scr_data.VertScrollProc(SB_PAGEUP, 0);
 			break;
 		case ID_AC_SOCTDOWN:
-			scr_data.VertScrollProc(SB_PAGEDOWN);
+			scr_data.VertScrollProc(SB_PAGEDOWN, 0);
 			break;
 		case IDM_RECENT_CLEAR:
 			ClearRecentFile();
@@ -1905,10 +1906,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 	case WM_KEYDOWN://keyboard pressed
 		switch(wParam){
 		case VK_PRIOR:
-			scr_data.VertScrollProc(SB_PAGEUP);
+			scr_data.VertScrollProc(SB_PAGEUP, 0);
 			break;
 		case VK_NEXT:
-			scr_data.VertScrollProc(SB_PAGEDOWN);
+			scr_data.VertScrollProc(SB_PAGEDOWN, 0);
 			break;
 		case VK_UP:
 			scr_data.KeyScroll(DIRECTION_UP);
@@ -2051,10 +2052,18 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 		break;
 	case WM_HSCROLL:
-		scr_data.HorzScrollProc(wParam);
+		ZeroMemory(&si, sizeof(si));
+		si.cbSize = sizeof(si);
+		si.fMask = SIF_TRACKPOS;
+		if (GetScrollInfo(hwndArea, SB_HORZ, &si))
+			scr_data.HorzScrollProc(LOWORD(wParam), si.nTrackPos);
 		break;
 	case WM_VSCROLL:
-		scr_data.VertScrollProc(wParam);
+		ZeroMemory(&si, sizeof(si));
+		si.cbSize = sizeof(si);
+		si.fMask = SIF_TRACKPOS;
+		if (GetScrollInfo(hwndArea, SB_VERT, &si))
+			scr_data.VertScrollProc(LOWORD(wParam), si.nTrackPos);
 		break;
 	case WM_MOUSEWHEEL:
 		scr_data.WheelScrollProc(lParam, wParam);		
@@ -2104,7 +2113,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		realHeight = HIWORD(lParam);
 		SetWindowPos(hwndArea, HWND_TOP, 0, rebarHeight, realWidth, realHeight - rebarHeight - GetBarHeight(hwndStatus), 0);
 
-		int swidths[] = { realWidth - 400, realWidth - 300, realWidth - 100, -1 };
+		int swidths[] = { realWidth - 450, realWidth - 350, realWidth - 150, -1 };
 		SendMessage(hwndStatus, SB_SETPARTS, sizeof(swidths) / sizeof(int), (LPARAM)swidths);
 
 

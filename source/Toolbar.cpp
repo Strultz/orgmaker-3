@@ -189,7 +189,7 @@ HWND CreateStatusBar(HWND hwnd) {
         0, 0, 0, 0, hwnd, NULL, hInst, NULL);
 
     int w = GetBarWidth(hwndStatus);
-    int swidths[] = { w - 400, w - 300, w - 100, -1 };
+    int swidths[] = { w - 450, w - 350, w - 150, -1 };
     SendMessage(hwndStatus, SB_SETPARTS, sizeof(swidths) / sizeof(int), (LPARAM)swidths);
     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Press F1 for help");
     SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Channel 1");
