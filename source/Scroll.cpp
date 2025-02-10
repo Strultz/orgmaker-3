@@ -11,6 +11,7 @@
 #define MAIN_WINDOW "WINDOW"
 
 extern char timer_sw;
+extern int NoteWidth;
 
 extern CHAR app_path[BUF_SIZE];
 extern CHAR num_buf[BUF_SIZE];
@@ -21,12 +22,12 @@ BOOL ScrollData::InitScroll(void)
 	scr_info.fMask = SIF_RANGE | SIF_PAGE;
 	scr_info.nMin = 0;
 	scr_info.nMax = MAXHORZRANGE;
-	scr_info.nPage = 4;
+	scr_info.nPage = 1;
 	SetScrollInfo(hwndArea,SB_HORZ,&scr_info,1);//横
 	scr_info.cbSize = sizeof(SCROLLINFO);
 	scr_info.fMask = SIF_RANGE | SIF_PAGE;
 	scr_info.nMax = MAXVERTRANGE;
-	scr_info.nPage = 4;
+	scr_info.nPage = 1;
 	SetScrollInfo(hwndArea,SB_VERT,&scr_info,1);//縦
 	hpos = 0;//水平スクロール値
 	//vpos = MAXVERTRANGE-27;//垂直初期値
@@ -41,31 +42,40 @@ BOOL ScrollData::InitScroll(void)
 	return TRUE;
 }
 void ScrollData::ChangeVerticalRange(int WindowHeight){ //ウィンドウサイズを元にスクロール可能域を設定
+	int fl = SIF_RANGE | SIF_PAGE;
+	int ap = 1;
+
 	if(WindowHeight>0){
-		int ap;
 		ap = (WindowHeight - 158)/12;
 
-		scr_info.nMax = 100 - ap;
-		vScrollMax = scr_info.nMax;
+		if (ap >= 100) {
+			fl |= SIF_DISABLENOSCROLL;
+		}
+
+		scr_info.nMax = 99;
+		vScrollMax = scr_info.nMax - ap + 1;
 		if (vScrollMax < 0) vScrollMax = 0;
 	}else{
 		scr_info.nMax = MAXVERTRANGE;
+		vScrollMax = MAXVERTRANGE - ap + 1;
 
 	}
+	if (vpos > vScrollMax) vpos = vScrollMax;
 	scr_info.cbSize = sizeof(SCROLLINFO);
-	scr_info.fMask = SIF_RANGE;
+	scr_info.fMask = fl;
+	scr_info.nPage = ap;
 	SetScrollInfo(hwndArea, SB_VERT, &scr_info, TRUE);//縦
 	return;
 }
 void ScrollData::ChangeHorizontalRange(int range) { //ウィンドウサイズを元にスクロール可能域を設定
-	//MAXHORZRANGE = range;
-	if (hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
+	int ap = (WWidth - KEYWIDTH) / NoteWidth;
+	if (hpos > MAXHORZRANGE) hpos = MAXHORZRANGE;
 	scr_info.cbSize = sizeof(SCROLLINFO);
 	scr_info.fMask = SIF_RANGE | SIF_PAGE;
 	scr_info.nMin = 0;
-	scr_info.nMax = range;
-	scr_info.nPage = 4;
-	SetScrollInfo(hwndArea, SB_HORZ, &scr_info, 1);
+	scr_info.nMax = range + ap - 1;
+	scr_info.nPage = ap;
+	SetScrollInfo(hwndArea, SB_HORZ, &scr_info, TRUE);
 }
 void ScrollData::AttachScroll(void)
 {

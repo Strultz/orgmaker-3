@@ -1400,11 +1400,14 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		switch(LOWORD(wParam)){
 		case IDM_LOUPE_MINUS:
 		case ID_AC_LOUPE_MINUS: // i hate this whole codebase so much i want to redo everything
-			NoteWidth -= 2; if(NoteWidth<4)NoteWidth=4;
+			NoteWidth -= 2;
+			if (NoteWidth < 4) NoteWidth = 4;
 			org_data.PutBackGround();
+			org_data.GetMusicInfo(&mi);
+			scr_data.ChangeHorizontalRange(mi.end_x);
 			//org_data.PutMusic();//View sheet music
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-			switch(NoteWidth){
+			switch (NoteWidth) {
 			case 4:		SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[25.%]"); break;
 			case 6:		SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[37.5%]"); break;
 			case 8:		SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[50%]"); break;
@@ -1417,8 +1420,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		case IDM_LOUPE_PLUS:
 		case ID_AC_LOUPE_PLUS:
-			NoteWidth += 2; if(NoteWidth>16)NoteWidth=16;
+			NoteWidth += 2;
+			if (NoteWidth > 16) NoteWidth = 16;
 			org_data.PutBackGround();
+			org_data.GetMusicInfo(&mi);
+			scr_data.ChangeHorizontalRange(mi.end_x);
 			//org_data.PutMusic();//View sheet music
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			switch(NoteWidth){
@@ -2122,6 +2128,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 //				wsprintf(strSize , "Height = %d" , (WHeight - 158)/12);
 //				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+		org_data.GetMusicInfo(&mi);
+		scr_data.ChangeHorizontalRange(mi.end_x);
 		scr_data.ChangeVerticalRange(WHeight);
 		//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
