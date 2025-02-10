@@ -226,8 +226,6 @@ HWND hwndTrackbarPopup = NULL;
 
 int rebarHeight;
 
-char selmsg[512];
-
 SAVEDNOTE gClipboardData;
 NOTECOPY nc_Select;
 int tra = -256, ful = 0, haba = 0;
@@ -310,8 +308,36 @@ void UpdateToolbarStatus() {
 	}
 }
 
-void UpdateStatusBar() {
-	SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)selmsg);
+void UpdateStatusBar(bool measonly) {
+	MUSICINFO mi;
+	char msg[256];
+	int meas = 0, step = 0;
+	long pl;
+
+	org_data.GetMusicInfo(&mi);
+
+	if (timer_sw == 0) {
+		scr_data.GetScrollPosition(&pl, NULL);
+	} else {
+		org_data.GetPlayPos(NULL, &pl);
+	}
+
+	if (mi.dot != 0 && mi.line != 0) {
+		meas = pl / (mi.dot * mi.line);
+		step = pl % (mi.dot * mi.line);
+	}
+
+	if (!measonly) {
+		snprintf(msg, 256, "Channel %s", TrackCode[org_data.track]);
+		SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)msg);
+
+		snprintf(msg, 256, "Wait: %d (%.3f BPM)", mi.wait, mi.wait <= 0 || mi.dot <= 0 ? 0 : 60000.0 / (double)(mi.wait * mi.dot));
+		SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)msg);
+	}
+
+	snprintf(msg, 256, "Meas %d:%d", meas, step);
+	SendMessage(hwndStatus, SB_SETTEXT, 3, (LPARAM)msg);
+
 }
 
 void SaveIniFile();
@@ -727,7 +753,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	//SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
 	//SetDlgItemInt(hDlgTrack,IDE_VIEWTRACK,0,TRUE );
 	//SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
-	UpdateStatusBar();
+	UpdateStatusBar(false);
 
 	FILE *fp;
 	char kfn[MAX_PATH],gfn[MAX_PATH];
@@ -753,7 +779,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 				//org_data.GetMusicInfo(&mi);
 				//SetDlgItemInt(hDlgTrack, IDE_VIEWWAIT, mi.wait, TRUE);
 				//SetDlgItemText(hDlgTrack, IDE_VIEWTRACK, "1");
-				UpdateStatusBar();
+				UpdateStatusBar(false);
 				ClearEZC_Message();
 				SelectReset();
 				//org_data.PutMusic();
@@ -980,7 +1006,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				//org_data.GetMusicInfo( &mi );
 				//SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
 				//SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
-				UpdateStatusBar();
+				UpdateStatusBar(false);
 				ClearEZC_Message();
 				SelectReset();
 				//org_data.PutMusic();
@@ -1039,7 +1065,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//頭出し
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				UpdateStatusBar();
+				UpdateStatusBar(false);
 				break;
 			case IDM_3BAI:
 				SetUndo();
@@ -1047,7 +1073,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//頭出し
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				UpdateStatusBar();
+				UpdateStatusBar(false);
 				break;
 			case IDM_2BUNNO1:
 				SetUndo();
@@ -1055,7 +1081,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//頭出し				
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				UpdateStatusBar();
+				UpdateStatusBar(false);
 				break;
 			case IDM_3BUNNO1:
 				SetUndo();
@@ -1063,7 +1089,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//頭出し				
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				UpdateStatusBar();
+				UpdateStatusBar(false);
 				break;
 			case IDM_CT_L1: //Linear debility IDM_CT_L1 to 9 must be consecutive numbers!
 			case IDM_CT_L2: //Convex weakness
@@ -1238,14 +1264,14 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				ReplaseUndo();
 				//org_data.PutMusic();//View sheet music
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				UpdateStatusBar();
+				UpdateStatusBar(false);
 				break;
 			case IDM_REDO:
 			case ID_AC_REDO:
 				ReplaceRedo();
 				//org_data.PutMusic();//View sheet music
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				UpdateStatusBar();
+				UpdateStatusBar(false);
 				break;
 			case IDC_LEFT:
 			case ID_AC_MEASBACK:
@@ -1339,8 +1365,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					break;
 				}
 
-				long x_scroll, y_scroll;
-				scr_data.GetScrollPosition(&x_scroll, &y_scroll);
+				long x_scroll;
+				scr_data.GetScrollPosition(&x_scroll, NULL);
 
 				org_data.SetUndoData();
 
@@ -1452,7 +1478,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			org_data.SetPlayPointer(0);
 			scr_data.SetHorzScroll(0);
 			//reflected in the player
-			UpdateStatusBar();
+			UpdateStatusBar(false);
 			//SetDlgItemText(hDlgPlayer, IDE_VIEWWAIT, "128");
 			//(hDlgPlayer, IDE_VIEWMEAS, "0");
 			//SetDlgItemText(hDlgPlayer, IDE_VIEWXPOS, "0");
@@ -1588,7 +1614,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			//DetectPreciseMode();
 
 			//Show to Player
-			UpdateStatusBar();
+			UpdateStatusBar(false);
 
 			ClearEZC_Message();
 			SelectReset();
@@ -1838,7 +1864,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		//DetectPreciseMode();
 		//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 		//Show to Player
-		UpdateStatusBar();
+		UpdateStatusBar(false);
 		SetModified(false);//title name set
         gFileUnsaved = false;
 
@@ -2078,7 +2104,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		realHeight = HIWORD(lParam);
 		SetWindowPos(hwndArea, HWND_TOP, 0, rebarHeight, realWidth, realHeight - rebarHeight - GetBarHeight(hwndStatus), 0);
 
-		int swidths[] = { realWidth - 300, realWidth - 200, realWidth - 100, -1 };
+		int swidths[] = { realWidth - 400, realWidth - 300, realWidth - 100, -1 };
 		SendMessage(hwndStatus, SB_SETPARTS, sizeof(swidths) / sizeof(int), (LPARAM)swidths);
 
 
@@ -2158,23 +2184,29 @@ void SetTitlebarText()
 }
 
 int GetCurrentMeasure() {
-	long x_scroll, y_scroll;
-	scr_data.GetScrollPosition(&x_scroll, &y_scroll);
+	long x_scroll;
+	scr_data.GetScrollPosition(&x_scroll, NULL);
 
 	MUSICINFO mi;
 	org_data.GetMusicInfo(&mi);
 
-	return x_scroll / (mi.dot * mi.line);
+	if (mi.dot != 0 && mi.line != 0) {
+		return x_scroll / (mi.dot * mi.line);
+	}
+	return 0;
 }
 
 int GetCurrentStep() {
-	long x_scroll, y_scroll;
-	scr_data.GetScrollPosition(&x_scroll, &y_scroll);
+	long x_scroll;
+	scr_data.GetScrollPosition(&x_scroll, NULL);
 
 	MUSICINFO mi;
 	org_data.GetMusicInfo(&mi);
 
-	return x_scroll % (mi.dot * mi.line);
+	if (mi.dot != 0 && mi.line != 0) {
+		return x_scroll % (mi.dot * mi.line);
+	}
+	return 0;
 }
 
 void SetModified(bool mod) {

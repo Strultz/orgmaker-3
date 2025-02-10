@@ -89,7 +89,7 @@ void ChangeTrackPlus(int iValue){
 	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 	//SetFocus(hWnd);
 	UpdateToolbarStatus();
-	UpdateStatusBar();
+	UpdateStatusBar(false);
 }
 
 
@@ -135,7 +135,7 @@ void ChangeTrack(int iTrack){
 	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
 	UpdateToolbarStatus();
-	UpdateStatusBar();
+	UpdateStatusBar(false);
 	//SetFocus(hWnd);
 }
 

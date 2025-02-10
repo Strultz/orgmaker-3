@@ -86,7 +86,7 @@ void ScrollData::SetHorzScroll(long x)
 	scr_info.fMask = SIF_POS;//nPos‚ð—LŒø‚É
 	scr_info.nPos = hpos;
 	SetScrollInfo(hwndArea,SB_HORZ,&scr_info,1);
-	UpdateStatusBar();
+	UpdateStatusBar(true);
 	//org_data.PutMusic();
 	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 }
@@ -102,7 +102,7 @@ void ScrollData::PrintHorzPosition(void)
 	itoa(hpos % (mi.dot * mi.line),str,10);
 	SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,str);*/
 
-	UpdateStatusBar();
+	UpdateStatusBar(true);
 
 }
 
@@ -207,8 +207,8 @@ void ScrollData::VertScrollProc(WPARAM wParam){
 //Get scroll position
 void ScrollData::GetScrollPosition(long *hp,long *vp)
 {
-	*hp = hpos;
-	*vp = vpos;
+	if (hp) *hp = hpos;
+	if (vp) *vp = vpos;
 }
 
 void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){

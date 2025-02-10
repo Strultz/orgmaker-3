@@ -30,7 +30,7 @@ extern BOOL actApp;//ウインドウのアクティブ
 extern int  WWidth, WHeight;	//ウィンドウのサイズ
 
 void UpdateToolbarStatus();
-void UpdateStatusBar();
+void UpdateStatusBar(bool measonly);
 
 int GetCurrentMeasure();
 int GetCurrentStep();

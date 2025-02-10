@@ -124,7 +124,7 @@ BOOL OrgData::SetMusicInfo(MUSICINFO *mi,unsigned long flag)
 	}
 
 	UpdateToolbarStatus();
-	UpdateStatusBar();
+	UpdateStatusBar(false);
 
 	return TRUE;
 }

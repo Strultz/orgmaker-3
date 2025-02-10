@@ -1,7 +1,9 @@
 #pragma once
 
-HWND CreateRebar(HWND hWnd);
+HWND CreateRebar(HWND hwnd);
 void CreateToolbars(HWND hwndRebar, HWND outHwnd[4]);
+
+int GetBarWidth(HWND hwndBar);
 int GetBarHeight(HWND hwndBar);
 
-HWND CreateStatusBar(HWND hWnd);
+HWND CreateStatusBar(HWND hwnd);

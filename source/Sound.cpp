@@ -1289,6 +1289,7 @@ void ExportOrganyaBuffer(unsigned long sample_rate, float* output_stream, size_t
 	}
 
 	Rxo_StopAllSoundNow();
+	S_ResetSounds();
 
 	organya_countdown = 0;
 	organya_timer = 0;

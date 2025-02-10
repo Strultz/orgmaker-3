@@ -58,6 +58,7 @@ void ClearDrag()
 void RedrawClick()
 {
 	UpdateToolbarStatus();
+	UpdateStatusBar(false);
 	//RECT rect = {64,0,WWidth,WHeight};
 	//org_data.PutMusic();//Šy•ˆ‚ÌÄ•`‰æ
 	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);

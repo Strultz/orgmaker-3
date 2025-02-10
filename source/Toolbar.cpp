@@ -3,11 +3,9 @@
 
 #include "resource.h"
 #include "Toolbar.h"
+#include "Setting.h"
 
 static char szTbClassName[] = "OrgToolbar";
-
-extern HINSTANCE hInst;
-extern HWND hWnd;
 
 LRESULT CALLBACK ToolbarWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
     if (message == WM_COMMAND) {
@@ -84,7 +82,7 @@ static void CreateToolbar(HWND hwndRebar, const char *iconBitmap, int buttonCoun
     return;
 }
 
-HWND CreateRebar(HWND hWnd)
+HWND CreateRebar(HWND hwnd)
 {
     // Initialize common controls.
     INITCOMMONCONTROLSEX icex;
@@ -94,10 +92,10 @@ HWND CreateRebar(HWND hWnd)
 
     HWND hwndRebar = CreateWindowEx(WS_EX_TOOLWINDOW, REBARCLASSNAME, NULL,
         WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_BORDER | RBS_AUTOSIZE | RBS_BANDBORDERS | CCS_NODIVIDER,
-        0, 0, 0, 0, hWnd, NULL, hInst, NULL);
+        0, 0, 0, 0, hwnd, NULL, hInst, NULL);
 
     RECT rcWindow;
-    GetClientRect(hWnd, &rcWindow);
+    GetClientRect(hwnd, &rcWindow);
     MoveWindow(hwndRebar, 0, 0, rcWindow.right - rcWindow.left, GetBarHeight(hwndRebar), TRUE);
 
     WNDCLASSEX ot;
@@ -173,24 +171,30 @@ void CreateToolbars(HWND hwndRebar, HWND outHwnd[4]) {
     CreateToolbar(hwndRebar, "TRACKBAR_ICONS", 17, tbb2, "Channels", &outHwnd[2]);
 }
 
+int GetBarWidth(HWND hwndBar) {
+    WINDOWPLACEMENT wp;
+    GetWindowPlacement(hwndBar, &wp);
+    return wp.rcNormalPosition.right - wp.rcNormalPosition.left;
+}
+
 int GetBarHeight(HWND hwndBar) {
-    // check the rebar size
     WINDOWPLACEMENT wp;
     GetWindowPlacement(hwndBar, &wp);
     return wp.rcNormalPosition.bottom - wp.rcNormalPosition.top;
 }
 
-HWND CreateStatusBar(HWND hWnd) {
+HWND CreateStatusBar(HWND hwnd) {
     HWND hwndStatus = CreateWindowEx(0, STATUSCLASSNAME, NULL,
         SBARS_SIZEGRIP | WS_CHILD | WS_VISIBLE,
-        0, 0, 0, 0, hWnd, NULL, hInst, NULL);
-    
-    int swidths[] = { 340, 440, 540, -1 };
+        0, 0, 0, 0, hwnd, NULL, hInst, NULL);
+
+    int w = GetBarWidth(hwndStatus);
+    int swidths[] = { w - 400, w - 300, w - 100, -1 };
     SendMessage(hwndStatus, SB_SETPARTS, sizeof(swidths) / sizeof(int), (LPARAM)swidths);
     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Press F1 for help");
-    SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Test1");
-    SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)"Test2");
-    SendMessage(hwndStatus, SB_SETTEXT, 3, (LPARAM)"Test3");
+    SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Channel 1");
+    SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)"Wait: 128 (117.188 BPM)");
+    SendMessage(hwndStatus, SB_SETTEXT, 3, (LPARAM)"Meas 0:0");
 
     return hwndStatus;
 }

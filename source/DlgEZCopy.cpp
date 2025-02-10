@@ -61,6 +61,7 @@ void SetEZCWindowMessage(char *Mess)
 	strcpy(CpHelp, Mess );
 	PrintCpHelp();
 	UpdateToolbarStatus();
+	UpdateStatusBar(false);
 }
 
 char TrackN[]="12345678QWERTYUI";
@@ -73,6 +74,7 @@ void ClearEZC_Message()
 	tra=-256;
 	PrintCpHelp();
 	UpdateToolbarStatus();
+	UpdateStatusBar(false);
 }
 
 void EZ_Delete()
@@ -490,6 +492,7 @@ void ShowStatusMessage(void)
 	SetDlgItemText(hDlgEZCopy, IDC_STATUS3, Mess);
 
 	UpdateToolbarStatus();
+	UpdateStatusBar(false);
 
 
 	//SetDlgItemText(hDlgEZCopy, IDC_STATUS, Mess);
