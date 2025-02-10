@@ -193,7 +193,7 @@ HWND CreateStatusBar(HWND hwnd) {
     SendMessage(hwndStatus, SB_SETPARTS, sizeof(swidths) / sizeof(int), (LPARAM)swidths);
     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Press F1 for help");
     SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Channel 1");
-    SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)"Wait: 128 (117.188 BPM)");
+    SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)"Wait: 125 (120.000 BPM)");
     SendMessage(hwndStatus, SB_SETTEXT, 3, (LPARAM)"Meas 0:0");
 
     return hwndStatus;

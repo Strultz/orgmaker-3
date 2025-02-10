@@ -677,7 +677,7 @@ void OrgData::InitOrgData(void)
 	info.alloc_note = ALLOCNOTE;//‚Æ‚è‚ ‚¦‚¸10000ŒÂŠm•Û
 	info.dot = 4;
 	info.line = 4;
-	info.wait = 128;
+	info.wait = 125;
 	info.repeat_x = info.dot * info.line * 0;
 	info.end_x = info.dot * info.line * 100; // updated
 	int i;
