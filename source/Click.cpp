@@ -18,7 +18,7 @@ extern HWND hwndToolbar;
 
 extern NOTECOPY nc_Select; //選択範囲
 extern int tra, ful, haba; 
-extern void SetEZCWindowMessage(char *Mess);
+extern void ClearEZC_Message(void);
 
 long Last_mouse_x = -99999;	//同位置の複数クリックはアンドゥとして記録しない。
 long Last_mouse_y = -99999;
@@ -70,38 +70,11 @@ void SelectReset()
 	tra = -256;
 	DragStartx = -99999;
 	RedrawClick();
-	SetEZCWindowMessage("");
+	ClearEZC_Message();
 }
 
 void PrintStatusMessage(int Zensentaku){
-	char wk[256],wk2[256];
-	if(Zensentaku != 0){
-		if(ful==0){
-			wsprintf(wk2,MessageString[IDS_STRING104], TrackN[tra]); //"トラック%c の"
-			strcpy(wk,wk2);
-			wsprintf(wk2,MessageString[IDS_STRING115]); // " はじめからおわりまでを"
-			strcat(wk,wk2);
-			SetEZCWindowMessage(wk);
-		}
-		else if(ful==1){
-			wsprintf(wk2,MessageString[IDS_STRING116]); //"全トラックの はじめからおわりまでを"
-			strcpy(wk,wk2);
-			SetEZCWindowMessage(wk);
-		}
-	}else{
-		if(ful==0){
-			wsprintf(wk2,MessageString[IDS_STRING104], TrackN[tra]); //"トラック%c の"
-			strcpy(wk,wk2);
-			wsprintf(wk2,MessageString[IDS_STRING105]); // "選択されている範囲を"
-			strcat(wk,wk2);
-			SetEZCWindowMessage(wk);
-		}
-		else if(ful==1){
-			wsprintf(wk2,MessageString[IDS_STRING106]); // "全トラックの選択されている範囲を"
-			strcpy(wk,wk2);
-			SetEZCWindowMessage(wk);
-		}
-	}
+	
 
 }
 
@@ -114,7 +87,6 @@ void SelectAll(int FullTrack)
 	nc_Select.x1_2=999*dot*line;
 	tra = org_data.track;
 	ful = FullTrack;
-	PrintStatusMessage(1);
 	RedrawClick();
 
 }
@@ -140,7 +112,6 @@ void LButtonUP(WPARAM wParam, LPARAM lParam)
 	}
 	if(DragStartx<=-99999)return;
 
-	PrintStatusMessage(0);
 	ClearDrag();
 	//org_data.PutMusic();//楽譜の再描画
 	ShowStatusMessage();
@@ -583,12 +554,7 @@ void ClickProcR(WPARAM wParam, LPARAM lParam)
 		Last_VOL_Drag_mouse_y = mouse_y;
 	}else if(mouse_y >=WHeight-13 && mouse_y<=WHeight-2){ //選択範囲
 		//DragStartx = mouse_x; //ドラッグ開始点
-		tra=-256;
-		//org_data.PutMusic();//楽譜の再描画
-		//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-		SetEZCWindowMessage("");
-		ClearDrag();
-		ShowStatusMessage();
+		SelectReset();
 	}
 
 	//以下はテスト用
@@ -648,17 +614,11 @@ void ClickProcM(WPARAM wParam, LPARAM lParam)
 			nc_Select.x1_2 = x2;
 			tra = NextTrack;
 			ful = (wParam & MK_CONTROL)? 1 : 0;
-			PrintStatusMessage(0);
 			org_data.RedrawSelectArea();
 			RedrawClick();
 		}else{
 			//選択範囲のｸﾘｱ
-			tra=-256;
-			//org_data.PutMusic();//楽譜の再描画
-			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-			SetEZCWindowMessage("");
-			ClearDrag();
-			ShowStatusMessage();
+			SelectReset();
 		}
 
 		//org_data.PutMusic();//楽譜の再描画

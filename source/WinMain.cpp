@@ -117,7 +117,7 @@ int CheckUpdate(bool act) {
 	} else {
 		char msg[256];
 		snprintf(msg, 256, "Version %s is now available. Would you like to download it?", s1.c_str());
-		int h = MessageBox(hWnd, msg, "OrgMaker Update", MB_ICONINFORMATION | MB_YESNO);
+		int h = MessageBox(hWnd, msg, "OrgMaker Update", MB_ICONINFORMATION | MB_OKCANCEL);
 		if (h == IDYES) {
 			snprintf(msg, 256, "https://github.com/Strultz/orgmaker-3/releases/tag/%s", s1.c_str());
 			ShellExecute(NULL, "open", msg, NULL, NULL, SW_SHOWNORMAL);
@@ -191,6 +191,8 @@ int sSmoothScroll = 0;
 extern int volChangeLength;
 extern bool volChangeUseNoteLength;
 extern bool volChangeSetNoteLength;
+
+static bool autoCheckUpdate = true;
 
 extern void LoadTrackBitmaps(HWND hdwnd);
 extern void LoadPlayerBitmaps(HWND hdwnd);
@@ -369,10 +371,10 @@ int previewOctave = 3;
 
 int iKeyPushDown[256]; // 2010.09.22 A
 
-char *strMIDIFile;
+char strMIDIFile[MAX_PATH];
 
-char *gSelectedTheme;
-char *gSelectedWave;
+char gSelectedTheme[MAX_PATH];
+char gSelectedWave[MAX_PATH];
 
 static HACCEL Ac;
 
@@ -513,9 +515,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	iCast[VK_OEM_PERIOD]=14; //.    B
 	iCast[VK_OEM_1]=15; //^   C
 	iCast[VK_OEM_2]=16; //:
-	strMIDIFile = (char *)malloc(MAX_PATH);
-	gSelectedTheme = (char *)malloc(MAX_PATH);
-	gSelectedWave = (char*)malloc(MAX_PATH);
     
 	LoadString(GetModuleHandle(NULL), IDS_TITLE, lpszName, sizeof(lpszName) / sizeof(lpszName[0]));
 
@@ -562,7 +561,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	}else{
 		lstrcat(app_path,".ini");
 	}
-	//NoteWidth = 16; //Frame designationš
+	//NoteWidth = 16; //Frame designation
 	NoteWidth =         GetPrivateProfileInt(MAIN_WINDOW,"NoteWidth",16,app_path);
 	NoteWidth = (NoteWidth > 16) ? 16: ( (NoteWidth<4) ? 4: NoteWidth );
 
@@ -583,29 +582,19 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	//GetPrivateProfileString(MIDI_EXPORT, "Author", "(C) AUTHOR xxxxx, 2014", strMIDI_AUTHOR, 255, app_path);	// 2045.01.18 D
 	GetPrivateProfileString(MIDI_EXPORT, "Author", strauthtmp, strMIDI_AUTHOR, 255, app_path);	// 2045.01.18 A
 	GetPrivateProfileString(MIDI_EXPORT, "Title", MessageString[IDS_DEFAULT_MIDI_TITLE], strMIDI_TITLE, 255, app_path);
-	for(i=0;i<8;i++)ucMIDIProgramChangeValue[i]=255;
+	for (i = 0; i < 8; i++) ucMIDIProgramChangeValue[i] = 255;
 
-	//SetWindowPos(hWnd,HWND_TOP,WinRect.left,WinRect.top,WinRect.right,WinRect.bottom,SWP_HIDEWINDOW);
+	unsigned long ul = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_THICKFRAME | WS_MAXIMIZEBOX;
 
-	unsigned long ul;
-	ul = WS_CAPTION|WS_MINIMIZEBOX|WS_SYSMENU|WS_THICKFRAME|WS_MAXIMIZEBOX;
-
-	//Generate main window
+	// main window
 	hWnd = CreateWindow(szClassName,
-			"OrgMaker 3",//Displayed "Name"
+			"OrgMaker 3",
 			ul,
-			//WS_CAPTION|WS_MINIMIZEBOX|WS_SYSMENU|WS_THICKFRAME|WS_MAXIMIZEBOX,
-//            WS_CAPTION|WS_VISIBLE|WS_SYSMENU,//window style
-/*
-            32,//Window's X
-			32,//Window's Y
-            wnd_width,//width
-            wnd_height,//height
-			*/
 			WinRect.left, WinRect.top, WinRect.right, WinRect.bottom,
             NULL, NULL, hInst, NULL);
 
-	if(!hWnd) return FALSE;
+	if (!hWnd)
+		return FALSE;
 
 	hwndRebar = CreateRebar(hWnd);
 	hwndStatus = CreateStatusBar(hWnd);
@@ -694,11 +683,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	EZCopyWindowState = GetPrivateProfileInt(COPY_WINDOW,"show",1,app_path);
 	if (EZCopyWindowState == 0) {
 		ShowWindow(hDlgEZCopy, SW_HIDE);
-		CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_UNCHECKED));
+		//CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_UNCHECKED));
 	}
 	else {
 		ShowWindow(hDlgEZCopy, SW_SHOWNOACTIVATE);
-		CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_CHECKED));
+		//CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_CHECKED));
 	}
 	SaveWithInitVolFile = GetPrivateProfileInt(INIT_DATA,"autosave",0,app_path);
 	ChangeAutoLoadMode(SaveWithInitVolFile);
@@ -721,6 +710,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	volChangeLength = GetPrivateProfileInt(MAIN_WINDOW, "VolChangeLength", 10, app_path);
 	volChangeUseNoteLength = GetPrivateProfileInt(MAIN_WINDOW, "VolChangeUseNoteLength", 1, app_path);
 	volChangeSetNoteLength = GetPrivateProfileInt(MAIN_WINDOW, "VolChangeSetNoteLength", 0, app_path);
+
+	autoCheckUpdate = GetPrivateProfileInt(MAIN_WINDOW, "AutoCheckUpdates", 1, app_path);
+
+	CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
 	
 	//org_data.PutMusic();//View sheet music
 
@@ -825,7 +818,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	org_data.PutMusic();
 	if (RefleshScreen(hWnd)) {
-		CheckUpdate(false);
+		if (autoCheckUpdate) {
+			CheckUpdate(false);
+		}
 
 		while (TRUE) {
 			org_data.PutMusic();
@@ -978,11 +973,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			if(EZCopyWindowState==0){
 				EZCopyWindowState=1;
 				ShowWindow(hDlgEZCopy, SW_SHOWNOACTIVATE);
-				CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_CHECKED));
+				//CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_CHECKED));
 			}else{
 				EZCopyWindowState=0;
 				ShowWindow(hDlgEZCopy, SW_HIDE);
-				CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_UNCHECKED));
+				//CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_UNCHECKED));
 			}
 		}
 		for(i=0;i<10;i++){	//recently used files
@@ -1682,6 +1677,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		case IDM_STOPNOWALL:
 		case ID_AC_KILLSOUND:
+			SelectReset();
 			StopPlayingSong();
 			Rxo_StopAllSoundNow();
 			memset(iKeyPhase, -1, sizeof(iKeyPhase));
@@ -1702,7 +1698,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 			//«	// 2010.12.01 A
 		case ID_AC_SELECT_CLEAR: //Clear selection
-			ClearEZC_Message();
+			SelectReset();
 			//org_data.PutMusic();
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			break;
@@ -1751,6 +1747,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		case IDM_CHECKUPD:
 			CheckUpdate(true);
+			break;
+		case IDM_AUTOCHECKUPDATES:
+			hMenu = GetMenu(hWnd);
+			autoCheckUpdate = !autoCheckUpdate;
+			CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
 			break;
 		}
 
@@ -1902,9 +1903,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		if(hDlgEZCopy) DestroyWindow(hDlgEZCopy);
 		if(hwnd) DestroyWindow(hwnd);
 		PostQuitMessage(0);
-		free(strMIDIFile); //2014.05.11
-		free(gSelectedTheme);
-		free(gSelectedWave);
 		FreeMessageStringBuffer();	// 2014.10.19 
 		break;
 	case WM_KEYDOWN://keyboard pressed
@@ -2276,6 +2274,8 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW, "VolChangeUseNoteLength", num_buf, app_path);
 	wsprintf(num_buf, "%d", volChangeSetNoteLength);
 	WritePrivateProfileString(MAIN_WINDOW, "VolChangeSetNoteLength", num_buf, app_path);
+	wsprintf(num_buf, "%d", autoCheckUpdate);
+	WritePrivateProfileString(MAIN_WINDOW, "AutoCheckUpdates", num_buf, app_path);
 
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentThemePath", gSelectedTheme, app_path);
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentWavePath", gSelectedWave, app_path);

@@ -948,9 +948,11 @@ BEGIN
         POPUP "&Preferences"
         BEGIN
             MENUITEM "Confirm &Unsaved Changes",    IDM_CHANGEFINISH
+            MENUITEM "&Auto Load/Save .pvi File", IDM_AUTOLOADPVI
+            MENUITEM "&Automatically Check for Updates", IDM_AUTOCHECKUPDATES
+            MENUITEM SEPARATOR
             MENUITEM "Allow Keyboard During &Playback", IDM_ENABLEPLAYING
-            MENUITEM "&Auto Load/Save .pvi File",   IDM_AUTOLOADPVI
-            MENUITEM "&Playback Smooth Scrolling",  IDM_SMOOTHSCROLL
+            MENUITEM "&Playback Smooth Scrolling", IDM_SMOOTHSCROLL
             MENUITEM "Extend &Note Heads",          IDM_NOTE_ENLARGE
             MENUITEM "S&lide Overlapping Notes",    IDM_SLIDEOVERLAPNOTES
             MENUITEM "Show &All Tracks",            IDM_DRAWDOUBLE
@@ -1093,7 +1095,7 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "041104b0"
+        BLOCK "040904E4"
         BEGIN
             VALUE "Comments", "Please ignore the rough parts."
             VALUE "CompanyName", "No extra taste."
@@ -1107,7 +1109,7 @@ BEGIN
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x409, 1200
+        VALUE "Translation", 0x409, 1252
     END
 END
 
@@ -1188,7 +1190,6 @@ BEGIN
     "U",            ID_AC_CT_KEY_UP,        VIRTKEY, SHIFT, CONTROL, NOINVERT
     VK_ADD,         ID_AC_NUMPLUS,          VIRTKEY, NOINVERT
     VK_BACK,        ID_AC_SELECT_BACKDEL,   VIRTKEY, NOINVERT
-    VK_DECIMAL,     ID_AC_SELECT_CLEAR,     VIRTKEY, NOINVERT
     VK_DELETE,      ID_AC_DELETEKEY,        VIRTKEY, NOINVERT
     VK_DELETE,      ID_AC_DELETE,           VIRTKEY, CONTROL, NOINVERT
     VK_ESCAPE,      ID_AC_KILLSOUND,        VIRTKEY, NOINVERT

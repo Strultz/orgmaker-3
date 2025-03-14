@@ -47,7 +47,7 @@ extern int sACrnt;	//”ÍˆÍ‘I‘ğ‚Íí‚É¶ÚİÄÄ×¯¸
 extern int tra, ful ,haba; 
 extern void SetEZCWindowMessage(char *Mess);
 extern char TrackN[];
-extern char* gSelectedTheme;
+extern char gSelectedTheme[MAX_PATH];
 
 void ChangeTrackPlus(int iValue){
 	char str[8];

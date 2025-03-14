@@ -19,7 +19,7 @@ static void CreateToolbar(HWND hwndRebar, const char *iconBitmap, int buttonCoun
     bool rebar = true;
     if (!hwndRebar) {
         rebar = false;
-        hwndRebar = CreateWindow(szTbClassName, toolbarName, WS_VISIBLE | WS_POPUP | WS_BORDER | WS_CAPTION, 0, 0, 0, 0, hWnd, NULL, hInst, NULL);
+        hwndRebar = CreateWindowEx(WS_EX_PALETTEWINDOW, szTbClassName, toolbarName, WS_VISIBLE | WS_POPUP | WS_BORDER | WS_CAPTION, 0, 0, 0, 0, hWnd, NULL, hInst, NULL);
         if (!hwndRebar) {
             return;
         }
@@ -36,7 +36,7 @@ static void CreateToolbar(HWND hwndRebar, const char *iconBitmap, int buttonCoun
     HBITMAP hBmp = LoadBitmap(hInst, iconBitmap);
     ImageList_AddMasked(hImageList, hBmp, RGB(0xFF, 0x00, 0xFF));
 
-    SendMessage(hWndToolbar, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_HIDECLIPPEDBUTTONS);
+    SendMessage(hWndToolbar, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS);
 
     SendMessage(hWndToolbar, TB_SETIMAGELIST, (WPARAM)0, (LPARAM)hImageList);
     SendMessage(hWndToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
@@ -73,7 +73,7 @@ static void CreateToolbar(HWND hwndRebar, const char *iconBitmap, int buttonCoun
         SendMessage(hwndRebar, RB_INSERTBAND, (WPARAM)-1, (LPARAM)&rbBand);
     } else {
         RECT wr = { 0, 0, s.cx, s.cy };
-        AdjustWindowRect(&wr, WS_VISIBLE | WS_POPUP | WS_BORDER | WS_CAPTION, FALSE);
+        AdjustWindowRectEx(&wr, WS_VISIBLE | WS_POPUP | WS_BORDER | WS_CAPTION, FALSE, WS_EX_PALETTEWINDOW);
         SetWindowPos(hwndRebar, HWND_TOP, 200, 200, wr.right - wr.left, wr.bottom - wr.top, 0);
 
         SetWindowPos(hWndToolbar, HWND_TOP, 0, 0, s.cx, s.cy, 0);
@@ -91,7 +91,7 @@ HWND CreateRebar(HWND hwnd)
     InitCommonControlsEx(&icex);
 
     HWND hwndRebar = CreateWindowEx(WS_EX_TOOLWINDOW, REBARCLASSNAME, NULL,
-        WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_BORDER | RBS_AUTOSIZE | RBS_BANDBORDERS | CCS_NODIVIDER,
+        WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_BORDER | RBS_AUTOSIZE | CCS_NODIVIDER,
         0, 0, 0, 0, hwnd, NULL, hInst, NULL);
 
     RECT rcWindow;

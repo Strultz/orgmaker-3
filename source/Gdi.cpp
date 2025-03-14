@@ -33,7 +33,7 @@ extern int rebarHeight;
 extern RECT WinRect; //ウィンドウサイズ保存用 A 2010.09.22
 extern int NoteWidth;
 extern int NoteEnlarge_Until_16px;
-extern char* gSelectedTheme;
+extern char gSelectedTheme[MAX_PATH];
 
 BOOL StartGDI(HWND hwnd) {
 	int nScreenWidth = GetSystemMetrics(SM_CXMAXTRACK);

@@ -24,8 +24,8 @@
 #define maxx(a, b) ((a) > (b) ? (a) : (b))
 
 extern HWND hDlgEZCopy;
-extern char* gSelectedTheme;
-extern char* gSelectedWave;
+extern char gSelectedTheme[MAX_PATH];
+extern char gSelectedWave[MAX_PATH];
 
 extern char TrackN[];
 
@@ -220,6 +220,33 @@ void InitSettingDialog(HWND hdwnd)
 	a = mi.end_x % (mi.dot * mi.line);
 	itoa(a, str, 10);
 	SetDlgItemText(hdwnd, IDD_END_BEAT, str);
+
+	HWND w = GetDlgItem(hdwnd, IDC_WAITSPIN);
+	SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(2000, 1));
+	SendMessage(w, UDM_SETPOS, 0, mi.wait);
+	w = GetDlgItem(hdwnd, IDC_BPMSPIN);
+	SendMessage(w, UDM_SETRANGE32, 1, 60000);
+	SendMessage(w, UDM_SETPOS32, 0, (mi.wait > 0 && mi.dot > 0) ? (int)(60000.0 / (double)(mi.wait * mi.dot)) : 0);
+
+	w = GetDlgItem(hdwnd, IDC_BPMSPIN2);
+	SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(99, 1));
+	SendMessage(w, UDM_SETPOS, 0, mi.line);
+	w = GetDlgItem(hdwnd, IDC_BPMSPIN3);
+	SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(99, 1));
+	SendMessage(w, UDM_SETPOS, 0, mi.dot);
+
+	w = GetDlgItem(hdwnd, IDC_STARTMEASSPIN);
+	SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(999, 1));
+	SendMessage(w, UDM_SETPOS, 0, (mi.dot > 0) ? mi.repeat_x / mi.dot : 0);
+	w = GetDlgItem(hdwnd, IDC_STARTSPIN);
+	SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(9801, 1));
+	SendMessage(w, UDM_SETPOS, 0, (mi.dot > 0) ? mi.repeat_x % mi.dot : 0);
+	w = GetDlgItem(hdwnd, IDC_ENDMEASSPIN);
+	SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(999, 1));
+	SendMessage(w, UDM_SETPOS, 0, (mi.dot > 0) ? mi.end_x / mi.dot : 0);
+	w = GetDlgItem(hdwnd, IDC_ENDSPIN);
+	SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(9801, 1));
+	SendMessage(w, UDM_SETPOS, 0, (mi.dot > 0) ? mi.end_x % mi.dot : 0);
 }
 
 //ウエイトの設定
@@ -587,7 +614,7 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 
 					snprintf(str, 128, "%.3f", iBPM);
 					SetDlgItemText(hdwnd, IDC_BPM, str);
-					SendMessage(lpnm->hwndFrom, UDM_SETPOS, 0, (int)iBPM);
+					SendMessage(lpnm->hwndFrom, UDM_SETPOS32, 0, (int)iBPM);
 				}
 
 				PropSheet_Changed(GetParent(hdwnd), hdwnd);
@@ -1162,6 +1189,15 @@ BOOL CALLBACK DialogPerc(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+int WINAPI SheetCallback(HWND hwnd, UINT uMsg, LPARAM lParam)
+{
+	if (uMsg == PSCB_BUTTONPRESSED && (lParam == PSBTN_APPLYNOW || lParam == PSBTN_OK)) {
+		SetUndo();
+	}
+
+	return 0;
+}
+
 void OpenSongProperties(HWND hwnd) {
 	PROPSHEETPAGE psp[3];
     
@@ -1193,14 +1229,14 @@ void OpenSongProperties(HWND hwnd) {
     psp[2].pfnCallback = NULL;
     
     psh.dwSize      = sizeof(PROPSHEETHEADER);
-    psh.dwFlags     = PSH_PROPSHEETPAGE | PSH_NOCONTEXTHELP;
+    psh.dwFlags     = PSH_PROPSHEETPAGE | PSH_NOCONTEXTHELP | PSH_USECALLBACK;
     psh.hwndParent  = hwnd;
     psh.hInstance   = hInst;
     psh.pszCaption  = "Song Properties";
     psh.nPages      = sizeof(psp) / sizeof(PROPSHEETPAGE);
     psh.nStartPage  = 0;
     psh.ppsp        = (LPCPROPSHEETPAGE)&psp;
-	psh.pfnCallback = NULL;
+	psh.pfnCallback = SheetCallback;
     
     PropertySheet(&psh);
 }
