@@ -968,6 +968,7 @@ int AllocMessageStringBuffer(void)
 	TCHAR *ptr, *p;
 	if(MessageStringBuffer == NULL){
 		MessageStringBuffer = (TCHAR *)calloc(MESSAGE_STRING_BUFFER_SIZE, sizeof(TCHAR));
+		if (MessageStringBuffer == NULL) return 0;
 	}
 	for(i = 0; i < MESSAGE_STRING_MAX; i++){
 		MessageString[i] = NULL;
@@ -999,5 +1000,255 @@ int AllocMessageStringBuffer(void)
 	//for(ptr = MessageString[110]; *ptr != 0; ptr++)if(*ptr == '!')*ptr = 0;
 	//for(ptr = MessageString[111]; *ptr != 0; ptr++)if(*ptr == '!')*ptr = 0;
 	return 0;
+}
+
+void EZ_Delete()
+{
+	if (tra < 0) {
+		//wsprintf(CpHelp, MessageString[IDS_STRING67]); //"範囲が指定されていない。"
+		return;
+	}
+	//int anss;
+	//anss = MessageBox(hWnd,"消去範囲は正しいですか？","確認",MB_OKCANCEL|MB_ICONEXCLAMATION);
+	//if(anss!=IDOK)return;
+	PARCHANGE pc1;
+	long scr_h, scr_v, lash;
+	scr_data.GetScrollPosition(&scr_h, &scr_v);
+	RECT rect = { 64,0,WWidth,WHeight };//更新する領域(トラック変更)
+	//char str[5];
+	char mss[255], mks[512];
+	MUSICINFO mi;
+	org_data.GetMusicInfo(&mi);
+	//GetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,str,4);//範囲from
+	nc_Select.x2 = scr_h; //ここにコピー
+	nc_Select.num = 1;
+	int t;
+	if (ful == 1) {
+		int j1, j2;
+		if (sACrnt == 0) {
+			j1 = 0; j2 = MAXTRACK;
+		}
+		else {
+			if (org_data.track < MAXMELODY) {
+				j1 = 0; j2 = MAXMELODY;
+			}
+			else {
+				j1 = MAXMELODY; j2 = MAXTRACK;
+			}
+		}
+		for (t = j1;t < j2;t++) {
+			pc1.track = t;
+			pc1.x1 = nc_Select.x1_1;
+			pc1.x2 = nc_Select.x1_2;
+			org_data.DelateNoteData(&pc1);
+			org_data.CheckNoteTail(t);
+		}
+	}
+	else {
+		pc1.track = tra;
+		pc1.x1 = nc_Select.x1_1;
+		pc1.x2 = nc_Select.x1_2;
+		org_data.DelateNoteData(&pc1);
+		org_data.CheckNoteTail(tra);
+
+	}
+	//MessageBox(NULL,"コピーしました","通知",MB_OK);
+	//org_data.PutMusic();
+	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+	lash = scr_h / (mi.dot * mi.line) + haba;
+	wsprintf(mss, MessageString[IDS_STRING68]);//"　消去しました。"
+
+
+	/*strcpy(mks, CpHelp);
+	strcat(mks, mss);
+	SetDlgItemText(hDlgEZCopy, IDC_COPYNOTION, mks);*/
+
+}
+
+void EZ_DeleteAndTrim()
+{
+	NOTECOPY  delNC, tmpNC;
+	delNC.num = 1;
+	long scr_h, scr_v, lash;
+	char mss[255], mks[512];
+	MUSICINFO mi;
+	int tmptra, tmpful, tmpsACrnt;
+	PARCHANGE pc1;
+
+	scr_data.GetScrollPosition(&scr_h, &scr_v);
+	RECT rect = { 64,0,WWidth,WHeight };//更新する領域(トラック変更)
+	org_data.GetMusicInfo(&mi);
+	//GetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,str,4);//範囲from
+	delNC.x2 = scr_h; //ここにコピー
+	if (tra < 0) {
+		//wsprintf(CpHelp, MessageString[IDS_STRING69]); //"範囲が指定されていないので 画面左端から 1ドットを"
+		//wsprintf(CpHelp,"範囲が指定されていない。");
+		//PrintCpHelp();
+		//return;
+		tmptra = org_data.track;
+		tmpful = 1;
+		tmpsACrnt = sACrnt;
+		delNC.x1_1 = scr_h;
+		//delNC.x1_2 = delNC.x1_1 + mi.dot - 1;	// 2014.05.31 D
+		delNC.x1_2 = delNC.x1_1;	// 2014.05.31 A
+
+	}
+	else {
+		delNC.x1_1 = nc_Select.x1_1;
+		delNC.x1_2 = nc_Select.x1_2;
+		tmptra = tra;
+		tmpful = ful;
+		tmpsACrnt = sACrnt;
+	}
+	tmpNC.x1_1 = delNC.x1_2 + 1;
+	tmpNC.x1_2 = 512 * mi.dot * mi.line;
+	tmpNC.x2 = delNC.x1_1;
+	tmpNC.num = 1;
+	//int anss;
+	//anss = MessageBox(hWnd,"消去範囲は正しいですか？","確認",MB_OKCANCEL|MB_ICONEXCLAMATION);
+	//if(anss!=IDOK)return;
+	//char str[5];
+	int t;
+	if (tmpful == 1) {
+		int j1, j2;
+		if (tmpsACrnt == 0) {
+			j1 = 0; j2 = MAXTRACK;
+		}
+		else {
+			if (org_data.track < MAXMELODY) {
+				j1 = 0; j2 = MAXMELODY;
+			}
+			else {
+				j1 = MAXMELODY; j2 = MAXTRACK;
+			}
+		}
+		for (t = j1;t < j2;t++) {
+			pc1.track = t;
+			pc1.x1 = delNC.x1_1;
+			pc1.x2 = delNC.x1_2;
+			org_data.DelateNoteData(&pc1);
+			org_data.CheckNoteTail(t);
+			tmpNC.track1 = t;
+			tmpNC.track2 = t;
+			org_data.CopyNoteData(&tmpNC);
+			org_data.CheckNoteTail(t);
+		}
+	}
+	else {
+		pc1.track = tmptra;
+		pc1.x1 = delNC.x1_1;
+		pc1.x2 = delNC.x1_2;
+		org_data.DelateNoteData(&pc1);
+		org_data.CheckNoteTail(tmptra);
+		tmpNC.track1 = tmptra;
+		tmpNC.track2 = tmptra;
+		org_data.CopyNoteData(&tmpNC);
+		org_data.CheckNoteTail(tmptra);
+
+	}
+
+	//MessageBox(NULL,"コピーしました","通知",MB_OK);
+	//org_data.PutMusic();
+	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+	lash = scr_h / (mi.dot * mi.line) + haba;
+	wsprintf(mss, MessageString[IDS_STRING70]); //"　消去し、詰めました。"
+
+	/*strcpy(mks, CpHelp);
+	strcat(mks, mss);
+	SetDlgItemText(hDlgEZCopy, IDC_COPYNOTION, mks);*/
+
+}
+
+
+void EZ_Insert()
+{
+	NOTECOPY  delNC, tmpNC;
+	delNC.num = 1;
+	long scr_h, scr_v, lash;
+	char mss[255], mks[512];
+	int tmptra, tmpful, tmpsACrnt;
+	MUSICINFO mi;
+	PARCHANGE pc1;
+	scr_data.GetScrollPosition(&scr_h, &scr_v);
+	RECT rect = { 64,0,WWidth,WHeight };//更新する領域(トラック変更)
+	org_data.GetMusicInfo(&mi);
+	//GetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,str,4);//範囲from
+	delNC.x2 = scr_h; //ここにコピー
+	if (tra < 0) {
+		//wsprintf(CpHelp, MessageString[IDS_STRING69]); //"範囲が指定されていないので 画面左端から 1ドットを"
+		//wsprintf(CpHelp,"範囲が指定されていない。");
+		//PrintCpHelp();
+		//return;
+		tmptra = org_data.track;
+		tmpful = 1;
+		tmpsACrnt = sACrnt;
+		delNC.x1_1 = scr_h;
+		//delNC.x1_2 = delNC.x1_1 + mi.dot - 1;	// 2014.05.31 D
+		delNC.x1_2 = delNC.x1_1;	// 2014.05.31 A
+	}
+	else {
+		delNC.x1_1 = nc_Select.x1_1;
+		delNC.x1_2 = nc_Select.x1_2;
+		tmptra = tra;
+		tmpful = ful;
+		tmpsACrnt = sACrnt;
+	}
+	tmpNC.x1_1 = delNC.x1_1;
+	tmpNC.x1_2 = 512 * mi.dot * mi.line;
+	tmpNC.x2 = delNC.x1_2 + 1;
+	tmpNC.num = 1;
+	//int anss;
+	//anss = MessageBox(hWnd,"消去範囲は正しいですか？","確認",MB_OKCANCEL|MB_ICONEXCLAMATION);
+	//if(anss!=IDOK)return;
+	//char str[5];
+	int t;
+	if (tmpful == 1) {
+		int j1, j2;
+		if (tmpsACrnt == 0) {
+			j1 = 0; j2 = MAXTRACK;
+		}
+		else {
+			if (org_data.track < MAXMELODY) {
+				j1 = 0; j2 = MAXMELODY;
+			}
+			else {
+				j1 = MAXMELODY; j2 = MAXTRACK;
+			}
+		}
+		for (t = j1;t < j2;t++) {
+			pc1.track = t;
+			pc1.x1 = delNC.x1_1;
+			pc1.x2 = delNC.x1_2;
+			tmpNC.track1 = t;
+			tmpNC.track2 = t;
+			org_data.CopyNoteData(&tmpNC);
+			org_data.CheckNoteTail(t);
+			org_data.DelateNoteData(&pc1);
+			org_data.CheckNoteTail(t);
+		}
+	}
+	else {
+		pc1.track = tmptra;
+		pc1.x1 = delNC.x1_1;
+		pc1.x2 = delNC.x1_2;
+		tmpNC.track1 = tmptra;
+		tmpNC.track2 = tmptra;
+		org_data.CopyNoteData(&tmpNC);
+		org_data.CheckNoteTail(tmptra);
+		org_data.DelateNoteData(&pc1);
+		org_data.CheckNoteTail(tmptra);
+
+	}
+
+	//MessageBox(NULL,"コピーしました","通知",MB_OK);
+	//org_data.PutMusic();
+	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+	lash = scr_h / (mi.dot * mi.line) + haba;
+	wsprintf(mss, MessageString[IDS_STRING71]);//"　後ろにずらしました。"
+
+	/*strcpy(mks, CpHelp);
+	strcat(mks, mss);
+	SetDlgItemText(hDlgEZCopy, IDC_COPYNOTION, mks);*/
+
 }
 

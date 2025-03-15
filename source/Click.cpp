@@ -17,8 +17,7 @@ extern void ResetLastUndo(); //取りけし
 extern HWND hwndToolbar;
 
 extern NOTECOPY nc_Select; //選択範囲
-extern int tra, ful, haba; 
-extern void ClearEZC_Message(void);
+extern int tra, ful, haba;
 
 long Last_mouse_x = -99999;	//同位置の複数クリックはアンドゥとして記録しない。
 long Last_mouse_y = -99999;
@@ -70,7 +69,8 @@ void SelectReset()
 	tra = -256;
 	DragStartx = -99999;
 	RedrawClick();
-	ClearEZC_Message();
+	UpdateToolbarStatus();
+	UpdateStatusBar(false);
 }
 
 void PrintStatusMessage(int Zensentaku){

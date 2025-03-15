@@ -23,7 +23,7 @@
 #define MAXWAVE		100
 #define maxx(a, b) ((a) > (b) ? (a) : (b))
 
-extern HWND hDlgEZCopy;
+//extern HWND hDlgEZCopy;
 extern char gSelectedTheme[MAX_PATH];
 extern char gSelectedWave[MAX_PATH];
 
@@ -105,7 +105,6 @@ int SamplePlayHeight = 36; //サンプル音を鳴らす高さ
 int SaveWithInitVolFile;	//曲データと…セーブするか。
 
 extern HINSTANCE hInst;//インスタンスハンドル
-extern void ClearEZC_Message(); //EZメッセージと範囲を消す
 extern void ReloadBitmaps();
 extern void GetApplicationPath(char* path);
 
@@ -152,7 +151,7 @@ void EnableDialogWindow(int iValue = TRUE)
 {
 	//EnableWindow(hDlgPlayer,iValue);
 	//EnableWindow(hDlgTrack,iValue);
-	EnableWindow(hDlgEZCopy,iValue);
+	//EnableWindow(hDlgEZCopy,iValue);
 
 }
 

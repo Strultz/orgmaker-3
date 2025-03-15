@@ -45,7 +45,6 @@ extern char timer_sw;
 extern HWND hWnd;
 extern int sACrnt;	//範囲選択は常にｶﾚﾝﾄﾄﾗｯｸ
 extern int tra, ful ,haba; 
-extern void SetEZCWindowMessage(char *Mess);
 extern char TrackN[];
 extern char gSelectedTheme[MAX_PATH];
 
@@ -66,7 +65,7 @@ void ChangeTrackPlus(int iValue){
 	//選択トラック表示
 	itoa(org_data.track,str,10);
 	
-	if(sACrnt){
+	/*if (sACrnt) {
 		if(tra>=0){
 			tra = org_data.track;
 			char wk[256],wk2[256];
@@ -84,7 +83,7 @@ void ChangeTrackPlus(int iValue){
 				SetEZCWindowMessage(wk);
 			}
 		}
-	}
+	}*/
 
 	//SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,TrackCode[org_data.track]);
 	//SetDlgItemText(hdwnd,IDE_VIEWTRACK,str);
@@ -115,7 +114,7 @@ void ChangeTrack(int iTrack){
 		}
 	}
 	//選択トラック表示
-	itoa(org_data.track,str,10);
+	/*itoa(org_data.track, str, 10);
 	if(sACrnt){
 		if(tra>=0){
 			tra = org_data.track;
@@ -134,7 +133,7 @@ void ChangeTrack(int iTrack){
 				SetEZCWindowMessage(wk);
 			}
 		}
-	}
+	}*/
 	//SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,TrackCode[org_data.track]);
 	//SetDlgItemText(hdwnd,IDE_VIEWTRACK,str);
 	//org_data.PutMusic();

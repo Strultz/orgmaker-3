@@ -91,3 +91,7 @@ extern int NoteEnlarge_Until_16px; //•\¦‚ÌÛANOTE‚Ì“ª‚ğÅ‘å16ƒsƒNƒZƒ‹‚Ü‚ÅL‚Î‚
 extern void ChangeNoteEnlarge(int iValue = -1);
 extern int iPushStratch;
 extern int iLastEditNoteLength;
+
+void EZ_Delete();
+void EZ_DeleteAndTrim();
+void EZ_Insert();

@@ -27,6 +27,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include <CommCtrl.h>
 #include <wininet.h>
 #include <string>
+#include <thread>
 
 #include "Setting.h"
 #include "DefOrg.h"
@@ -46,9 +47,14 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #include "Toolbar.h"
 
-int CheckUpdate(bool act) {
-	// TODO: Put this on another thread
-	// Also TODO: Add an option to disable this check on startup
+#define OWM_UPDATESTATUS (WM_USER + 1)
+
+static char tVerName[64];
+static bool canUpdateCheck = true;
+
+void CheckUpdate(bool act) {
+	if (!canUpdateCheck) return;
+	canUpdateCheck = false;
 
 	HINTERNET hSession = NULL, hConnect = NULL, hRequest = NULL;
 	BOOL bResult = FALSE;
@@ -57,22 +63,25 @@ int CheckUpdate(bool act) {
 
 	hSession = InternetOpen("OrgMaker/3.x", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
 	if (hSession == NULL) {
-		return 1;
+		canUpdateCheck = true;
+		return;
 	}
 
 	hConnect = InternetConnect(hSession, "api.github.com", INTERNET_DEFAULT_HTTP_PORT, NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
 	if (hConnect == NULL) {
 		InternetCloseHandle(hSession);
-		if (act) MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
-		return 1;
+		if (act) PostMessage(hWnd, OWM_UPDATESTATUS, 1, 0); //MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
+		canUpdateCheck = true;
+		return;
 	}
 
 	hRequest = HttpOpenRequest(hConnect, "GET", "/repos/Strultz/orgmaker-3/releases/latest", NULL, NULL, NULL, 0, 0);
 	if (hRequest == NULL) {
 		InternetCloseHandle(hConnect);
 		InternetCloseHandle(hSession);
-		if (act) MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
-		return 1;
+		if (act) PostMessage(hWnd, OWM_UPDATESTATUS, 1, 0); //MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
+		canUpdateCheck = true;
+		return;
 	}
 
 	bResult = HttpSendRequest(hRequest, NULL, 0, NULL, 0);
@@ -80,8 +89,9 @@ int CheckUpdate(bool act) {
 		InternetCloseHandle(hRequest);
 		InternetCloseHandle(hConnect);
 		InternetCloseHandle(hSession);
-		if (act) MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
-		return 1;
+		if (act) PostMessage(hWnd, OWM_UPDATESTATUS, 1, 0); //MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
+		canUpdateCheck = true;
+		return;
 	}
 
 	std::string content;
@@ -96,8 +106,9 @@ int CheckUpdate(bool act) {
 	// I'm not adding some large ass json library so this is what you get
 	size_t f = content.find("\"tag_name\":");
 	if (f == std::string::npos) {
-		if (act) MessageBox(hWnd, "Recieved invalid response from server. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
-		return 2;
+		if (act) PostMessage(hWnd, OWM_UPDATESTATUS, 2, 0);
+		canUpdateCheck = true;
+		return;
 	}
 
 	std::string s1 = content.substr(f + 12);
@@ -105,26 +116,24 @@ int CheckUpdate(bool act) {
 
 	size_t nq = s1.find_first_of('\"');
 	if (f == std::string::npos) {
-		if (act) MessageBox(hWnd, "Recieved invalid response from server. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
-		return 2;
+		if (act) PostMessage(hWnd, OWM_UPDATESTATUS, 2, 0);
+		canUpdateCheck = true;
+		return;
 	}
 
 	s1 = s1.substr(0, nq);
 
 	// Now we have the tag name
 	if (s1 == "3.1.0") {
-		if (act) MessageBox(hWnd, "No updates are available.", "OrgMaker Update", MB_ICONINFORMATION | MB_OK);
+		if (act) PostMessage(hWnd, OWM_UPDATESTATUS, 3, 0); //MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
+		canUpdateCheck = true;
+		return;
 	} else {
-		char msg[256];
-		snprintf(msg, 256, "Version %s is now available. Would you like to download it?", s1.c_str());
-		int h = MessageBox(hWnd, msg, "OrgMaker Update", MB_ICONINFORMATION | MB_OKCANCEL);
-		if (h == IDYES) {
-			snprintf(msg, 256, "https://github.com/Strultz/orgmaker-3/releases/tag/%s", s1.c_str());
-			ShellExecute(NULL, "open", msg, NULL, NULL, SW_SHOWNORMAL);
-		}
+		strncpy(tVerName, s1.c_str(), 64);
+		PostMessage(hWnd, OWM_UPDATESTATUS, 0, (LPARAM)tVerName);
 	}
-
-	return 0;
+	canUpdateCheck = true;
+	return;
 }
 
 //main procedure
@@ -159,7 +168,7 @@ void SetModified(bool mod);
 HINSTANCE hInst;//instance handle
 HWND hWnd;//main window handle
 //HWND hDlgTrack;
-HWND hDlgEZCopy;
+//HWND hDlgEZCopy;
 HWND hDlgHelp = NULL;
 BOOL actApp;
 
@@ -199,8 +208,7 @@ extern void LoadPlayerBitmaps(HWND hdwnd);
 extern void ChangeTrack(int iTrack);
 extern void ChangeTrackPlus(int iValue);
 extern char timer_sw; //Playing?
-extern int EZCopyWindowState; //Easy copy status
-extern void ClearEZC_Message(); //Erase EZ messages and ranges
+//extern int EZCopyWindowState; //Easy copy status
 extern RECT CmnDialogWnd;
 extern int SaveWithInitVolFile;	//Song data and... save.
 extern int Menu_Recent[];
@@ -331,15 +339,24 @@ void UpdateStatusBar(bool measonly) {
 
 	if (!measonly) {
 		snprintf(msg, 256, "Channel %s", TrackCode[org_data.track]);
-		SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)msg);
+		SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)msg);
 
 		snprintf(msg, 256, "Wait: %d (%.3f BPM)", mi.wait, mi.wait <= 0 || mi.dot <= 0 ? 0 : 60000.0 / (double)(mi.wait * mi.dot));
-		SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)msg);
+		SendMessage(hwndStatus, SB_SETTEXT, 3, (LPARAM)msg);
 	}
 
 	snprintf(msg, 256, "Meas %d:%d", meas, step);
-	SendMessage(hwndStatus, SB_SETTEXT, 3, (LPARAM)msg);
+	SendMessage(hwndStatus, SB_SETTEXT, 4, (LPARAM)msg);
 
+	switch (NoteWidth) {
+	case 4:		SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 25%"); break;
+	case 6:		SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 37.5%"); break;
+	case 8:		SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 50%"); break;
+	case 10:	SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 62.5%"); break;
+	case 12:	SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 75%"); break;
+	case 14:	SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 87.5%"); break;
+	case 16:	SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 100%"); break;
+	}
 }
 
 void SaveIniFile();
@@ -665,7 +682,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	
 	//hDlgPlayer = CreateDialog(hInst,"PLAYER",hWnd,DialogPlayer);
 	//hDlgTrack = CreateDialog(hInst,"TRACK",hWnd,DialogTrack);
-	hDlgEZCopy = CreateDialog(hInst,"COPYBD",hWnd,DialogEZCopy);
+	//hDlgEZCopy = CreateDialog(hInst,"COPYBD",hWnd,DialogEZCopy);
 
 	HMENU hMenu;
 	hMenu = GetMenu(hWnd);
@@ -679,7 +696,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	SetWindowPos(hDlgPlayer,NULL,WinRect.left,WinRect.top,0,0,SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);*/
 	WinRect.left=GetPrivateProfileInt(COPY_WINDOW,"left",180,app_path);
 	WinRect.top=GetPrivateProfileInt(COPY_WINDOW,"top",380,app_path);
-	SetWindowPos(hDlgEZCopy,NULL,WinRect.left,WinRect.top,0,0,SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);
+	/*SetWindowPos(hDlgEZCopy, NULL, WinRect.left, WinRect.top, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);
 	EZCopyWindowState = GetPrivateProfileInt(COPY_WINDOW,"show",1,app_path);
 	if (EZCopyWindowState == 0) {
 		ShowWindow(hDlgEZCopy, SW_HIDE);
@@ -688,7 +705,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	else {
 		ShowWindow(hDlgEZCopy, SW_SHOWNOACTIVATE);
 		//CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_CHECKED));
-	}
+	}*/
 	SaveWithInitVolFile = GetPrivateProfileInt(INIT_DATA,"autosave",0,app_path);
 	ChangeAutoLoadMode(SaveWithInitVolFile);
 	org_data.InitOrgData();
@@ -714,6 +731,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	autoCheckUpdate = GetPrivateProfileInt(MAIN_WINDOW, "AutoCheckUpdates", 1, app_path);
 
 	CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
+
+	if (GetPrivateProfileInt(MAIN_WINDOW, "UserExists", 0, app_path) == 0) {
+		// TODO
+	}
 	
 	//org_data.PutMusic();//View sheet music
 
@@ -771,7 +792,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 				//SetDlgItemInt(hDlgTrack, IDE_VIEWWAIT, mi.wait, TRUE);
 				//SetDlgItemText(hDlgTrack, IDE_VIEWTRACK, "1");
 				UpdateStatusBar(false);
-				ClearEZC_Message();
 				SelectReset();
 				//org_data.PutMusic();
 			}
@@ -819,7 +839,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	org_data.PutMusic();
 	if (RefleshScreen(hWnd)) {
 		if (autoCheckUpdate) {
-			CheckUpdate(false);
+			std::thread t(CheckUpdate, false);
+			t.detach();
 		}
 
 		while (TRUE) {
@@ -868,11 +889,9 @@ BOOL SystemTask(void)
 		if (!TranslateAccelerator(hWnd, Ac, &msg)) {
 			if (!hwndToolbarPopup || !IsDialogMessage(hwndToolbarPopup, &msg)) {
 				if (!hwndTrackbarPopup || !IsDialogMessage(hwndTrackbarPopup, &msg)) {
-					if (!hDlgEZCopy || !IsDialogMessage(hDlgEZCopy, &msg)) {
-						if (!hDlgHelp || !IsDialogMessage(hDlgHelp, &msg)) {
-							TranslateMessage(&msg);
-							DispatchMessage(&msg);
-						}
+					if (!hDlgHelp || !IsDialogMessage(hDlgHelp, &msg)) {
+						TranslateMessage(&msg);
+						DispatchMessage(&msg);
 					}
 				}
 			}
@@ -882,7 +901,28 @@ BOOL SystemTask(void)
 	return TRUE;
 }
 
-void ShowStatusMessage(void);
+void ShowStatusMessage(void)
+{
+	/*char Mess[16];
+	if(sACrnt)strcpy(Mess,"Current");
+	else strcpy(Mess,"");
+	SetDlgItemText(hDlgEZCopy, IDC_STATUS1, Mess);
+
+	if(sGrid)strcpy(Mess,"Grid");
+	else strcpy(Mess,"");
+	SetDlgItemText(hDlgEZCopy, IDC_STATUS2, Mess);
+
+	if(iDragMode)strcpy(Mess,"Drag");
+	else strcpy(Mess,"");
+	SetDlgItemText(hDlgEZCopy, IDC_STATUS3, Mess);*/
+
+	UpdateToolbarStatus();
+	UpdateStatusBar(false);
+
+
+	//SetDlgItemText(hDlgEZCopy, IDC_STATUS, Mess);
+
+}
 
 LRESULT CALLBACK AreaWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -911,6 +951,56 @@ LRESULT CALLBACK AreaWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
+void ClipboardPaste(int no) {
+	if (gClipboardData.track1 == -1) {
+		return;
+	}
+
+	long x_scroll;
+	scr_data.GetScrollPosition(&x_scroll, NULL);
+
+	org_data.SetUndoData();
+
+	nc_Select.x1_1 = (tra >= 0 && nc_Select.x1_1 == nc_Select.x1_2) ? nc_Select.x1_1 : x_scroll;
+	nc_Select.x1_2 = nc_Select.x1_1 + gClipboardData.length - 1;
+	org_data.PasteNoteData(&gClipboardData, org_data.track, nc_Select.x1_1, no);
+
+	if (gClipboardData.track1 == gClipboardData.track2) {
+		org_data.CheckNoteTail(org_data.track);
+		tra = org_data.track;
+		ful = 0;
+	}
+	else {
+		for (int i = gClipboardData.track1; i <= gClipboardData.track2; ++i) {
+			org_data.CheckNoteTail(i);
+		}
+		tra = gClipboardData.track1;
+		ful = 1;
+	}
+
+	ShowStatusMessage();
+}
+
+static int Bn[] = {
+	ID_AC_NUM1,
+	ID_AC_NUM2,
+	ID_AC_NUM3,
+	ID_AC_NUM4,
+	ID_AC_NUM5,
+	ID_AC_NUM6,
+	ID_AC_C_NUM1,
+	ID_AC_C_NUM2,
+	ID_AC_C_NUM3,
+	ID_AC_C_NUM4,
+	ID_AC_C_NUM5,
+	ID_AC_C_NUM6,
+};
+
+static int Hni[] = {
+	1,2,3,4,8,16,
+	1,2,3,4,8,16,
+};
+
 //main procedure
 LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
@@ -932,6 +1022,32 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 	char str[128];
 	
 	switch(message){
+	case OWM_UPDATESTATUS: {
+		switch (wParam) {
+		case 0: {
+			char* ver = (char*)lParam;
+
+			char msg[256];
+			snprintf(msg, 256, "Version %s is now available. Would you like to download it?", ver);
+			int h = MessageBox(hWnd, msg, "OrgMaker Update", MB_ICONINFORMATION | MB_OKCANCEL);
+			if (h == IDYES) {
+				snprintf(msg, 256, "https://github.com/Strultz/orgmaker-3/releases/tag/%s", ver);
+				ShellExecute(NULL, "open", msg, NULL, NULL, SW_SHOWNORMAL);
+			}
+			break;
+		}
+		case 2:
+			MessageBox(hWnd, "Recieved invalid response from server. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
+			break;
+		case 3:
+			MessageBox(hWnd, "No new updates are available.", "OrgMaker Update", MB_ICONERROR | MB_OK);
+			break;
+		default:
+		case 1:
+			MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
+			break;
+		}
+	}
 	case WM_COMMAND:
 		for(i=0;i<16;i++){
 			if (LOWORD(wParam) == iChgTrackKey[i]){
@@ -968,7 +1084,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				MuteTrack(i);
 			}
 		}
-		if(LOWORD(wParam)==IDM_EZCOPYVISIBLE || LOWORD(wParam)==ID_AC_SHOWEZCOPY){
+		/*if (LOWORD(wParam) == IDM_EZCOPYVISIBLE || LOWORD(wParam) == ID_AC_SHOWEZCOPY) {
 			hMenu = GetMenu(hWnd);
 			if(EZCopyWindowState==0){
 				EZCopyWindowState=1;
@@ -979,7 +1095,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				ShowWindow(hDlgEZCopy, SW_HIDE);
 				//CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_UNCHECKED));
 			}
-		}
+		}*/
 		for(i=0;i<10;i++){	//recently used files
 			if(LOWORD(wParam)==Menu_Recent[i]){
 				if (CancelDeleteCurrentData(CDCD_LOAD)) break;
@@ -1001,7 +1117,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				//SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
 				//SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
 				UpdateStatusBar(false);
-				ClearEZC_Message();
 				SelectReset();
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
@@ -1284,27 +1399,16 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				scr_data.HorzScrollProc(SB_LINERIGHT, 0);
 				break;
 			case ID_AC_SELECT_BACKDEL: //2014.04.13
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_DELETEBUTTON_2  , NULL);
+				SetUndo();
+				EZ_DeleteAndTrim();
 				break;
 			case ID_AC_SELECT_INSERT: //2014.04.13
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_INSERTBUTTON  , NULL);
-				break;
-			//Range selection operation using the numeric keypad
-			//Paste
-			case ID_AC_NUM7:
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_PST1 , NULL);
-				break;
-			case ID_AC_NUM8:
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_PST2 , NULL);
-				break;
-			case ID_AC_NUM9:
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_PST3 , NULL);
-				break;
-			case ID_AC_NUMPLUS:
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_PST4 , NULL);
+				SetUndo();
+				EZ_Insert();
 				break;
 			case ID_AC_DELETEKEY: //Add 2014/04/12
-				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_DELETEBUTTON , NULL);
+				SetUndo();
+				EZ_Delete();
 				break;
 			case ID_AC_CUT:
 			case IDM_SELECT_CUT:
@@ -1353,37 +1457,20 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				}
 				break;
 			}
+			case ID_AC_NUM7:
 			case ID_AC_PASTE:
-			case IDM_SELECT_PASTE: {
-				if (gClipboardData.track1 == -1) {
-					break;
-				}
-
-				long x_scroll;
-				scr_data.GetScrollPosition(&x_scroll, NULL);
-
-				org_data.SetUndoData();
-
-				nc_Select.x1_1 = (tra >= 0 && nc_Select.x1_1 == nc_Select.x1_2) ? nc_Select.x1_1 : x_scroll;
-				nc_Select.x1_2 = nc_Select.x1_1 + gClipboardData.length - 1;
-				org_data.PasteNoteData(&gClipboardData, org_data.track, nc_Select.x1_1, 1);
-
-				if (gClipboardData.track1 == gClipboardData.track2) {
-					org_data.CheckNoteTail(org_data.track);
-					tra = org_data.track;
-					ful = 0;
-				}
-				else {
-					for (int i = gClipboardData.track1; i <= gClipboardData.track2; ++i) {
-						org_data.CheckNoteTail(i);
-					}
-					tra = gClipboardData.track1;
-					ful = 1;
-				}
-
-				ShowStatusMessage();
+			case IDM_SELECT_PASTE:
+				ClipboardPaste(1);
 				break;
-			}
+			case ID_AC_NUM8:
+				ClipboardPaste(2);
+				break;
+			case ID_AC_NUM9:
+				ClipboardPaste(3);
+				break;
+			case ID_AC_NUMPLUS:
+				ClipboardPaste(4);
+				break;
 			}
 		}else{
 			//only while playing
@@ -1400,16 +1487,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			scr_data.ChangeHorizontalRange(mi.end_x);
 			//org_data.PutMusic();//View sheet music
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-			switch (NoteWidth) {
-			case 4:		SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[25.%]"); break;
-			case 6:		SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[37.5%]"); break;
-			case 8:		SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[50%]"); break;
-			case 10:	SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[62.5%]"); break;
-			case 12:	SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[75%]"); break;
-			case 14:	SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[87.5%]"); break;
-			case 16:	SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[100%]"); break;
-			}
 			UpdateToolbarStatus();
+			UpdateStatusBar(false);
 			break;
 		case IDM_LOUPE_PLUS:
 		case ID_AC_LOUPE_PLUS:
@@ -1420,16 +1499,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			scr_data.ChangeHorizontalRange(mi.end_x);
 			//org_data.PutMusic();//View sheet music
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-			switch(NoteWidth){
-			case 4:		SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[25%]"); break;
-			case 6:		SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[37.5%]"); break;
-			case 8:		SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[50%]"); break;
-			case 10:	SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[62.5%]"); break;
-			case 12:	SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[75%]"); break;
-			case 14:	SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[87.5%]"); break;
-			case 16:	SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[100%]"); break;
-			}
 			UpdateToolbarStatus();
+			UpdateStatusBar(false);
 			break;
 		case IDM_PLAYPAUSE:
 			if (timer_sw) {
@@ -1485,7 +1556,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			SetModified(false);
 			gFileUnsaved = true;
 			//MessageBox(hwnd,"initialized","Message",MB_OK);
-			ClearEZC_Message(); //Erase EZ messages and ranges
 			SelectReset();
 			//org_data.PutMusic();
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
@@ -1511,7 +1581,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			EndGDI();
 			//if (!hDlgPlayer)DestroyWindow(hDlgPlayer);
 			//if (!hDlgTrack)DestroyWindow(hDlgTrack);
-			if (hDlgEZCopy) DestroyWindow(hDlgEZCopy);
+			//if (hDlgEZCopy) DestroyWindow(hDlgEZCopy);
 			if (hDlgHelp) DestroyWindow(hDlgHelp);
 
 			if (hwnd) DestroyWindow(hwnd);
@@ -1616,7 +1686,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			//Show to Player
 			UpdateStatusBar(false);
 
-			ClearEZC_Message();
 			SelectReset();
 			//org_data.PutMusic();
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
@@ -1703,41 +1772,48 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			break;
 		case ID_AC_NUM1:
-			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB1, NULL);
-			break;
 		case ID_AC_NUM2:
-			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB2, NULL);
-			break;
 		case ID_AC_NUM3:
-			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB3, NULL);
-			break;
 		case ID_AC_NUM4:
-			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB4, NULL);
-			break;
 		case ID_AC_NUM5:
-			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB5, NULL);
-			break;
 		case ID_AC_NUM6:
-			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB6, NULL);
-			break;
 		case ID_AC_C_NUM1:
-			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB7, NULL);
-			break;
 		case ID_AC_C_NUM2:
-			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB8, NULL);
-			break;
 		case ID_AC_C_NUM3:
-			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB9, NULL);
-			break;
 		case ID_AC_C_NUM4:
-			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB10, NULL);
-			break;
 		case ID_AC_C_NUM5:
-			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB11, NULL);
+		case ID_AC_C_NUM6: {
+			int bt = -1;
+			long scr_h, scr_v;
+			for (i = 0;i < 12;i++) {
+				if (LOWORD(wParam) == Bn[i])bt = i;
+			}
+			if (bt >= 0) { //＋１とかのボタンが押された。
+				int a, b, d, bb;
+				//char str[5];
+				org_data.GetMusicInfo(&mi);
+				scr_data.GetScrollPosition(&scr_h, &scr_v);
+				//GetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,str,4);//範囲from
+				//b = atol(str);
+				b = scr_h / (mi.dot * mi.line);
+				bb = b + Hni[bt];
+				haba = Hni[bt];
+				a = b * mi.dot * mi.line; //開始点
+				d = bb * mi.dot * mi.line - 1; //終了点
+				nc_Select.x1_1 = a;
+				nc_Select.x1_2 = d;
+				if (bt >= 6)ful = 1;else ful = 0; //全トラック？
+				tra = org_data.track;
+				//org_data.CopyNoteDataToCB(&nc_Select, tra, ful);
+				//if(ful==0)wsprintf(CpHelp,"トラック%c の%d小節～%d小節までを",TrackN[tra],b,bb);	// 2014.10.19 D
+				//if (ful == 0)wsprintf(CpHelp, MessageString[IDS_STRING74], TrackN[tra], b, bb);	// 2014.10.19 A
+				//else wsprintf(CpHelp,"全トラックの%d小節～%d小節までを",b,bb);	// 2014.10.19 D
+				//else wsprintf(CpHelp, MessageString[IDS_STRING75], b, bb);	// 2014.10.19 A
+				//org_data.PutMusic();
+				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+			}
 			break;
-		case ID_AC_C_NUM6:
-			SendMessage(hDlgEZCopy, WM_COMMAND, IDC_CTB12, NULL);
-			break;
+		}
 		case IDM_DLGDEFAULT://Show Default Dialog
 		case ID_AC_DEFAULT:
 			DialogBox(hInst, "DLGDEFAULT", hwnd, DialogDefault);
@@ -1745,9 +1821,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_GITHUB:
 			ShellExecute(NULL, "open", "https://github.com/Strultz/orgmaker-3", NULL, NULL, SW_SHOWNORMAL);
 			break;
-		case IDM_CHECKUPD:
-			CheckUpdate(true);
+		case IDM_CHECKUPD: {
+			std::thread t(CheckUpdate, true);
+			t.detach();
 			break;
+		}
 		case IDM_AUTOCHECKUPDATES:
 			hMenu = GetMenu(hWnd);
 			autoCheckUpdate = !autoCheckUpdate;
@@ -1900,7 +1978,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		EndGDI();
 		//if(!hDlgPlayer)DestroyWindow(hDlgPlayer);
 		//if(!hDlgTrack)DestroyWindow(hDlgTrack);
-		if(hDlgEZCopy) DestroyWindow(hDlgEZCopy);
+		//if(hDlgEZCopy) DestroyWindow(hDlgEZCopy);
 		if(hwnd) DestroyWindow(hwnd);
 		PostQuitMessage(0);
 		FreeMessageStringBuffer();	// 2014.10.19 
@@ -2276,6 +2354,8 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW, "VolChangeSetNoteLength", num_buf, app_path);
 	wsprintf(num_buf, "%d", autoCheckUpdate);
 	WritePrivateProfileString(MAIN_WINDOW, "AutoCheckUpdates", num_buf, app_path);
+	wsprintf(num_buf, "%d", 1);
+	WritePrivateProfileString(MAIN_WINDOW, "UserExists", num_buf, app_path);
 
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentThemePath", gSelectedTheme, app_path);
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentWavePath", gSelectedWave, app_path);
@@ -2292,13 +2372,13 @@ void SaveIniFile()
 	WritePrivateProfileString(PLAY_WINDOW,"left",num_buf,app_path);
 	wsprintf(num_buf,"%d",WinRect.top);
 	WritePrivateProfileString(PLAY_WINDOW,"top",num_buf,app_path);*/
-	GetWindowRect(hDlgEZCopy,(LPRECT)&WinRect);
+	/*GetWindowRect(hDlgEZCopy, (LPRECT)&WinRect);
 	wsprintf(num_buf,"%d",WinRect.left);
 	WritePrivateProfileString(COPY_WINDOW,"left",num_buf,app_path);
 	wsprintf(num_buf,"%d",WinRect.top);
 	WritePrivateProfileString(COPY_WINDOW,"top",num_buf,app_path);
 	wsprintf(num_buf,"%d",EZCopyWindowState);
-	WritePrivateProfileString(COPY_WINDOW,"show",num_buf,app_path);
+	WritePrivateProfileString(COPY_WINDOW,"show",num_buf,app_path);*/
 
 	wsprintf(num_buf,"%d",CmnDialogWnd.left);
 	WritePrivateProfileString(COMMON_WINDOW,"left",num_buf,app_path);
