@@ -740,13 +740,20 @@
 #define IDM_CHECKUPD                    40324
 #define IDM_AUTOCHECKUPDATES            40325
 #define IDM_FLOATTOOLBARS               40326
+#define ID_SELECTION_PANNING            40327
+#define ID_SELECTION_TRANSPOSE          40338
+#define ID_SELECTION_DELETE             40339
+#define ID_SELECTION_VOLUME             40340
+#define IDM_SELECT_ADVPASTE             40341
+#define ID_SELECTION_CLEAR              40342
+#define ID_SELECTION_INSERT             40343
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        254
-#define _APS_NEXT_COMMAND_VALUE         40327
+#define _APS_NEXT_COMMAND_VALUE         40342
 #define _APS_NEXT_CONTROL_VALUE         1270
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

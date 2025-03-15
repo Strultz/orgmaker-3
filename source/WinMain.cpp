@@ -245,10 +245,9 @@ SAVEDNOTE gClipboardData;
 NOTECOPY nc_Select;
 int tra = -256, ful = 0, haba = 0;
 
-static const int playbar_controls_menu[70] = {
-	IDM_SORTMUSICNOTE, IDM_DLGDELETE, IDM_DLGCOPY, IDM_DLGCOPY2, IDM_DLGPAN,
-	IDM_DLGTRANS, IDM_DLGVOL, IDM_DLGSWAP, IDM_2BAI, IDM_3BAI,
-	IDM_2BUNNO1, IDM_3BUNNO1, IDM_CT_L1, IDM_CT_L2, IDM_CT_L3,
+static const int playbar_controls_menu[67] = {
+	IDM_SORTMUSICNOTE, IDM_DLGDELETE, IDM_DLGCOPY, IDM_DLGCOPY2, IDM_DLGSWAP,
+	IDM_2BAI, IDM_3BAI, IDM_2BUNNO1, IDM_3BUNNO1, IDM_CT_L1, IDM_CT_L2, IDM_CT_L3,
 	IDM_CT_L4, IDM_CT_L5, IDM_CT_L6, IDM_CT_L7, IDM_CT_L8,
 	IDM_CT_L9, IDM_CT_L10, IDM_CT_L11, IDM_CT_L12, IDM_CT_L13,
 	IDM_CT_L14, IDM_CT_L15, IDM_CT_L16, IDM_CT_L17, IDM_CT_L18,
@@ -259,7 +258,12 @@ static const int playbar_controls_menu[70] = {
 	IDM_CT_S20, IDM_CT_OCT_DOWN, IDM_CT_OCT_UP, IDM_CT_PAN_R, IDM_CT_PAN_L,
 	IDM_CT_PAN_REVERSE, IDM_CT_TRANS_UP, IDM_CT_TRANS_DOWN, IDM_CT_VOL_PLUS, IDM_CT_VOL_MINUS,
 	IDM_CT_VOLWARIAI_UP, IDM_CT_VOLWARIAI_DOWN, IDM_ML_PAN_R, IDM_ML_PAN_L, IDM_ML_TRANS_UP,
-	IDM_ML_TRANS_DOWN, IDM_ML_VOL_PLUS, IDM_ML_VOL_MINUS, IDM_DR_VOL_PLUS, IDM_DR_VOL_MINUS,
+	IDM_ML_TRANS_DOWN, IDM_ML_VOL_PLUS, IDM_ML_VOL_MINUS, IDM_DR_VOL_PLUS, IDM_DR_VOL_MINUS
+};
+
+static const int playbar_controls_select[9]{
+	ID_SELECTION_CLEAR, ID_SELECTION_DELETE,ID_SELECTION_INSERT,ID_SELECTION_VOLUME,ID_SELECTION_PANNING,
+	ID_SELECTION_TRANSPOSE, IDM_SELECT_RESET, IDM_SELECT_CUT, IDM_SELECT_COPY
 };
 
 static const int playbar_controls_toolbar[4] = {
@@ -279,7 +283,7 @@ void UpdateToolbarStatus() {
 	// disable editor features while song is playing
 	bool enabled = timer_sw == 0;
 	if (lastUpdCheck != enabled) {
-		for (int i = 0; i < 70; ++i) {
+		for (int i = 0; i < 67; ++i) {
 			EnableMenuItem(hMenu, playbar_controls_menu[i], MF_BYCOMMAND | (enabled ? MF_ENABLED : MF_GRAYED));
 		}
 
@@ -302,14 +306,17 @@ void UpdateToolbarStatus() {
 	EnableMenuItem(hMenu, IDM_REDO, MF_BYCOMMAND | (enabled && org_data.RedoEnable ? MF_ENABLED : MF_GRAYED));
 	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_REDO, enabled && org_data.RedoEnable);
 
-	EnableMenuItem(hMenu, IDM_SELECT_RESET, MF_BYCOMMAND | (enabled && tra >= 0 ? MF_ENABLED : MF_GRAYED));
-	EnableMenuItem(hMenu, IDM_SELECT_CUT, MF_BYCOMMAND | (enabled && tra >= 0 ? MF_ENABLED : MF_GRAYED));
-	EnableMenuItem(hMenu, IDM_SELECT_COPY, MF_BYCOMMAND | (enabled && tra >= 0 ? MF_ENABLED : MF_GRAYED));
+	for (int i = 0; i < 9; ++i) {
+		EnableMenuItem(hMenu, playbar_controls_select[i], MF_BYCOMMAND | (enabled && tra >= 0 ? MF_ENABLED : MF_GRAYED));
+	}
+
 	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_SELECT_CUT, enabled && tra >= 0);
 	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_SELECT_COPY, enabled && tra >= 0);
 
 	EnableMenuItem(hMenu, IDM_SELECT_PASTE, MF_BYCOMMAND | (enabled && gClipboardData.track1 != -1 ? MF_ENABLED : MF_GRAYED));
+	EnableMenuItem(hMenu, IDM_SELECT_ADVPASTE, MF_BYCOMMAND | (enabled && gClipboardData.track1 != -1 ? MF_ENABLED : MF_GRAYED));
 	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_SELECT_PASTE, enabled && gClipboardData.track1 != -1);
+	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_SELECT_ADVPASTE, enabled && gClipboardData.track1 != -1);
 
 	// min/max zoom
 	EnableMenuItem(GetMenu(hWnd), IDM_LOUPE_MINUS, NoteWidth > 4 ? MF_ENABLED : MF_GRAYED);
@@ -1440,14 +1447,17 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDC_RIGHTSTEP:
 				scr_data.HorzScrollProc(SB_LINERIGHT, 0);
 				break;
+			case ID_SELECTION_DELETE:
 			case ID_AC_SELECT_BACKDEL: //2014.04.13
 				SetUndo();
 				EZ_DeleteAndTrim();
 				break;
+			case ID_SELECTION_INSERT:
 			case ID_AC_SELECT_INSERT: //2014.04.13
 				SetUndo();
 				EZ_Insert();
 				break;
+			case ID_SELECTION_CLEAR:
 			case ID_AC_DELETEKEY: //Add 2014/04/12
 				SetUndo();
 				EZ_Delete();
