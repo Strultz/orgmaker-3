@@ -26,8 +26,8 @@
 extern HWND hDlgTrack;
 extern HWND hDlgPlayer;
 extern HWND hDlgEZCopy;
-extern char* gSelectedTheme;
-extern char* gSelectedWave;
+extern char gSelectedTheme[MAX_PATH];
+extern char gSelectedWave[MAX_PATH];
 
 extern char TrackN[];
 

@@ -42,6 +42,8 @@ static struct S_Sound
 	float target_volume_l;
 	float target_volume_r;
 	long vol_ticks;
+    
+    signed long stop_in;
 
 	struct S_Sound* next;
 };
@@ -202,6 +204,29 @@ static void S_PlaySound(S_Sound* sound, bool looping) {
 	}
 
 	sound->looping = looping;
+	sound->stop_in = 0;
+
+	ma_mutex_unlock(&mutex);
+}
+
+static void S_PlaySoundFor(S_Sound* sound, int ms) {
+	if (sound == NULL || ms == 0)
+		return;
+
+	ma_mutex_lock(&mutex);
+
+	if (!sound->playing) {
+		sound->position = 0;
+
+		if (sound->silence_count == 0) {
+			sound->sub_position = 0;
+		}
+
+		sound->playing = true;
+	}
+
+	sound->looping = true;
+	sound->stop_in = (ms * output_frequency) / 1000;
 
 	ma_mutex_unlock(&mutex);
 }
@@ -323,6 +348,12 @@ static void S_MixSounds(float* stream, size_t frames_total) {
 
 				// Stop or loop sample once it's reached its end
 				if (sound->playing) {
+                    if (sound->stop_in > 0) {
+						--sound->stop_in;
+						if (sound->stop_in == 0) {
+							sound->looping = FALSE;
+						}
+					}
 					if (sound->position >= sound->frames)
 					{
 						if (sound->looping)
@@ -1135,18 +1166,14 @@ void PlayDramObject(unsigned char key, int mode,char track)
 
 void PlayOrganKey(unsigned char key,char track,DWORD freq,int Nagasa)
 {
-	if (key > 96) return;
+	if (key >= 96) return;
 	if (track < MAXMELODY && lpORGANBUFFER[track][key/12][0] != NULL){
 		DWORD wait = timeGetTime();
 		ChangeOrganFrequency(key%12,track,freq);//Žü”g”‚ðÝ’è‚µ‚Ä
 		S_SetSoundVolume(lpORGANBUFFER[track][key / 12][0], ((200 * 100 / 0x7F) - 255) * 8);
 		S_SetSoundPan(lpORGANBUFFER[track][key / 12][0], 0);
-		S_PlaySound(lpORGANBUFFER[track][key / 12][0], true);
-		do{
-		}while(timeGetTime() < wait + (DWORD)Nagasa);
+		S_PlaySoundFor(lpORGANBUFFER[track][key / 12][0], Nagasa);
 //		lpORGANBUFFER[track][key/12][0]->Play(0, 0, 0); //C 2010.09.23 ‘¦Žž’âŽ~‚·‚éB
-		S_StopSound(lpORGANBUFFER[track][key / 12][0]);
-		S_RewindSound(lpORGANBUFFER[track][key / 12][0]);
 	} else if (lpDRAMBUFFER[track - MAXMELODY] != NULL) {
 		S_StopSound(lpDRAMBUFFER[track - MAXMELODY]);
 		S_RewindSound(lpDRAMBUFFER[track - MAXMELODY]);
@@ -1161,7 +1188,7 @@ void PlayOrganKey(unsigned char key,char track,DWORD freq,int Nagasa)
 //2010.08.14 A
 void Rxo_PlayKey(unsigned char key,char track,DWORD freq, int Phase)
 {
-	if (key > 96) return;
+	if (key >= 96) return;
 	if (track < MAXMELODY && lpORGANBUFFER[track][key/12][Phase] != NULL) {
 		ChangeOrganFrequency(key%12,track,freq);
 		S_SetSoundVolume(lpORGANBUFFER[track][key/12][Phase], ((200 * 100 / 0x7F) - 255) * 8);
@@ -1179,7 +1206,7 @@ void Rxo_PlayKey(unsigned char key,char track,DWORD freq, int Phase)
 //2010.08.14 A
 void Rxo_StopKey(unsigned char key,char track, int Phase)
 {
-	if (key > 96) return;
+	if (key >= 96) return;
 	if (track < MAXMELODY && lpORGANBUFFER[track][key/12][Phase] != NULL) {
 		//lpORGANBUFFER[track][key/12][Phase]->Play(0, 0, 0);	// 2010.08.14 D
 		S_StopSound(lpORGANBUFFER[track][key/12][Phase]);	// 2010.08.14 A

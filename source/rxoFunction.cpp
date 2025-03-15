@@ -968,6 +968,7 @@ int AllocMessageStringBuffer(void)
 	TCHAR *ptr, *p;
 	if(MessageStringBuffer == NULL){
 		MessageStringBuffer = (TCHAR *)calloc(MESSAGE_STRING_BUFFER_SIZE, sizeof(TCHAR));
+        if (MessageStringBuffer == NULL) return 0;
 	}
 	for(i = 0; i < MESSAGE_STRING_MAX; i++){
 		MessageString[i] = NULL;

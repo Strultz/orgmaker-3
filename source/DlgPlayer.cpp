@@ -12,7 +12,7 @@
 char timer_sw = 0;
 extern HWND hDlgTrack;
 extern HWND hWnd;
-extern char* gSelectedTheme;
+extern char gSelectedTheme[MAX_PATH];
 
 int mute_name[MAXTRACK] = {
 	IDC_MUTE0,

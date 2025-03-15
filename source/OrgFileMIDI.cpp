@@ -131,7 +131,7 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 	strMIDIHeader[13] = (unsigned char)((info.dot * iDeltaTime) & 0xFF);
 	fwrite(strMIDIHeader, 14, 1, fp);
 
-	unsigned char strConductorTrack[] = {'M','T','r','k',0,0,0,0x0B, 0x00, 0xFF, 0x51, 0x03,  0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, };
+	unsigned char strConductorTrack[512] = {'M','T','r','k',0,0,0,0x0B, 0x00, 0xFF, 0x51, 0x03,  0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, };
 	//テンポ
 	//long ltempo, invtempo;
 	long invtempo, LastPan;
@@ -156,12 +156,13 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 
 	//曲のタイトル表示
 	tmpuc = (unsigned char)strlen(strMIDI_TITLE);
+    tmpuc = tmpuc > 128 ? 128 : tmpuc;
 	if(tmpuc>0){
 		*p++=0x00; lenbuf++;
 		*p++=0xFF; lenbuf++;
 		*p++=0x03; lenbuf++;
 		*p++=0x00; pBufLen = p-1; lenbuf++;
-		strcpy((char *)p, strMIDI_TITLE);
+		strncpy((char *)p, strMIDI_TITLE, 128);
 		lenbuf += tmpuc;
 		*pBufLen = tmpuc;
 		p+=tmpuc;
@@ -169,13 +170,14 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 
 	//著作権表示
 	tmpuc = (unsigned char)strlen(strMIDI_AUTHOR);
+    tmpuc = tmpuc > 128 ? 128 : tmpuc;
 	if(tmpuc>0){
 		*p++=0x00; lenbuf++;
 		*p++=0xFF; lenbuf++;
 		*p++=0x02; lenbuf++;
 		*p++=0x00; pBufLen = p-1; lenbuf++;
 		//strcpy((char *)p, "(C)COMPOSER                "); lenbuf+=27; *pBufLen=27; p+=27;
-		strcpy((char *)p, strMIDI_AUTHOR);
+		strncpy((char *)p, strMIDI_AUTHOR, 128);
 		lenbuf += tmpuc;
 		*pBufLen = tmpuc;
 		p+=tmpuc;

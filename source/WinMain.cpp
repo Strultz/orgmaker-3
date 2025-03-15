@@ -149,10 +149,10 @@ int previewOctave = 3;
 
 int iKeyPushDown[256]; // 2010.09.22 A
 
-char *strMIDIFile;
+char strMIDIFile[MAX_PATH];
 
-char *gSelectedTheme;
-char *gSelectedWave;
+char gSelectedTheme[MAX_PATH];
+char gSelectedWave[MAX_PATH];
 
 static HACCEL Ac;
 
@@ -286,9 +286,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	iCast[VK_OEM_PERIOD]=14; //.    B
 	iCast[VK_OEM_1]=15; //^   C
 	iCast[VK_OEM_2]=16; //:
-	strMIDIFile = (char *)malloc(MAX_PATH);
-	gSelectedTheme = (char *)malloc(MAX_PATH);
-	gSelectedWave = (char*)malloc(MAX_PATH);
     
 	LoadString(GetModuleHandle(NULL), IDS_TITLE, lpszName, sizeof(lpszName) / sizeof(lpszName[0]));
 
@@ -325,7 +322,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	}else{
 		lstrcat(app_path,".ini");
 	}
-	//NoteWidth = 16; //Frame designationš
+	//NoteWidth = 16; //Frame designation
 	NoteWidth =         GetPrivateProfileInt(MAIN_WINDOW,"NoteWidth",16,app_path);
 	NoteWidth = (NoteWidth > 16) ? 16: ( (NoteWidth<4) ? 4: NoteWidth );
 
@@ -346,21 +343,21 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	//GetPrivateProfileString(MIDI_EXPORT, "Author", "(C) AUTHOR xxxxx, 2014", strMIDI_AUTHOR, 255, app_path);	// 2045.01.18 D
 	GetPrivateProfileString(MIDI_EXPORT, "Author", strauthtmp, strMIDI_AUTHOR, 255, app_path);	// 2045.01.18 A
 	GetPrivateProfileString(MIDI_EXPORT, "Title", MessageString[IDS_DEFAULT_MIDI_TITLE], strMIDI_TITLE, 255, app_path);
-	for(i=0;i<8;i++)ucMIDIProgramChangeValue[i]=255;
+	for(i = 0; i < 8; i++) ucMIDIProgramChangeValue[i] = 255;
 
 	//SetWindowPos(hWnd,HWND_TOP,WinRect.left,WinRect.top,WinRect.right,WinRect.bottom,SWP_HIDEWINDOW);
 
-	unsigned long ul;
-	ul = WS_CAPTION|WS_MINIMIZEBOX|WS_SYSMENU|WS_THICKFRAME|WS_MAXIMIZEBOX;
+	unsigned long ul = WS_CAPTION|WS_MINIMIZEBOX|WS_SYSMENU|WS_THICKFRAME|WS_MAXIMIZEBOX;
 
-	//Generate main window
+	// main window
 	hWnd = CreateWindow(lpszName,
 			"OrgMaker 3",
 			ul,
 			WinRect.left, WinRect.top, WinRect.right, WinRect.bottom,
             NULL, NULL, hInst, NULL);
     
-	if(!hWnd) return FALSE;
+	if(!hWnd)
+        return FALSE;
 
 //	DialogBox(hInst,"DLGFLASH",NULL,DialogFlash);
 
@@ -390,6 +387,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 //Image initialization //////////
 	if (!StartGDI(hWnd)) { //GDI ready
+        MessageBox(hWnd, "Graphics engine failed to initalize.", "OrgMaker Error", MB_ICONERROR | MB_OK);
 		QuitMMTimer();
 		DestroyWindow(hWnd);
 		return 0;
@@ -399,6 +397,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	InitCursor();
 //Sound initialization ///////
 	if (!InitDirectSound(hWnd)) {
+        MessageBox(hWnd, "Sound engine failed to initalize.", "OrgMaker Error", MB_ICONERROR | MB_OK);
 		QuitMMTimer();
 		EndGDI();
 		DestroyWindow(hWnd);
@@ -1422,9 +1421,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		if(!hDlgEZCopy)DestroyWindow(hDlgEZCopy);
 		if(!hwnd)DestroyWindow(hwnd);
 		PostQuitMessage(0);
-		free(strMIDIFile); //2014.05.11
-		free(gSelectedTheme);
-		free(gSelectedWave);
 		FreeMessageStringBuffer();	// 2014.10.19 
 		break;
 	case WM_KEYDOWN://keyboard pressed
