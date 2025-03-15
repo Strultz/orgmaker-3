@@ -122,7 +122,7 @@ void CreateToolbarClass(void) {
 }
 
 void CreateToolbars(HWND hwndRebar, HWND outHwnd[4]) {
-    TBBUTTON tbb1[26] =
+    TBBUTTON tbb1[27] =
     {
         {0, IDM_INIT, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"New (Ctrl+N)"},
         {1, IDM_LOAD, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Open (Ctrl+O)"},
@@ -134,6 +134,7 @@ void CreateToolbars(HWND hwndRebar, HWND outHwnd[4]) {
         {6, IDM_SELECT_CUT, 0,BTNS_BUTTON, {}, 0, (INT_PTR)"Cut (Ctrl+X)"},
         {7, IDM_SELECT_COPY, 0,BTNS_BUTTON, {}, 0, (INT_PTR)"Copy (Ctrl+C)"},
         {8, IDM_SELECT_PASTE, 0, BTNS_BUTTON, {}, 0, (INT_PTR)"Paste (Ctrl+V)"},
+        {21, IDM_SELECT_ADVPASTE, 0, BTNS_BUTTON, {}, 0, (INT_PTR)"Advanced Paste (Ctrl+Shift+V)"},
         {0, 0, 0, BTNS_SEP},
         {19, IDM_UNDO, 0,BTNS_BUTTON, {}, 0, (INT_PTR)"Undo (Ctrl+Z)"},
         {20, IDM_REDO, 0, BTNS_BUTTON, {}, 0, (INT_PTR)"Redo (Ctrl+Y)"},

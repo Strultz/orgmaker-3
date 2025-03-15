@@ -747,13 +747,14 @@
 #define IDM_SELECT_ADVPASTE             40341
 #define ID_SELECTION_CLEAR              40342
 #define ID_SELECTION_INSERT             40343
+#define ID_AC_ADVPASTE                     40344
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        254
-#define _APS_NEXT_COMMAND_VALUE         40342
+#define _APS_NEXT_COMMAND_VALUE         40345
 #define _APS_NEXT_CONTROL_VALUE         1270
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

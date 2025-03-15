@@ -994,6 +994,7 @@ BEGIN
     "X",            ID_AC_CUT,              VIRTKEY, CONTROL, NOINVERT
     "C",            ID_AC_COPY,             VIRTKEY, CONTROL, NOINVERT
     "V",            ID_AC_PASTE,            VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_AC_ADVPASTE,         VIRTKEY, SHIFT, CONTROL, NOINVERT
 END
 
 
