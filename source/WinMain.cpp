@@ -185,7 +185,7 @@ int realHeight = WINDOWHEIGHT;
 static const char szClassName[] = "OrgMaker3";
 static const char szAreaClass[] = "OrgArea";
 
-char lpszName[MAX_PATH+20];// = "Organya 2 - ";//Name to register on Windows
+char lpszName[MAX_PATH+30];// = "Organya 2 - ";//Name to register on Windows
 
 ORGDATA org_data;//main data
 SCROLLDATA scr_data;//scroll data
@@ -1079,7 +1079,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			char msg[256];
 			snprintf(msg, 256, "Version %s is now available. Would you like to download it?", ver);
 			int h = MessageBox(hWnd, msg, "OrgMaker Update", MB_ICONINFORMATION | MB_OKCANCEL);
-			if (h == IDYES) {
+			if (h == IDOK) {
 				snprintf(msg, 256, "https://github.com/Strultz/orgmaker-3/releases/tag/%s", ver);
 				ShellExecute(NULL, "open", msg, NULL, NULL, SW_SHOWNORMAL);
 			}
@@ -2320,7 +2320,7 @@ void SetTitlebarText()
 		set_name[i + k] = file_name[i];
 	}
 	//Insert app title
-	for (j = 0; j < 20; j++) {
+	for (j = 0; j < 30; j++) {
 		set_name[i + k] = lpszName[j];
 		if (set_name[i + k] == NULL) break;
 		i++;
