@@ -10,9 +10,9 @@
 #define BUF_SIZE 256
 #define MAIN_WINDOW "WINDOW"
 
-
 extern HWND hDlgPlayer;
 extern char timer_sw;
+extern int NoteWidth;
 
 extern CHAR app_path[BUF_SIZE];
 extern CHAR num_buf[BUF_SIZE];
@@ -227,8 +227,8 @@ void ScrollData::VertScrollProc(short mode, long scroll){
 //Get scroll position
 void ScrollData::GetScrollPosition(long *hp,long *vp)
 {
-	*hp = hpos;
-	*vp = vpos;
+	if (hp) *hp = hpos;
+	if (vp) *vp = vpos;
 }
 
 void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){

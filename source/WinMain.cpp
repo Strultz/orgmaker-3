@@ -1572,14 +1572,14 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		ZeroMemory(&si, sizeof(si));
         si.cbSize = sizeof(si);
         si.fMask = SIF_TRACKPOS;
-        if (GetScrollInfo(hwndArea, SB_HORZ, &si))
+        if (GetScrollInfo(hWnd, SB_HORZ, &si))
 			scr_data.HorzScrollProc(LOWORD(wParam), si.nTrackPos);
 		break;
 	case WM_VSCROLL:
 		ZeroMemory(&si, sizeof(si));
 		si.cbSize = sizeof(si);
 		si.fMask = SIF_TRACKPOS;
-		if (GetScrollInfo(hwndArea, SB_VERT, &si))
+		if (GetScrollInfo(hWnd, SB_VERT, &si))
 			scr_data.VertScrollProc(LOWORD(wParam), si.nTrackPos);
 		break;
 	case WM_MOUSEWHEEL:
