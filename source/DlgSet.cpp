@@ -158,6 +158,8 @@ void EnableDialogWindow(int iValue = TRUE)
 
 
 //ダイアログ内容の初期化
+static bool gPropChanged = false;
+
 void InitSettingDialog(HWND hdwnd)
 {
 	char str[128] = {NULL};
@@ -409,6 +411,7 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 					EnableWindow(GetDlgItem(hdwnd, IDD_GRIDEDIT2), FALSE);
 				}
 				PropSheet_Changed(GetParent(hdwnd), hdwnd);
+				gPropChanged = true;
 			}
 			break;
 		case IDC_BPM:
@@ -483,6 +486,7 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 				PostMessage(GetDlgItem(hdwnd, LOWORD(wParam)), EM_SETSEL, 0, -1);
 			} else if (HIWORD(wParam) == EN_UPDATE) {
 				PropSheet_Changed(GetParent(hdwnd), hdwnd);
+				gPropChanged = true;
 			}
 			break;
 		}
@@ -618,6 +622,7 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 				}
 
 				PropSheet_Changed(GetParent(hdwnd), hdwnd);
+				gPropChanged = true;
 				return 0;
 			}
 			return 1;
@@ -967,6 +972,123 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }*/
 
+static bool gOkay = false;
+static unsigned char gWaveTrack = 0;
+static unsigned char gAllWaveSel[MAXMELODY] = { 0 };
+static char* strTone[] = { "C-", "C#", "D-", "D#", "E-", "F-", "F#", "G-", "G#", "A-", "A#", "B-" };
+
+BOOL CALLBACK DialogWaveSel(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	LPNMHDR lpnm;
+	MUSICINFO mi;
+	char tone[4] = { 0 };
+
+	switch (message) {
+	case WM_INITDIALOG: {
+
+		SendMessage(GetDlgItem(hdwnd, IDC_SLIDERPITCH), TBM_SETPOS, TRUE, SamplePlayHeight);
+		SendMessage(GetDlgItem(hdwnd, IDC_SLIDERPITCH), TBM_SETRANGE, 0, MAKELPARAM(0, 95));
+		SendMessage(GetDlgItem(hdwnd, IDC_SLIDERPITCH), TBM_SETLINESIZE, 0, 1);
+		SendMessage(GetDlgItem(hdwnd, IDC_SLIDERPITCH), TBM_SETPAGESIZE, 0, 12);
+		SendMessage(GetDlgItem(hdwnd, IDC_SLIDERPITCH), TBM_SETTICFREQ, 12, 0);
+
+		snprintf(tone, 4, "%s%d", strTone[SamplePlayHeight % 12], (SamplePlayHeight / 12) + 1);
+		SetDlgItemText(hdwnd, IDC_PREVPITCH, tone);
+
+		return 1;
+	}
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK:
+			gOkay = true;
+			EndDialog(hdwnd, 0);
+			break;
+		case IDCANCEL:
+			EndDialog(hdwnd, 0);
+			break;
+		}
+		break;
+	case WM_LBUTTONDOWN: {
+		org_data.GetMusicInfo(&mi);
+
+		int x = LOWORD(lParam);
+		int y = HIWORD(lParam);
+
+		if (y < 491) {
+			if (x > 190) x -= 4;
+			x = (x - 6) / 36;
+			if (x < 0) x = 0;
+			if (x > 9) x = 9;
+
+			if (y > 246) y -= 4;
+			y = (y - 4) / 48;
+			if (y < 0) y = 0;
+			if (y > 9) y = 9;
+
+			// Invalidate Old, Rect
+			int boxX = 8 + (gAllWaveSel[gWaveTrack] % 10) * 36 + ((gAllWaveSel[gWaveTrack] % 10) > 4 ? 4 : 0);
+			int boxY = 16 + (gAllWaveSel[gWaveTrack] / 10) * 48 + ((gAllWaveSel[gWaveTrack] / 10) > 4 ? 4 : 0);
+
+			RECT rcSel = { boxX - 4, boxY - 4, boxX + 36, boxY + 36 };
+			InvalidateRect(hdwnd, &rcSel, FALSE);
+
+			gAllWaveSel[gWaveTrack] = (unsigned char)(x % 10 + y * 10);
+
+			// Invalidate New, Rect
+			boxX = 8 + (gAllWaveSel[gWaveTrack] % 10) * 36 + ((gAllWaveSel[gWaveTrack] % 10) > 4 ? 4 : 0);
+			boxY = 16 + (gAllWaveSel[gWaveTrack] / 10) * 48 + ((gAllWaveSel[gWaveTrack] / 10) > 4 ? 4 : 0);
+
+			rcSel = { boxX - 4, boxY - 4, boxX + 36, boxY + 36 };
+			InvalidateRect(hdwnd, &rcSel, FALSE);
+
+			MakeOrganyaWave(gWaveTrack, gAllWaveSel[gWaveTrack], mi.tdata[gWaveTrack].pipi);
+			PlayOrganKey(SamplePlayHeight, gWaveTrack, mi.tdata[gWaveTrack].freq, 240);
+		}
+		break;
+	}
+	case WM_PAINT: {
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hdwnd, &ps);
+
+		HDC hdcMem = CreateCompatibleDC(hdc);
+		HBITMAP oldBitmap = (HBITMAP)SelectObject(hdcMem, waveBmp);
+
+		BITMAP bitmap;
+		GetObject(waveBmp, sizeof(bitmap), &bitmap);
+		BitBlt(hdc, 0, 0, bitmap.bmWidth, bitmap.bmHeight, hdcMem, 0, 0, SRCCOPY);
+
+		HBRUSH hbr = CreateSolidBrush(RGB(0, 255, 0));
+
+		int boxX = 8 + (gAllWaveSel[gWaveTrack] % 10) * 36 + ((gAllWaveSel[gWaveTrack] % 10) > 4 ? 4 : 0);
+		int boxY = 16 + (gAllWaveSel[gWaveTrack] / 10) * 48 + ((gAllWaveSel[gWaveTrack] / 10) > 4 ? 4 : 0);
+
+		RECT rc = { boxX - 2, boxY - 2, boxX, boxY + 34 };
+		FillRect(hdc, &rc, hbr);
+		rc = { boxX + 32, boxY - 2, boxX + 34, boxY + 34 };
+		FillRect(hdc, &rc, hbr);
+		rc = { boxX, boxY - 2, boxX + 32, boxY };
+		FillRect(hdc, &rc, hbr);
+		rc = { boxX, boxY + 32, boxX + 32, boxY + 34 };
+		FillRect(hdc, &rc, hbr);
+
+		DeleteObject(hbr);
+
+		SelectObject(hdcMem, oldBitmap);
+		DeleteDC(hdcMem);
+
+		EndPaint(hdwnd, &ps);
+		break;
+	}
+	case WM_HSCROLL: {
+		if (lParam != NULL && GetWindowLong((HWND)lParam, GWL_ID) == IDC_SLIDERPITCH) {
+			SamplePlayHeight = SendMessage(GetDlgItem(hdwnd, IDC_SLIDERPITCH), TBM_GETPOS, 0, 0);
+			snprintf(tone, 4, "%s%d", strTone[SamplePlayHeight % 12], (SamplePlayHeight / 12) + 1);
+			SetDlgItemText(hdwnd, IDC_PREVPITCH, tone);
+		}
+		break;
+	}
+	}
+	return 0;
+}
 
 BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	char bfr[256];
@@ -978,7 +1100,9 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_INITDIALOG:
 		org_data.GetMusicInfo(&mi);
 		for (i = 0; i < MAXMELODY; ++i) {
-			snprintf(bfr, 256, "Wave-%02d", mi.tdata[i].wave_no);
+			gAllWaveSel[i] = mi.tdata[i].wave_no;
+
+			snprintf(bfr, 256, "Wave-%02d", gAllWaveSel[i]);
 			SetDlgItemText(hdwnd, btn_wave[i], bfr);
 			SetDlgItemInt(hdwnd, txt_freq[i], mi.tdata[i].freq, FALSE);
 			CheckDlgButton(hdwnd, check_pipi[i], mi.tdata[i].pipi);
@@ -987,6 +1111,7 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(2000, 0));
 			SendMessage(w, UDM_SETPOS, 0, mi.tdata[i].freq);
 		}
+
 		return 1;
 	case WM_COMMAND:
 		switch (HIWORD(wParam)) {
@@ -1003,6 +1128,7 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case IDC_FREQ8:
 				if (HIWORD(wParam) == EN_UPDATE) {
 					PropSheet_Changed(GetParent(hdwnd), hdwnd);
+					gPropChanged = true;
 				} else {
 					PostMessage(GetDlgItem(hdwnd, LOWORD(wParam)), EM_SETSEL, 0, -1);
 				}
@@ -1028,11 +1154,25 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case IDC_PI7:
 			case IDC_PI8:
 				PropSheet_Changed(GetParent(hdwnd), hdwnd);
+				gPropChanged = true;
 			default: i = -1; break;
 			}
 
 			if (i >= 0) {
+				org_data.GetMusicInfo(&mi);
+				gWaveTrack = i;
 
+				gOkay = false;
+				DialogBox(hInst, "DLGWAVESEL", hdwnd, DialogWaveSel);
+				if (gOkay) {
+					snprintf(bfr, 256, "Wave-%02d", gAllWaveSel[i]);
+					SetDlgItemText(hdwnd, btn_wave[i], bfr);
+					gOkay = false;
+					PropSheet_Changed(GetParent(hdwnd), hdwnd);
+					gPropChanged = true;
+				} else {
+					gAllWaveSel[i] = mi.tdata[i].wave_no;
+				}
 			}
 			break;
 		}
@@ -1050,6 +1190,7 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			org_data.GetMusicInfo(&mi);
 			for (i = 0; i < MAXMELODY; ++i) {
+				mi.tdata[i].wave_no = gAllWaveSel[i];
 				int v = GetDlgItemInt(hdwnd, txt_freq[i], NULL, FALSE);
 				if (v < 0 || v > 65535) {
 					v = 1000;
@@ -1064,8 +1205,18 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			else {
 				SetWindowLong(hdwnd, DWL_MSGRESULT, PSNRET_NOERROR);
 				org_data.SetMusicInfo(&mi, SETFREQ | SETPIPI | SETWAVE);
+				for (i = 0; i < MAXMELODY; ++i) {
+					MakeOrganyaWave(i, mi.tdata[i].wave_no, mi.tdata[i].pipi);
+				}
 			}
 			return error;
+		}
+		case PSN_QUERYCANCEL: {
+			org_data.GetMusicInfo(&mi);
+			for (i = 0; i < MAXMELODY; ++i) {
+				MakeOrganyaWave(i, mi.tdata[i].wave_no, mi.tdata[i].pipi);
+			}
+			break;
 		}
 		case UDN_DELTAPOS: {
 			LPNMUPDOWN lud = (LPNMUPDOWN)lParam;
@@ -1081,6 +1232,7 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				SendMessage(lpnm->hwndFrom, UDM_SETPOS, 0, v);
 
 				PropSheet_Changed(GetParent(hdwnd), hdwnd);
+				gPropChanged = true;
 				return 0;
 			}
 			return 1;
@@ -1132,6 +1284,7 @@ BOOL CALLBACK DialogPerc(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			
 			PropSheet_Changed(GetParent(hdwnd), hdwnd);
+			gPropChanged = true;
 			break;
 		}
 		break;
@@ -1173,6 +1326,9 @@ BOOL CALLBACK DialogPerc(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			else {
 				SetWindowLong(hdwnd, DWL_MSGRESULT, PSNRET_NOERROR);
 				org_data.SetMusicInfo(&mi, SETWAVE);
+				for (i = 0; i < MAXDRAM; ++i) {
+					InitDramObject(mi.tdata[i + MAXMELODY].wave_no, i);
+				}
 			}
 			return error;
 		}
@@ -1192,16 +1348,18 @@ BOOL CALLBACK DialogPerc(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 int WINAPI SheetCallback(HWND hwnd, UINT uMsg, LPARAM lParam)
 {
 	if (uMsg == PSCB_BUTTONPRESSED && (lParam == PSBTN_APPLYNOW || lParam == PSBTN_OK)) {
-		SetUndo();
+		if (gPropChanged) {
+			SetUndo();
+			gPropChanged = false;
+		}
 	}
 
 	return 0;
 }
 
 void OpenSongProperties(HWND hwnd) {
+	PROPSHEETHEADER psh;
 	PROPSHEETPAGE psp[3];
-    
-    PROPSHEETHEADER psh;
     
     psp[0].dwSize      = sizeof(PROPSHEETPAGE);
     psp[0].dwFlags     = PSP_USETITLE;

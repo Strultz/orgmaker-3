@@ -474,6 +474,7 @@
 #define IDC_WAVEW                       1248
 #define IDC_SLIDER2                     1249
 #define IDC_WAVEE                       1249
+#define IDC_SLIDERPITCH                 1249
 #define IDC_WAVER                       1250
 #define IDC_WAVET                       1251
 #define IDC_WAVEY                       1252
@@ -491,6 +492,7 @@
 #define fuckyou                         1265
 #define IDC_STARTMEASSPIN               1265
 #define IDC_ENDMEASSPIN                 1266
+#define IDC_PREVPITCH                   1266
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005
@@ -789,7 +791,7 @@
 #define IDM_TRACKI                      40322
 #define IDM_GITHUB                      40323
 #define IDM_CHECKUPD                    40324
-#define IDM_AUTOCHECKUPDATES			40325
+#define IDM_AUTOCHECKUPDATES            40325
 
 // Next default values for new objects
 // 
@@ -797,7 +799,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        248
 #define _APS_NEXT_COMMAND_VALUE         40326
-#define _APS_NEXT_CONTROL_VALUE         1266
+#define _APS_NEXT_CONTROL_VALUE         1267
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
