@@ -1,7 +1,6 @@
-#define _WIN32_WINNT	0x0400
-#define WINVER			0x0400
-#define _WIN32_WINDOWS	0x0410
-#define _WIN32_IE		0x0400
+#define _WIN32_WINNT	0x0501
+#define WINVER			0x0501
+#define _WIN32_WINDOWS	0x0501
 #define BUF_SIZE 256
 //#define HENKOU_NO_SHIRUSHI	"[change ants]"
 
@@ -12,6 +11,7 @@
 #define COPY_WINDOW "COPYWINDOW"
 #define INIT_DATA	"INIT_PAN_VOL"
 #define MIDI_EXPORT	"STANDARD_MIDI_EXPORT"
+#define TOOLBAR_POS "TOOLBAR_POS"
 
 #define CDCD_INIT 0
 #define CDCD_EXIT 1
@@ -143,9 +143,9 @@ LRESULT CALLBACK AreaWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 void OpenSongProperties(HWND hwnd);
 //BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogDefault(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
-BOOL CALLBACK DialogDelete(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
-BOOL CALLBACK DialogCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
-BOOL CALLBACK DialogCopy2(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+//BOOL CALLBACK DialogDelete(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+//BOOL CALLBACK DialogCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+//BOOL CALLBACK DialogCopy2(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogTrans(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogVolume(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -202,7 +202,11 @@ extern int volChangeLength;
 extern bool volChangeUseNoteLength;
 extern bool volChangeSetNoteLength;
 
+int toolbarSavedX[2] = { 100, 100 };
+int toolbarSavedY[2] = { 100, 160 };
+
 static bool autoCheckUpdate = true;
+static bool floatingToolbars = false;
 
 extern void LoadTrackBitmaps(HWND hdwnd);
 extern void LoadPlayerBitmaps(HWND hdwnd);
@@ -210,7 +214,7 @@ extern void ChangeTrack(int iTrack);
 extern void ChangeTrackPlus(int iValue);
 extern char timer_sw; //Playing?
 //extern int EZCopyWindowState; //Easy copy status
-extern RECT CmnDialogWnd;
+//extern RECT CmnDialogWnd;
 extern int SaveWithInitVolFile;	//Song data and... save.
 extern int Menu_Recent[];
 extern int iDragMode;
@@ -440,16 +444,42 @@ int CancelDeleteCurrentData(int iMessagePattern = 1){
 }
 
 void UpdateToolbars(bool floating) {
+	if (floating) {
+		if (hwndRebar) {
+			DestroyWindow(hwndRebar);
+		}
+		hwndRebar = NULL;
+		rebarHeight = 0;
+	}
+	else if (!hwndRebar) {
+		hwndRebar = CreateRebar(hWnd);
+		rebarHeight = GetBarHeight(hwndRebar);
+	}
+	
 	if (hwndToolbar) DestroyWindow(hwndToolbar);
-	if (hwndToolbarPopup) DestroyWindow(hwndToolbarPopup);
 	if (hwndTrackbar) DestroyWindow(hwndTrackbar);
-	if (hwndTrackbarPopup) DestroyWindow(hwndTrackbarPopup);
+	if (hwndToolbarPopup) {
+		GetWindowRect(hwndToolbarPopup, (LPRECT)&WinRect);
+		toolbarSavedX[0] = WinRect.left;
+		toolbarSavedY[0] = WinRect.top;
+		DestroyWindow(hwndToolbarPopup);
+	}
+	if (hwndTrackbarPopup) {
+		GetWindowRect(hwndTrackbarPopup, (LPRECT)&WinRect);
+		toolbarSavedX[1] = WinRect.left;
+		toolbarSavedY[1] = WinRect.top;
+		DestroyWindow(hwndTrackbarPopup);
+	}
+
 	HWND wnds[4] = { NULL,NULL,NULL,NULL };
 	CreateToolbars(floating ? NULL : hwndRebar, wnds);
+
 	hwndToolbar = wnds[0];
 	hwndToolbarPopup = wnds[1];
 	hwndTrackbar = wnds[2];
 	hwndTrackbarPopup = wnds[3];
+
+	SendMessage(hWnd, WM_SIZE, 0, MAKELPARAM(realWidth, realHeight));
 }
 
 void InitBitmaps() {
@@ -587,10 +617,12 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	WinRect.top=        GetPrivateProfileInt(MAIN_WINDOW,"top",0,app_path);
 	WinRect.right=      GetPrivateProfileInt(MAIN_WINDOW,"right",640,app_path);
 	WinRect.bottom=     GetPrivateProfileInt(MAIN_WINDOW,"bottom",480,app_path);
-	CmnDialogWnd.left=	GetPrivateProfileInt(COMMON_WINDOW,"left",	20,app_path);
+
+	/*CmnDialogWnd.left = GetPrivateProfileInt(COMMON_WINDOW, "left", 20, app_path);
 	CmnDialogWnd.top=	GetPrivateProfileInt(COMMON_WINDOW,"top",	20,app_path);
 	CmnDialogWnd.right=	GetPrivateProfileInt(COMMON_WINDOW,"right",	550,app_path);
-	CmnDialogWnd.bottom=GetPrivateProfileInt(COMMON_WINDOW,"bottom",560,app_path);
+	CmnDialogWnd.bottom=GetPrivateProfileInt(COMMON_WINDOW,"bottom",560,app_path);*/
+
 	iDlgRepeat =        GetPrivateProfileInt(MIDI_EXPORT,"Repeat",1,app_path);
 
 	char strauthtmp[128];
@@ -604,22 +636,22 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	unsigned long ul = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_THICKFRAME | WS_MAXIMIZEBOX;
 
+	realWidth = WinRect.right;
+	realHeight = WinRect.bottom;
+
 	// main window
 	hWnd = CreateWindow(szClassName,
 			"OrgMaker 3",
 			ul,
-			WinRect.left, WinRect.top, WinRect.right, WinRect.bottom,
+			WinRect.left, WinRect.top, realWidth, realHeight,
             NULL, NULL, hInst, NULL);
+
 
 	if (!hWnd)
 		return FALSE;
 
-	hwndRebar = CreateRebar(hWnd);
 	hwndStatus = CreateStatusBar(hWnd);
-
-	UpdateToolbars(false);
-
-	rebarHeight = GetBarHeight(hwndRebar);
+	CreateToolbarClass();
 
 	hwndArea = CreateWindow(szAreaClass, "", WS_CHILD | WS_VISIBLE, 0,
 		rebarHeight, WinRect.right - WinRect.left, WinRect.bottom - WinRect.top - rebarHeight - GetBarHeight(hwndStatus),
@@ -654,7 +686,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 //Image initialization //////////
 	if (!StartGDI(hwndArea)) { //GDI ready
 		QuitMMTimer();
-		DestroyWindow(hwndRebar);
+		if (hwndRebar) DestroyWindow(hwndRebar);
 		DestroyWindow(hwndStatus);
 		DestroyWindow(hwndArea);
 		DestroyWindow(hWnd);
@@ -667,7 +699,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	if (!InitDirectSound(hWnd)) {
 		QuitMMTimer();
 		EndGDI();
-		DestroyWindow(hwndRebar);
+		if (hwndRebar) DestroyWindow(hwndRebar);
 		DestroyWindow(hwndStatus);
 		DestroyWindow(hwndArea);
 		DestroyWindow(hWnd);
@@ -730,8 +762,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	volChangeSetNoteLength = GetPrivateProfileInt(MAIN_WINDOW, "VolChangeSetNoteLength", 0, app_path);
 
 	autoCheckUpdate = GetPrivateProfileInt(MAIN_WINDOW, "AutoCheckUpdates", 1, app_path);
+	floatingToolbars = GetPrivateProfileInt(MAIN_WINDOW, "FloatingToolbars", 0, app_path);
 
 	CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
+	CheckMenuItem(hMenu, IDM_FLOATTOOLBARS, MF_BYCOMMAND | (floatingToolbars ? MFS_CHECKED : MFS_UNCHECKED));
 
 	if (GetPrivateProfileInt(MAIN_WINDOW, "UserExists", 0, app_path) == 0) {
 		// TODO
@@ -745,6 +779,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		ShowWindow(hWnd,nCmdShow);//Main window display
 	}
 	UpdateWindow(hWnd);//Update main window
+
+	toolbarSavedX[0] = GetPrivateProfileInt(TOOLBAR_POS, "ToolbarMainX", 100, app_path);
+	toolbarSavedY[0] = GetPrivateProfileInt(TOOLBAR_POS, "ToolbarMainY", 100, app_path);
+	toolbarSavedX[1] = GetPrivateProfileInt(TOOLBAR_POS, "ToolbarChannelX", 100, app_path);
+	toolbarSavedY[1] = GetPrivateProfileInt(TOOLBAR_POS, "ToolbarChannelY", 160, app_path);
 
 	DragAcceptFiles(hWnd,TRUE);//Now allow dragging
 	//Generate player dialog (modalless)
@@ -835,6 +874,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	}
 
 	QuitMMTimer(); //A 2010.09.21
+
+	UpdateToolbars(floatingToolbars);
 	UpdateToolbarStatus();
 
 	org_data.PutMusic();
@@ -1057,13 +1098,13 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				//SendDlgItemMessage(hDlgTrack , IDC_TRACK0 , BM_CLICK , 0, 0);
 			}
 			else if (LOWORD(wParam) == iChgTrackBtn[i]) {
-				if (GetKeyState(VK_CONTROL) & 0x8000) { // Side
+				if (GetKeyState(VK_MENU) & 0x8000) { // Side
 					char d = (org_data.mute[i] == 0);
 					for (j = 0; j < 8; ++j) {
 						org_data.mute[j + (i < 8 ? 0 : 8)] = d;
 					}
 					UpdateToolbarStatus();
-				} else if (GetKeyState(VK_MENU) & 0x8000) { // Solo
+				} else if (GetKeyState(VK_CONTROL) & 0x8000) { // Solo
 					bool un = true;
 					for (j = 0; j < 16; ++j) {
 						if (org_data.mute[j] != (i != j)) {
@@ -1135,15 +1176,15 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				break;
 			case IDM_DLGDELETE://
 			case ID_AC_DELETE:
-				DialogBox(hInst,"DLGDELETE",hwnd,DialogDelete);
+				//DialogBox(hInst,"DLGDELETE",hwnd,DialogDelete);
 				break;
 			case IDM_DLGCOPY://
 			case ID_AC_COPYDLG:
-				DialogBox(hInst,"DLGCOPY",hwnd,DialogCopy);
+				//DialogBox(hInst,"DLGCOPY",hwnd,DialogCopy);
 				break;
 			case IDM_DLGCOPY2://
 			case ID_AC_COPY2:
-				DialogBox(hInst,"DLGCOPY2",hwnd,DialogCopy2);
+				//DialogBox(hInst,"DLGCOPY2",hwnd,DialogCopy2);
 				break;
 			case IDM_DLGPAN://
 			case ID_AC_DLG_PAN:
@@ -1832,6 +1873,12 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			autoCheckUpdate = !autoCheckUpdate;
 			CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
 			break;
+		case IDM_FLOATTOOLBARS:
+			hMenu = GetMenu(hWnd);
+			floatingToolbars = !floatingToolbars;
+			CheckMenuItem(hMenu, IDM_FLOATTOOLBARS, MF_BYCOMMAND | (floatingToolbars ? MFS_CHECKED : MFS_UNCHECKED));
+			UpdateToolbars(floatingToolbars);
+			break;
 		}
 
 		break;
@@ -2182,15 +2229,15 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		break;
 	}
 	case WM_SIZE: {
-		SendMessage(hwndRebar, WM_SIZE, 0, 0);
 		SendMessage(hwndStatus, WM_SIZE, 0, 0);
+		if (hwndRebar) SendMessage(hwndRebar, WM_SIZE, 0, 0);
 		rebarHeight = GetBarHeight(hwndRebar);
 
 		realWidth = LOWORD(lParam);
 		realHeight = HIWORD(lParam);
 		SetWindowPos(hwndArea, HWND_TOP, 0, rebarHeight, realWidth, realHeight - rebarHeight - GetBarHeight(hwndStatus), 0);
 
-		int swidths[] = { realWidth - 450, realWidth - 350, realWidth - 150, -1 };
+		int swidths[] = { realWidth - 550, realWidth - 450, realWidth - 350, realWidth - 150, -1 };
 		SendMessage(hwndStatus, SB_SETPARTS, sizeof(swidths) / sizeof(int), (LPARAM)swidths);
 
 
@@ -2355,6 +2402,8 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW, "VolChangeSetNoteLength", num_buf, app_path);
 	wsprintf(num_buf, "%d", autoCheckUpdate);
 	WritePrivateProfileString(MAIN_WINDOW, "AutoCheckUpdates", num_buf, app_path);
+	wsprintf(num_buf, "%d", floatingToolbars);
+	WritePrivateProfileString(MAIN_WINDOW, "FloatingToolbars", num_buf, app_path);
 	wsprintf(num_buf, "%d", 1);
 	WritePrivateProfileString(MAIN_WINDOW, "UserExists", num_buf, app_path);
 
@@ -2381,14 +2430,26 @@ void SaveIniFile()
 	wsprintf(num_buf,"%d",EZCopyWindowState);
 	WritePrivateProfileString(COPY_WINDOW,"show",num_buf,app_path);*/
 
-	wsprintf(num_buf,"%d",CmnDialogWnd.left);
-	WritePrivateProfileString(COMMON_WINDOW,"left",num_buf,app_path);
-	wsprintf(num_buf,"%d",CmnDialogWnd.top);
-	WritePrivateProfileString(COMMON_WINDOW,"top",num_buf,app_path);
-	wsprintf(num_buf,"%d",CmnDialogWnd.right );
-	WritePrivateProfileString(COMMON_WINDOW,"right",num_buf,app_path);
-	wsprintf(num_buf,"%d",CmnDialogWnd.bottom );
-	WritePrivateProfileString(COMMON_WINDOW,"bottom",num_buf,app_path);
+	if (hwndToolbarPopup) {
+		GetWindowRect(hwndToolbarPopup, (LPRECT)&WinRect);
+		toolbarSavedX[0] = WinRect.left;
+		toolbarSavedY[0] = WinRect.top;
+	}
+	if (hwndTrackbarPopup) {
+		GetWindowRect(hwndTrackbarPopup, (LPRECT)&WinRect);
+		toolbarSavedX[1] = WinRect.left;
+		toolbarSavedY[1] = WinRect.top;
+	}
+
+	wsprintf(num_buf,"%d", toolbarSavedX[0]);
+	WritePrivateProfileString(TOOLBAR_POS,"ToolbarMainX",num_buf,app_path);
+	wsprintf(num_buf,"%d", toolbarSavedY[0]);
+	WritePrivateProfileString(TOOLBAR_POS,"ToolbarMainY",num_buf,app_path);
+	wsprintf(num_buf,"%d", toolbarSavedX[1]);
+	WritePrivateProfileString(TOOLBAR_POS,"ToolbarChannelX",num_buf,app_path);
+	wsprintf(num_buf,"%d", toolbarSavedY[1]);
+	WritePrivateProfileString(TOOLBAR_POS,"ToolbarChannelY",num_buf,app_path);
+
 	wsprintf(num_buf,"%d",iDlgRepeat );
 	WritePrivateProfileString(MIDI_EXPORT,"Repeat",num_buf,app_path);
 

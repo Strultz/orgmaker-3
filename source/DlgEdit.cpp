@@ -14,7 +14,7 @@ extern int tra, ful ,haba;
 extern char TrackN[];
 extern char *dram_name[];
 
-BOOL CALLBACK DialogDelete(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
+/*BOOL CALLBACK DialogDelete(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	char str[128] = {NULL};
 	int v;
@@ -197,7 +197,7 @@ BOOL CALLBACK DialogCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 	}
 	return 0;
-}
+}*/
 
 //パンチェンジダイアログ
 BOOL CALLBACK DialogPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -408,7 +408,7 @@ BOOL CALLBACK DialogVolume(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 	return 0;
 }
 //コピーダイアログ2
-int cbox[MAXTRACK] = {
+/*int cbox[MAXTRACK] = {
 	IDC_USE0,
 	IDC_USE1,
 	IDC_USE2,
@@ -547,7 +547,7 @@ BOOL CALLBACK DialogCopy2(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 		}
 	}
 	return 0;
-}
+}*/
 
 BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -601,6 +601,7 @@ BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			//MessageBox(hdwnd,"指定Trackを入れ替えました。","通知",MB_OK);	// 2014.10.19 D
 			//msgbox(hdwnd,IDS_SWAP_TRACK,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
+			EndDialog(hdwnd, 0);
 			return 1;
 		}
 	}

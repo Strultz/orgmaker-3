@@ -7,6 +7,9 @@
 
 static char szTbClassName[] = "OrgToolbar";
 
+extern int toolbarSavedX[2];
+extern int toolbarSavedY[2];
+
 LRESULT CALLBACK ToolbarWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
     if (message == WM_COMMAND) {
         SendMessage(hWnd, WM_COMMAND, wParam, lParam);
@@ -15,7 +18,7 @@ LRESULT CALLBACK ToolbarWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
     return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
-static void CreateToolbar(HWND hwndRebar, const char *iconBitmap, int buttonCount, TBBUTTON tbb[], const char* toolbarName, HWND outHwnd[2]) {
+static void CreateToolbar(int id, HWND hwndRebar, const char *iconBitmap, int buttonCount, TBBUTTON tbb[], const char* toolbarName, HWND outHwnd[2]) {
     bool rebar = true;
     if (!hwndRebar) {
         rebar = false;
@@ -70,11 +73,11 @@ static void CreateToolbar(HWND hwndRebar, const char *iconBitmap, int buttonCoun
         rbBand.cx = 0;
 
         // Add the band
-        SendMessage(hwndRebar, RB_INSERTBAND, (WPARAM)-1, (LPARAM)&rbBand);
+        SendMessage(hwndRebar, RB_INSERTBAND, (WPARAM)id, (LPARAM)&rbBand);
     } else {
         RECT wr = { 0, 0, s.cx, s.cy };
         AdjustWindowRectEx(&wr, WS_VISIBLE | WS_POPUP | WS_BORDER | WS_CAPTION, FALSE, WS_EX_PALETTEWINDOW);
-        SetWindowPos(hwndRebar, HWND_TOP, 200, 200, wr.right - wr.left, wr.bottom - wr.top, 0);
+        SetWindowPos(hwndRebar, HWND_TOP, toolbarSavedX[id], toolbarSavedY[id], wr.right - wr.left, wr.bottom - wr.top, 0);
 
         SetWindowPos(hWndToolbar, HWND_TOP, 0, 0, s.cx, s.cy, 0);
     }
@@ -98,6 +101,10 @@ HWND CreateRebar(HWND hwnd)
     GetClientRect(hwnd, &rcWindow);
     MoveWindow(hwndRebar, 0, 0, rcWindow.right - rcWindow.left, GetBarHeight(hwndRebar), TRUE);
 
+    return hwndRebar;
+}
+
+void CreateToolbarClass(void) {
     WNDCLASSEX ot;
     ot.cbSize = sizeof(WNDCLASSEX);
     ot.style = 0;
@@ -112,8 +119,6 @@ HWND CreateRebar(HWND hwnd)
     ot.lpszMenuName = NULL;
     ot.lpszClassName = szTbClassName;
     RegisterClassEx(&ot);
-
-    return hwndRebar;
 }
 
 void CreateToolbars(HWND hwndRebar, HWND outHwnd[4]) {
@@ -146,7 +151,7 @@ void CreateToolbars(HWND hwndRebar, HWND outHwnd[4]) {
         {0, 0, 0, BTNS_SEP},
         {5, IDM_PREFERENCES, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Preferences"},
     };
-    CreateToolbar(hwndRebar, "TOOLBAR_ICONS", 26, tbb1, "Main", outHwnd);
+    CreateToolbar(0, hwndRebar, "TOOLBAR_ICONS", 26, tbb1, "Main", outHwnd);
 
     TBBUTTON tbb2[17] =
     {
@@ -168,16 +173,24 @@ void CreateToolbars(HWND hwndRebar, HWND outHwnd[4]) {
         {14, IDM_TRACKU, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Channel U (U)"},
         {15, IDM_TRACKI, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Channel I (I)"},
     };
-    CreateToolbar(hwndRebar, "TRACKBAR_ICONS", 17, tbb2, "Channels", &outHwnd[2]);
+    CreateToolbar(1, hwndRebar, "TRACKBAR_ICONS", 17, tbb2, "Channels", &outHwnd[2]);
 }
 
 int GetBarWidth(HWND hwndBar) {
+    if (hwndBar == NULL) {
+        return 0;
+    }
+
     WINDOWPLACEMENT wp;
     GetWindowPlacement(hwndBar, &wp);
     return wp.rcNormalPosition.right - wp.rcNormalPosition.left;
 }
 
 int GetBarHeight(HWND hwndBar) {
+    if (hwndBar == NULL) {
+        return 0;
+    }
+
     WINDOWPLACEMENT wp;
     GetWindowPlacement(hwndBar, &wp);
     return wp.rcNormalPosition.bottom - wp.rcNormalPosition.top;
@@ -189,12 +202,13 @@ HWND CreateStatusBar(HWND hwnd) {
         0, 0, 0, 0, hwnd, NULL, hInst, NULL);
 
     int w = GetBarWidth(hwndStatus);
-    int swidths[] = { w - 450, w - 350, w - 150, -1 };
+    int swidths[] = { w - 550, w - 450, w - 350, w - 150, -1 };
     SendMessage(hwndStatus, SB_SETPARTS, sizeof(swidths) / sizeof(int), (LPARAM)swidths);
     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Press F1 for help");
-    SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Channel 1");
-    SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)"Wait: 125 (120.000 BPM)");
-    SendMessage(hwndStatus, SB_SETTEXT, 3, (LPARAM)"Meas 0:0");
+    SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 100%");
+    SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)"Channel 1");
+    SendMessage(hwndStatus, SB_SETTEXT, 3, (LPARAM)"Wait: 125 (120.000 BPM)");
+    SendMessage(hwndStatus, SB_SETTEXT, 4, (LPARAM)"Meas 0:0");
 
     return hwndStatus;
 }

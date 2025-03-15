@@ -7,7 +7,7 @@
 
 
 
-RECT CmnDialogWnd;
+//RECT CmnDialogWnd;
 int count_of_INIT_DONE;
 int iDlgRepeat; //ダイアログから取得した繰り返し回数
 extern char strMIDI_TITLE[256];
