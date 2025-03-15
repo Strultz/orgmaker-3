@@ -355,20 +355,20 @@ void UpdateStatusBar(bool measonly) {
 
 		snprintf(msg, 256, "Wait: %d (%.3f BPM)", mi.wait, mi.wait <= 0 || mi.dot <= 0 ? 0 : 60000.0 / (double)(mi.wait * mi.dot));
 		SendMessage(hwndStatus, SB_SETTEXT, 3, (LPARAM)msg);
+
+		switch (NoteWidth) {
+		case 4:		SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 25%"); break;
+		case 6:		SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 37.5%"); break;
+		case 8:		SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 50%"); break;
+		case 10:	SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 62.5%"); break;
+		case 12:	SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 75%"); break;
+		case 14:	SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 87.5%"); break;
+		case 16:	SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 100%"); break;
+		}
 	}
 
 	snprintf(msg, 256, "Meas %d:%d", meas, step);
 	SendMessage(hwndStatus, SB_SETTEXT, 4, (LPARAM)msg);
-
-	switch (NoteWidth) {
-	case 4:		SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 25%"); break;
-	case 6:		SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 37.5%"); break;
-	case 8:		SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 50%"); break;
-	case 10:	SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 62.5%"); break;
-	case 12:	SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 75%"); break;
-	case 14:	SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 87.5%"); break;
-	case 16:	SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 100%"); break;
-	}
 }
 
 void SaveIniFile();
