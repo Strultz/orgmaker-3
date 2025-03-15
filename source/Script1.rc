@@ -673,8 +673,6 @@ BEGIN
         MENUITEM "Zoom &In\tF7",                IDM_LOUPE_PLUS
         MENUITEM "Zoom &Out\tF8",               IDM_LOUPE_MINUS
         MENUITEM SEPARATOR
-        MENUITEM "&Quick Copy Toolbar\tF9",     IDM_EZCOPYVISIBLE
-        MENUITEM SEPARATOR
         POPUP "&Preferences"
         BEGIN
             MENUITEM "Confirm &Unsaved Changes",    IDM_CHANGEFINISH
