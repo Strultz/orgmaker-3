@@ -191,8 +191,9 @@ ORGDATA org_data;//main data
 SCROLLDATA scr_data;//scroll data
 MOUSEDATA mouse_data;//mouse data
 extern char music_file[];//file name
-extern int sGrid;	//Range selection in grid units
-extern int sACrnt;	//Range selection always on current track
+int sGrid = 0;
+int sACrnt = 0;
+char TrackN[] = "12345678QWERTYUI";
 
 int sMetronome = 0;
 int sSmoothScroll = 0;
@@ -962,7 +963,7 @@ void ClipboardPaste(int no) {
 	org_data.SetUndoData();
 
 	nc_Select.x1_1 = (tra >= 0 && nc_Select.x1_1 == nc_Select.x1_2) ? nc_Select.x1_1 : x_scroll;
-	nc_Select.x1_2 = nc_Select.x1_1 + gClipboardData.length - 1;
+	nc_Select.x1_2 = nc_Select.x1_1 + (gClipboardData.length * no) - 1;
 	org_data.PasteNoteData(&gClipboardData, org_data.track, nc_Select.x1_1, no);
 
 	if (gClipboardData.track1 == gClipboardData.track2) {

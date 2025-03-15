@@ -27,9 +27,6 @@
     <ClCompile Include="DlgEdit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DlgEZCopy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DlgPlayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
