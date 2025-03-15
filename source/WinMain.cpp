@@ -701,6 +701,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 //Image initialization //////////
 	if (!StartGDI(hwndArea)) { //GDI ready
+		MessageBox(hWnd, "Graphics engine failed to initalize.", "OrgMaker Error", MB_ICONERROR | MB_OK);
 		QuitMMTimer();
 		if (hwndRebar) DestroyWindow(hwndRebar);
 		DestroyWindow(hwndStatus);
@@ -713,6 +714,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	InitCursor();
 //Sound initialization ///////
 	if (!InitDirectSound(hWnd)) {
+		MessageBox(hWnd, "Sound engine failed to initalize.", "OrgMaker Error", MB_ICONERROR | MB_OK);
 		QuitMMTimer();
 		EndGDI();
 		if (hwndRebar) DestroyWindow(hwndRebar);
