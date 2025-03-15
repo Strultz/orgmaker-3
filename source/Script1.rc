@@ -434,8 +434,8 @@ CAPTION "About OrgMaker"
 FONT 9, "MS PGothic", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,39,113,40,18
-    CTEXT           "OrgMaker ver.3.0.9",IDC_STATIC,20,32,80,8
-    LTEXT           "2024 / 10 / 16",IDC_STATIC,37,43,44,8
+    CTEXT           "OrgMaker ver.3.0.10",IDC_STATIC,20,32,80,8
+    LTEXT           "2025 / 03 / 15",IDC_STATIC,37,43,44,8
     CTEXT           "OrgMaker 1 by Studio Pixel",IDC_STATIC,2,57,114,16,SS_CENTERIMAGE | SS_SUNKEN
     ICON            "ICON",ID_ICON_ORG,49,3,20,20,SS_NOTIFY,WS_EX_DLGMODALFRAME
     CTEXT           "OrgMaker 2 by Rxo Inverse",IDC_STATIC,2,75,114,16,SS_CENTERIMAGE | SS_SUNKEN
@@ -1067,6 +1067,8 @@ BEGIN
     BEGIN
         MENUITEM "&Help...\tCtrl+Alt+H",        IDM_DLGHELP
         MENUITEM SEPARATOR
+        MENUITEM "Open &GitHub Page",           IDM_GITHUB
+        MENUITEM SEPARATOR
         MENUITEM "&About OrgMaker",              IDM_DLGMEMO
     END
 END
@@ -1160,8 +1162,8 @@ ZZZ                     ICON                    "bitmap\\ffff.ico"
 //
 
 WAVE100                 WAVE                    "Wave\\WAVE100.wdb"
-/*
-TOM01                   WAVE                    "Wave\\Tom01.wav"
+
+/* TOM01                   WAVE                    "Wave\\Tom01.wav"
 
 BASS02                  WAVE                    "Wave\\Bass02.wav"
 
@@ -1245,11 +1247,13 @@ BASS08                  WAVE                    "Wave\\Bass08.wav"
 
 HICLOSE05               WAVE                    "Wave\\HiClose05.wav"
 
-SNARE08                 WAVE                    "Wave\\Snare08.wav"
-*/
+SNARE08                 WAVE                    "Wave\\Snare08.wav" */
+
 METRO01                 WAVE                    "Wave\\Metro01.wav"
 
 METRO02                 WAVE                    "Wave\\Metro02.wav"
+
+CAT                     WAVE                    "Wave\\Cat.wav"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1258,8 +1262,8 @@ METRO02                 WAVE                    "Wave\\Metro02.wav"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,0,9,0
- PRODUCTVERSION 3,0,9,0
+ FILEVERSION 3,0,10,0
+ PRODUCTVERSION 3,0,10,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -1272,21 +1276,21 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "041104b0"
+        BLOCK "040904E4"
         BEGIN
             VALUE "Comments", "Please ignore the rough parts."
             VALUE "CompanyName", "No extra taste."
             VALUE "FileDescription", "OrgMaker 3"
-            VALUE "FileVersion", "3.0.9"
-            VALUE "LegalCopyright", "Copyright (C) 2005-2024 Pixel and Rxo Inverse"
+            VALUE "FileVersion", "3.0.10"
+            VALUE "LegalCopyright", "Copyright (C) 2005-2025 Pixel and Rxo Inverse"
             VALUE "OriginalFilename", "OrgMaker.exe"
-            VALUE "ProductName", "OrgMaker 3"
-            VALUE "ProductVersion", "3.0.9"
+            VALUE "ProductName", "OrgMaker"
+            VALUE "ProductVersion", "3.0.10"
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x409, 1200
+        VALUE "Translation", 0x409, 1252
     END
 END
 
@@ -1521,10 +1525,10 @@ BEGIN
     IDS_NOTIFY_TITLE_LOAD   "Unsaved Changes"
     IDS_SWAP_TRACK          "Replaced the designated Track."
     IDS_USAGE               "Usage"
-    IDS_VALUESET012         "Value must be in range (0-12)."
-    IDS_VALUESET0254        "Value must be in range (0-254)."
-    IDS_VALUESET1001900     "Recommended value is in range (100-1900)."
-    IDS_VALUESET12000       "Value must be in range (1-2000)."
+    IDS_VALUESET012         "Value must be within the range 0 to 12."
+    IDS_VALUESET0254        "Value must be within the range 0 to 254."
+    IDS_VALUESET1001900     "Recommended value is within the range 100 to 1900."
+    IDS_VALUESET12000       "Wait value must be within the range 1 to 2000."
     IDS_WARNING_ACCESS_FILE "Couldn't access file."
     IDS_WARNING_BUNKATSU    "The numbers for the division are invalid."
 END
@@ -1534,7 +1538,7 @@ BEGIN
     IDS_WARNING_COPY_HANI   "Invalid copy range"
     IDS_WARNING_COPY_KAISUU "Invalid copy count"
     IDS_WARNING_FROM_BEAT   "Invalid From Beat"
-    IDS_WARNING_FROM_TO     "Invalid head (head < end)"
+    IDS_WARNING_FROM_TO     "Invalid repeat range (start > end)"
     IDS_WARNING_FROM_TRACK  "Invalid From Track"
     IDS_WARNING_HANI        "Invalid range"
     IDS_WARNING_HYOUSHI     "Invalid beat values"
@@ -1598,7 +1602,7 @@ BEGIN
     IDS_STRING100           "What about clearing history (for development)?"
     IDS_STRING101           "Automatically save/load *.pvi in the same folder as *.org"
     IDS_STRING102           "*.chm help is tasteless because I spared the time to create it"
-    IDS_STRING103           "Meow!"
+    IDS_STRING103           "About"
     IDS_STRING104           "Track %c"
     IDS_STRING105           " selection"
     IDS_STRING106           "Selection of all tracks"

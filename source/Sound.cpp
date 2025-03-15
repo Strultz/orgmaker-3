@@ -21,13 +21,19 @@
 
 static struct S_Sound
 {
-	signed char* samples;
+	signed char samples[4];
+    long ring;
+    
+    signed char* buffer;
 	size_t frames;
-	float position;
+	long position;
+	float sub_position;
 	float advance_delta;
+    long silence_count;
 	bool playing;
-	bool hasPlayedBefore;
+	bool played_before;
 	bool looping;
+    
 	float volume;
 	float pan_l;
 	float pan_r;
@@ -83,7 +89,7 @@ static void S_SetSoundVolume(S_Sound* sound, long volume) {
 	sound->target_volume_l = sound->pan_l * sound->volume;
 	sound->target_volume_r = sound->pan_r * sound->volume;
 
-	if (!sound->playing || !sound->hasPlayedBefore) {
+	if (!sound->playing || !sound->played_before) {
 		sound->volume_l = sound->target_volume_l;
 		sound->volume_r = sound->target_volume_r;
 		sound->vol_ticks = 0;
@@ -107,7 +113,7 @@ static void S_SetSoundPan(S_Sound* sound, long pan) {
 	sound->target_volume_l = sound->pan_l * sound->volume;
 	sound->target_volume_r = sound->pan_r * sound->volume;
 
-	if (!sound->playing || !sound->hasPlayedBefore) {
+	if (!sound->playing || !sound->played_before) {
 		sound->volume_l = sound->target_volume_l;
 		sound->volume_r = sound->target_volume_r;
 		sound->vol_ticks = 0;
@@ -124,19 +130,24 @@ static S_Sound* S_CreateSound(unsigned int frequency, const unsigned char* sampl
 	if (sound == NULL)
 		return NULL;
 
-	sound->samples = (signed char*)malloc(length);
-	if (sound->samples == NULL) {
+	sound->buffer = (signed char*)malloc(length);
+	if (sound->buffer == NULL) {
 		free(sound);
 		return NULL;
 	}
 
 	for (size_t i = 0; i < length; ++i)
-		sound->samples[i] = samples[i] - 0x80;
+		sound->buffer[i] = samples[i] - 0x80;
+    
+    memset(sound->samples, 0, 4);
 
 	sound->frames = length;
 	sound->playing = false;
-	sound->hasPlayedBefore = false;
+	sound->played_before = false;
 	sound->position = 0;
+    sound->ring = 0;
+    sound->sub_position = 0;
+    sound->silence_count = 0;
 
 	S_SetSoundFrequency(sound, frequency);
 	S_SetSoundVolume(sound, 0);
@@ -168,7 +179,7 @@ void S_DestroySound(S_Sound* sound)
 		}
 	}
 
-	free(sound->samples);
+	free(sound->buffer);
 	free(sound);
 
 	ma_mutex_unlock(&mutex);
@@ -179,8 +190,17 @@ static void S_PlaySound(S_Sound* sound, bool looping) {
 		return;
 
 	ma_mutex_lock(&mutex);
+    
+    if (!sound->playing) {
+		sound->position = 0;
 
-	sound->playing = true;
+		if (sound->silence_count == 0) {
+			sound->sub_position = 0;
+		}
+        
+        sound->playing = true;
+	}
+
 	sound->looping = looping;
 
 	ma_mutex_unlock(&mutex);
@@ -192,7 +212,10 @@ static void S_StopSound(S_Sound* sound) {
 
 	ma_mutex_lock(&mutex);
 
-	sound->playing = false;
+    if (sound->playing) {
+        sound->playing = false;
+        sound->silence_count = 4;
+    }
 
 	ma_mutex_unlock(&mutex);
 }
@@ -208,13 +231,38 @@ static void S_RewindSound(S_Sound* sound) {
 	ma_mutex_unlock(&mutex);
 }
 
+// This is for exporting
+static void S_ResetSounds() {
+	ma_mutex_lock(&mutex);
+
+	for (S_Sound* sound = sound_list_head; sound != NULL; sound = sound->next) {
+		sound->playing = false;
+		sound->looping = false;
+		sound->played_before = false;
+		sound->silence_count = 0;
+		sound->ring = 0;
+		sound->position = 0;
+		sound->sub_position = 0;
+		sound->volume = 1.0F;
+		sound->pan_l = 1.0F;
+		sound->pan_r = 1.0F;
+		sound->target_volume_l = sound->pan_l * sound->volume;
+		sound->target_volume_r = sound->pan_r * sound->volume;
+		sound->volume_l = sound->target_volume_l;
+		sound->volume_r = sound->target_volume_r;
+		sound->vol_ticks = 0;
+	}
+
+	ma_mutex_unlock(&mutex);
+}
+
 static void S_MixSounds(float* stream, size_t frames_total) {
 	for (S_Sound* sound = sound_list_head; sound != NULL; sound = sound->next) {
-		if (sound->playing) {
+		if (sound->playing || sound->silence_count > 0) {
 			float* stream_pointer = stream;
 
-			sound->hasPlayedBefore = TRUE;
-
+			sound->played_before = true;
+            
 			for (size_t frames_done = 0; frames_done < frames_total; ++frames_done) {
 				// Update volume ramp
 				if (sound->vol_ticks > 0) {
@@ -225,26 +273,15 @@ static void S_MixSounds(float* stream, size_t frames_total) {
 				}
 
 				// Perform lagrange interpolation
-				const float subsample = mmodf(sound->position, 1.0F);
-				const long sp = (long)sound->position;
+				const float subsample = sound->sub_position;
+				const long sp = sound->position;
 
-				float sample_a;
-				float sample_b;
-				float sample_c;
-				float sample_d;
+				const long margin = sound->ring - 2;
 
-				if (sound->looping) {
-					sample_a = (float)sound->samples[mmodi(sp - 1, sound->frames)] / (float)(1 << 7);
-					sample_b = (float)sound->samples[sp] / (float)(1 << 7);
-					sample_c = (float)sound->samples[mmodi(sp + 1, sound->frames)] / (float)(1 << 7);
-					sample_d = (float)sound->samples[mmodi(sp + 2, sound->frames)] / (float)(1 << 7);
-				}
-				else {
-					sample_a = sp - 1 < 0 ? 0.0F : (float)sound->samples[sp - 1] / (float)(1 << 7);
-					sample_b = (float)sound->samples[sp] / (float)(1 << 7);
-					sample_c = sp + 1 >= sound->frames ? 0.0F : (float)sound->samples[sp + 1] / (float)(1 << 7);
-					sample_d = sp + 2 >= sound->frames ? 0.0F : (float)sound->samples[sp + 2] / (float)(1 << 7);
-				}
+				const float sample_a = (float)sound->samples[mmodi(margin - 1, 4)] / (float)(1 << 7);
+				const float sample_b = (float)sound->samples[mmodi(margin, 4)] / (float)(1 << 7);
+				const float sample_c = (float)sound->samples[mmodi(margin + 1, 4)] / (float)(1 << 7);
+				const float sample_d = (float)sound->samples[mmodi(margin + 2, 4)] / (float)(1 << 7);
 
 				const float c0 = sample_b;
 				const float c1 = sample_c - 1 / 3.0 * sample_a - 1 / 2.0 * sample_b - 1 / 6.0 * sample_d;
@@ -258,21 +295,49 @@ static void S_MixSounds(float* stream, size_t frames_total) {
 				*stream_pointer++ += interpolated_sample * sound->volume_r;
 
 				// Increment sample
-				sound->position += sound->advance_delta;
+				const long last_position = sound->position;
+
+				sound->sub_position += sound->advance_delta;
+                sound->position += (long)sound->sub_position;
+                sound->sub_position = mmodf(sound->sub_position, 1.0F);
+
+				if (sound->position > last_position) {
+					/* Update ring buffer position and write new sample(s) */
+					for (int i = 0; i < (sound->position - last_position); ++i) {
+						sound->ring = (sound->ring + 1) % 4;
+
+						if (sound->playing) {
+							if (sound->looping) {
+								sound->samples[sound->ring] = (signed long)sound->buffer[(last_position + i) % sound->frames];
+							}
+							else {
+								sound->samples[sound->ring] = (signed long)((last_position + i) >= sound->frames ? 0 : sound->buffer[(last_position + i)]);
+							}
+						}
+						else {
+							sound->samples[sound->ring] = 0;
+							--sound->silence_count;
+						}
+					}
+				}
 
 				// Stop or loop sample once it's reached its end
-				if (sound->position >= sound->frames)
-				{
-					if (sound->looping)
+				if (sound->playing) {
+					if (sound->position >= sound->frames)
 					{
-						sound->position = fmodf(sound->position, sound->frames);
+						if (sound->looping)
+						{
+							sound->position = sound->position % sound->frames;
+						}
+						else
+						{
+							sound->playing = FALSE;
+							sound->silence_count = 4;
+						}
 					}
-					else
-					{
-						sound->playing = FALSE;
-						sound->position = 0;
-						break;
-					}
+				}
+				else {
+					sound->position = 0;
 				}
 			}
 		}
@@ -384,6 +449,8 @@ BOOL InitDirectSound(HWND hwnd)
 //	}
 //	dsbd.dwFlags = 0; //ƒZƒJƒ“ƒ_ƒŠƒoƒbƒtƒ@
 //	CapDev->CreateCaptureBuffer(&dsbd, &CapBuf, NULL);
+
+    sound_list_head = NULL;
 
 	ma_device_config config = ma_device_config_init(ma_device_type_playback);
 	config.playback.pDeviceID = NULL;
@@ -706,8 +773,8 @@ void ChangeOrganFrequency(unsigned char key,char track, DWORD a)
 }
 short pan_tbl[13] = {0,43,86,129,172,215,256,297,340,383,426,469,512}; 
 unsigned char old_key[MAXTRACK] = {255,255,255,255,255,255,255,255};//Ä¶’†‚Ì‰¹
-unsigned char key_on[MAXTRACK] = {0};//ƒL[ƒXƒCƒbƒ`
-unsigned char key_twin[MAXTRACK] = {0};//¡Žg‚Á‚Ä‚¢‚éƒL[(˜A‘±Žž‚ÌƒmƒCƒY–hŽ~‚Ìˆ×‚É“ñ‚Â—pˆÓ)
+unsigned char key_on[MAXTRACK] = {0,0,0,0,0,0,0,0};//ƒL[ƒXƒCƒbƒ`
+unsigned char key_twin[MAXTRACK] = {0,0,0,0,0,0,0,0};//¡Žg‚Á‚Ä‚¢‚éƒL[(˜A‘±Žž‚ÌƒmƒCƒY–hŽ~‚Ìˆ×‚É“ñ‚Â—pˆÓ)
 void ChangeOrganPan(unsigned char key, unsigned char pan,char track)//512‚ªMAX‚Å256‚ªÉ°ÏÙ
 {
 	if(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]] != NULL && old_key[track] != 255)
@@ -757,14 +824,14 @@ void PlayOrganObject(unsigned char key, int mode,char track,DWORD freq, bool pip
 				//¡‚È‚Á‚Ä‚¢‚é‚Ì‚ð•à‚©‚¹’âŽ~
 				if (!pipi)
 					S_PlaySound(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], false);
-				key_twin[track]++;
-				if(key_twin[track] == 2)key_twin[track] = 0; 
+				key_twin[track] ^= 1;
+                
 				S_PlaySound(lpORGANBUFFER[track][key / 12][key_twin[track]], !pipi);
 			}else{//ˆá‚¤‰¹‚ð–Â‚ç‚·‚È‚ç
 				if (!pipi)
 					S_PlaySound(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], false);
-				key_twin[track]++;
-				if(key_twin[track] == 2)key_twin[track] = 0; 
+				key_twin[track] ^= 1;
+                
 				ChangeOrganFrequency(key%12,track,freq);//Žü”g”‚ðÝ’è‚µ‚Ä
 				S_PlaySound(lpORGANBUFFER[track][key / 12][key_twin[track]], !pipi);
 				old_key[track] = key;
@@ -812,13 +879,17 @@ BOOL InitWaveData100(void)
 	bybuffer += (100 * 256);
 
 	for (int i = 0; i < NUMDRAMITEM; ++i) {
+        if (drumsData[i].data != NULL) {
+			free(drumsData[i].data);
+			drumsData[i].data = NULL;
+		}
+        
 		int length = (bybuffer[3] << 24) | (bybuffer[2] << 16) | (bybuffer[1] << 8) | bybuffer[0];
 		bybuffer += 4;
 
 		unsigned char* drumsample = (unsigned char*)malloc(length);
 
 		if (drumsample == NULL) {
-			drumsData[i].data = NULL;
 			return FALSE;
 		}
 
@@ -826,9 +897,6 @@ BOOL InitWaveData100(void)
 		bybuffer += length;
 
 		drumsData[i].length = length;
-
-		if (drumsData[i].data != NULL)
-			free(drumsData[i].data);
 
 		drumsData[i].data = drumsample;
 	}
@@ -855,6 +923,11 @@ BOOL LoadWaveData100(const char *file)
 	}
 
 	for (int i = 0; i < NUMDRAMITEM; ++i) {
+        if (drumsData[i].data != NULL) {
+			free(drumsData[i].data);
+			drumsData[i].data = NULL;
+		}
+        
 		if (fread(bytes, 4, 1, fp) == 0) {
 			memset(drumsData, 0, sizeof(drumsData));
 			fclose(fp);
@@ -866,17 +939,17 @@ BOOL LoadWaveData100(const char *file)
 		unsigned char* drumsample = (unsigned char*)malloc(length);
 
 		if (drumsample == NULL) {
-			drumsData[i].data = NULL;
 			fclose(fp);
 			return FALSE;
 		}
 
-		fread(drumsample, sizeof(unsigned char), length, fp);
+		if (fread(drumsample, sizeof(unsigned char), length, fp) == 0) {
+            free(drumsample);
+            fclose(fp);
+            return FALSE;
+        }
 
 		drumsData[i].length = length;
-
-		if (drumsData[i].data != NULL)
-			free(drumsData[i].data);
 
 		drumsData[i].data = drumsample;
 	}
@@ -1163,6 +1236,8 @@ void ExportOrganyaBuffer(unsigned long sample_rate, float* output_stream, size_t
 	exporting = true;
 
 	Rxo_StopAllSoundNow();
+    S_ResetSounds();
+    
 	org_data.SetPlayPointer(0);
 
 	ma_mutex_lock(&organya_mutex);

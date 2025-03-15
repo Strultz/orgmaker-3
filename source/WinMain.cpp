@@ -76,7 +76,7 @@ bool gIsDrawing = false;
 bool gFileModified = false;
 bool gFileUnsaved = true;
 
-long MAXHORZRANGE = MAXHORZMEAS * 16;
+long MAXHORZRANGE = 0x7FFFFFFF;
 
 int WWidth = WINDOWWIDTH, WHeight = WINDOWHEIGHT;
 
@@ -145,7 +145,7 @@ TCHAR strSize[128]; //for Debug	// 2010.08.14 A
 int iKeyPhase[128];
 int iCurrentPhase;
 int iCast[256];
-int iPushShift[2];
+int previewOctave = 3;
 
 int iKeyPushDown[256]; // 2010.09.22 A
 
@@ -257,8 +257,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	strSize[0]=0;	// 2010.08.14 A
 	for(int jjj=0;jjj<128;jjj++)iKeyPhase[jjj]=-1;
 	iCurrentPhase=0;
-	iPushShift[0]=0;
-	iPushShift[1]=0;
 	int i, vvv;
 	for(vvv=0;vvv<256;vvv++){
 		iCast[vvv]=0xFFFF;
@@ -271,25 +269,23 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	//initial file name
 	strcpy(music_file, MessageString[IDS_DEFAULT_ORG_FILENAME]);
 
-	iCast['Z']= 33;
-	iCast['S']= 34;
-	iCast['X']= 35;
-	iCast['C']= 36; //C c C sound
-	iCast['F']= 37;
-	iCast['V']= 38; //     D
-	iCast['G']= 39;
-	iCast['B']= 40; //     E
-	iCast['N']= 41; //     F
-	iCast['J']= 42;
-	iCast['M']= 43; //     G
-	iCast['K']= 44;
-	iCast[0xBC]=45; //,    A
-	iCast['L']= 46;
-	iCast[0xBE]=47; //.    B
-	iCast[0xBF]=48; //^   C
-	iCast[0xBA]=49; //:
-	iCast[0xE2]=50; //
-	iCast[0xDD]=51; //]
+	iCast['Z']= 0;
+	iCast['S']= 1;
+	iCast['X']= 2;
+	iCast['D'] = 3;
+	iCast['C']= 4; //C c C sound
+	iCast['V']= 5; //     D
+	iCast['G']= 6;
+	iCast['B']= 7; //     E
+	iCast['H'] = 8;
+	iCast['N']= 9; //     F
+	iCast['J']= 10;
+	iCast['M']= 11; //     G
+	iCast[VK_OEM_COMMA]=12; //,    A
+	iCast['L']= 13;
+	iCast[VK_OEM_PERIOD]=14; //.    B
+	iCast[VK_OEM_1]=15; //^   C
+	iCast[VK_OEM_2]=16; //:
 	strMIDIFile = (char *)malloc(MAX_PATH);
 	gSelectedTheme = (char *)malloc(MAX_PATH);
 	gSelectedWave = (char*)malloc(MAX_PATH);
@@ -345,8 +341,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	char strauthtmp[128];
 	SYSTEMTIME stTime; GetLocalTime(&stTime); //stTime.wYear get a year in // 2014.10.18
-	strcpy(strauthtmp, "(C) AUTHOR xxxxx,                 ");
-	sprintf(strauthtmp + 18, "%d", stTime.wYear); //, put the year after
+	sprintf(strauthtmp, "(C) AUTHOR xxxxx, %d", stTime.wYear);
 
 	//GetPrivateProfileString(MIDI_EXPORT, "Author", "(C) AUTHOR xxxxx, 2014", strMIDI_AUTHOR, 255, app_path);	// 2045.01.18 D
 	GetPrivateProfileString(MIDI_EXPORT, "Author", strauthtmp, strMIDI_AUTHOR, 255, app_path);	// 2045.01.18 A
@@ -360,18 +355,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	//Generate main window
 	hWnd = CreateWindow(lpszName,
-			"OrgMaker 3",//Displayed "Name"
+			"OrgMaker 3",
 			ul,
-			//WS_CAPTION|WS_MINIMIZEBOX|WS_SYSMENU|WS_THICKFRAME|WS_MAXIMIZEBOX,
-//            WS_CAPTION|WS_VISIBLE|WS_SYSMENU,//window style
-/*
-            32,//Window's X
-			32,//Window's Y
-            wnd_width,//width
-            wnd_height,//height
-			*/
 			WinRect.left, WinRect.top, WinRect.right, WinRect.bottom,
             NULL, NULL, hInst, NULL);
+    
 	if(!hWnd) return FALSE;
 
 //	DialogBox(hInst,"DLGFLASH",NULL,DialogFlash);
@@ -389,17 +377,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		if (dwAttrib == INVALID_FILE_ATTRIBUTES || !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY))
 			gSelectedTheme[0] = 0; // Theme is gone
 	}
-	GetApplicationPath(sDir);
-	strcat(sDir, "soundbanks");
-	CreateDirectory(sDir, NULL);
-
-	GetPrivateProfileString(MAIN_WINDOW, "CurrentWavePath", NULL, gSelectedWave, MAX_PATH, app_path); //2024.05.19
-	if (strlen(gSelectedWave) > 0) {
-		DWORD dwAttrib = GetFileAttributes(gSelectedWave);
-		if (dwAttrib == INVALID_FILE_ATTRIBUTES || dwAttrib & FILE_ATTRIBUTE_DIRECTORY)
-			gSelectedWave[0] = 0; // soundbank is gone
-	}
-
 	GetApplicationPath(sDir);
 	strcat(sDir, "soundbanks");
 	CreateDirectory(sDir, NULL);
@@ -433,10 +410,15 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	InitSoundObject("METRO01", 1);
 	InitSoundObject("METRO02", 2);
+    InitSoundObject("CAT", 3);
 	
 	hDlgPlayer = CreateDialog(hInst,"PLAYER",hWnd,DialogPlayer);
 	hDlgTrack = CreateDialog(hInst,"TRACK",hWnd,DialogTrack);
 	hDlgEZCopy = CreateDialog(hInst,"COPYBD",hWnd,DialogEZCopy);
+    
+    HMENU hMenu;
+    hMenu = GetMenu(hWnd);
+    
 	//hDlgShortCutList = CreateDialog(hInst,"DLGSHORTCUTINFO",hWnd,DialogShortCut);
 	WinRect.left=GetPrivateProfileInt(TRACK_WINDOW,"left",200,app_path);
 	WinRect.top=GetPrivateProfileInt(TRACK_WINDOW,"top",200,app_path);
@@ -448,7 +430,14 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	WinRect.top=GetPrivateProfileInt(COPY_WINDOW,"top",380,app_path);
 	SetWindowPos(hDlgEZCopy,NULL,WinRect.left,WinRect.top,0,0,SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);
 	EZCopyWindowState = GetPrivateProfileInt(COPY_WINDOW,"show",1,app_path);
-	if(EZCopyWindowState==0)ShowWindow(hDlgEZCopy, SW_HIDE);
+	if (EZCopyWindowState == 0) {
+		ShowWindow(hDlgEZCopy, SW_HIDE);
+		CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_UNCHECKED));
+	}
+	else {
+		ShowWindow(hDlgEZCopy, SW_SHOWNOACTIVATE);
+		CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_CHECKED));
+	}
 	SaveWithInitVolFile = GetPrivateProfileInt(INIT_DATA,"autosave",0,app_path);
 	ChangeAutoLoadMode(SaveWithInitVolFile);
 	org_data.InitOrgData();
@@ -634,7 +623,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 	RECT rect = {0,0,WWidth,WHeight};//Area to update (track change)
 	MUSICINFO mi;
 	MINMAXINFO *pmmi;
-
+    HMENU hMenu;
+	SCROLLINFO si;
+    
 	
 
 
@@ -655,13 +646,15 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		//return FALSE;
 		}
 		if(LOWORD(wParam)==IDM_EZCOPYVISIBLE || LOWORD(wParam)==ID_AC_SHOWEZCOPY){
+            hMenu = GetMenu(hWnd);
 			if(EZCopyWindowState==0){
 				EZCopyWindowState=1;
 				ShowWindow(hDlgEZCopy, SW_SHOWNOACTIVATE);
+                CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_CHECKED));
 			}else{
 				EZCopyWindowState=0;
 				ShowWindow(hDlgEZCopy, SW_HIDE);
-
+                CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_UNCHECKED));
 			}
 		}
 		for(i=0;i<10;i++){	//recently used files
@@ -753,7 +746,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				DialogBox(hInst,"DLGSWAP",hwnd,DialogSwap);
 				break;
 			case IDM_DLGMEMO://
-				PlaySound( "CAT" , GetModuleHandle(NULL),SND_RESOURCE | SND_ASYNC); 
+				PlaySoundObject(3, 1);
 				DialogBox(hInst,"DLGMEMO",hwnd,DialogMemo);
 				break;
 			case IDM_DLGTHEMES:
@@ -1151,10 +1144,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				SendMessage(hDlgPlayer, WM_COMMAND, IDC_RIGHT, NULL);
 				break;
 			case ID_AC_SOCTUP:
-				scr_data.VertScrollProc(SB_PAGEDOWN);
+				scr_data.VertScrollProc(SB_PAGEUP, 0);
 				break;
 			case ID_AC_SOCTDOWN:
-				scr_data.VertScrollProc(SB_PAGEUP);
+				scr_data.VertScrollProc(SB_PAGEDOWN, 0);
 				break;
 			case IDM_RECENT_CLEAR:
 				ClearRecentFile();
@@ -1203,8 +1196,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 				break;
 				//«	// 2010.12.01 A
-			case ID_AC_SELECT_CLEAR: //Clear selection
 			case ID_AC_SELECT_CLEAR2: //Clear selection //2014.04.13
+                SendMessage(hDlgPlayer, WM_COMMAND, IDC_STOP, NULL);
+                Rxo_StopAllSoundNow();
+			case ID_AC_SELECT_CLEAR: //Clear selection
 				ClearEZC_Message();
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
@@ -1276,11 +1271,14 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		switch(LOWORD(wParam)){
 		case IDM_LOUPE_MINUS:
 		case ID_AC_LOUPE_MINUS: // i hate this whole codebase so much i want to redo everything
-			NoteWidth -= 2; if(NoteWidth<4)NoteWidth=4;
+			NoteWidth -= 2;
+            if (NoteWidth < 4) NoteWidth=4;
 			org_data.PutBackGround();
+            org_data.GetMusicInfo(&mi);
+			scr_data.ChangeHorizontalRange(mi.end_x);
 			//org_data.PutMusic();//View sheet music
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-			switch(NoteWidth){
+			switch (NoteWidth) {
 			case 4:		SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[25.%]"); break;
 			case 6:		SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[37.5%]"); break;
 			case 8:		SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[50%]"); break;
@@ -1293,8 +1291,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		case IDM_LOUPE_PLUS:
 		case ID_AC_LOUPE_PLUS:
-			NoteWidth += 2; if(NoteWidth>16)NoteWidth=16;
+			NoteWidth += 2;
+            if (NoteWidth > 16) NoteWidth=16;
 			org_data.PutBackGround();
+            org_data.GetMusicInfo(&mi);
+			scr_data.ChangeHorizontalRange(mi.end_x);
 			//org_data.PutMusic();//View sheet music
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			switch(NoteWidth){
@@ -1307,6 +1308,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case 16:	SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[100%]"); break;
 			}
 			CheckLoupeMenu();
+			break;
+        case IDM_GITHUB:
+			ShellExecute(NULL, "open", "https://github.com/Strultz/orgmaker-3", NULL, NULL, SW_SHOWNORMAL);
 			break;
 		}
 
@@ -1426,10 +1430,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 	case WM_KEYDOWN://keyboard pressed
 		switch(wParam){
 		case VK_PRIOR:
-			scr_data.VertScrollProc(SB_PAGEUP);
+			scr_data.VertScrollProc(SB_PAGEUP, 0);
 			break;
 		case VK_NEXT:
-			scr_data.VertScrollProc(SB_PAGEDOWN);
+			scr_data.VertScrollProc(SB_PAGEDOWN, 0);
 			break;
 		case VK_UP:
 			scr_data.KeyScroll(DIRECTION_UP);
@@ -1438,10 +1442,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			scr_data.KeyScroll(DIRECTION_DOWN);
 			break;
 		case VK_LEFT:
-			scr_data.KeyScroll(DIRECTION_LEFT);
+			if (timer_sw == 0) scr_data.KeyScroll(DIRECTION_LEFT);
 			break;
 		case VK_RIGHT:
-			scr_data.KeyScroll(DIRECTION_RIGHT);
+			if (timer_sw == 0) scr_data.KeyScroll(DIRECTION_RIGHT);
 			break;
 		case VK_F5:
 		case VK_NUMPAD0:
@@ -1454,45 +1458,57 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case 'Z':
 		case 'S':
 		case 'X':
+        case 'D':
 		case 'C':
-		case 'F':
 		case 'V':
 		case 'G':
 		case 'B':
+		case 'H':
 		case 'N':
 		case 'J':
 		case 'M':
-		case 'K':
-		case 0xBC:
+		case VK_OEM_COMMA:
 		case 'L':
-		case 0xBE:
-		case 0xBF:
-		case 0xBA:
-		case 0xE2:
-		case 0xDD:
+		case VK_OEM_PERIOD:
+        case VK_OEM_1:
+        case VK_OEM_2:
 
 			if((lParam & 0x40000000) ==0 && (timer_sw==0 || iChangeEnablePlaying!=0)){
 				org_data.GetMusicInfo(&mi);
 				iKeyPhase[iCast[wParam]]=iCurrentPhase;
 				iCurrentPhase=-iCurrentPhase + 1;
-				Rxo_PlayKey(iCast[wParam] + iPushShift[0]*12 -iPushShift[1]*12 , org_data.track, mi.tdata[org_data.track].freq, iKeyPhase[iCast[wParam]]);
-				iKeyPushDown[iCast[wParam]+ iPushShift[0]*12 -iPushShift[1]*12] = 1;
+				
+                char key = iCast[wParam] + previewOctave * 12;
+                if (key < 0) break;
+                if (key > 95) break;
+                
+                Rxo_PlayKey(key, org_data.track, mi.tdata[org_data.track].freq, iKeyPhase[iCast[wParam]]);
+				iKeyPushDown[key] = 1;
+                
 				//org_data.PutMusic();//Redrawing sheet music
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
 			}
 
 			break;
-		case VK_TAB:
+		case VK_MULTIPLY:
 			if ((lParam & 0x40000000) == 0 && (timer_sw == 0 || iChangeEnablePlaying != 0)) {
-				iPushShift[0] = 1;
+				++previewOctave;
+                if (previewOctave > 7)
+                    previewOctave = 7;
 				Rxo_StopAllSoundNow();
+                memset(iKeyPhase, -1, sizeof(iKeyPhase));
+                memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
 			}
 			break;
-		case VK_SHIFT:
+		case VK_DIVIDE:
 			if ((lParam & 0x40000000) == 0 && (timer_sw == 0 || iChangeEnablePlaying != 0)) {
-				iPushShift[1] = 1;
+				--previewOctave;
+                if (previewOctave > 0)
+                    previewOctave = 0;
 				Rxo_StopAllSoundNow();
+                memset(iKeyPhase, -1, sizeof(iKeyPhase));
+                memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
 			}
 			break;
 		}
@@ -1504,46 +1520,34 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case 'Z':
 		case 'S':
 		case 'X':
+        case 'D':
 		case 'C':
-		case 'F':
 		case 'V':
 		case 'G':
 		case 'B':
+		case 'H':
 		case 'N':
 		case 'J':
 		case 'M':
-		case 'K':
-		case 0xBC:
+		case VK_OEM_COMMA:
 		case 'L':
-		case 0xBE:
-		case 0xBF:
-		case 0xBA:
-		case 0xE2:
-		case 0xDD:
+		case VK_OEM_PERIOD:
+        case VK_OEM_1:
+        case VK_OEM_2:
 			if((timer_sw==0 || iChangeEnablePlaying!=0)){
-				Rxo_StopKey(iCast[wParam]+ iPushShift[0]*12 -iPushShift[1]*12, org_data.track, iKeyPhase[iCast[wParam]]);
+				if (iKeyPhase[iCast[wParam]] == -1)
+					break;
+
+				char key = iCast[wParam] + previewOctave * 12;
+				if (key < 0) break;
+				if (key > 95) break;
+
+				Rxo_StopKey(key, org_data.track, iKeyPhase[iCast[wParam]]);
+				iKeyPushDown[key] = 0;
+                
 				iKeyPhase[iCast[wParam]] = -1;
-				iKeyPushDown[iCast[wParam]+ iPushShift[0]*12 -iPushShift[1]*12] = 0;
 				//org_data.PutMusic();//Redrawing sheet music
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-			}
-			break;
-		case VK_TAB:
-			if((timer_sw==0 || iChangeEnablePlaying!=0)){
-				iPushShift[0]=0;
-				for(i=0;i<256;i++)iKeyPushDown[i]=0;
-				//org_data.PutMusic();//Redrawing sheet music
-				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				Rxo_StopAllSoundNow();
-			}
-			break;
-		case VK_SHIFT:
-			if((timer_sw==0 || iChangeEnablePlaying!=0)){
-				iPushShift[1]=0;
-				for(i=0;i<256;i++)iKeyPushDown[i]=0;
-				//org_data.PutMusic();//Redrawing sheet music
-				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-				Rxo_StopAllSoundNow();
 			}
 			break;
 		}
@@ -1569,10 +1573,18 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 		break;
 	case WM_HSCROLL:
-		scr_data.HorzScrollProc(wParam);
+		ZeroMemory(&si, sizeof(si));
+        si.cbSize = sizeof(si);
+        si.fMask = SIF_TRACKPOS;
+        if (GetScrollInfo(hwndArea, SB_HORZ, &si))
+			scr_data.HorzScrollProc(LOWORD(wParam), si.nTrackPos);
 		break;
 	case WM_VSCROLL:
-		scr_data.VertScrollProc(wParam);
+		ZeroMemory(&si, sizeof(si));
+		si.cbSize = sizeof(si);
+		si.fMask = SIF_TRACKPOS;
+		if (GetScrollInfo(hwndArea, SB_VERT, &si))
+			scr_data.VertScrollProc(LOWORD(wParam), si.nTrackPos);
 		break;
 	case WM_MOUSEWHEEL:
 		scr_data.WheelScrollProc(lParam, wParam);		
@@ -1609,6 +1621,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		
 //				wsprintf(strSize , "Height = %d" , (WHeight - 158)/12);
 //				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+        org_data.GetMusicInfo(&mi);
+        scr_data.ChangeHorizontalRange(mi.end_x);
 		scr_data.ChangeVerticalRange(WHeight);
 		//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 

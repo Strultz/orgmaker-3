@@ -407,7 +407,7 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 			np = np->to;
 		}
 	}
-	/*else if (pc->mode == (MODEDECAY + 14)) { //ê LINEAR 10 L
+	/*else if (pc->mode == (MODEDECAY + 14)) { //ÅELINEAR 10 L
 		for (i = 0; i < num; i++) {
 			if (np->volume != VOLDUMMY) {
 				if (d == 0) {
@@ -713,7 +713,7 @@ BOOL OrgData::EnlargeAllNotes(int Power)
 	info.end_x = info.end_x * Power;
 	j = info.dot * Power;
 	if(j < 256 && j > 0) info.dot = (unsigned char)j;
-	scr_data.ChangeHorizontalRange(info.dot * info.line * MAXHORZMEAS);
+	scr_data.ChangeHorizontalRange(info.end_x);
 	//MakeMusicParts(info.line,info.dot);//ÉpÅ[ÉcÇê∂ê¨
 	//MakePanParts(info.line,info.dot);
 
@@ -762,7 +762,7 @@ BOOL OrgData::ShortenAllNotes(int Power)
 
 	j = info.dot / Power;
 	if(j < 256 && j > 0) info.dot = (unsigned char)j;
-	scr_data.ChangeHorizontalRange(info.dot * info.line * MAXHORZMEAS);
+	scr_data.ChangeHorizontalRange(info.end_x);
 	//MakeMusicParts(info.line,info.dot);//ÉpÅ[ÉcÇê∂ê¨
 	//MakePanParts(info.line,info.dot);
 

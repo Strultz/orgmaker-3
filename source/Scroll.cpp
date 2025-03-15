@@ -23,12 +23,12 @@ BOOL ScrollData::InitScroll(void)
 	scr_info.fMask = SIF_RANGE | SIF_PAGE;
 	scr_info.nMin = 0;
 	scr_info.nMax = MAXHORZRANGE;
-	scr_info.nPage = 4;
+	scr_info.nPage = 1;
 	SetScrollInfo(hWnd,SB_HORZ,&scr_info,1);//横
 	scr_info.cbSize = sizeof(SCROLLINFO);
 	scr_info.fMask = SIF_RANGE | SIF_PAGE;
 	scr_info.nMax = MAXVERTRANGE;
-	scr_info.nPage = 4;
+	scr_info.nPage = 1;
 	SetScrollInfo(hWnd,SB_VERT,&scr_info,1);//縦
 	hpos = 0;//水平スクロール値
 	//vpos = MAXVERTRANGE-27;//垂直初期値
@@ -43,30 +43,39 @@ BOOL ScrollData::InitScroll(void)
 	return TRUE;
 }
 void ScrollData::ChangeVerticalRange(int WindowHeight){ //ウィンドウサイズを元にスクロール可能域を設定
+    int fl = SIF_RANGE | SIF_PAGE;
+    int ap = 1;
+    
 	if(WindowHeight>0){
-		int ap;
 		ap = (WindowHeight - 158)/12;
+        
+        if (ap >= 100) {
+            fl |= SIF_DISABLENOSCROLL;
+        }
 
-		scr_info.nMax = 100 - ap;
-		vScrollMax = scr_info.nMax;
+		scr_info.nMax = 99;
+		vScrollMax = scr_info.nMax - ap + 1;
+        if (vScrollMax < 0) vScrollMax = 0;
 	}else{
 		scr_info.nMax = MAXVERTRANGE;
+        vScrollMax = MAXVERTRANGE - ap + 1;
 
 	}
 	scr_info.cbSize = sizeof(SCROLLINFO);
-	scr_info.fMask = SIF_RANGE;
+	scr_info.fMask = fl;
+    scr_info.nPage = ap;
 	SetScrollInfo(hWnd, SB_VERT, &scr_info, TRUE);//縦
 	return;
 }
 void ScrollData::ChangeHorizontalRange(int range) { //ウィンドウサイズを元にスクロール可能域を設定
-	MAXHORZRANGE = range;
-	if (hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
+	int ap = (WWidth - KEYWIDTH) / NoteWidth;
+	if (hpos > MAXHORZRANGE) hpos = MAXHORZRANGE;
 	scr_info.cbSize = sizeof(SCROLLINFO);
 	scr_info.fMask = SIF_RANGE | SIF_PAGE;
 	scr_info.nMin = 0;
-	scr_info.nMax = MAXHORZRANGE;
-	scr_info.nPage = 4;
-	SetScrollInfo(hWnd, SB_HORZ, &scr_info, 1);
+	scr_info.nMax = range + ap - 1;
+	scr_info.nPage = ap;
+	SetScrollInfo(hWnd, SB_HORZ, &scr_info, TRUE);
 }
 void ScrollData::AttachScroll(void)
 {
@@ -104,29 +113,37 @@ void ScrollData::PrintHorzPosition(void)
 
 }
 
-void ScrollData::HorzScrollProc(WPARAM wParam){
+void ScrollData::HorzScrollProc(short mode, long scroll){
 	RECT rect = {0,0,WWidth,WHeight};//更新する領域
 	MUSICINFO mi;
 	org_data.GetMusicInfo(&mi);
 
-	switch(LOWORD(wParam)){
+	switch(mode){
+    case SB_LEFT:
+		hpos = 0;
+		break;
+	case SB_RIGHT:
+		hpos = mi.end_x;
+		break;
 	case SB_LINERIGHT://右へ
 		hpos++;
 		if(hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
+        if (hpos < 0)hpos = 0;
 		break;
 	case SB_LINELEFT://左へ
 		hpos--;
 		if(hpos < 0)hpos = 0;
 		break;
 	case SB_THUMBPOSITION:
-		hpos = HIWORD(wParam);//現在位置を取得
+		hpos = scroll;//現在位置を取得
 		break;
 	case SB_THUMBTRACK:
-		hpos = HIWORD(wParam);//現在位置を取得
+		hpos = scroll;//現在位置を取得
 		break;
 	case SB_PAGERIGHT://右へ
 		hpos = (hpos / (mi.dot * mi.line) + 1) * (mi.dot * mi.line);
 		if(hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
+        if (hpos < 0)hpos = 0;
 		break;
 	case SB_PAGELEFT://左へ
 	{
@@ -158,26 +175,35 @@ void ScrollData::HorzScrollProc(WPARAM wParam){
 //	TextOut(hdc,200,1,str,strlen(str));
 //	ReleaseDC(hWnd,hdc);
 }
-void ScrollData::VertScrollProc(WPARAM wParam){
+void ScrollData::VertScrollProc(short mode, long scroll){
 	RECT rect = {0,0,WWidth,WHeight};//更新する領域
-	switch(LOWORD(wParam)){
+	switch(mode){
+	case SB_TOP:
+		vpos = 0;
+		break;
+	case SB_BOTTOM:
+		vpos = vScrollMax;
+		if (vpos < 0) vpos = 0;
+		break;
 	case SB_LINEDOWN://下へ
 		vpos++;
 		if(vpos > vScrollMax)vpos = vScrollMax;
+        if (vpos < 0)vpos = 0;
 		break;
 	case SB_LINEUP://上へ
 		vpos--;
 		if(vpos < 0)vpos = 0;
 		break;
 	case SB_THUMBPOSITION:
-		vpos = HIWORD(wParam);//現在位置を取得
+		vpos = scroll;//現在位置を取得
 		break;
 	case SB_THUMBTRACK:
-		vpos = HIWORD(wParam);//現在位置を取得
+		vpos = scroll;//現在位置を取得
 		break;
 	case SB_PAGEDOWN://下へ
 		vpos += 12;
 		if(vpos > vScrollMax)vpos = vScrollMax;
+        if (vpos < 0)vpos = 0;
 		break;
 	case SB_PAGEUP://上へ
 		vpos -= 12;
@@ -246,9 +272,11 @@ void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){
 		if(fwKeys && MK_CONTROL){
 			hpos += 4;
 			if (hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
+            if (hpos < 0)hpos = 0;
 		}else{
 			vpos+=4;
 			if(vpos > vScrollMax)vpos = vScrollMax;
+            if (vpos < 0)vpos = 0;
 		}
 	}else{
 		if(fwKeys && MK_CONTROL){
@@ -290,10 +318,10 @@ void ScrollData::KeyScroll(int iDirection)
 		hpos++;
 		break;
 	}
-	if(hpos < 0)hpos = 0;
-	if(vpos > vScrollMax)vpos = vScrollMax;
-	if(hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
-	if(vpos < 0)vpos = 0;
+	if (hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
+	if (vpos > vScrollMax)vpos = vScrollMax;
+	if (hpos < 0)hpos = 0;
+	if (vpos < 0)vpos = 0;
 
 	PrintHorzPosition();
 	scr_info.fMask = SIF_POS;//nPosを有効に

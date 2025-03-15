@@ -173,27 +173,28 @@ void LoadRecentFromIniFile(){
 
 void SetMenuRecent(int iMenuNumber, char *strText, int iDisable)
 {
-
-	if(iMenuNumber<0 || iMenuNumber>9)return;
-	HMENU hMenu;
+    int y, i;
+    char strCc[MAX_PATH + 2];
+    HMENU hMenu;
+    
+    if (iMenuNumber<0 || iMenuNumber>9) return;
+    
 	hMenu=GetMenu(hWnd);
-	char strCc[256];
-	strcpy(strCc,"  &&");
-	itoa((iMenuNumber+1)%10, &strCc[3], 10);
-	strCc[4]='\0';
-	strcat(strCc," ");
-	//strcat(strCc,strText);
-	int y,i;
+	
 	y = strlen(strText);
-	for(i=y;i>0;i--)if(strText[i]=='\\'){i++;break;}
-	strcat(strCc,&strText[i]);
-	if(iMenuNumber==0){
-		strcat(strCc,"\tCtrl+Shift+Home");
-	}
+	for (i = y; i > 0; --i) {
+        if (strText[i] == '\\') {
+            ++i;
+            break;
+        }
+    }
+    
+	snprintf(strCc, MAX_PATH + 2, "&%d %s%s", (iMenuNumber + 1) % 10, &strText[i], (iMenuNumber == 0 ? "\tCtrl+Shift+Home" : ""));
+    
 	ModifyMenu(hMenu, Menu_Recent[iMenuNumber], MF_BYCOMMAND|MF_STRING, Menu_Recent[iMenuNumber], strCc);
-	if(iDisable){
+	if (iDisable) {
 		EnableMenuItem(hMenu,Menu_Recent[iMenuNumber],MF_BYCOMMAND|MF_GRAYED);
-	}else{
+	} else {
 		EnableMenuItem(hMenu,Menu_Recent[iMenuNumber],MF_BYCOMMAND|MF_ENABLED);
 	}
 }
@@ -202,8 +203,8 @@ void ClearRecentFile()
 {
 	int a;
 	//a = MessageBox(hWnd,"履歴を抹ッ消しますか？","「最近使ったファイル」のクリア",MB_OKCANCEL|MB_ICONQUESTION|MB_DEFBUTTON2);	// 2014.10.19 D
-	a = msgbox(hWnd,IDS_NOTIFY_RECENT_INITIALIZE,IDS_CLEAR_RECENT,MB_OKCANCEL|MB_ICONQUESTION|MB_DEFBUTTON2);	// 2014.10.19 A
-	if(a == IDOK){
+	a = msgbox(hWnd,IDS_NOTIFY_RECENT_INITIALIZE,IDS_CLEAR_RECENT,MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2);	// 2014.10.19 A
+	if(a == IDYES){
 		int i;
 		for(i=0;i<10;i++){
 			RecentFileName[i][0]='@';
@@ -211,11 +212,11 @@ void ClearRecentFile()
 		}
 		CreateMenuRecent();
 		//MessageBox(hWnd,"真っ白になったぜ。","通知",MB_OK);	// 2014.10.19 D
-		msgbox(hWnd,IDS_INFO_INITIALIZE,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
+		//msgbox(hWnd,IDS_INFO_INITIALIZE,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 
 	}else{
 		//MessageBox(hWnd,"キャンセルしました。","通知",MB_OK);	// 2014.10.19 D
-		msgbox(hWnd,IDS_CANCEL,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
+		//msgbox(hWnd,IDS_CANCEL,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 	}
 
 	
@@ -447,15 +448,15 @@ void SortMusicNote(void)
 {
 	int a;
 	//a = MessageBox(hWnd,"長時間の使用により、ノート（音符）がメモリ上に\n散乱してしまいます。（譜面順とメモリ順は異なっている）\nこの関数はノートを譜面の順番に\n並べ換えます。\n尚、データをロードし直しても同じ効果が得られます。\n実行しますか？","使い方と目的",MB_OKCANCEL|MB_ICONQUESTION|MB_DEFBUTTON2);	// 2014.10.19 D
-	a = msgbox(hWnd,IDS_INFO_MEMORY,IDS_USAGE,MB_OKCANCEL|MB_ICONQUESTION|MB_DEFBUTTON2);	// 2014.10.19 A
-	if(a == IDOK){
+	a = msgbox(hWnd,IDS_INFO_MEMORY,IDS_USAGE,MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2);	// 2014.10.19 A
+	if(a == IDYES){
 		org_data.SortNotes();
 		//MessageBox(hWnd,"並べ替え・再構築しました。","通知",MB_OK);	// 2014.10.19 D
-		msgbox(hWnd,IDS_INFO_NARABEKAE,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
+		//msgbox(hWnd,IDS_INFO_NARABEKAE,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 
 	}else{
 		//MessageBox(hWnd,"キャンセルしました。","通知",MB_OK);	// 2014.10.19 D
-		msgbox(hWnd,IDS_CANCEL,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
+		//msgbox(hWnd,IDS_CANCEL,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 	}
 }
 
@@ -584,11 +585,13 @@ void ReplaseUndo()
 	//通常の状態に戻すには
 	EnableMenuItem(hMenu,IDM_REDO,MF_BYCOMMAND|MF_ENABLED);
 	DrawMenuBar(hWnd);//メニューを再描画
-	if(org_data.MinimumUndoCursor==0 && org_data.CurrentUndoCursor==0){
+	/*if(org_data.MinimumUndoCursor==0 && org_data.CurrentUndoCursor==0){
 		SetModified(false);
 	}else{
 		SetModified(true);
-	}
+	}*/
+    
+    SetModified(true);
 }
 
 void SetUndo()
@@ -640,6 +643,7 @@ void ReplaceRedo()
 	}
 	EnableMenuItem(hMenu,IDM_UNDO,MF_BYCOMMAND|MF_ENABLED);
 	DrawMenuBar(hWnd);//メニューを再描画
+    SetModified(true);
 	//org_data.PutBackGround();
 	//org_data.PutMusic();	//表示
 	//RedrawWindow(hWnd,&rect1,NULL,RDW_INVALIDATE|RDW_ERASENOW);

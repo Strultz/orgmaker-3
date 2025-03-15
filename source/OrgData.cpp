@@ -88,7 +88,7 @@ BOOL OrgData::SetMusicInfo(MUSICINFO *mi,unsigned long flag)
 	if(flag & SETGRID){//グリッドを有効に
 		info.dot = mi->dot;
 		info.line = mi->line;
-		scr_data.ChangeHorizontalRange(info.dot * info.line * MAXHORZMEAS);
+		scr_data.ChangeHorizontalRange(info.end_x);
 		//MakeMusicParts(info.line,info.dot);//パーツを生成
 		//MakePanParts(info.line,info.dot);
 //		MessageBox(hWnd,"グリッド","",MB_OK);
@@ -109,6 +109,7 @@ BOOL OrgData::SetMusicInfo(MUSICINFO *mi,unsigned long flag)
 	if(flag & SETREPEAT){
 		info.repeat_x = mi->repeat_x;
 		info.end_x = mi->end_x;
+        scr_data.ChangeHorizontalRange(info.end_x);
 	}
 	if(flag & SETFREQ){
 		for(int i = 0; i < MAXMELODY; i++){
@@ -675,7 +676,7 @@ void OrgData::InitOrgData(void)
 	info.alloc_note = ALLOCNOTE;//とりあえず10000個確保
 	info.dot = 4;
 	info.line = 4;
-	info.wait = 128;
+	info.wait = 125;
 	info.repeat_x = info.dot * info.line * 0;
 	info.end_x = info.dot * info.line * 100; // updated
 	int i;

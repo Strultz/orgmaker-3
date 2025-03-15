@@ -233,19 +233,19 @@ BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 			}
 			return 1;
 		case IDC_LEFT:
-			scr_data.HorzScrollProc(SB_PAGELEFT);
+			scr_data.HorzScrollProc(SB_PAGELEFT, 0);
 			SetFocus(hWnd);
 			return 1;
 		case IDC_RIGHT:
-			scr_data.HorzScrollProc(SB_PAGERIGHT);
+			scr_data.HorzScrollProc(SB_PAGERIGHT, 0);
 			SetFocus(hWnd);
 			return 1;
 		case IDC_LEFTSTEP:
-			scr_data.HorzScrollProc(SB_LINELEFT);
+			scr_data.HorzScrollProc(SB_LINELEFT, 0);
 			SetFocus(hWnd);
 			return 1;
 		case IDC_RIGHTSTEP:
-			scr_data.HorzScrollProc(SB_LINERIGHT);
+			scr_data.HorzScrollProc(SB_LINERIGHT, 0);
 			SetFocus(hWnd);
 			return 1;
 		}

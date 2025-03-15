@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string>
+#include <stdexcept>
 
 #include "Sound.h"
 #include "resource.h"
@@ -42,17 +43,17 @@ typedef struct{
 	char dot;
 }GRID;
 GRID grid[NUMGRIDA] = {
-	{"☆自由設定",0,0},
-	{"４拍：４分割",4,4},
-	{"４拍：３分割",4,3},
-	{"３拍：４分割",3,4},
-	{"３拍：３分割",3,3},
-	{"４拍：６分割",4,6},
-	{"３拍：６分割",3,6},
-	{"４拍：２分割",4,2},
-	{"４拍：８分割",4,8},
-	{"４拍：12分割",4,12},
-	{"５拍：４分割",5,4},
+	{"Custom",0,0},
+	{"4/4",4,4},
+	{"4/3",4,3},
+	{"3/4",3,4},
+	{"3/3",3,3},
+	{"4/6",4,6},
+	{"3/6",3,6},
+	{"4/2",4,2},
+	{"4/8",4,8},
+	{"4/12",4,12},
+	{"5/4",5,4},
 };
 //IDS_GRID_STRINGに!区切りで追加すること。ここの文字列はﾀﾞﾐｰです。
 
@@ -160,9 +161,11 @@ void InitSettingDialog(HWND hdwnd)
 //	itoa(org_data.track,str,10);
 //	SetDlgItemText(hdwnd,IDD_SETTRACK,str);
 	//再生ウエイトの初期化//////////////////
+    
 	itoa(mi.wait,str,10);
 	SetDlgItemText(hdwnd,IDD_SETWAIT,str);
-	snprintf(str, 128, "%.2f", (60000.0 / (double)(mi.wait * mi.dot)));
+    
+	snprintf(str, 128, "%.3f", ((mi.wait > 0 && mi.dot > 0) ? (60000.0 / (double)(mi.wait * mi.dot)) : 0));
 	SetDlgItemText(hdwnd, IDC_BPM, str);
 	//ｸﾞﾘｯﾄﾞの初期化
 	TCHAR *q, *p;
@@ -377,6 +380,9 @@ BOOL SetPipiCheck(HWND hdwnd, MUSICINFO *mi)
 //曲の設定
 BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    static bool updateWait = false;
+	static bool updateBPM = false;
+    
 	int i, j;
 	double iBPM;
 	int iWAIT;
@@ -385,6 +391,8 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 	MUSICINFO mi,mg;
 	switch(message){
 	case WM_INITDIALOG://ダイアログが呼ばれた
+        updateWait = true;
+		updateBPM = true;
 		InitSettingDialog(hdwnd);
 		EnableDialogWindow(FALSE);
 		return 1;
@@ -393,7 +401,7 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 		break;
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
-		case IDC_BTN1:
+		/*case IDC_BTN1:
 			org_data.GetMusicInfo(&mi);
 			GetDlgItemText(hdwnd, IDC_BPM, str, 128);
 			iBPM = std::stod(str);
@@ -414,7 +422,7 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 				snprintf(str, 128, "%.2f", iBPM);
 				SetDlgItemText(hdwnd, IDC_BPM, str);
 			}
-			return 1;
+			return 1;*/
 		case IDD_LB1:
 			if(HIWORD(wParam) == LBN_SELCHANGE){ //ﾘｽﾄﾎﾞｯｸｽでの選択変更
 				i = SendDlgItemMessage(hdwnd, IDD_LB1,LB_GETCURSEL,0,0);//インデックスを得る
@@ -442,10 +450,77 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 				SetDlgItemText(hdwnd, IDD_END_MEAS, str);
 			}
 			break;*/
-		case IDD_REP_MEAS: case IDD_END_MEAS: case IDD_REP_BEAT: case IDD_END_BEAT: case IDD_SETWAIT: case IDC_BPM:
-		case IDD_GRIDEDIT1: case IDD_GRIDEDIT2:
+		case IDC_BPM:
+		case IDD_SETWAIT:
+			org_data.GetMusicInfo(&mi);
+
+			// Update wait when BPM is updated
+			if (LOWORD(wParam) == IDC_BPM && (HIWORD(wParam) == EN_UPDATE || HIWORD(wParam) == EN_KILLFOCUS))
+			{
+				if (updateBPM) {
+					updateBPM = false;
+					return -1;
+				}
+
+				GetDlgItemText(hdwnd, IDC_BPM, str, 128);
+
+				iBPM = 0;
+				try {
+					iBPM = std::stod(str);
+				} catch (const std::invalid_argument&) { // No
+				} catch (const std::out_of_range&) {
+				}
+
+				iWAIT = 0;
+				if (iBPM > 0 && mi.dot > 0) {
+					iWAIT = (int)round(60000.0 / iBPM / (double)mi.dot);
+				}
+                
+                snprintf(str, 128, "%d", iWAIT);
+
+                updateWait = true;
+                SetDlgItemText(hdwnd, IDD_SETWAIT, str);
+			}
+
+			// Update BPM when wait is updated
+			if ((LOWORD(wParam) == IDD_SETWAIT && (HIWORD(wParam) == EN_UPDATE || HIWORD(wParam) == EN_KILLFOCUS))
+				|| (LOWORD(wParam) == IDC_BPM && HIWORD(wParam) == EN_KILLFOCUS))
+			{
+				if (updateWait) {
+					updateWait = false;
+					return -1;
+				}
+
+				GetDlgItemText(hdwnd, IDD_SETWAIT, str, 128);
+
+				iWAIT = atoi(str);
+                iBPM = 0;
+
+				if (iWAIT > 0 && mi.dot > 0) {
+					iBPM = 60000.0 / (double)(iWAIT * mi.dot);
+				}
+                
+                snprintf(str, 128, "%.3f", iBPM);
+
+                updateBPM = true;
+                SetDlgItemText(hdwnd, IDC_BPM, str);
+			}
+
+			// This is just to reformat it so it's consistent
+			if (LOWORD(wParam) == IDD_SETWAIT && HIWORD(wParam) == EN_KILLFOCUS) {
+				GetDlgItemText(hdwnd, IDD_SETWAIT, str, 128);
+				iWAIT = atoi(str);
+				snprintf(str, 128, "%d", iWAIT);
+				updateWait = true;
+				SetDlgItemText(hdwnd, IDD_SETWAIT, str);
+			}
+
+			// Fallthrough
+		case IDD_REP_MEAS: case IDD_END_MEAS: case IDD_REP_BEAT: case IDD_END_BEAT:
+        case IDD_GRIDEDIT1: case IDD_GRIDEDIT2:
 		case IDD_SETFREQ0: case IDD_SETFREQ1: case IDD_SETFREQ2: case IDD_SETFREQ3: case IDD_SETFREQ4: case IDD_SETFREQ5: case IDD_SETFREQ6: case IDD_SETFREQ7:
-			if(HIWORD(wParam) == EN_SETFOCUS)PostMessage(GetDlgItem(hdwnd, LOWORD(wParam)), EM_SETSEL, 0, -1); //フォーカス時にテキストを全選択する
+			if(HIWORD(wParam) == EN_SETFOCUS)
+				PostMessage(GetDlgItem(hdwnd, LOWORD(wParam)), EM_SETSEL, 0, -1); //フォーカス時にテキストを全選択する
 			return -1;
 		case IDCANCEL:
 			EndDialog(hdwnd,0);
@@ -666,7 +741,7 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		if (waveBmp != NULL) {
 			HBITMAP oldBmp = (HBITMAP)SendDlgItemMessage(hdwnd, IDC_WAVE100, STM_SETIMAGE, IMAGE_BITMAP, (long)waveBmp);
-			if (oldBmp != NULL) DeleteObject(oldBmp);
+			if (oldBmp != NULL && oldBmp != waveBmp) DeleteObject(oldBmp);
 		}
 		return 1;
 	case WM_COMMAND:
@@ -891,6 +966,7 @@ BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 	switch (message) {
 	case WM_INITDIALOG://ダイアログが呼ばれた
 	{
+        int cursel = 0;
 		SendDlgItemMessage(hdwnd, IDD_THEMES, LB_ADDSTRING, 0, (LPARAM)"OrgMaker 3 (default)");
 
 		WIN32_FIND_DATA fdFile;
@@ -903,6 +979,7 @@ BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 		char sPath[MAX_PATH];
 		sprintf(sPath, "%s\\*.*", sDir);
 
+        i = 0;
 		if ((hFind = FindFirstFile(sPath, &fdFile)) != INVALID_HANDLE_VALUE)
 		{
 			do
@@ -915,12 +992,18 @@ BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 					if (fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) // It should be a theme folder
 					{
 						SendDlgItemMessage(hdwnd, IDD_THEMES, LB_ADDSTRING, 0, (LPARAM)fdFile.cFileName);
+                        ++i;
+                        if (strlen(gSelectedTheme) > 0 && strcmp(sPath, gSelectedTheme) == 0) {
+							cursel = i;
+						}
 					}
 				}
 			} while (FindNextFile(hFind, &fdFile));
 
 			FindClose(hFind);
 		}
+
+        SendDlgItemMessage(hdwnd, IDD_THEMES, LB_SETCURSEL, (WPARAM)cursel, 0);
 
 		EnableDialogWindow(FALSE);
 		return 1;
@@ -981,6 +1064,8 @@ BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 	switch (message) {
 	case WM_INITDIALOG://ダイアログが呼ばれた
 	{
+        int cursel = 0;
+        
 		SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_ADDSTRING, 0, (LPARAM)"Organya (default)");
 
 		WIN32_FIND_DATA fdFile;
@@ -993,6 +1078,7 @@ BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 		char sPath[MAX_PATH];
 		sprintf(sPath, "%s\\*.wdb", sDir);
 
+        i = 0;
 		if ((hFind = FindFirstFile(sPath, &fdFile)) != INVALID_HANDLE_VALUE)
 		{
 			do
@@ -1005,9 +1091,15 @@ BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 					if (!(fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) // It should be a .wdb file
 					{
 						SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_ADDSTRING, 0, (LPARAM)fdFile.cFileName);
+                        ++i;
+                        if (strlen(gSelectedWave) > 0 && strcmp(sPath, gSelectedWave) == 0) {
+                            cursel = i;
+                        }
 					}
 				}
 			} while (FindNextFile(hFind, &fdFile));
+            
+            SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_SETCURSEL, (WPARAM)cursel, 0);
 
 			FindClose(hFind);
 		}
@@ -1090,7 +1182,7 @@ BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			EndDialog(hdwnd,0);
 			return 1;
 		case ID_ICON_ORG:
-			PlaySound( "CAT" , GetModuleHandle(NULL),SND_RESOURCE | SND_ASYNC); 
+			PlaySoundObject(3, 1);
 			return 1;
 		}
 
