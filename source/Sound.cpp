@@ -1167,7 +1167,7 @@ void PlayDramObject(unsigned char key, int mode,char track)
 
 void PlayOrganKey(unsigned char key,char track,DWORD freq,int Nagasa)
 {
-	if (key > 96) return;
+	if (key >= 96) return;
 	if (track < MAXMELODY && lpORGANBUFFER[track][key/12][0] != NULL){
 		DWORD wait = timeGetTime();
 		ChangeOrganFrequency(key%12,track,freq);//Žü”g”‚ðÝ’è‚µ‚Ä
@@ -1189,7 +1189,7 @@ void PlayOrganKey(unsigned char key,char track,DWORD freq,int Nagasa)
 //2010.08.14 A
 void Rxo_PlayKey(unsigned char key,char track,DWORD freq, int Phase)
 {
-	if (key > 96) return;
+	if (key >= 96) return;
 	if (track < MAXMELODY && lpORGANBUFFER[track][key/12][Phase] != NULL) {
 		ChangeOrganFrequency(key%12,track,freq);
 		S_SetSoundVolume(lpORGANBUFFER[track][key/12][Phase], ((200 * 100 / 0x7F) - 255) * 8);
@@ -1207,7 +1207,7 @@ void Rxo_PlayKey(unsigned char key,char track,DWORD freq, int Phase)
 //2010.08.14 A
 void Rxo_StopKey(unsigned char key,char track, int Phase)
 {
-	if (key > 96) return;
+	if (key >= 96) return;
 	if (track < MAXMELODY && lpORGANBUFFER[track][key/12][Phase] != NULL) {
 		//lpORGANBUFFER[track][key/12][Phase]->Play(0, 0, 0);	// 2010.08.14 D
 		S_StopSound(lpORGANBUFFER[track][key/12][Phase]);	// 2010.08.14 A

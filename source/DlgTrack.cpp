@@ -50,6 +50,9 @@ extern char TrackN[];
 extern char gSelectedTheme[MAX_PATH];
 
 void ChangeTrackPlus(int iValue){
+	MUSICINFO mi;
+	org_data.GetMusicInfo(&mi);
+
 	char str[8];
 
 	RECT rect = {64,0,WWidth,WHeight};//更新する領域(トラック変更)
@@ -59,7 +62,7 @@ void ChangeTrackPlus(int iValue){
 	org_data.track =(org_data.track + 16)% 16;
 	setRecentTrack(org_data.track); //A 2010.09.23 
 
-	if(timer_sw == 0) PlayOrganKey(36,org_data.track,1000,80);
+	if(timer_sw == 0) PlayOrganKey(36,org_data.track,mi.tdata[org_data.track].freq, 80);
 	//選択トラック表示
 	itoa(org_data.track,str,10);
 	
@@ -94,6 +97,9 @@ void ChangeTrackPlus(int iValue){
 
 
 void ChangeTrack(int iTrack){
+	MUSICINFO mi;
+	org_data.GetMusicInfo(&mi);
+
 	char str[8];
 	int i;
 	RECT rect = {64,0,WWidth,WHeight};//更新する領域(トラック変更)
@@ -102,7 +108,7 @@ void ChangeTrack(int iTrack){
 	org_data.track = i;
 	setRecentTrack(org_data.track); //A 2010.09.23 
 
-	if(timer_sw == 0) PlayOrganKey(36,i,1000,80);
+	if(timer_sw == 0) PlayOrganKey(36,i,mi.tdata[i].freq, 80);
 	if(sACrnt){
 		if(tra>=0){
 			tra = org_data.track;
