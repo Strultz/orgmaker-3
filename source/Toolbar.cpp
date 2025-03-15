@@ -4,6 +4,7 @@
 #include "resource.h"
 #include "Toolbar.h"
 #include "Setting.h"
+#include "Gdi.h"
 
 static char szTbClassName[] = "OrgToolbar";
 
@@ -16,6 +17,20 @@ LRESULT CALLBACK ToolbarWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
         SetFocus(hWnd);
     }
     return DefWindowProc(hwnd, message, wParam, lParam);
+}
+
+void SetToolbarImageList(HWND hwndToolbar, const char *imageName, int imageCount) {
+    HIMAGELIST hImageList = ImageList_Create(16, 16, ILC_MASK | ILC_COLOR24, imageCount, 0);
+
+    HBITMAP hBmp = GetThemedBitmap(imageName, 0);
+    ImageList_AddMasked(hImageList, hBmp, RGB(0xFF, 0x00, 0xFF));
+    DeleteObject(hBmp);
+
+    HIMAGELIST oldImageList = (HIMAGELIST)SendMessage(hwndToolbar, TB_SETIMAGELIST, (WPARAM)0, (LPARAM)hImageList);
+
+    if (oldImageList) {
+        ImageList_Destroy(oldImageList);
+    }
 }
 
 static void CreateToolbar(int id, HWND hwndRebar, const char *iconBitmap, int buttonCount, TBBUTTON tbb[], const char* toolbarName, HWND outHwnd[2]) {
@@ -35,13 +50,10 @@ static void CreateToolbar(int id, HWND hwndRebar, const char *iconBitmap, int bu
         WS_CHILD | WS_CLIPSIBLINGS | TBSTYLE_TOOLTIPS | TBSTYLE_FLAT | TBSTYLE_LIST | WS_CLIPCHILDREN | CCS_NODIVIDER | CCS_NOPARENTALIGN,
         0, 0, 0, 0, hwndRebar, (HMENU)NULL, hInst, NULL);
 
-    HIMAGELIST hImageList = ImageList_Create(16, 16, ILC_MASK | ILC_COLOR32, buttonCount, 0);
-    HBITMAP hBmp = LoadBitmap(hInst, iconBitmap);
-    ImageList_AddMasked(hImageList, hBmp, RGB(0xFF, 0x00, 0xFF));
-
     SendMessage(hWndToolbar, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS);
 
-    SendMessage(hWndToolbar, TB_SETIMAGELIST, (WPARAM)0, (LPARAM)hImageList);
+    SetToolbarImageList(hWndToolbar, iconBitmap, buttonCount);
+
     SendMessage(hWndToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
     SendMessage(hWndToolbar, TB_SETMAXTEXTROWS, 0, 0);
 
@@ -122,7 +134,7 @@ void CreateToolbarClass(void) {
 }
 
 void CreateToolbars(HWND hwndRebar, HWND outHwnd[4]) {
-    TBBUTTON tbb1[27] =
+    TBBUTTON tbb1[TOOLBAR_MAIN_BUTTON_COUNT] =
     {
         {0, IDM_INIT, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"New (Ctrl+N)"},
         {1, IDM_LOAD, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Open (Ctrl+O)"},
@@ -152,9 +164,9 @@ void CreateToolbars(HWND hwndRebar, HWND outHwnd[4]) {
         {0, 0, 0, BTNS_SEP},
         {5, IDM_PREFERENCES, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Preferences"},
     };
-    CreateToolbar(0, hwndRebar, "TOOLBAR_ICONS", 26, tbb1, "Main", outHwnd);
+    CreateToolbar(0, hwndRebar, "TOOLBAR_ICONS", TOOLBAR_MAIN_BUTTON_COUNT, tbb1, "Main", outHwnd);
 
-    TBBUTTON tbb2[17] =
+    TBBUTTON tbb2[TOOLBAR_CHANNEL_BUTTON_COUNT] =
     {
         {0, IDM_TRACK1, TBSTATE_ENABLED | TBSTATE_CHECKED, BTNS_BUTTON, {}, 0, (INT_PTR)"Channel 1 (1)"},
         {1, IDM_TRACK2, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Channel 2 (2)"},
@@ -174,7 +186,7 @@ void CreateToolbars(HWND hwndRebar, HWND outHwnd[4]) {
         {14, IDM_TRACKU, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Channel U (U)"},
         {15, IDM_TRACKI, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Channel I (I)"},
     };
-    CreateToolbar(1, hwndRebar, "TRACKBAR_ICONS", 17, tbb2, "Channels", &outHwnd[2]);
+    CreateToolbar(1, hwndRebar, "TRACKBAR_ICONS", TOOLBAR_CHANNEL_BUTTON_COUNT, tbb2, "Channels", &outHwnd[2]);
 }
 
 int GetBarWidth(HWND hwndBar) {

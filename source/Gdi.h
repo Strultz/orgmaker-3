@@ -10,6 +10,7 @@ BOOL ResizeGDI(HWND hwnd);
 //GDIの開放
 void EndGDI(void);
 //画像のロード(リソースから)
+HBITMAP GetThemedBitmap(const char* name, int flags);
 BOOL InitBitmap(char *name, int no);
 void InitCursor();
 //いわゆるフリップ

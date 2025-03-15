@@ -494,6 +494,15 @@ void InitBitmaps() {
 	InitBitmap("NOTE", BMPNOTE);//Note
 	InitBitmap("NUMBER", BMPNUMBER);//number
 	InitBitmap("PAN", BMPPAN);//Pan and volume
+
+	if (hwndToolbar) {
+		SetToolbarImageList(hwndToolbar, "TOOLBAR_ICONS", TOOLBAR_MAIN_BUTTON_COUNT);
+		InvalidateRect(hwndToolbar, NULL, TRUE);
+	}
+	if (hwndTrackbar) {
+		SetToolbarImageList(hwndTrackbar, "TRACKBAR_ICONS", TOOLBAR_CHANNEL_BUTTON_COUNT);
+		InvalidateRect(hwndTrackbar, NULL, TRUE);
+	}
 }
 
 void ReloadBitmaps() {

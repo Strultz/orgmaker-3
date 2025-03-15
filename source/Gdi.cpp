@@ -120,10 +120,7 @@ void EndGDI(void) {
 	memset(bitmapMeta, 0, sizeof(bitmapMeta));
 }
 
-BOOL InitBitmap(char *name, int no) {
-	if (no >= MAXBITMAP)
-		return FALSE;
-
+HBITMAP GetThemedBitmap(const char* name, int flags) {
 	bool useTheme = false;
 	char str[MAX_PATH + 20];
 
@@ -137,10 +134,27 @@ BOOL InitBitmap(char *name, int no) {
 	else
 		strcpy(str, name);
 
-	HANDLE handle = LoadImage(useTheme ? NULL : GetModuleHandle(NULL), str, IMAGE_BITMAP, 0, 0, useTheme ? (LR_LOADFROMFILE | LR_CREATEDIBSECTION) : LR_CREATEDIBSECTION);
+	HANDLE handle = LoadImage(useTheme ? NULL : GetModuleHandle(NULL), str, IMAGE_BITMAP, 0, 0, useTheme ? (LR_LOADFROMFILE | flags) : flags);
 	if (handle == NULL && useTheme) { // fallback
-		handle = LoadImage(GetModuleHandle(NULL), name, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+		handle = LoadImage(GetModuleHandle(NULL), name, IMAGE_BITMAP, 0, 0, flags);
+		if (handle == NULL) {
+			return NULL;
+		}
 	}
+	else if (handle == NULL) {
+		return NULL;
+	}
+
+	return (HBITMAP)handle;
+}
+
+BOOL InitBitmap(char *name, int no) {
+	if (no >= MAXBITMAP)
+		return FALSE;
+
+	HBITMAP handle = GetThemedBitmap(name, LR_CREATEDIBSECTION);
+	if (handle == NULL)
+		return FALSE;
 
 	BITMAP bitmap;
 	GetObject(handle, sizeof(BITMAP), &bitmap);
@@ -180,7 +194,7 @@ BOOL InitBitmap(char *name, int no) {
 
 	DeleteObject(handle);
 
-	bitmapMeta[no].file = useTheme;
+	bitmapMeta[no].file = (strlen(gSelectedTheme) > 0);
 	bitmapMeta[no].system = FALSE;
 	bitmapMeta[no].width = bitmap.bmWidth;
 	bitmapMeta[no].height = bitmap.bmHeight;
