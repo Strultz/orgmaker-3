@@ -22,6 +22,7 @@ BOOL OrgData::NoteAlloc(unsigned short alloc)
 	for(j = 0; j < MAXTRACK; j++){
 		info.tdata[j].wave_no = 0;
 		info.tdata[j].note_list = NULL;//コンストラクタにやらせたい
+		info.tdata[j].note_p_len = alloc;
 		info.tdata[j].note_p = new NOTELIST[alloc];
 		if(info.tdata[j].note_p == NULL)return FALSE;
 		//	info.alloc_note = alloc;

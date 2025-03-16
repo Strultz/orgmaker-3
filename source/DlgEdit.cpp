@@ -612,15 +612,21 @@ BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 void ClipboardPaste(int no, int flags);
 
+static int copyNum = 1;
+static bool mixPaste = false;
+static bool copyNotes = false;
+static bool copyVol = false;
+static bool copyPan = false;
+
 BOOL CALLBACK DialogAdvPaste(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message) {
 	case WM_INITDIALOG:
-		SetDlgItemInt(hdwnd, IDC_ADVCOUNT, 1, FALSE);
-		CheckDlgButton(hdwnd, IDC_ADVMIX, FALSE);
-		CheckDlgButton(hdwnd, IDC_ADVNOTES, TRUE);
-		CheckDlgButton(hdwnd, IDC_ADVVOL, TRUE);
-		CheckDlgButton(hdwnd, IDC_ADVPAN, TRUE);
+		SetDlgItemInt(hdwnd, IDC_ADVCOUNT, copyNum, FALSE);
+		CheckDlgButton(hdwnd, IDC_ADVMIX, mixPaste);
+		CheckDlgButton(hdwnd, IDC_ADVNOTES, copyNotes);
+		CheckDlgButton(hdwnd, IDC_ADVVOL, copyVol);
+		CheckDlgButton(hdwnd, IDC_ADVPAN, copyPan);
 		return 1;
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
@@ -628,11 +634,11 @@ BOOL CALLBACK DialogAdvPaste(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 			EndDialog(hdwnd, 0);
 			return 0;
 		case IDOK:
-			int copyNum = GetDlgItemInt(hdwnd, IDC_ADVCOUNT, NULL, FALSE);
-			bool mixPaste = IsDlgButtonChecked(hdwnd, IDC_ADVMIX);
-			bool copyNotes = IsDlgButtonChecked(hdwnd, IDC_ADVNOTES);
-			bool copyVol = IsDlgButtonChecked(hdwnd, IDC_ADVVOL);
-			bool copyPan = IsDlgButtonChecked(hdwnd, IDC_ADVPAN);
+			copyNum = GetDlgItemInt(hdwnd, IDC_ADVCOUNT, NULL, FALSE);
+			mixPaste = IsDlgButtonChecked(hdwnd, IDC_ADVMIX);
+			copyNotes = IsDlgButtonChecked(hdwnd, IDC_ADVNOTES);
+			copyVol = IsDlgButtonChecked(hdwnd, IDC_ADVVOL);
+			copyPan = IsDlgButtonChecked(hdwnd, IDC_ADVPAN);
 
 			int copyFlags = 0;
 			copyFlags |= (mixPaste  ? PF_MIX_PASTE  : 0);

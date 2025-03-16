@@ -32,6 +32,7 @@ typedef struct{
 //	unsigned short note_num;//音符の数
 	unsigned char wave_no;//波形No
 	char pipi;
+	long note_p_len;
 	NOTELIST *note_p;//NoteData領域の先頭アドレス
 	NOTELIST *note_list;//リストの先頭アドレス1
 }TRACKDATA;
