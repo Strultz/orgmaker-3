@@ -353,7 +353,7 @@ void UpdateStatusBar(bool measonly) {
 	}
 
 	if (!measonly) {
-		snprintf(msg, 256, "Preview Octave: %d", previewOctave);
+		snprintf(msg, 256, "Preview Octave: %d", previewOctave + 1);
 		SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)msg);
 
 		switch (NoteWidth) {
@@ -2104,9 +2104,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case ID_SELECTION_VOLUME:   SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Modify volume within the selection"); break;
 		case ID_SELECTION_PANNING:  SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Modify panning within the selection"); break;
 		case ID_SELECTION_TRANSPOSE:SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Transpose notes within the selection"); break;
-		case ID_SELECTION_INSERT:   SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"TODO"); break;
-		case ID_SELECTION_CLEAR:    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"TODO"); break;
-		case ID_SELECTION_DELETE:   SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"TODO"); break;
+		case ID_SELECTION_INSERT:   SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Insert empty space in the selection"); break;
+		case ID_SELECTION_CLEAR:    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Remove notes in the selection"); break;
+		case ID_SELECTION_DELETE:   SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Remove and trim the selection"); break;
 		case IDM_DLGSWAP:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Swap the data of two channels"); break;
 		case IDM_CT_S20:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Clear all volume change events in the selection/channel"); break;
 		case IDM_DCLEN:             SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Edit note decay length and settings"); break;

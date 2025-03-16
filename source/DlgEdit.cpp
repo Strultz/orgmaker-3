@@ -959,16 +959,130 @@ BOOL CALLBACK DialogAdvPaste(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 	return 0;
 }
 
+static int tvol[MAXTRACK] = {
+	IDC_DEFVOL1, IDC_DEFVOL2, IDC_DEFVOL3, IDC_DEFVOL4,
+	IDC_DEFVOL5, IDC_DEFVOL6, IDC_DEFVOL7, IDC_DEFVOL8,
+	IDC_DEFVOL9, IDC_DEFVOL10, IDC_DEFVOL11, IDC_DEFVOL12,
+	IDC_DEFVOL13, IDC_DEFVOL14, IDC_DEFVOL15, IDC_DEFVOL16,
+};
+static int tvol_spin[MAXTRACK] = {
+	IDC_DEFVOLSPIN1, IDC_DEFVOLSPIN2, IDC_DEFVOLSPIN3, IDC_DEFVOLSPIN4,
+	IDC_DEFVOLSPIN5, IDC_DEFVOLSPIN6, IDC_DEFVOLSPIN7, IDC_DEFVOLSPIN8,
+	IDC_DEFVOLSPIN9, IDC_DEFVOLSPIN10, IDC_DEFVOLSPIN11, IDC_DEFVOLSPIN12,
+	IDC_DEFVOLSPIN13, IDC_DEFVOLSPIN14, IDC_DEFVOLSPIN15, IDC_DEFVOLSPIN16,
+};
+static int tpan_spin[MAXTRACK] = {
+	IDC_DEFPANSPIN1, IDC_DEFPANSPIN2, IDC_DEFPANSPIN3, IDC_DEFPANSPIN4,
+	IDC_DEFPANSPIN5, IDC_DEFPANSPIN6, IDC_DEFPANSPIN7, IDC_DEFPANSPIN8,
+	IDC_DEFPANSPIN9, IDC_DEFPANSPIN10, IDC_DEFPANSPIN11, IDC_DEFPANSPIN12,
+	IDC_DEFPANSPIN13, IDC_DEFPANSPIN14, IDC_DEFPANSPIN15, IDC_DEFPANSPIN16,
+};
+static int tpan[MAXTRACK] = {
+	IDC_DEFPAN1, IDC_DEFPAN2, IDC_DEFPAN3, IDC_DEFPAN4,
+	IDC_DEFPAN5, IDC_DEFPAN6, IDC_DEFPAN7, IDC_DEFPAN8,
+	IDC_DEFPAN9, IDC_DEFPAN10, IDC_DEFPAN11, IDC_DEFPAN12,
+	IDC_DEFPAN13, IDC_DEFPAN14, IDC_DEFPAN15, IDC_DEFPAN16,
+};
 
 BOOL CALLBACK DialogDefaults(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	int i;
+	HWND w;
+	LPNMHDR lpnm;
+	
 	switch (message) {
 	case WM_INITDIALOG:
+		for (i = 0; i < MAXTRACK; ++i) {
+			SetDlgItemInt(hdwnd, tvol[i], org_data.def_volume[i], FALSE);
+			SetDlgItemInt(hdwnd, tpan[i], org_data.def_pan[i], FALSE);
 
+			w = GetDlgItem(hdwnd, tvol_spin[i]);
+			SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(254, 0));
+			SendMessage(w, UDM_SETPOS, 0, org_data.def_volume[i]);
+			w = GetDlgItem(hdwnd, tpan_spin[i]);
+			SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(12, 0));
+			SendMessage(w, UDM_SETPOS, 0, org_data.def_pan[i]);
+		}
 		break;
 	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK:
+			for (i = 0; i < MAXTRACK; ++i) {
+				org_data.def_volume[i] = GetDlgItemInt(hdwnd, tvol[i], NULL, FALSE);
+				org_data.def_pan[i] = GetDlgItemInt(hdwnd, tpan[i], NULL, FALSE);
 
+				if (org_data.def_volume[i] < 0) org_data.def_volume[i] = 0;
+				if (org_data.def_volume[i] > 254) org_data.def_volume[i] = 254;
+				if (org_data.def_pan[i] < 0) org_data.def_pan[i] = 0;
+				if (org_data.def_pan[i] > 12) org_data.def_pan[i] = 12;
+			}
+
+			EndDialog(hdwnd, 0);
+			break;
+		case IDC_DEFRESET:
+			for (i = 0; i < MAXTRACK; ++i) {
+				org_data.def_volume[i] = 200;
+				org_data.def_pan[i] = 6;
+
+				SetDlgItemInt(hdwnd, tvol[i], org_data.def_volume[i], FALSE);
+				SetDlgItemInt(hdwnd, tpan[i], org_data.def_pan[i], FALSE);
+
+				w = GetDlgItem(hdwnd, tvol_spin[i]);
+				SendMessage(w, UDM_SETPOS, 0, org_data.def_volume[i]);
+				w = GetDlgItem(hdwnd, tpan_spin[i]);
+				SendMessage(w, UDM_SETPOS, 0, org_data.def_pan[i]);
+			}
+			break;
+		case IDCANCEL:
+			EndDialog(hdwnd, 0);
+			break;
+		}
 		break;
+	case WM_NOTIFY: {
+		lpnm = (LPNMHDR)lParam;
+		switch (lpnm->code) {
+		case UDN_DELTAPOS: {
+			LPNMUPDOWN lud = (LPNMUPDOWN)lParam;
+			HWND buddy = (HWND)SendMessage(lpnm->hwndFrom, UDM_GETBUDDY, 0, 0);
+			if (buddy) {
+				int v = GetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), NULL, FALSE);
+				
+				switch (lpnm->idFrom) {
+				case IDC_DEFPANSPIN1:
+				case IDC_DEFPANSPIN2:
+				case IDC_DEFPANSPIN3:
+				case IDC_DEFPANSPIN4:
+				case IDC_DEFPANSPIN5:
+				case IDC_DEFPANSPIN6:
+				case IDC_DEFPANSPIN7:
+				case IDC_DEFPANSPIN8:
+				case IDC_DEFPANSPIN9:
+				case IDC_DEFPANSPIN10:
+				case IDC_DEFPANSPIN11:
+				case IDC_DEFPANSPIN12:
+				case IDC_DEFPANSPIN13:
+				case IDC_DEFPANSPIN14:
+				case IDC_DEFPANSPIN15:
+				case IDC_DEFPANSPIN16:
+					v += lud->iDelta;
+					if (v < 0) v = 0;
+					if (v > 12) v = 12;
+					break;
+				default:
+					v += lud->iDelta * 5;
+					if (v < 0) v = 0;
+					if (v > 254) v = 254;
+					break;
+				}
+
+				SetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), v, FALSE);
+				SendMessage(lpnm->hwndFrom, UDM_SETPOS, 0, v);
+				return 0;
+			}
+			return 1;
+		}
+		}
+	}
 	}
 	return 0;
 }
