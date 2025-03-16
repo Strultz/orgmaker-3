@@ -176,7 +176,7 @@ NOTELIST* OrgData::CreateOrgNote(char track, int x) {
 		}
 		if (nfrom->x == x) return NULL; // note exists here
 	}
-	NOTELIST* mnp = SearchNote(info.tdata[track].note_p);
+	NOTELIST* mnp = SearchNote(track);
 	if (mnp == NULL) return NULL;
 	if (nfrom == NULL) {
 		info.tdata[track].note_list = mnp;
@@ -371,14 +371,14 @@ BOOL OrgData::CopyNoteData(NOTECOPY *nc)
 	DelateNoteData(&pc);//消す
 
 	//ペーストリストの生成
-	np = p_list1 = p_list2 = SearchNote(info.tdata[nc->track2].note_p);
+	np = p_list1 = p_list2 = SearchNote(nc->track2);
 	if(np == NULL){//未使用音譜が不足
 		free( work );
 		return FALSE;
 	}
 	np->length = 1;//仮生成
 	for(i = 1; i < copy_num*nc->num; i++){
-		np = SearchNote(info.tdata[nc->track2].note_p);
+		np = SearchNote(nc->track2);
 		if(np == NULL){//未使用音譜が不足
 			//free( work );
 			//return FALSE;

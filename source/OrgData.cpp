@@ -22,7 +22,6 @@ BOOL OrgData::NoteAlloc(unsigned short alloc)
 	for(j = 0; j < MAXTRACK; j++){
 		info.tdata[j].wave_no = 0;
 		info.tdata[j].note_list = NULL;//コンストラクタにやらせたい
-		info.tdata[j].note_p_len = alloc;
 		info.tdata[j].note_p = new NOTELIST[alloc];
 		if(info.tdata[j].note_p == NULL)return FALSE;
 		//	info.alloc_note = alloc;
@@ -131,9 +130,10 @@ BOOL OrgData::SetMusicInfo(MUSICINFO *mi,unsigned long flag)
 	return TRUE;
 }
 //未使用音符を検索
-NOTELIST *OrgData::SearchNote(NOTELIST *np)
+NOTELIST *OrgData::SearchNote(char track)
 {
 	int i;
+	NOTELIST* np = info.tdata[track].note_p;
 	for(i = 0; i < info.alloc_note; i++,np++){
 		if(np->length == 0){
 			return np;
@@ -161,7 +161,7 @@ BOOL OrgData::SetNote(long x,unsigned char y, int DragMode)
 	NOTELIST *p;//リストを指すポインター
 	NOTELIST *cut_p;//それを置く事によってカットすべき音符
 	//未使用NOTEを検索
-	if((note = SearchNote(info.tdata[track].note_p)) == NULL)return FALSE;
+	if((note = SearchNote(track)) == NULL)return FALSE;
 	//初音符ならリストに登録
 	if(info.tdata[track].note_list == NULL){
 		PlayOrganKey(y,track,info.tdata[track].freq,100);//■
@@ -391,7 +391,7 @@ BOOL OrgData::SetPan(long x,unsigned char y)
 	NOTELIST *note;//生成NOTE
 	NOTELIST *p;//リストを指すポインター
 	//未使用NOTEを検索
-	if((note = SearchNote(info.tdata[track].note_p)) == NULL)return FALSE;
+	if((note = SearchNote(track)) == NULL)return FALSE;
 	//初音符ならリストに登録
 	if(info.tdata[track].note_list == NULL){
 		info.tdata[track].note_list = note;
@@ -446,7 +446,7 @@ BOOL OrgData::SetPan2(long x,unsigned char y)
 	NOTELIST *note;//生成NOTE
 	NOTELIST *p;//リストを指すポインター
 	//未使用NOTEを検索
-	if((note = SearchNote(info.tdata[track].note_p)) == NULL)return FALSE;
+	if((note = SearchNote(track)) == NULL)return FALSE;
 	//初音符ならリストに登録
 	if(info.tdata[track].note_list == NULL){
 		return FALSE;
@@ -494,7 +494,7 @@ BOOL OrgData::SetVolume(long x,unsigned char y)
 	NOTELIST *note;//生成NOTE
 	NOTELIST *p;//リストを指すポインター
 	//未使用NOTEを検索
-	if((note = SearchNote(info.tdata[track].note_p)) == NULL)return FALSE;
+	if((note = SearchNote(track)) == NULL)return FALSE;
 	//初音符ならリストに登録
 	if(info.tdata[track].note_list == NULL){
 		info.tdata[track].note_list = note;
@@ -563,7 +563,7 @@ BOOL OrgData::SetVolume2(long x,unsigned char y,long fade)
 	long lastx = 0;
 	int i;
 	//未使用NOTEを検索
-	if((note = SearchNote(info.tdata[track].note_p)) == NULL)return FALSE;
+	if((note = SearchNote(track)) == NULL)return FALSE;
 	//初音符ならリストに登録
 	if(info.tdata[track].note_list == NULL){
 		info.tdata[track].note_list = note;
@@ -861,7 +861,7 @@ BOOL OrgData::SetNote_onlyLength(long x, long Length)
 	NOTELIST *note;//生成NOTE
 	NOTELIST *p;//リストを指すポインター
 	//未使用NOTEを検索
-	if((note = SearchNote(info.tdata[track].note_p)) == NULL)return FALSE;
+	if((note = SearchNote(track)) == NULL)return FALSE;
 	if(info.tdata[track].note_list == NULL)return FALSE;
 	p = info.tdata[track].note_list;
 	while(p->x < x && p->to != NULL){
@@ -885,7 +885,7 @@ BOOL OrgData::SetNote_afterSetLength(long x)
 	NOTELIST *p;//リストを指すポインター
 	NOTELIST *cut_p;//それを置く事によってカットすべき音符
 	//未使用NOTEを検索
-	if((note = SearchNote(info.tdata[track].note_p)) == NULL)return FALSE;
+	if((note = SearchNote(track)) == NULL)return FALSE;
 	if(info.tdata[track].note_list == NULL)return FALSE;
 	p = info.tdata[track].note_list;
 	while(p->x < x && p->to != NULL){

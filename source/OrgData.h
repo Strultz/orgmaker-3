@@ -1,3 +1,5 @@
+#pragma once
+
 //編集用構造体///////////////
 typedef struct{//●コピー構造体
 	char track1;//このトラックの
@@ -32,9 +34,8 @@ typedef struct{
 //	unsigned short note_num;//音符の数
 	unsigned char wave_no;//波形No
 	char pipi;
-	long note_p_len;
-	NOTELIST *note_p;//NoteData領域の先頭アドレス
-	NOTELIST *note_list;//リストの先頭アドレス1
+	NOTELIST* note_p;//NoteData領域の先頭アドレス
+	NOTELIST* note_list;//リストの先頭アドレス1
 }TRACKDATA;
 //曲単位で持つ固有の情報
 typedef struct MUSICINFO{
@@ -95,7 +96,7 @@ typedef struct OrgData{
 		BOOL SetMusicInfo(MUSICINFO *mi,unsigned long flag);
 		BOOL NoteAlloc(unsigned short note_num);//指定の数だけNoteDataの領域を確保
 		void ReleaseNote(void);//NoteDataを開放
-		NOTELIST *SearchNote(NOTELIST *np);//未使用NOTEの検索
+		NOTELIST *SearchNote(char track);//未使用NOTEの検索
 		void OrgData::TouchKeyboard(unsigned char y);//鍵盤に触れる
 		void OrgData::StopKeyboard(unsigned char y);//鍵盤に触れる
 		BOOL SetNote(long x,unsigned char y, int DragMode = 0);//音符を配置
