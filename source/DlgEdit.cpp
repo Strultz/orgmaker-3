@@ -7,10 +7,12 @@
 #include "OrgData.h"
 #include "Gdi.h"
 #include "rxoFunction.h"
+#include <commctrl.h>
 
 extern HWND hDlgTrack;
 extern NOTECOPY nc_Select; //‘I‘ð”ÍˆÍ
-extern int tra, ful ,haba; 
+extern int tra, ful ,haba;
+extern int sACrnt;
 extern char TrackN[];
 extern char *dram_name[];
 
@@ -549,7 +551,308 @@ BOOL CALLBACK DialogCopy2(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 	return 0;
 }*/
 
-// TODO: Edit selection dialogs
+static int volTimes = 1;
+static bool volUp = true;
+BOOL CALLBACK DialogSelVol(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	LPNMHDR lpnm;
+
+	switch (message) {
+	case WM_INITDIALOG: {
+		SetDlgItemInt(hdwnd, IDE_PAR, volTimes, FALSE);
+
+		SendDlgItemMessage(hdwnd, volUp ? IDR_ADD : IDR_SUB, BM_SETCHECK, BST_CHECKED, 0);
+
+		HWND w = GetDlgItem(hdwnd, IDC_SPIN2);
+		SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(999, 1));
+		SendMessage(w, UDM_SETPOS, 0, volTimes);
+
+		return 1;
+	}
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK: {
+			volTimes = GetDlgItemInt(hdwnd, IDE_PAR, NULL, FALSE);
+
+			long t1;
+			long t2;
+			if (ful == 1) {
+				if (sACrnt == 0) {
+					t1 = 0;
+					t2 = MAXTRACK - 1;
+				}
+				else {
+					if (org_data.track < MAXMELODY) {
+						t1 = 0;
+						t2 = MAXMELODY - 1;
+					}
+					else {
+						t1 = MAXMELODY;
+						t2 = MAXTRACK - 1;
+					}
+				}
+			}
+			else {
+				t1 = t2 = tra;
+			}
+
+			if (tra >= 0) {
+				PARCHANGE pc = { 0 };
+				pc.x1 = nc_Select.x1_1;
+				pc.x2 = nc_Select.x1_2;
+				pc.a = volTimes;
+
+				if (SendDlgItemMessage(hdwnd, IDR_ADD, BM_GETCHECK, 0, 0)) {
+					pc.mode = MODEPARADD;
+					volUp = true;
+				}
+				else if (SendDlgItemMessage(hdwnd, IDR_SUB, BM_GETCHECK, 0, 0)) {
+					pc.mode = MODEPARSUB;
+					volUp = false;
+				}
+				else {
+					// ???
+				}
+
+				SetUndo();
+
+				for (int i = t1; i <= t2; ++i) {
+					pc.track = i;
+					org_data.ChangeVolumeData(&pc, 0);
+				}
+			}
+
+			EndDialog(hdwnd, 0);
+			break;
+		}
+		case IDCANCEL:
+			EndDialog(hdwnd, 0);
+			break;
+		}
+		break;
+	case WM_NOTIFY: {
+		lpnm = (LPNMHDR)lParam;
+		switch (lpnm->code) {
+		case UDN_DELTAPOS: {
+			LPNMUPDOWN lud = (LPNMUPDOWN)lParam;
+			HWND buddy = (HWND)SendMessage(lpnm->hwndFrom, UDM_GETBUDDY, 0, 0);
+			if (buddy) {
+				int v = GetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), NULL, FALSE);
+				v += lud->iDelta;
+				if (v < 1) v = 1;
+				if (v > 999) v = 999;
+
+				SetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), v, FALSE);
+				SendMessage(lpnm->hwndFrom, UDM_SETPOS, 0, v);
+				return 0;
+			}
+			return 1;
+		}
+		}
+	}
+	}
+	return 0;
+}
+
+static int panTimes = 1;
+static bool panUp = true;
+BOOL CALLBACK DialogSelPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	LPNMHDR lpnm;
+
+	switch (message) {
+	case WM_INITDIALOG: {
+		SetDlgItemInt(hdwnd, IDE_PAR, panTimes, FALSE);
+
+		SendDlgItemMessage(hdwnd, panUp ? IDR_ADD : IDR_SUB, BM_SETCHECK, BST_CHECKED, 0);
+
+		HWND w = GetDlgItem(hdwnd, IDC_SPIN2);
+		SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(999, 1));
+		SendMessage(w, UDM_SETPOS, 0, panTimes);
+
+		return 1;
+	}
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK: {
+			panTimes = GetDlgItemInt(hdwnd, IDE_PAR, NULL, FALSE);
+
+			long t1;
+			long t2;
+			if (ful == 1) {
+				if (sACrnt == 0) {
+					t1 = 0;
+					t2 = MAXTRACK - 1;
+				}
+				else {
+					if (org_data.track < MAXMELODY) {
+						t1 = 0;
+						t2 = MAXMELODY - 1;
+					}
+					else {
+						t1 = MAXMELODY;
+						t2 = MAXTRACK - 1;
+					}
+				}
+			}
+			else {
+				t1 = t2 = tra;
+			}
+
+			if (tra >= 0) {
+				PARCHANGE pc = { 0 };
+				pc.x1 = nc_Select.x1_1;
+				pc.x2 = nc_Select.x1_2;
+				pc.a = panTimes;
+
+				if (SendDlgItemMessage(hdwnd, IDR_ADD, BM_GETCHECK, 0, 0)) {
+					pc.mode = MODEPARADD;
+					panUp = true;
+				}
+				else if (SendDlgItemMessage(hdwnd, IDR_SUB, BM_GETCHECK, 0, 0)) {
+					pc.mode = MODEPARSUB;
+					panUp = false;
+				}
+				else {
+					// ???
+				}
+
+				SetUndo();
+
+				for (int i = t1; i <= t2; ++i) {
+					pc.track = i;
+					org_data.ChangePanData(&pc);
+				}
+			}
+
+			EndDialog(hdwnd, 0);
+			break;
+		}
+		case IDCANCEL:
+			EndDialog(hdwnd, 0);
+			break;
+		}
+		break;
+	case WM_NOTIFY: {
+		lpnm = (LPNMHDR)lParam;
+		switch (lpnm->code) {
+		case UDN_DELTAPOS: {
+			LPNMUPDOWN lud = (LPNMUPDOWN)lParam;
+			HWND buddy = (HWND)SendMessage(lpnm->hwndFrom, UDM_GETBUDDY, 0, 0);
+			if (buddy) {
+				int v = GetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), NULL, FALSE);
+				v += lud->iDelta;
+				if (v < 1) v = 1;
+				if (v > 999) v = 999;
+
+				SetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), v, FALSE);
+				SendMessage(lpnm->hwndFrom, UDM_SETPOS, 0, v);
+				return 0;
+			}
+			return 1;
+		}
+		}
+	}
+	}
+	return 0;
+}
+
+static int traTimes = 1;
+static bool traUp = true;
+BOOL CALLBACK DialogSelTra(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	LPNMHDR lpnm;
+
+	switch (message) {
+	case WM_INITDIALOG: {
+		SetDlgItemInt(hdwnd, IDE_PAR, traTimes, FALSE);
+
+		SendDlgItemMessage(hdwnd, traUp ? IDR_ADD : IDR_SUB, BM_SETCHECK, BST_CHECKED, 0);
+
+		HWND w = GetDlgItem(hdwnd, IDC_SPIN2);
+		SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(999, 1));
+		SendMessage(w, UDM_SETPOS, 0, traTimes);
+
+		return 1;
+	}
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK: {
+			traTimes = GetDlgItemInt(hdwnd, IDE_PAR, NULL, FALSE);
+
+			long t1;
+			long t2;
+			if (ful == 1) {
+				if (sACrnt == 0) {
+					t1 = 0;
+					t2 = MAXTRACK - 1;
+				} else {
+					if (org_data.track < MAXMELODY) {
+						t1 = 0;
+						t2 = MAXMELODY - 1;
+					} else {
+						t1 = MAXMELODY;
+						t2 = MAXTRACK - 1;
+					}
+				}
+			} else {
+				t1 = t2 = tra;
+			}
+
+			if (tra >= 0) {
+				PARCHANGE pc = { 0 };
+				pc.x1 = nc_Select.x1_1;
+				pc.x2 = nc_Select.x1_2;
+				pc.a = traTimes;
+
+				if (SendDlgItemMessage(hdwnd, IDR_ADD, BM_GETCHECK, 0, 0)) {
+					pc.mode = MODEPARADD;
+					traUp = true;
+				}
+				else if (SendDlgItemMessage(hdwnd, IDR_SUB, BM_GETCHECK, 0, 0)) {
+					pc.mode = MODEPARSUB;
+					traUp = false;
+				}
+				else {
+					// ???
+				}
+
+				SetUndo();
+
+				for (int i = t1; i <= t2; ++i) {
+					pc.track = i;
+					org_data.ChangeTransData(&pc);
+				}
+			}
+
+			EndDialog(hdwnd, 0);
+			break;
+		}
+		case IDCANCEL:
+			EndDialog(hdwnd, 0);
+			break;
+		}
+		break;
+	case WM_NOTIFY: {
+		lpnm = (LPNMHDR)lParam;
+		switch (lpnm->code) {
+		case UDN_DELTAPOS: {
+			LPNMUPDOWN lud = (LPNMUPDOWN)lParam;
+			HWND buddy = (HWND)SendMessage(lpnm->hwndFrom, UDM_GETBUDDY, 0, 0);
+			if (buddy) {
+				int v = GetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), NULL, FALSE);
+				v += lud->iDelta;
+				if (v < 1) v = 1;
+				if (v > 999) v = 999;
+
+				SetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), v, FALSE);
+				SendMessage(lpnm->hwndFrom, UDM_SETPOS, 0, v);
+				return 0;
+			}
+			return 1;
+		}
+		}
+	}
+	}
+	return 0;
+}
 
 BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {

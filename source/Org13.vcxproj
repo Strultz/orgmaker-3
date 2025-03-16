@@ -141,9 +141,7 @@
   <ItemGroup>
     <ClCompile Include="Click.cpp" />
     <ClCompile Include="DlgEdit.cpp" />
-    <ClCompile Include="DlgPlayer.cpp" />
     <ClCompile Include="DlgSet.cpp" />
-    <ClCompile Include="DlgTrack.cpp" />
     <ClCompile Include="Filer.cpp" />
     <ClCompile Include="Gdi.cpp" />
     <ClCompile Include="MainPut.cpp" />

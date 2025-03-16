@@ -142,7 +142,7 @@ LRESULT CALLBACK AreaWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 
 void OpenSongProperties(HWND hwnd);
 //BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
-BOOL CALLBACK DialogDefault(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+//BOOL CALLBACK DialogDefault(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 //BOOL CALLBACK DialogDelete(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 //BOOL CALLBACK DialogCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 //BOOL CALLBACK DialogCopy2(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -150,8 +150,8 @@ BOOL CALLBACK DialogDefault(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 //BOOL CALLBACK DialogTrans(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 //BOOL CALLBACK DialogVolume(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 //BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
-BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
-BOOL CALLBACK DialogTrack(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+//BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+//BOOL CALLBACK DialogTrack(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogNoteUsed(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -162,6 +162,9 @@ BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lP
 BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogDecayLength(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogAdvPaste(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK DialogSelPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK DialogSelVol(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK DialogSelTra(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void SetModified(bool mod);
 
@@ -209,8 +212,6 @@ int toolbarSavedY[2] = { 100, 160 };
 static bool autoCheckUpdate = true;
 static bool floatingToolbars = false;
 
-extern void LoadTrackBitmaps(HWND hdwnd);
-extern void LoadPlayerBitmaps(HWND hdwnd);
 extern void ChangeTrack(int iTrack);
 extern void ChangeTrackPlus(int iValue);
 extern char timer_sw; //Playing?
@@ -246,16 +247,16 @@ SAVEDNOTE gClipboardData;
 NOTECOPY nc_Select;
 int tra = -256, ful = 0, haba = 0;
 
-static const int playbar_controls_menu[67] = {
+static const int playbar_controls_menu[67 - 6 - 6] = {
 	IDM_SORTMUSICNOTE, IDM_DLGDELETE, IDM_DLGCOPY, IDM_DLGCOPY2, IDM_DLGSWAP,
 	IDM_2BAI, IDM_3BAI, IDM_2BUNNO1, IDM_3BUNNO1, IDM_CT_L1, IDM_CT_L2, IDM_CT_L3,
 	IDM_CT_L4, IDM_CT_L5, IDM_CT_L6, IDM_CT_L7, IDM_CT_L8,
 	IDM_CT_L9, IDM_CT_L10, IDM_CT_L11, IDM_CT_L12, IDM_CT_L13,
-	IDM_CT_L14, IDM_CT_L15, IDM_CT_L16, IDM_CT_L17, IDM_CT_L18,
-	IDM_CT_L19, IDM_CT_S1, IDM_CT_S2, IDM_CT_S3, IDM_CT_S4,
+	/*IDM_CT_L14, IDM_CT_L15, IDM_CT_L16, IDM_CT_L17, IDM_CT_L18,
+	IDM_CT_L19,*/ IDM_CT_S1, IDM_CT_S2, IDM_CT_S3, IDM_CT_S4,
 	IDM_CT_S5, IDM_CT_S6, IDM_CT_S7, IDM_CT_S8, IDM_CT_S9,
-	IDM_CT_S10, IDM_CT_S11, IDM_CT_S12, IDM_CT_S13, IDM_CT_S14,
-	IDM_CT_S15, IDM_CT_S16, IDM_CT_S17, IDM_CT_S18, IDM_CT_S19,
+	IDM_CT_S10, IDM_CT_S11, IDM_CT_S12, IDM_CT_S13, /*IDM_CT_S14,
+	IDM_CT_S15, IDM_CT_S16, IDM_CT_S17, IDM_CT_S18, IDM_CT_S19,*/
 	IDM_CT_S20, IDM_CT_OCT_DOWN, IDM_CT_OCT_UP, IDM_CT_PAN_R, IDM_CT_PAN_L,
 	IDM_CT_PAN_REVERSE, IDM_CT_TRANS_UP, IDM_CT_TRANS_DOWN, IDM_CT_VOL_PLUS, IDM_CT_VOL_MINUS,
 	IDM_CT_VOLWARIAI_UP, IDM_CT_VOLWARIAI_DOWN, IDM_ML_PAN_R, IDM_ML_PAN_L, IDM_ML_TRANS_UP,
@@ -284,7 +285,7 @@ void UpdateToolbarStatus() {
 	// disable editor features while song is playing
 	bool enabled = timer_sw == 0;
 	if (lastUpdCheck != enabled) {
-		for (int i = 0; i < 67; ++i) {
+		for (int i = 0; i < 67 - 6 - 6; ++i) {
 			EnableMenuItem(hMenu, playbar_controls_menu[i], MF_BYCOMMAND | (enabled ? MF_ENABLED : MF_GRAYED));
 		}
 
@@ -1204,19 +1205,20 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_DLGCOPY2://
 			case ID_AC_COPY2:
 				//DialogBox(hInst,"DLGCOPY2",hwnd,DialogCopy2);
-				break;
-			case IDM_DLGPAN://
-			case ID_AC_DLG_PAN:
-				DialogBox(hInst,"DLGPAN",hwnd,DialogPan);
-				break;
-			case IDM_DLGTRANS://
-			case ID_AC_DLG_TRANS:
-				DialogBox(hInst,"DLGTRANS",hwnd,DialogTrans);
-				break;
-			case IDM_DLGVOL://
-			case ID_AC_DLG_VOL:
-				DialogBox(hInst,"DLGVOLUME",hwnd,DialogVolume);
 				break;*/
+			case ID_SELECTION_PANNING://
+			case ID_AC_DLG_PAN:
+				DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGSELPAN), hwnd, DialogSelPan);
+				break;
+			case ID_SELECTION_TRANSPOSE://
+			case ID_AC_DLG_TRANS:
+				DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGSELTRA), hwnd, DialogSelTra);
+				break;
+			case ID_SELECTION_VOLUME://
+			case ID_AC_DLG_VOL:
+				DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGSELVOL), hwnd, DialogSelVol);
+				//DialogBox(hInst,"DLGVOLUME",hwnd,DialogVolume);
+				break;
 			case ID_AC_STPLAY:
 				StartPlayingSong();
 				break;
@@ -1888,7 +1890,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		}
 		case IDM_DLGDEFAULT://Show Default Dialog
 		case ID_AC_DEFAULT:
-			DialogBox(hInst, "DLGDEFAULT", hwnd, DialogDefault);
+			//DialogBox(hInst, "DLGDEFAULT", hwnd, DialogDefault);
 			break;
 		case IDM_GITHUB:
 			ShellExecute(NULL, "open", "https://github.com/Strultz/orgmaker-3", NULL, NULL, SW_SHOWNORMAL);

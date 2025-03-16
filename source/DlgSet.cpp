@@ -1769,6 +1769,17 @@ BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lP
 		itoa(fade_mseconds, str, 10);
 		SetDlgItemText(hdwnd, IDE_FADE_MSECONDS, str);
 		CheckDlgButton(hdwnd, IDC_EXPORTSEPARATE, 0);
+
+		HWND w = GetDlgItem(hdwnd, IDC_SPIN3);
+		SendMessage(w, UDM_SETRANGE32, 100, 192000);
+		SendMessage(w, UDM_SETPOS32, 0, sample_rate);
+		w = GetDlgItem(hdwnd, IDC_SPIN2);
+		SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(256, 0));
+		SendMessage(w, UDM_SETPOS, 0, loop_count);
+		w = GetDlgItem(hdwnd, IDC_SPIN3);
+		SendMessage(w, UDM_SETRANGE32, 0, 60000);
+		SendMessage(w, UDM_SETPOS32, 0, fade_mseconds);
+
 		EnableDialogWindow(FALSE);
 		return 1;
 	}
@@ -1856,8 +1867,10 @@ BOOL CALLBACK DialogDecayLength(HWND hdwnd, UINT message, WPARAM wParam, LPARAM 
 {
 	MUSICINFO mi;
 	FILE* deez;
+	LPNMHDR lpnm;
 	char res;
 	char strPath[MAX_PATH] = { NULL };
+
 	switch (message) {
 	case WM_INITDIALOG: {
 		char str[10] = { NULL };
@@ -1865,6 +1878,11 @@ BOOL CALLBACK DialogDecayLength(HWND hdwnd, UINT message, WPARAM wParam, LPARAM 
 		SetDlgItemText(hdwnd, IDE_VOL_LENGTH, str);
 		CheckDlgButton(hdwnd, IDC_VOL_USENOTELEN, volChangeUseNoteLength ? 1 : 0);
 		CheckDlgButton(hdwnd, IDC_VOL_SETNOTELEN, volChangeSetNoteLength ? 1 : 0);
+
+		HWND w = GetDlgItem(hdwnd, IDC_SPINDECAY);
+		SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(9999, 1));
+		SendMessage(w, UDM_SETPOS, 0, volChangeLength);
+
 		EnableDialogWindow(FALSE);
 		return 1;
 	}
@@ -1875,6 +1893,7 @@ BOOL CALLBACK DialogDecayLength(HWND hdwnd, UINT message, WPARAM wParam, LPARAM 
 
 			GetDlgItemText(hdwnd, IDE_VOL_LENGTH, str, 7);
 			volChangeLength = atol(str);
+			volChangeLength = volChangeLength < 1 ? 1 : volChangeLength;
 
 			volChangeUseNoteLength = IsDlgButtonChecked(hdwnd, IDC_VOL_USENOTELEN);
 			volChangeSetNoteLength = IsDlgButtonChecked(hdwnd, IDC_VOL_SETNOTELEN);
@@ -1889,6 +1908,29 @@ BOOL CALLBACK DialogDecayLength(HWND hdwnd, UINT message, WPARAM wParam, LPARAM 
 			return 1;
 		}
 		return 1;
+	case WM_NOTIFY: {
+		lpnm = (LPNMHDR)lParam;
+		switch (lpnm->code) {
+		case UDN_DELTAPOS: {
+			LPNMUPDOWN lud = (LPNMUPDOWN)lParam;
+			HWND buddy = (HWND)SendMessage(lpnm->hwndFrom, UDM_GETBUDDY, 0, 0);
+			if (buddy) {
+				int v = GetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), NULL, FALSE);
+				v += lud->iDelta;
+				if (v < 1) v = 1;
+				if (v > 9999) v = 9999;
+
+				SetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), v, FALSE);
+				SendMessage(lpnm->hwndFrom, UDM_SETPOS, 0, v);
+
+				PropSheet_Changed(GetParent(hdwnd), hdwnd);
+				gPropChanged = true;
+				return 0;
+			}
+			return 1;
+		}
+		}
+	}
 	}
 	return 0;
 }
@@ -1921,7 +1963,7 @@ bool CheckDefPanVol(HWND hdwnd, int WithSet)
 	return true;
 }
 
-bool LoadPVIFile(HWND hdwnd, char *FileName)
+/*bool LoadPVIFile(HWND hdwnd, char* FileName)
 {
 	FILE *fp;
 	fp = fopen(FileName, "rt");
@@ -2027,7 +2069,7 @@ BOOL CALLBACK DialogDefault(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 		SetDlgItemText(hdwnd,IDD_DEFPAN,str);
 		itoa(org_data.def_volume,str,10);
 		SetDlgItemText(hdwnd,IDD_DEFVOLUME,str);
-		*/
+		*
 		for(i=0;i<MAXTRACK;i++){
 			SetText(hdwnd, txt_Pan[i] , (int) org_data.def_pan[i] );
 			SetText(hdwnd, txt_Vol[i] , (int) org_data.def_volume[i] );
@@ -2107,7 +2149,7 @@ BOOL CALLBACK DialogDefault(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 				return FALSE;
 			}
 			org_data.def_volume = (unsigned char)i;
-			*/
+			*
 			if( !CheckDefPanVol(hdwnd, 1) )return FALSE; //検査とセッティング
 			EndDialog(hdwnd,0);
 			EnableDialogWindow(TRUE);
@@ -2115,7 +2157,7 @@ BOOL CALLBACK DialogDefault(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 		}
 	}
 	return 0;
-}
+}*/
 BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 //	char str[10] = {NULL};

@@ -7,6 +7,7 @@
 #include "OrgData.h"
 #include "rxoFunction.h"
 #include "Scroll.h"
+#include "Sound.h"
 
 #define PI 3.14159265358979323846
 /*
@@ -32,6 +33,110 @@ typedef struct{//●トランスポートやパンポット
 extern int volChangeLength;
 extern bool volChangeUseNoteLength;
 extern bool volChangeSetNoteLength;
+
+extern char timer_sw;
+extern int sACrnt;
+
+void ChangeTrackPlus(int iValue) {
+	MUSICINFO mi;
+	org_data.GetMusicInfo(&mi);
+
+	char str[8];
+
+	RECT rect = { 64,0,WWidth,WHeight };//更新する領域(トラック変更)
+
+
+	org_data.track += iValue;
+	org_data.track = (org_data.track + 16) % 16;
+	setRecentTrack(org_data.track); //A 2010.09.23 
+
+	if (timer_sw == 0) PlayOrganKey(36, org_data.track, mi.tdata[org_data.track].freq, 80);
+	if (sACrnt) {
+		if (tra >= 0) {
+			tra = org_data.track;
+		}
+	}
+	//選択トラック表示
+	//itoa(org_data.track, str, 10);
+
+	/*if (sACrnt) {
+		if(tra>=0){
+			tra = org_data.track;
+			char wk[256],wk2[256];
+
+			if(ful==0){
+				wsprintf(wk2,MessageString[IDS_STRING104], TrackN[tra]);
+				strcpy(wk,wk2);
+				wsprintf(wk2,MessageString[IDS_STRING105]);
+				strcat(wk,wk2);
+				SetEZCWindowMessage(wk);
+			}
+			else if(ful==1){
+				wsprintf(wk2,MessageString[IDS_STRING106]);
+				strcpy(wk,wk2);
+				SetEZCWindowMessage(wk);
+			}
+		}
+	}*/
+
+	//SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,TrackCode[org_data.track]);
+	//SetDlgItemText(hdwnd,IDE_VIEWTRACK,str);
+	//org_data.PutMusic();
+	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+	//SetFocus(hWnd);
+	UpdateToolbarStatus();
+	UpdateStatusBar(false);
+}
+
+
+void ChangeTrack(int iTrack) {
+	MUSICINFO mi;
+	org_data.GetMusicInfo(&mi);
+
+	char str[8];
+	int i;
+	RECT rect = { 64,0,WWidth,WHeight };//更新する領域(トラック変更)
+
+	i = iTrack;
+	org_data.track = i;
+	setRecentTrack(org_data.track); //A 2010.09.23 
+
+	if (timer_sw == 0) PlayOrganKey(36, i, mi.tdata[i].freq, 80);
+	if (sACrnt) {
+		if (tra >= 0) {
+			tra = org_data.track;
+		}
+	}
+	//選択トラック表示
+	/*itoa(org_data.track, str, 10);
+	if(sACrnt){
+		if(tra>=0){
+			tra = org_data.track;
+			char wk[256],wk2[256];
+
+			if(ful==0){
+				wsprintf(wk2,MessageString[IDS_STRING104], TrackN[tra]);
+				strcpy(wk,wk2);
+				wsprintf(wk2,MessageString[IDS_STRING105]);
+				strcat(wk,wk2);
+				SetEZCWindowMessage(wk);
+			}
+			else if(ful==1){
+				wsprintf(wk2,MessageString[IDS_STRING106]);
+				strcpy(wk,wk2);
+				SetEZCWindowMessage(wk);
+			}
+		}
+	}*/
+	//SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,TrackCode[org_data.track]);
+	//SetDlgItemText(hdwnd,IDE_VIEWTRACK,str);
+	//org_data.PutMusic();
+	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+
+	UpdateToolbarStatus();
+	UpdateStatusBar(false);
+	//SetFocus(hWnd);
+}
 
 BOOL OrgData::DelateNoteData(PARCHANGE *pc)
 {

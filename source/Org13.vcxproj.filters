@@ -27,13 +27,7 @@
     <ClCompile Include="DlgEdit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DlgPlayer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DlgSet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DlgTrack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Filer.cpp">
