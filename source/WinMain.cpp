@@ -47,8 +47,6 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #include "Toolbar.h"
 
-#define OWM_UPDATESTATUS (WM_USER + 1)
-
 static char tVerName[64];
 static bool canUpdateCheck = true;
 
@@ -391,6 +389,11 @@ int iChgTrackKey[16] = {
 int iMuteKey[16]={
 	ID_AC_S1, ID_AC_S2, ID_AC_S3, ID_AC_S4, ID_AC_S5, ID_AC_S6, ID_AC_S7, ID_AC_S8,
 	ID_AC_SQ, ID_AC_SW, ID_AC_SE, ID_AC_SR, ID_AC_ST, ID_AC_SY, ID_AC_SU, ID_AC_SI, 
+};
+
+int iSoloKey[16] = {
+	ID_AC_L1, ID_AC_L2, ID_AC_L3, ID_AC_L4, ID_AC_L5, ID_AC_L6, ID_AC_L7, ID_AC_L8,
+	ID_AC_LQ, ID_AC_LW, ID_AC_LE, ID_AC_LR, ID_AC_LT, ID_AC_LY, ID_AC_LU, ID_AC_LI,
 };
 
 TCHAR strSize[128]; //for Debug	// 2010.08.14 A
@@ -1059,6 +1062,57 @@ static int Hni[] = {
 	1,2,3,4,8,16,
 };
 
+static bool IsSolo(char track) {
+	bool un = true;
+	for (int j = 0; j < MAXTRACK; ++j) {
+		if (org_data.mute[j] != (track != j)) {
+			un = false;
+			break;
+		}
+	}
+	return un;
+}
+static bool IsAnyMuted(void) {
+	bool un = true;
+	for (int j = 0; j < MAXTRACK; ++j) {
+		if (org_data.mute[j]) {
+			un = false;
+			break;
+		}
+	}
+	return !un;
+}
+static bool IsAnyUnmuted(void) {
+	bool un = true;
+	for (int j = 0; j < MAXTRACK; ++j) {
+		if (!org_data.mute[j]) {
+			un = false;
+			break;
+		}
+	}
+	return !un;
+}
+static bool IsAnyMutedSide(int side) {
+	bool un = true;
+	for (int j = (side == 0 ? 0 : MAXMELODY); j < (side == 0 ? MAXMELODY : MAXTRACK); ++j) {
+		if (org_data.mute[j]) {
+			un = false;
+			break;
+		}
+	}
+	return !un;
+}
+static bool IsAnyUnmutedSide(int side) {
+	bool un = true;
+	for (int j = (side == 0 ? 0 : MAXMELODY); j < (side == 0 ? MAXMELODY : MAXTRACK); ++j) {
+		if (!org_data.mute[j]) {
+			un = false;
+			break;
+		}
+	}
+	return !un;
+}
+
 //main procedure
 LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
@@ -1106,8 +1160,46 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		}
 	}
+	case OWM_TBCONTEXTMENU: {
+		for (i = 0; i < MAXTRACK; i++) {
+			if (wParam == iChgTrackBtn[i]) {
+				hMenu = CreatePopupMenu();
+
+				snprintf(str, 128, "Select\t%c", TrackN[i]);
+				AppendMenu(hMenu, MF_STRING, iChgTrackKey[i], str);
+
+				snprintf(str, 128, "%sute\tShift+%c", org_data.mute[i] ? "Unm" : "M", TrackN[i]);
+				AppendMenu(hMenu, MF_STRING, iMuteKey[i], str);
+
+				if (!IsSolo(i)) {
+					snprintf(str, 128, "%s", "Solo");
+					AppendMenu(hMenu, MF_STRING, iSoloKey[i], str);
+				}
+				/*if (IsAnyUnmuted()) {
+					snprintf(str, 128, "%s", "Mute All");
+					AppendMenu(hMenu, MF_STRING, IDC_MUTE_ALL, str);
+				}*/
+				if (IsAnyMuted()) {
+					snprintf(str, 128, "%s", "Unmute All");
+					AppendMenu(hMenu, MF_STRING, IDC_UNMUTE_ALL, str);
+				}
+				if (IsAnyUnmutedSide(i / 8)) {
+					snprintf(str, 128, "Mute %s Channels", (i < MAXMELODY) ? "Melody" : "Percussion");
+					AppendMenu(hMenu, MF_STRING, (i < MAXMELODY) ? IDC_MUTE_MELO : IDC_MUTE_PERC, str);
+				}
+				if (IsAnyMutedSide(i / 8)) {
+					snprintf(str, 128, "Unmute %s Channels", (i < MAXMELODY) ? "Melody" : "Percussion");
+					AppendMenu(hMenu, MF_STRING, (i < MAXMELODY) ? IDC_UNMUTE_MELO : IDC_UNMUTE_PERC, str);
+				}
+
+				TrackPopupMenu(hMenu, TPM_RIGHTBUTTON, LOWORD(lParam), HIWORD(lParam), 0, hwnd, NULL);
+				DestroyMenu(hMenu);
+			}
+		}
+		break;
+	}
 	case WM_COMMAND:
-		for(i=0;i<16;i++){
+		for (i = 0; i < MAXTRACK; i++) {
 			if (LOWORD(wParam) == iChgTrackKey[i]){
 				ChangeTrack(i);
 				//return FALSE;
@@ -1116,19 +1208,13 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			else if (LOWORD(wParam) == iChgTrackBtn[i]) {
 				if (GetKeyState(VK_MENU) & 0x8000) { // Side
 					char d = (org_data.mute[i] == 0);
-					for (j = 0; j < 8; ++j) {
+					for (j = 0; j < (i < 8 ? MAXMELODY : MAXDRAM); ++j) {
 						org_data.mute[j + (i < 8 ? 0 : 8)] = d;
 					}
 					UpdateToolbarStatus();
 				} else if (GetKeyState(VK_CONTROL) & 0x8000) { // Solo
-					bool un = true;
-					for (j = 0; j < 16; ++j) {
-						if (org_data.mute[j] != (i != j)) {
-							un = false;
-							break;
-						}
-					}
-					for (j = 0; j < 16; ++j) {
+					bool un = IsSolo(i);
+					for (j = 0; j < MAXTRACK; ++j) {
 						org_data.mute[j] = (!un && i != j);
 					}
 					UpdateToolbarStatus();
@@ -1141,6 +1227,51 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			else if (LOWORD(wParam) == iMuteKey[i]) {
 				MuteTrack(i);
 			}
+			else if (LOWORD(wParam) == iSoloKey[i]) {
+				bool un = IsSolo(i);
+				for (j = 0; j < MAXTRACK; ++j) {
+					org_data.mute[j] = (!un && i != j);
+				}
+				UpdateToolbarStatus();
+			}
+		}
+		switch (LOWORD(wParam)) {
+		case IDC_MUTE_ALL:
+			for (j = 0; j < MAXTRACK; ++j) {
+				org_data.mute[j] = true;
+			}
+			UpdateToolbarStatus();
+			break;
+		case IDC_UNMUTE_ALL:
+			for (j = 0; j < MAXTRACK; ++j) {
+				org_data.mute[j] = false;
+			}
+			UpdateToolbarStatus();
+			break;
+		case IDC_MUTE_MELO:
+			for (j = 0; j < MAXMELODY; ++j) {
+				org_data.mute[j] = true;
+			}
+			UpdateToolbarStatus();
+			break;
+		case IDC_UNMUTE_MELO:
+			for (j = 0; j < MAXMELODY; ++j) {
+				org_data.mute[j] = false;
+			}
+			UpdateToolbarStatus();
+			break;
+		case IDC_MUTE_PERC:
+			for (j = MAXMELODY; j < MAXTRACK; ++j) {
+				org_data.mute[j] = true;
+			}
+			UpdateToolbarStatus();
+			break;
+		case IDC_UNMUTE_PERC:
+			for (j = MAXMELODY; j < MAXTRACK; ++j) {
+				org_data.mute[j] = false;
+			}
+			UpdateToolbarStatus();
+			break;
 		}
 		/*if (LOWORD(wParam) == IDM_EZCOPYVISIBLE || LOWORD(wParam) == ID_AC_SHOWEZCOPY) {
 			hMenu = GetMenu(hWnd);

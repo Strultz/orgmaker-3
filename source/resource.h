@@ -142,6 +142,8 @@
 #define IDD_DLGADVPASTE                 254
 #define IDD_DLGSELVOL                   256
 #define IDD_DLGDEFAULT                  258
+#define IDR_MENU1                       263
+#define IDR_CHBTNMENU                   263
 #define IDD_LB1                         1001
 #define IDM_DIALOG1                     1002
 #define IDM_DLGGRID                     1002
@@ -818,14 +820,37 @@
 #define ID_SELECTION_INSERT             40343
 #define ID_AC_ADVPASTE                  40344
 #define IDD_DLGSELPAN                   40345
+#define ID_CHANNEL_MUTE                 40345
 #define IDD_DLGSELTRA                   40346
+#define IDC_MUTE_MELO                   40347
+#define IDC_MUTE_PERC                   40348
+#define IDC_MUTE_ALL                    40349
+#define IDC_UNMUTE_ALL                  40350
+#define IDC_UNMUTE_MELO                 40351
+#define IDC_UNMUTE_PERC                 40352
+#define ID_AC_L1                        40353
+#define ID_AC_L2                        40354
+#define ID_AC_L3                        40355
+#define ID_AC_L4                        40356
+#define ID_AC_L5                        40357
+#define ID_AC_L6                        40358
+#define ID_AC_L7                        40359
+#define ID_AC_L8                        40360
+#define ID_AC_LQ                        40361
+#define ID_AC_LW                        40362
+#define ID_AC_LE                        40363
+#define ID_AC_LR                        40364
+#define ID_AC_LT                        40365
+#define ID_AC_LY                        40366
+#define ID_AC_LU                        40367
+#define ID_AC_LI                        40368
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        262
-#define _APS_NEXT_COMMAND_VALUE         40345
+#define _APS_NEXT_RESOURCE_VALUE        264
+#define _APS_NEXT_COMMAND_VALUE         40351
 #define _APS_NEXT_CONTROL_VALUE         1279
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

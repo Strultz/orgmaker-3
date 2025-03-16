@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include <commctrl.h>
 
+#include "DefOrg.h"
 #include "resource.h"
 #include "Toolbar.h"
 #include "Setting.h"
@@ -11,12 +12,35 @@ static char szTbClassName[] = "OrgToolbar";
 extern int toolbarSavedX[2];
 extern int toolbarSavedY[2];
 
+static WNDPROC oldTbProc = NULL;
+
 LRESULT CALLBACK ToolbarWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+    // Defer commands to main window
     if (message == WM_COMMAND) {
         SendMessage(hWnd, WM_COMMAND, wParam, lParam);
         SetFocus(hWnd);
+        return 0;
     }
     return DefWindowProc(hwnd, message, wParam, lParam);
+}
+
+// This is obnoxious, I am unaware of an easier way to just do this though
+LRESULT CALLBACK TbscWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+    if (message == WM_CONTEXTMENU) {
+        // Get mouse coords
+        POINT box = { LOWORD(lParam), HIWORD(lParam) };
+        // Convert to client coords
+        MapWindowPoints(NULL, hwnd, &box, 1);
+        // get button index
+        int btn = SendMessage(hwnd, TB_HITTEST, 0, (LPARAM)&box);
+        // get button info
+        TBBUTTON tbtn = { 0 };
+        SendMessage(hwnd, TB_GETBUTTON, btn, (LPARAM)&tbtn);
+        // send to main window
+        SendMessage(hWnd, OWM_TBCONTEXTMENU, tbtn.idCommand, lParam);
+        return 0;
+    }
+    return CallWindowProc(oldTbProc, hwnd, message, wParam, lParam);
 }
 
 void SetToolbarImageList(HWND hwndToolbar, const char *imageName, int imageCount) {
@@ -51,6 +75,11 @@ static void CreateToolbar(int id, HWND hwndRebar, const char *iconBitmap, int bu
         0, 0, 0, 0, hwndRebar, (HMENU)NULL, hInst, NULL);
 
     SendMessage(hWndToolbar, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS);
+
+    // :(
+    if (id == 1) {
+        oldTbProc = (WNDPROC)SetWindowLongPtr(hWndToolbar, GWLP_WNDPROC, (LONG_PTR)TbscWndProc);
+    }
 
     SetToolbarImageList(hWndToolbar, iconBitmap, buttonCount);
 

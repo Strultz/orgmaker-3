@@ -30,6 +30,9 @@
 #define PF_PASTE_PAN  0x8
 #define PF_PASTE_ALL (PF_PASTE_NOTE | PF_PASTE_VOL | PF_PASTE_PAN)
 
+#define OWM_UPDATESTATUS (WM_USER + 1)
+#define OWM_TBCONTEXTMENU (WM_USER + 2)
+
 
 //#define NUMDRAMITEM		39	//ÇPÇQÅ{ÇTÅ{ÇXÅ{ÇP(îL)Å{ÇPÇP	    // 2011.10.17 D
 #define NUMDRAMITEM		42	//ÇPÇQÅ{ÇTÅ{ÇXÅ{ÇP(îL)Å{ÇPÇPÅ{ÇR	// 2011.10.17 A
