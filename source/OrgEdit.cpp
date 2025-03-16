@@ -144,6 +144,7 @@ BOOL OrgData::GrabNoteData(SAVEDNOTE* sn, char track1, char track2, long x1, lon
 			wp->volume = np->volume;
 			wp->y = np->y;
 			wp->x = np->x - ind_x;
+			wp->from = wp->to = NULL;
 			np = np->to;
 			wp++;
 		}
@@ -154,14 +155,93 @@ BOOL OrgData::GrabNoteData(SAVEDNOTE* sn, char track1, char track2, long x1, lon
 	return TRUE;
 }
 
-BOOL OrgData::PasteNoteData(SAVEDNOTE* sn, char track, long x, long num)
+// I'm tired of this
+NOTELIST* OrgData::FindOrgNote(char track, int x) {
+	if (track < 0 || track > 15) return NULL;
+	NOTELIST* rnp = info.tdata[track].note_list;
+	while (rnp != NULL && rnp->x < x) {
+		rnp = rnp->to;
+	}
+	if (rnp == NULL) return NULL;
+	if (rnp->x == x) return rnp;
+	return NULL;
+}
+
+NOTELIST* OrgData::CreateOrgNote(char track, int x) {
+	if (track < 0 || track > 15) return NULL;
+	NOTELIST* nfrom = info.tdata[track].note_list;
+	if (nfrom != NULL) {
+		while (nfrom->x < x && nfrom->to != NULL) {
+			nfrom = nfrom->to;
+		}
+		if (nfrom->x == x) return NULL; // note exists here
+	}
+	NOTELIST* mnp = SearchNote(info.tdata[track].note_p);
+	if (mnp == NULL) return NULL;
+	if (nfrom == NULL) {
+		info.tdata[track].note_list = mnp;
+		mnp->from = NULL;
+		mnp->to = NULL;
+		mnp->x = x;
+		mnp->y = KEYDUMMY;
+		mnp->volume = VOLDUMMY;
+		mnp->pan = PANDUMMY;
+		mnp->length = 1;
+		return mnp;
+	}
+	else if (nfrom->x > x) {
+		mnp->from = nfrom->from;
+		mnp->to = nfrom;
+		mnp->x = x;
+		mnp->y = KEYDUMMY;
+		mnp->volume = VOLDUMMY;
+		mnp->pan = PANDUMMY;
+		mnp->length = 1;
+		if (nfrom->from == NULL) {
+			info.tdata[track].note_list = mnp;
+		}
+		else {
+			nfrom->from->to = mnp;
+		}
+		nfrom->from = mnp;
+		return mnp;
+	}
+	else if (nfrom->to == NULL) {
+		mnp->from = nfrom;
+		nfrom->to = mnp;
+		mnp->to = NULL;
+		mnp->x = x;
+		mnp->y = KEYDUMMY;
+		mnp->volume = VOLDUMMY;
+		mnp->pan = PANDUMMY;
+		mnp->length = 1;
+		return mnp;
+	}
+	return NULL;
+}
+
+void OrgData::DeleteOrgNote(char track,NOTELIST* note) {
+	if (track < 0 || track > 15) return;
+	if (note == NULL) return;
+	if (note->from == NULL) {
+		if (note != info.tdata[track].note_list) {
+			return;
+		}
+		info.tdata[track].note_list = note->to;
+	}
+	else {
+		note->from->to = note->to;
+	}
+	if (note->to != NULL) {
+		note->to->from = note->from;
+	}
+	//free(note);
+	note->length = 0;
+}
+
+BOOL OrgData::PasteNoteData(SAVEDNOTE* sn, char track, long x, long num, int pasteFlags)
 {
 	int i, j, k;
-	PARCHANGE pc;
-	NOTELIST* np;
-	NOTELIST* p_list1, * p_list2;
-	NOTELIST* work;
-	NOTELIST* wp;
 	long copy_num;
 	SAVEDTRACK* st;
 
@@ -169,8 +249,7 @@ BOOL OrgData::PasteNoteData(SAVEDNOTE* sn, char track, long x, long num)
 		st = &sn->data[k];
 
 		copy_num = st->size;
-		work = st->data;
-		if (work == NULL) {
+		if (st->data == NULL) {
 			continue;
 		}
 
@@ -178,76 +257,69 @@ BOOL OrgData::PasteNoteData(SAVEDNOTE* sn, char track, long x, long num)
 			track = k;
 		}
 
-		pc.track = track;
-		pc.x1 = x;
-		pc.x2 = x + sn->length * num - 1;
-		DelateNoteData(&pc);
+		if (!(pasteFlags & PF_MIX_PASTE)) {
+			for (j = x; j < x + (sn->length * num); ++j) {
+				NOTELIST* note = FindOrgNote(track, j);
+				if (note) {
+					if (pasteFlags & PF_PASTE_NOTE) {
+						note->y = KEYDUMMY;
+						note->length = 1;
+					}
+					if (pasteFlags & PF_PASTE_VOL) {
+						note->volume = VOLDUMMY;
+					}
+					if (pasteFlags & PF_PASTE_PAN) {
+						note->pan = PANDUMMY;
+					}
 
-		np = p_list1 = p_list2 = SearchNote(info.tdata[track].note_p);
-		if (np == NULL) {
-			return FALSE;
-		}
-		np->length = 1;
-		for (i = 1; i < copy_num * num; i++) {
-			np = SearchNote(info.tdata[track].note_p);
-			if (np == NULL) {
-				break;
+					if (note->y == KEYDUMMY && note->volume == VOLDUMMY && note->pan == PANDUMMY) {
+						DeleteOrgNote(track, note);
+					}
+				}
 			}
-			np->length = 1;
-			p_list2->to = np;
-			np->from = p_list2;
-			p_list2 = np;
-		}
-
-		long index;
-		np = p_list1;
-		for (j = 0; j < num;j++) {
-			wp = work;
-			index = x + sn->length * j;
-			for (i = 0; i < copy_num; i++) {
-				np->length = wp->length;
-				np->pan = wp->pan;
-				np->volume = wp->volume;
-				np->y = wp->y;
-
-				np->x = wp->x + index;
-
-				np = np->to;
-				wp++;
-				if (np == NULL) break;
-			}
-			if (np == NULL) break;
 		}
 
-		np = info.tdata[track].note_list;
-		if (np == NULL) {
-			info.tdata[track].note_list = p_list1;
-			p_list1->from = NULL;
-			p_list2->to = NULL;
-		}
-		else {
-			if (np->x > p_list2->x) {
-				np->from = p_list2;
-				p_list2->to = np;
-				p_list1->from = NULL;
-				info.tdata[track].note_list = p_list1;
-				continue;
-			}
-			while (np->to != NULL && np->to->x < x)np = np->to;
-			if (np->to == NULL) {
-				np->to = p_list1;
-				p_list1->from = np;
-				p_list2->to = NULL;
-				continue;
-			}
-			else {
-				np->to->from = p_list2;
-				p_list2->to = np->to;
-				np->to = p_list1;
-				p_list1->from = np;
-				continue;
-			}
+		for (j = 0; j < num; ++j) {
+			int lastVolumeCheck = 0;
+			int lastPanCheck = 0;
+			NOTELIST* work = st->data;
+			for (i = 0; i < copy_num && (work->x + x) < x + (sn->length * num); ++i) {
+				// create or find note
+				NOTELIST* note = FindOrgNote(track, work->x + x + (sn->length * j));
+				if (!note) {
+					note = CreateOrgNote(track, work->x + x + (sn->length * j));
+					if (!note) {
+						// OOPS
+						return FALSE;
+					}
+				}
 
+				// copy values
+				if (pasteFlags & PF_PASTE_NOTE) {
+					note->y = work->y;
+					note->length = work->length;
+				}
+				if (pasteFlags & PF_PASTE_VOL) {
+					note->volume = work->volume;
+				}
+				if (pasteFlags & PF_PASTE_PAN) {
+					note->pan = work->pan;
+				}
+
+				// make sure volume exists!
+				if (note->y == KEYDUMMY) {
+					note->length = 1;
+				}
+
+				lastVolumeCheck = note->volume;
+
+				// delete empty events
+				if (note->y == KEYDUMMY && note->volume == VOLDUMMY && note->pan == PANDUMMY) {
+					DeleteOrgNote(track, note);
+				}
+
+				++work;
+			}
 		}
 	}
 	return TRUE;

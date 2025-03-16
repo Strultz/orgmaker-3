@@ -200,7 +200,7 @@ BOOL CALLBACK DialogCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 }*/
 
 //パンチェンジダイアログ
-BOOL CALLBACK DialogPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
+/*BOOL CALLBACK DialogPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	char str[128] = {NULL};
 //	long a,b,c,d;
@@ -230,7 +230,7 @@ BOOL CALLBACK DialogPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch(LOWORD(wParam)){
 		case IDCANCEL:
 			EndDialog(hdwnd,0);
-			return 1;
+			return 0;
 		case IDOK:
 			if(SendDlgItemMessage(hdwnd,IDR_ADD,BM_GETCHECK,0,0))
 				pc.mode = MODEPARADD;
@@ -263,13 +263,13 @@ BOOL CALLBACK DialogPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			//MessageBox(hdwnd,"指定範囲のパンを変更しました","通知",MB_OK);	// 2014.10.19 D
 			//msgbox(hdwnd,IDS_CHANGE_PAN,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
-			return 1;
+			return 0;
 		}
 	}
 	return 0;
-}
+}*/
 //トランスポーズダイアログ
-BOOL CALLBACK DialogTrans(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
+/*BOOL CALLBACK DialogTrans(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	char str[128] = {NULL};
 //	long a,b,c,d;
@@ -299,7 +299,7 @@ BOOL CALLBACK DialogTrans(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 		switch(LOWORD(wParam)){
 		case IDCANCEL:
 			EndDialog(hdwnd,0);
-			return 1;
+			return 0;
 		case IDOK:
 			if(SendDlgItemMessage(hdwnd,IDR_ADD,BM_GETCHECK,0,0))
 				pc.mode = MODEPARADD;
@@ -333,13 +333,13 @@ BOOL CALLBACK DialogTrans(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			//MessageBox(hdwnd,"指定範囲のキーを変更しました","通知",MB_OK);	// 2014.10.19 D
 			//msgbox(hdwnd,IDS_CHANGE_KEY,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
-			return 1;
+			return 0;
 		}
 	}
 	return 0;
-}
+}*/
 //ヴォリュームチェンジダイアログ
-BOOL CALLBACK DialogVolume(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
+/*BOOL CALLBACK DialogVolume(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	char str[128] = {NULL};
 //	long a,b,c,d;
@@ -369,7 +369,7 @@ BOOL CALLBACK DialogVolume(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 		switch(LOWORD(wParam)){
 		case IDCANCEL:
 			EndDialog(hdwnd,0);
-			return 1;
+			return 0;
 		case IDOK:
 			if(SendDlgItemMessage(hdwnd,IDR_ADD,BM_GETCHECK,0,0))
 				pc.mode = MODEPARADD;
@@ -402,11 +402,11 @@ BOOL CALLBACK DialogVolume(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			//MessageBox(hdwnd,"指定範囲のボリュームを変更しました","通知",MB_OK);	// 2014.10.19 D
 			//msgbox(hdwnd,IDS_CHANGE_VOLUME,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
-			return 1;
+			return 0;
 		}
 	}
 	return 0;
-}
+}*/
 //コピーダイアログ2
 /*int cbox[MAXTRACK] = {
 	IDC_USE0,
@@ -549,6 +549,8 @@ BOOL CALLBACK DialogCopy2(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 	return 0;
 }*/
 
+// TODO: Edit selection dialogs
+
 BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	char str[128] = {NULL};
@@ -570,7 +572,7 @@ BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch(LOWORD(wParam)){
 		case IDCANCEL:
 			EndDialog(hdwnd,0);
-			return 1;
+			return 0;
 		case IDOK:
 			//トラックのチェック
 			GetDlgItemText(hdwnd,IDE_TRACK1,str,4);
@@ -602,8 +604,48 @@ BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//MessageBox(hdwnd,"指定Trackを入れ替えました。","通知",MB_OK);	// 2014.10.19 D
 			//msgbox(hdwnd,IDS_SWAP_TRACK,IDS_NOTIFY_TITLE,MB_OK);	// 2014.10.19 A
 			EndDialog(hdwnd, 0);
-			return 1;
+			return 0;
 		}
+	}
+	return 0;
+}
+
+void ClipboardPaste(int no, int flags);
+
+BOOL CALLBACK DialogAdvPaste(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message) {
+	case WM_INITDIALOG:
+		SetDlgItemInt(hdwnd, IDC_ADVCOUNT, 1, FALSE);
+		CheckDlgButton(hdwnd, IDC_ADVMIX, FALSE);
+		CheckDlgButton(hdwnd, IDC_ADVNOTES, TRUE);
+		CheckDlgButton(hdwnd, IDC_ADVVOL, TRUE);
+		CheckDlgButton(hdwnd, IDC_ADVPAN, TRUE);
+		return 1;
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDCANCEL:
+			EndDialog(hdwnd, 0);
+			return 0;
+		case IDOK:
+			int copyNum = GetDlgItemInt(hdwnd, IDC_ADVCOUNT, NULL, FALSE);
+			bool mixPaste = IsDlgButtonChecked(hdwnd, IDC_ADVMIX);
+			bool copyNotes = IsDlgButtonChecked(hdwnd, IDC_ADVNOTES);
+			bool copyVol = IsDlgButtonChecked(hdwnd, IDC_ADVVOL);
+			bool copyPan = IsDlgButtonChecked(hdwnd, IDC_ADVPAN);
+
+			int copyFlags = 0;
+			copyFlags |= (mixPaste  ? PF_MIX_PASTE  : 0);
+			copyFlags |= (copyNotes ? PF_PASTE_NOTE : 0);
+			copyFlags |= (copyVol   ? PF_PASTE_VOL  : 0);
+			copyFlags |= (copyPan   ? PF_PASTE_PAN  : 0);
+
+			ClipboardPaste(copyNum, copyFlags);
+
+			EndDialog(hdwnd, 0);
+			return 0;
+		}
+		break;
 	}
 	return 0;
 }

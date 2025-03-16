@@ -24,6 +24,12 @@
 #define MODEMULTIPLY 10 //2014.04.30 A
 #define MODEDECAY   64  //2014.05.01 A
 
+#define PF_MIX_PASTE  0x1
+#define PF_PASTE_NOTE 0x2
+#define PF_PASTE_VOL  0x4
+#define PF_PASTE_PAN  0x8
+#define PF_PASTE_ALL (PF_PASTE_NOTE | PF_PASTE_VOL | PF_PASTE_PAN)
+
 
 //#define NUMDRAMITEM		39	//ÇPÇQÅ{ÇTÅ{ÇXÅ{ÇP(îL)Å{ÇPÇP	    // 2011.10.17 D
 #define NUMDRAMITEM		42	//ÇPÇQÅ{ÇTÅ{ÇXÅ{ÇP(îL)Å{ÇPÇPÅ{ÇR	// 2011.10.17 A

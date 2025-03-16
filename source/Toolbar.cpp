@@ -161,8 +161,8 @@ void CreateToolbars(HWND hwndRebar, HWND outHwnd[4]) {
         {14, IDC_RIGHTSTEP, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Forwards (Right)"},
         {15, IDC_RIGHT, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Next Measure (Shift+Right)"},
         {16, IDC_END, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"To Song End (Ctrl+Right)"},
-        {0, 0, 0, BTNS_SEP},
-        {5, IDM_PREFERENCES, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Preferences"},
+        //{0, 0, 0, BTNS_SEP},
+        //{5, IDM_PREFERENCES, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Preferences"},
     };
     CreateToolbar(0, hwndRebar, "TOOLBAR_ICONS", TOOLBAR_MAIN_BUTTON_COUNT, tbb1, "Main", outHwnd);
 

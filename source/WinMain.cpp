@@ -146,21 +146,22 @@ BOOL CALLBACK DialogDefault(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 //BOOL CALLBACK DialogDelete(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 //BOOL CALLBACK DialogCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 //BOOL CALLBACK DialogCopy2(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
-BOOL CALLBACK DialogPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
-BOOL CALLBACK DialogTrans(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
-BOOL CALLBACK DialogVolume(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+//BOOL CALLBACK DialogPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+//BOOL CALLBACK DialogTrans(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+//BOOL CALLBACK DialogVolume(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 //BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogTrack(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogNoteUsed(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
-BOOL CALLBACK DialogEZCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+//BOOL CALLBACK DialogEZCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogDecayLength(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK DialogAdvPaste(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void SetModified(bool mod);
 
@@ -1011,7 +1012,7 @@ LRESULT CALLBACK AreaWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
-void ClipboardPaste(int no) {
+void ClipboardPaste(int no, int flags) {
 	if (gClipboardData.track1 == -1) {
 		return;
 	}
@@ -1023,7 +1024,7 @@ void ClipboardPaste(int no) {
 
 	nc_Select.x1_1 = (tra >= 0 && nc_Select.x1_1 == nc_Select.x1_2) ? nc_Select.x1_1 : x_scroll;
 	nc_Select.x1_2 = nc_Select.x1_1 + (gClipboardData.length * no) - 1;
-	org_data.PasteNoteData(&gClipboardData, org_data.track, nc_Select.x1_1, no);
+	org_data.PasteNoteData(&gClipboardData, org_data.track, nc_Select.x1_1, no, flags);
 
 	if (gClipboardData.track1 == gClipboardData.track2) {
 		org_data.CheckNoteTail(org_data.track);
@@ -1192,7 +1193,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				SetUndo();
 				SortMusicNote();
 				break;
-			case IDM_DLGDELETE://
+				/*case IDM_DLGDELETE://
 			case ID_AC_DELETE:
 				//DialogBox(hInst,"DLGDELETE",hwnd,DialogDelete);
 				break;
@@ -1215,7 +1216,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_DLGVOL://
 			case ID_AC_DLG_VOL:
 				DialogBox(hInst,"DLGVOLUME",hwnd,DialogVolume);
-				break;
+				break;*/
 			case ID_AC_STPLAY:
 				StartPlayingSong();
 				break;
@@ -1523,16 +1524,24 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case ID_AC_NUM7:
 			case ID_AC_PASTE:
 			case IDM_SELECT_PASTE:
-				ClipboardPaste(1);
+				ClipboardPaste(1, PF_PASTE_ALL);
 				break;
 			case ID_AC_NUM8:
-				ClipboardPaste(2);
+				ClipboardPaste(2, PF_PASTE_ALL);
 				break;
 			case ID_AC_NUM9:
-				ClipboardPaste(3);
+				ClipboardPaste(3, PF_PASTE_ALL);
 				break;
 			case ID_AC_NUMPLUS:
-				ClipboardPaste(4);
+				ClipboardPaste(4, PF_PASTE_ALL);
+				break;
+			case ID_AC_ADVPASTE:
+			case IDM_SELECT_ADVPASTE:
+				if (gClipboardData.track1 == -1) {
+					break;
+				}
+
+				DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGADVPASTE), hWnd, DialogAdvPaste);
 				break;
 			}
 		}else{

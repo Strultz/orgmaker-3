@@ -518,6 +518,22 @@ BEGIN
     CONTROL         "",IDC_SPINDECAY,"msctls_updown32",UDS_AUTOBUDDY | UDS_ARROWKEYS,96,12,10,14
 END
 
+IDD_DLGADVPASTE DIALOGEX 0, 0, 149, 68
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Advanced Paste"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,40,48,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,92,48,50,14
+    EDITTEXT        IDC_ADVCOUNT,56,10,28,12,ES_NUMBER
+    GROUPBOX        "",IDC_STATIC,4,0,140,44
+    LTEXT           "Paste count:",IDC_STATIC,12,12,42,8
+    CONTROL         "Notes",IDC_ADVNOTES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,28,32,10
+    CONTROL         "Volume",IDC_ADVVOL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,56,28,36,10
+    CONTROL         "Panning",IDC_ADVPAN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,28,40,10
+    CONTROL         "Mix Paste",IDC_ADVMIX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,94,11,44,10
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -569,8 +585,8 @@ BEGIN
             MENUITEM "&Volume...\tF4",              ID_SELECTION_VOLUME,MFT_STRING,MFS_ENABLED
             MENUITEM "&Panning...\tCtrl+F4",        ID_SELECTION_PANNING,MFT_STRING,MFS_ENABLED
             MENUITEM "&Transpose...\tShift+F4",     ID_SELECTION_TRANSPOSE,MFT_STRING,MFS_ENABLED
-            MENUITEM "&Insert\tIns",                ID_SELECTION_INSERT, MFT_STRING, MFS_ENABLED
-            MENUITEM "&Clear\tDel",                 ID_SELECTION_CLEAR, MFT_STRING, MFS_ENABLED
+            MENUITEM "&Insert\tIns",                ID_SELECTION_INSERT,MFT_STRING,MFS_ENABLED
+            MENUITEM "&Clear\tDel",                 ID_SELECTION_CLEAR,MFT_STRING,MFS_ENABLED
             MENUITEM "&Delete\tBackspace",          ID_SELECTION_DELETE,MFT_STRING,MFS_ENABLED
         END
         MENUITEM MFT_SEPARATOR
@@ -1071,6 +1087,11 @@ BEGIN
     0
 END
 
+IDD_DLGADVPASTE AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1152,6 +1173,14 @@ BEGIN
 
     "DLGDCLEN", DIALOG
     BEGIN
+    END
+
+    IDD_DLGADVPASTE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 142
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 61
     END
 END
 #endif    // APSTUDIO_INVOKED

@@ -141,13 +141,17 @@ typedef struct OrgData{
 		BOOL CheckNoteTail(char track);
 
 		BOOL GrabNoteData(SAVEDNOTE* sn, char track1, char track2, long x1, long x2);
-		BOOL PasteNoteData(SAVEDNOTE* sn, char track, long x, long num);
+		BOOL PasteNoteData(SAVEDNOTE* sn, char track, long x, long num, int pasteFlags);
 
 		BOOL EnsureEmptyArea(PARCHANGE *pc, int Function); //[新]空白を埋める 2014.05.01
 		BOOL SwapTrack(NOTECOPY *pc); //[新]トラックを入れ替える 2014.05.10
 		BOOL ExportMIDIData(char *strMidiFileName, int iRepeat); //MIDIｴｸｽﾎﾟｰﾄ,繰り返し回数 2014.05.11
 
 		unsigned short GetWait(void);
+
+		NOTELIST* FindOrgNote(char track, int x);
+		NOTELIST* CreateOrgNote(char track, int x);
+		void DeleteOrgNote(char track, NOTELIST* note);
 
 	bool CopyNoteDataToCB(NOTECOPY *nc, int iTrack, int iFullTrack);
 }ORGDATA;
