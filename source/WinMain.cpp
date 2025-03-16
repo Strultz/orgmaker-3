@@ -786,10 +786,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
 	CheckMenuItem(hMenu, IDM_FLOATTOOLBARS, MF_BYCOMMAND | (floatingToolbars ? MFS_CHECKED : MFS_UNCHECKED));
-
-	if (GetPrivateProfileInt(MAIN_WINDOW, "UserExists", 0, app_path) == 0) {
-		// TODO
-	}
 	
 	//org_data.PutMusic();//View sheet music
 
@@ -2418,8 +2414,6 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW, "AutoCheckUpdates", num_buf, app_path);
 	wsprintf(num_buf, "%d", floatingToolbars);
 	WritePrivateProfileString(MAIN_WINDOW, "FloatingToolbars", num_buf, app_path);
-	wsprintf(num_buf, "%d", 1);
-	WritePrivateProfileString(MAIN_WINDOW, "UserExists", num_buf, app_path);
 
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentThemePath", gSelectedTheme, app_path);
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentWavePath", gSelectedWave, app_path);
