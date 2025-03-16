@@ -122,7 +122,7 @@ void CheckUpdate(bool act) {
 	s1 = s1.substr(0, nq);
 
 	// Now we have the tag name
-	if (s1 == "3.1.0") {
+	if (s1 == "3.1.0" || s1[0] != '3') { // It's never gonna be 4
 		if (act) PostMessage(hWnd, OWM_UPDATESTATUS, 3, 0); //MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
 		canUpdateCheck = true;
 		return;
@@ -163,6 +163,8 @@ BOOL CALLBACK DialogAdvPaste(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 BOOL CALLBACK DialogSelPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogSelVol(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogSelTra(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK DialogDefaults(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+
 
 void SetModified(bool mod);
 
@@ -215,7 +217,7 @@ extern void ChangeTrackPlus(int iValue);
 extern char timer_sw; //Playing?
 //extern int EZCopyWindowState; //Easy copy status
 //extern RECT CmnDialogWnd;
-extern int SaveWithInitVolFile;	//Song data and... save.
+//extern int SaveWithInitVolFile;	//Song data and... save.
 extern int Menu_Recent[];
 extern int iDragMode;
 extern int iDlgRepeat; //Iteration count obtained from the dialog
@@ -329,6 +331,7 @@ void UpdateToolbarStatus() {
 		SendMessage(hwndTrackbar, TB_CHANGEBITMAP, iChgTrackBtn[i], org_data.mute[i] ? i + 16 : i);
 	}
 }
+int previewOctave = 3;
 
 void UpdateStatusBar(bool measonly) {
 	MUSICINFO mi;
@@ -350,25 +353,28 @@ void UpdateStatusBar(bool measonly) {
 	}
 
 	if (!measonly) {
-		snprintf(msg, 256, "Channel %s", TrackCode[org_data.track]);
-		SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)msg);
-
-		snprintf(msg, 256, "Wait: %d (%.3f BPM)", mi.wait, mi.wait <= 0 || mi.dot <= 0 ? 0 : 60000.0 / (double)(mi.wait * mi.dot));
-		SendMessage(hwndStatus, SB_SETTEXT, 3, (LPARAM)msg);
+		snprintf(msg, 256, "Preview Octave: %d", previewOctave);
+		SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)msg);
 
 		switch (NoteWidth) {
-		case 4:		SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 25%"); break;
-		case 6:		SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 37.5%"); break;
-		case 8:		SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 50%"); break;
-		case 10:	SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 62.5%"); break;
-		case 12:	SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 75%"); break;
-		case 14:	SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 87.5%"); break;
-		case 16:	SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 100%"); break;
+		case 4:		SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)"Zoom: 25%"); break;
+		case 6:		SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)"Zoom: 37.5%"); break;
+		case 8:		SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)"Zoom: 50%"); break;
+		case 10:	SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)"Zoom: 62.5%"); break;
+		case 12:	SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)"Zoom: 75%"); break;
+		case 14:	SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)"Zoom: 87.5%"); break;
+		case 16:	SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)"Zoom: 100%"); break;
 		}
+
+		snprintf(msg, 256, "Channel %s", TrackCode[org_data.track]);
+		SendMessage(hwndStatus, SB_SETTEXT, 3, (LPARAM)msg);
+
+		snprintf(msg, 256, "Wait: %d (%.3f BPM)", mi.wait, mi.wait <= 0 || mi.dot <= 0 ? 0 : 60000.0 / (double)(mi.wait * mi.dot));
+		SendMessage(hwndStatus, SB_SETTEXT, 4, (LPARAM)msg);
 	}
 
 	snprintf(msg, 256, "Meas %d:%d", meas, step);
-	SendMessage(hwndStatus, SB_SETTEXT, 4, (LPARAM)msg);
+	SendMessage(hwndStatus, SB_SETTEXT, 5, (LPARAM)msg);
 }
 
 void SaveIniFile();
@@ -401,7 +407,6 @@ TCHAR strSize[128]; //for Debug	// 2010.08.14 A
 int iKeyPhase[128];
 int iCurrentPhase;
 int iCast[256];
-int previewOctave = 3;
 
 int iKeyPushDown[256]; // 2010.09.22 A
 
@@ -762,8 +767,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		ShowWindow(hDlgEZCopy, SW_SHOWNOACTIVATE);
 		//CheckMenuItem(hMenu, IDM_EZCOPYVISIBLE, (MF_BYCOMMAND | MFS_CHECKED));
 	}*/
-	SaveWithInitVolFile = GetPrivateProfileInt(INIT_DATA,"autosave",0,app_path);
-	ChangeAutoLoadMode(SaveWithInitVolFile);
+	//SaveWithInitVolFile = GetPrivateProfileInt(INIT_DATA,"autosave",0,app_path);
+	//ChangeAutoLoadMode(SaveWithInitVolFile);
 	org_data.InitOrgData();
 
 	
@@ -1152,7 +1157,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			MessageBox(hWnd, "Recieved invalid response from server. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
 			break;
 		case 3:
-			MessageBox(hWnd, "No new updates are available.", "OrgMaker Update", MB_ICONERROR | MB_OK);
+			MessageBox(hWnd, "No new updates are available.", "OrgMaker Update", MB_ICONINFORMATION | MB_OK);
 			break;
 		default:
 		case 1:
@@ -1897,6 +1902,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case ID_AC_SELECT_ALL:
 			SelectAll(0);
 			break;
+		case IDM_SELECT_ALL_ALL:
+			SelectAll(1);
+			break;
 		case IDM_SELECT_RESET:
 		case ID_AC_SELECT_RESET:
 			SelectReset();
@@ -1914,9 +1922,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case ID_AC_GRIDMODE:
 			ChangeGridMode();
 			break;
-		case IDM_AUTOLOADPVI:
+		/*case IDM_AUTOLOADPVI:
 			ChangeAutoLoadMode();
-			break;
+			break;*/
 		case IDM_METRONOME:
 			ChangeMetronomeMode();
 			break;
@@ -2016,7 +2024,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		}
 		case IDM_DLGDEFAULT://Show Default Dialog
-		case ID_AC_DEFAULT:
+			DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGDEFAULT), hwnd, DialogDefaults);
 			//DialogBox(hInst, "DLGDEFAULT", hwnd, DialogDefault);
 			break;
 		case IDM_GITHUB:
@@ -2048,7 +2056,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"");
 		break;
 	case WM_EXITMENULOOP:
-		SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Press F1 for help");
+		SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"For help, press F1");
 		break;
 	case WM_MENUSELECT:
 		switch(LOWORD(wParam)){
@@ -2077,13 +2085,29 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_SELECT_CUT:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Cut the selection and put it on the Clipboard"); break;
 		case IDM_SELECT_COPY:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Copy the selection and put it on the Clipboard"); break;
 		case IDM_SELECT_PASTE:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Insert Clipboard contents"); break;
-		case IDM_SELECT_ALL:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select the entire document"); break;
+		case IDM_SELECT_ADVPASTE:   SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"TODO"); break;
+		case IDM_SELECT_ALL:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select everything on the current channel"); break;
 		case IDM_SELECT_RESET:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Clear the current selection"); break;
-		case IDM_DLGVOL:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Modify volume within a range"); break;
-		case IDM_DLGPAN:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Modify panning within a range"); break;
-		case IDM_DLGTRANS:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Transpose notes within a range"); break;
+		case IDM_SELECT_ALL_ALL:    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select the entire document"); break;
+		case ID_AC_NUM1:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select 1 measure on the current channel"); break;
+		case ID_AC_NUM2:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select 2 measures on the current channel"); break;
+		case ID_AC_NUM3:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select 3 measures on the current channel"); break;
+		case ID_AC_NUM4:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select 4 measures on the current channel"); break;
+		case ID_AC_NUM5:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select 8 measures on the current channel"); break;
+		case ID_AC_NUM6:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select 16 measures on the current channel"); break;
+		case ID_AC_C_NUM1:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select 1 measure on all channels"); break;
+		case ID_AC_C_NUM2:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select 2 measures on all channels"); break;
+		case ID_AC_C_NUM3:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select 3 measures on all channels"); break;
+		case ID_AC_C_NUM4:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select 4 measures on all channels"); break;
+		case ID_AC_C_NUM5:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select 8 measures on all channels"); break;
+		case ID_AC_C_NUM6:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select 16 measures on all channels"); break;
+		case ID_SELECTION_VOLUME:   SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Modify volume within the selection"); break;
+		case ID_SELECTION_PANNING:  SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Modify panning within the selection"); break;
+		case ID_SELECTION_TRANSPOSE:SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Transpose notes within the selection"); break;
+		case ID_SELECTION_INSERT:   SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"TODO"); break;
+		case ID_SELECTION_CLEAR:    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"TODO"); break;
+		case ID_SELECTION_DELETE:   SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"TODO"); break;
 		case IDM_DLGSWAP:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Swap the data of two channels"); break;
-		case IDM_DLGDELETE:         SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Delete data within a range"); break;
 		case IDM_CT_S20:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Clear all volume change events in the selection/channel"); break;
 		case IDM_DCLEN:             SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Edit note decay length and settings"); break;
 		case IDM_CT_PAN_R:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Pan the selection/channel to the right"); break;
@@ -2116,12 +2140,23 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_STOPNOWALL:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Stop all playing sounds"); break;
 
 		case IDM_DLGSETTING:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Configure the active document"); break;
-		case IDM_DLGDEFAULT:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Modify default volume/panning values"); break;
 		case IDM_DLGUSED:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"View how many events this song uses"); break;
 
 		case IDM_LOUPE_PLUS:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Zoom the piano roll in"); break;
 		case IDM_LOUPE_MINUS:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Zoom the piano roll out"); break;
-		case IDM_PREFERENCES:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open OrgMaker preferences"); break;
+		//case IDM_PREFERENCES:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open OrgMaker preferences"); break;
+		case IDM_CHANGEFINISH:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Confirm unsaved changes on exit"); break;
+		case IDM_FLOATTOOLBARS:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Pop out toolbars into their own window"); break;
+		case IDM_AUTOCHECKUPDATES:  SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Automatically check for new versions on launch"); break;
+		case IDM_ENABLEPLAYING:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Allow keyboard playback while the song is playing"); break;
+		case IDM_SMOOTHSCROLL:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Scroll by steps while the song is playing"); break;
+		case IDM_NOTE_ENLARGE:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Enlarge note heads while zoomed out"); break;
+		case IDM_SLIDEOVERLAPNOTES: SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Shift overlapping notes on other channels"); break;
+		case IDM_DRAWDOUBLE:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Show ghost notes from melody or percussion channels"); break;
+		case IDM_DLGDEFAULT:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Modify default volume/panning values"); break;
+		case IDM_METRONOME:         SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Plays a sound on every beat/measure"); break;
+		case IDM_DLGTHEMES:         SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select a custom visual style"); break;
+		case IDM_DLGWAVEDBS:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select a custom sound bank"); break;
 
 		case IDM_DLGHELP:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open the Help menu"); break;
 		case IDM_GITHUB:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open the GitHub page for OrgMaker 3"); break;
@@ -2261,6 +2296,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				Rxo_StopAllSoundNow();
 				memset(iKeyPhase, -1, sizeof(iKeyPhase));
 				memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
+				UpdateStatusBar(false);
 			}
 			break;
 		case VK_DIVIDE:
@@ -2271,6 +2307,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				Rxo_StopAllSoundNow();
 				memset(iKeyPhase, -1, sizeof(iKeyPhase));
 				memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
+				UpdateStatusBar(false);
 			}
 			break;
 		}
@@ -2396,7 +2433,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		realHeight = HIWORD(lParam);
 		SetWindowPos(hwndArea, HWND_TOP, 0, rebarHeight, realWidth, realHeight - rebarHeight - GetBarHeight(hwndStatus), 0);
 
-		int swidths[] = { realWidth - 550, realWidth - 450, realWidth - 350, realWidth - 150, -1 };
+		int swidths[] = { realWidth - 640, realWidth - 525, realWidth - 425, realWidth - 350, realWidth - 150, -1 };
 		SendMessage(hwndStatus, SB_SETPARTS, sizeof(swidths) / sizeof(int), (LPARAM)swidths);
 
 
@@ -2595,8 +2632,8 @@ void SaveIniFile()
 	WritePrivateProfileString(MIDI_EXPORT,"Author", strMIDI_AUTHOR, app_path);
 	WritePrivateProfileString(MIDI_EXPORT,"Title", strMIDI_TITLE, app_path);
 
-	wsprintf(num_buf,"%d",SaveWithInitVolFile );
-	WritePrivateProfileString(INIT_DATA,"autosave",num_buf,app_path);
+	//wsprintf(num_buf,"%d",SaveWithInitVolFile );
+	//WritePrivateProfileString(INIT_DATA,"autosave",num_buf,app_path);
 
 	SaveRecentFilesToInifile();
 	scr_data.SetIniFile();

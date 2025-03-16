@@ -50,7 +50,7 @@ extern int sACrnt;	//範囲選択は常にｶﾚﾝﾄﾄﾗｯｸ
 extern int gDrawDouble;	//両方のトラックグループを描画する
 extern CHAR app_path[];
 extern int iDragMode;
-extern int SaveWithInitVolFile;
+//extern int SaveWithInitVolFile;
 extern int sMetronome;
 extern int sSmoothScroll;
 
@@ -865,7 +865,7 @@ void ChangePushStratchNOTE(int iValue)
 
 }
 
-bool AutoLoadPVIFile()
+/*bool AutoLoadPVIFile()
 {
 	//2014.05.06 A
 	//2014.05.30 M
@@ -945,7 +945,7 @@ void ChangeAutoLoadMode(int iValue)
 	else
 		CheckMenuItem(hMenu,IDM_AUTOLOADPVI,(MF_BYCOMMAND|MFS_CHECKED));
 	ShowStatusMessage();
-}
+}*/
 
 // StringTableを参照するメッセージボックス //2014.10.18 
 int msgbox(HWND hWnd , int MessageID, int TitleID, UINT uType)

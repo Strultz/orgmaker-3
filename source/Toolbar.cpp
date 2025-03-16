@@ -244,13 +244,14 @@ HWND CreateStatusBar(HWND hwnd) {
         0, 0, 0, 0, hwnd, NULL, hInst, NULL);
 
     int w = GetBarWidth(hwndStatus);
-    int swidths[] = { w - 550, w - 450, w - 350, w - 150, -1 };
+    int swidths[] = { w - 700, w - 550, w - 450, w - 350, w - 150, -1 };
     SendMessage(hwndStatus, SB_SETPARTS, sizeof(swidths) / sizeof(int), (LPARAM)swidths);
-    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Press F1 for help");
-    SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Zoom: 100%");
-    SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)"Channel 1");
-    SendMessage(hwndStatus, SB_SETTEXT, 3, (LPARAM)"Wait: 125 (120.000 BPM)");
-    SendMessage(hwndStatus, SB_SETTEXT, 4, (LPARAM)"Meas 0:0");
+    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"For help, press F1");
+    SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)"Preview Measure: 3");
+    SendMessage(hwndStatus, SB_SETTEXT, 2, (LPARAM)"Zoom: 100%");
+    SendMessage(hwndStatus, SB_SETTEXT, 3, (LPARAM)"Channel 1");
+    SendMessage(hwndStatus, SB_SETTEXT, 4, (LPARAM)"Wait: 125 (120.000 BPM)");
+    SendMessage(hwndStatus, SB_SETTEXT, 5, (LPARAM)"Meas 0:0");
 
     return hwndStatus;
 }

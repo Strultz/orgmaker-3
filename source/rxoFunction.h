@@ -80,10 +80,10 @@ extern int iActivatePAN; //2014.05.01 A
 extern int iActivateVOL; //2014.05.01 A
 extern int iSlideOverlapNotes; //2014.05.06 A
 
-extern bool AutoLoadPVIFile();
-extern bool AutoSavePVIFile();
-extern int SaveWithInitVolFile;
-extern void ChangeAutoLoadMode(int iValue = -1);
+//extern bool AutoLoadPVIFile();
+//extern bool AutoSavePVIFile();
+//extern int SaveWithInitVolFile;
+//extern void ChangeAutoLoadMode(int iValue = -1);
 extern int tra;
 
 extern int NoteWidth; //âπïÑÇÃïù 2014.05.26

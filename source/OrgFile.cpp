@@ -133,9 +133,9 @@ BOOL OrgData::SaveMusicData(void)
 	PutRecentFile(music_file);
 //	MessageBox(hWnd,"ï€ë∂ÇµÇ‹ÇµÇΩ","Message (Save)",MB_OK);
 	//Å´2014.05.06 A
-	if(SaveWithInitVolFile != 0){
+	/*if (SaveWithInitVolFile != 0) {
 		AutoSavePVIFile();
-	}
+	}*/
 
 	return TRUE;
 }
@@ -300,9 +300,9 @@ BOOL OrgData::LoadMusicData(void)
 	//MakePanParts(info.line,info.dot);
 	PutRecentFile(music_file);
 	//Å´2014.05.06 A
-	if(SaveWithInitVolFile != 0){
+	/*if (SaveWithInitVolFile != 0) {
 		AutoLoadPVIFile();
-	}
+	}*/
 	return TRUE;
 }
 

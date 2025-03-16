@@ -102,7 +102,7 @@ char *strNNNTrack[MAXTRACK];	// 2014.10.19 A
 
 int SamplePlayHeight = 36; //サンプル音を鳴らす高さ
 
-int SaveWithInitVolFile;	//曲データと…セーブするか。
+//int SaveWithInitVolFile;	//曲データと…セーブするか。
 
 extern HINSTANCE hInst;//インスタンスハンドル
 extern void ReloadBitmaps();

@@ -511,6 +511,8 @@
 #define IDC_DEFPANSPIN15                1304
 #define IDC_DEFVOLSPIN16                1305
 #define IDC_DEFPANSPIN16                1306
+#define IDC_BUTTON1                     1307
+#define IDC_DEFRESET                    1307
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005
@@ -844,14 +846,15 @@
 #define ID_AC_LY                        40366
 #define ID_AC_LU                        40367
 #define ID_AC_LI                        40368
+#define IDM_SELECT_ALL_ALL              40369
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        264
-#define _APS_NEXT_COMMAND_VALUE         40351
-#define _APS_NEXT_CONTROL_VALUE         1279
+#define _APS_NEXT_COMMAND_VALUE         40370
+#define _APS_NEXT_CONTROL_VALUE         1308
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

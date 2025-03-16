@@ -249,7 +249,7 @@ END
 
 DLGUSED DIALOGEX 0, 0, 193, 176
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION
-CAPTION "Memory Usage"
+CAPTION "Event Usage"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,148,160,40,12
@@ -309,7 +309,7 @@ BEGIN
     GROUPBOX        "Percussion",IDC_STATIC,100,4,88,152
 END
 
-DLGMEMO DIALOGEX 0, 0, 119, 135
+DLGMEMO DIALOGEX 0, 0, 117, 132
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION
 CAPTION "About OrgMaker"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
@@ -328,7 +328,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTI
 CAPTION "Default Volume/Panning"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,100,168,44,12
+    DEFPUSHBUTTON   "OK",IDOK,52,168,44,12
     PUSHBUTTON      "Cancel",IDCANCEL,148,168,44,12
     CTEXT           "Pan\n(0-6-12)",IDC_STATIC,24,12,28,16
     CTEXT           "Volume\n(0-254)",IDC_STATIC,56,12,28,16
@@ -416,6 +416,7 @@ BEGIN
     CONTROL         "",IDC_DEFPANSPIN16,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,172,144,11,12
     GROUPBOX        "Melody",IDC_STATIC,4,4,92,160
     GROUPBOX        "Percussion",IDC_STATIC,104,4,88,160
+    PUSHBUTTON      "Reset",IDC_DEFRESET,100,168,44,12
 END
 
 DLGHELP DIALOGEX 0, 0, 365, 329
@@ -505,16 +506,16 @@ BEGIN
     GROUPBOX        "",IDC_STATIC,4,0,156,64
 END
 
-DLGDCLEN DIALOGEX 0, 0, 121, 80
+DLGDCLEN DIALOGEX 0, 0, 121, 76
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION
 CAPTION "Setup Decay Length"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    EDITTEXT        IDE_VOL_LENGTH,60,12,44,12
-    CONTROL         "",IDC_SPINDECAY,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,96,12,10,12
+    EDITTEXT        IDE_VOL_LENGTH,64,10,40,12
+    CONTROL         "",IDC_SPINDECAY,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,92,10,11,12
     DEFPUSHBUTTON   "OK",IDOK,32,60,40,12
     PUSHBUTTON      "Cancel",IDCANCEL,76,60,40,12
-    LTEXT           "Decay Length",IDC_STATIC,12,14,44,8
+    LTEXT           "Decay Length",IDC_STATIC,12,12,44,8
     CONTROL         "Use note length instead",IDC_VOL_USENOTELEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,28,86,8
     CONTROL         "Shorten notes if too long",IDC_VOL_SETNOTELEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,40,94,8
     GROUPBOX        "",IDC_STATIC,4,0,112,56
@@ -522,7 +523,7 @@ END
 
 IDD_DLGADVPASTE DIALOGEX 0, 0, 149, 64
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Advanced Paste"
+CAPTION "Paste Special"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,60,48,42,12
@@ -570,7 +571,7 @@ BEGIN
         MENUITEM "Export &WAV File (*.wav)...\tCtrl+Alt+W", IDM_EXPORT_WAV,MFT_STRING,MFS_ENABLED
         MENUITEM "Export &MIDI File (*.mid)...\tCtrl+Alt+M", IDM_EXPORT_MIDI,MFT_STRING,MFS_ENABLED
         MENUITEM MFT_SEPARATOR
-        MENUITEM "&Quit",                       IDM_EXIT,MFT_STRING,MFS_ENABLED
+        MENUITEM "&Exit\tAlt+F4",                       IDM_EXIT,MFT_STRING,MFS_ENABLED
     END
     POPUP "&Edit",                          65535,MFT_STRING,MFS_ENABLED
     BEGIN
@@ -580,9 +581,28 @@ BEGIN
         MENUITEM "Cu&t\tCtrl+X",                IDM_SELECT_CUT,MFT_STRING,MFS_ENABLED
         MENUITEM "&Copy\tCtrl+C",               IDM_SELECT_COPY,MFT_STRING,MFS_ENABLED
         MENUITEM "&Paste\tCtrl+V",              IDM_SELECT_PASTE,MFT_STRING,MFS_ENABLED
-        MENUITEM "Ad&vanced Paste...\tCtrl+Shift+V", IDM_SELECT_ADVPASTE,MFT_STRING,MFS_ENABLED
-        MENUITEM "Select &All\tCtrl+A",         IDM_SELECT_ALL,MFT_STRING,MFS_ENABLED
-        MENUITEM "&Deselect\tCtrl+D",           IDM_SELECT_RESET,MFT_STRING,MFS_ENABLED
+        MENUITEM "P&aste Special...\tCtrl+Shift+V", IDM_SELECT_ADVPASTE,MFT_STRING,MFS_ENABLED
+        POPUP "&Select...",             65535,MFT_STRING,MFS_ENABLED
+        BEGIN
+            MENUITEM "&All\tCtrl+A",                IDM_SELECT_ALL,MFT_STRING,MFS_ENABLED
+            MENUITEM "&None\tEsc",                  IDM_SELECT_RESET,MFT_STRING,MFS_ENABLED
+            MENUITEM MFT_SEPARATOR
+            MENUITEM "All on All &Channels",        IDM_SELECT_ALL_ALL,MFT_STRING,MFS_ENABLED
+            MENUITEM MFT_SEPARATOR
+            MENUITEM "&Measure\tNumpad1",           ID_AC_NUM1,MFT_STRING,MFS_ENABLED
+            MENUITEM "&2 Measures\tNumpad2",        ID_AC_NUM2,MFT_STRING,MFS_ENABLED
+            MENUITEM "&3 Measures\tNumpad3",        ID_AC_NUM3,MFT_STRING,MFS_ENABLED
+            MENUITEM "&4 Measures\tNumpad4",        ID_AC_NUM4,MFT_STRING,MFS_ENABLED
+            MENUITEM "&8 Measures\tNumpad5",        ID_AC_NUM5,MFT_STRING,MFS_ENABLED
+            MENUITEM "1&6 Measures\tNumpad6",       ID_AC_NUM6,MFT_STRING,MFS_ENABLED
+            MENUITEM MFT_SEPARATOR
+            MENUITEM "Measur&e on All Channels\tCtrl+Numpad1",    ID_AC_C_NUM1,MFT_STRING,MFS_ENABLED
+            MENUITEM "&2 Measures on All Channels\tCtrl+Numpad2", ID_AC_C_NUM2,MFT_STRING,MFS_ENABLED
+            MENUITEM "&3 Measures on All Channels\tCtrl+Numpad3", ID_AC_C_NUM3,MFT_STRING,MFS_ENABLED
+            MENUITEM "&4 Measures on All Channels\tCtrl+Numpad4", ID_AC_C_NUM4,MFT_STRING,MFS_ENABLED
+            MENUITEM "&8 Measures on All Channels\tCtrl+Numpad5", ID_AC_C_NUM5,MFT_STRING,MFS_ENABLED
+            MENUITEM "&16 Measures on All Channels\tCtrl+Numpad6",ID_AC_C_NUM6,MFT_STRING,MFS_ENABLED
+        END
         POPUP "&Edit Selection...",             65535,MFT_STRING,MFS_ENABLED
         BEGIN
             MENUITEM "&Volume...\tF4",              ID_SELECTION_VOLUME,MFT_STRING,MFS_ENABLED
@@ -643,15 +663,15 @@ BEGIN
         MENUITEM MFT_SEPARATOR
         POPUP "Edit &Current Channel",          65535,MFT_STRING,MFS_ENABLED
         BEGIN
-            MENUITEM "Pan &Right\tShift+Ctrl+R",    IDM_CT_PAN_R,MFT_STRING,MFS_ENABLED
-            MENUITEM "Pan &Left\tShift+Ctrl+L",     IDM_CT_PAN_L,MFT_STRING,MFS_ENABLED
+            MENUITEM "Pan &Right\tCtrl+Shift+R",    IDM_CT_PAN_R,MFT_STRING,MFS_ENABLED
+            MENUITEM "Pan &Left\tCtrl+Shift+L",     IDM_CT_PAN_L,MFT_STRING,MFS_ENABLED
             MENUITEM "Pan &Invert\tCtrl+Alt+R",     IDM_CT_PAN_REVERSE,MFT_STRING,MFS_ENABLED
             MENUITEM "Volume &Up\tF11",             IDM_CT_VOL_PLUS,MFT_STRING,MFS_ENABLED
             MENUITEM "Volume &Down\tF12",           IDM_CT_VOL_MINUS,MFT_STRING,MFS_ENABLED
-            MENUITEM "Volume &Up (12.5%)\tShift+Ctrl+F11", IDM_CT_VOLWARIAI_UP,MFT_STRING,MFS_ENABLED
-            MENUITEM "Volume &Down (12.5%)\tShift+Ctrl+F12", IDM_CT_VOLWARIAI_DOWN,MFT_STRING,MFS_ENABLED
-            MENUITEM "Transpose &Up\tShift+Ctrl+U", IDM_CT_TRANS_UP,MFT_STRING,MFS_ENABLED
-            MENUITEM "Transpose &Down\tShift+Ctrl+D", IDM_CT_TRANS_DOWN,MFT_STRING,MFS_ENABLED
+            MENUITEM "Volume &Up (12.5%)\tCtrl+Shift+F11", IDM_CT_VOLWARIAI_UP,MFT_STRING,MFS_ENABLED
+            MENUITEM "Volume &Down (12.5%)\tCtrl+Shift+F12", IDM_CT_VOLWARIAI_DOWN,MFT_STRING,MFS_ENABLED
+            MENUITEM "Transpose &Up\tCtrl+Shift+U", IDM_CT_TRANS_UP,MFT_STRING,MFS_ENABLED
+            MENUITEM "Transpose &Down\tCtrl+Shift+D", IDM_CT_TRANS_DOWN,MFT_STRING,MFS_ENABLED
             MENUITEM "Transpose &Up (Octave)\tCtrl+Alt+U", IDM_CT_OCT_UP,MFT_STRING,MFS_ENABLED
             MENUITEM "Transpose &Down (Octave)\tCtrl+Alt+D", IDM_CT_OCT_DOWN,MFT_STRING,MFS_ENABLED
         END
@@ -661,8 +681,8 @@ BEGIN
             MENUITEM "Pan &Left",                   IDM_ML_PAN_L,MFT_STRING,MFS_ENABLED
             MENUITEM "Volume &Up\tShift+F11",       IDM_ML_VOL_PLUS,MFT_STRING,MFS_ENABLED
             MENUITEM "Volume &Down\tShift+F12",     IDM_ML_VOL_MINUS,MFT_STRING,MFS_ENABLED
-            MENUITEM "Transpose &Up\tShift+Ctrl+H", IDM_ML_TRANS_UP,MFT_STRING,MFS_ENABLED
-            MENUITEM "Transpose &Down\tShift+Ctrl+N", IDM_ML_TRANS_DOWN,MFT_STRING,MFS_ENABLED
+            MENUITEM "Transpose &Up\tCtrl+Shift+H", IDM_ML_TRANS_UP,MFT_STRING,MFS_ENABLED
+            MENUITEM "Transpose &Down\tCtrl+Shift+N", IDM_ML_TRANS_DOWN,MFT_STRING,MFS_ENABLED
         END
         POPUP "Edit Perc&ussion Channels",      65535,MFT_STRING,MFS_ENABLED
         BEGIN
@@ -677,7 +697,7 @@ BEGIN
             MENUITEM "Reduce to 1/3x",              IDM_3BUNNO1,MFT_STRING,MFS_ENABLED
         END
         MENUITEM MFT_SEPARATOR
-        MENUITEM "&Swap Channels...\tShift+Ctrl+F4", IDM_DLGSWAP,MFT_STRING,MFS_ENABLED
+        MENUITEM "&Swap Channels...\tCtrl+Shift+F4", IDM_DLGSWAP,MFT_STRING,MFS_ENABLED
         MENUITEM MFT_SEPARATOR
         MENUITEM "Snap Selection to &Beat Grid\tCtrl+G", IDM_GRIDMODE,MFT_STRING,MFS_ENABLED
         MENUITEM "A&lways Select Current Channel\tCtrl+T", IDM_ALWAYS_CURRENT,MFT_STRING,MFS_ENABLED
@@ -689,8 +709,6 @@ BEGIN
     POPUP "&Song",                          65535,MFT_STRING,MFS_ENABLED
     BEGIN
         MENUITEM "&Properties...\tF2",          IDM_DLGSETTING,MFT_STRING,MFS_ENABLED
-        MENUITEM "&Default Volume/Panning...\tF3", IDM_DLGDEFAULT,MFT_STRING,MFS_ENABLED
-        MENUITEM MFT_SEPARATOR
         MENUITEM "&Event Usage...",             IDM_DLGUSED,MFT_STRING,MFS_ENABLED
     END
     POPUP "&View",                          65535,MFT_STRING,MFS_ENABLED
@@ -701,7 +719,6 @@ BEGIN
         POPUP "&Preferences",                   65535,MFT_STRING,MFS_ENABLED
         BEGIN
             MENUITEM "Confirm &Unsaved Changes",    IDM_CHANGEFINISH,MFT_STRING,MFS_ENABLED
-            MENUITEM "&Auto Load/Save .pvi File",   IDM_AUTOLOADPVI,MFT_STRING,MFS_ENABLED
             MENUITEM "&Pop Out Toolbars",           IDM_FLOATTOOLBARS,MFT_STRING,MFS_ENABLED
             MENUITEM "&Automatically Check for Updates", IDM_AUTOCHECKUPDATES,MFT_STRING,MFS_ENABLED
             MENUITEM MFT_SEPARATOR
@@ -709,7 +726,8 @@ BEGIN
             MENUITEM "&Playback Smooth Scrolling",  IDM_SMOOTHSCROLL,MFT_STRING,MFS_ENABLED
             MENUITEM "Extend &Note Heads",          IDM_NOTE_ENLARGE,MFT_STRING,MFS_ENABLED
             MENUITEM "S&lide Overlapping Notes",    IDM_SLIDEOVERLAPNOTES,MFT_STRING,MFS_ENABLED
-            MENUITEM "Show &All Tracks",            IDM_DRAWDOUBLE,MFT_STRING,MFS_ENABLED
+            MENUITEM "Show &All Channels",          IDM_DRAWDOUBLE,MFT_STRING,MFS_ENABLED
+            MENUITEM "&Default Volume/Panning...",  IDM_DLGDEFAULT,MFT_STRING,MFS_ENABLED
             MENUITEM MFT_SEPARATOR
             MENUITEM "&Metronome",                  IDM_METRONOME,MFT_STRING,MFS_ENABLED
             MENUITEM MFT_SEPARATOR
@@ -959,7 +977,6 @@ BEGIN
     VK_F12,         ID_AC_VOLWARIAI_DOWN,   VIRTKEY, SHIFT, CONTROL, NOINVERT
     VK_F2,          ID_AC_SETTEMPO,         VIRTKEY, NOINVERT
     VK_F2,          ID_AC_COPYDLG,          VIRTKEY, CONTROL, NOINVERT
-    VK_F3,          ID_AC_DEFAULT,          VIRTKEY, NOINVERT
     VK_F3,          ID_AC_COPY2,            VIRTKEY, CONTROL, NOINVERT
     VK_F4,          ID_AC_DLG_VOL,          VIRTKEY, NOINVERT
     VK_F4,          ID_AC_DLG_PAN,          VIRTKEY, CONTROL, NOINVERT

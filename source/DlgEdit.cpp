@@ -958,3 +958,17 @@ BOOL CALLBACK DialogAdvPaste(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 	}
 	return 0;
 }
+
+
+BOOL CALLBACK DialogDefaults(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message) {
+	case WM_INITDIALOG:
+
+		break;
+	case WM_COMMAND:
+
+		break;
+	}
+	return 0;
+}
