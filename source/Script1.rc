@@ -1293,7 +1293,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_STRING1             "Currently, messages are grouped into a StringTable for easy multilingual support."
-    IDS_TITLE               " - OrgMaker 3.1.0 [Debug]"
+    IDS_TITLE               "OrgMaker 3.1.0"
     IDS_CANCEL              "Canceled."
     IDS_CHANGE_KEY          "Changed the key for the specified range."
     IDS_CHANGE_PAN          "Changed the pan for the specified range."

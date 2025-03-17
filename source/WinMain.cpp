@@ -2491,7 +2491,11 @@ void SetTitlebarText()
 		name = slash < backslash ? &backslash[1] : &slash[1];
 	}
 
-	snprintf(set_name, MAX_PATH + 30, "%s%s%s", gFileModified ? "*" : "", name, lpszName);
+#ifdef _DEBUG
+	snprintf(set_name, MAX_PATH + 30, "%s%s - %s [Debug]", gFileModified ? "*" : "", name, lpszName);
+#else
+	snprintf(set_name, MAX_PATH + 30, "%s%s - %s", gFileModified ? "*" : "", name, lpszName);
+#endif
 
 	SetWindowText(hWnd, set_name);
 }
