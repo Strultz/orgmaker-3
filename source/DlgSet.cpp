@@ -1971,7 +1971,7 @@ BOOL CALLBACK DialogDecayLength(HWND hdwnd, UINT message, WPARAM wParam, LPARAM 
 	return 0;
 }
 
-bool CheckDefPanVol(HWND hdwnd, int WithSet)
+/*bool CheckDefPanVol(HWND hdwnd, int WithSet)
 {
 	int t,a,b;
 	for(t=0;t<MAXTRACK;t++){
@@ -1997,7 +1997,7 @@ bool CheckDefPanVol(HWND hdwnd, int WithSet)
 		}
 	}
 	return true;
-}
+}*/
 
 /*bool LoadPVIFile(HWND hdwnd, char* FileName)
 {

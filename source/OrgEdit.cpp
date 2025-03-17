@@ -1253,14 +1253,14 @@ BOOL OrgData::SwapTrack(NOTECOPY *pc)
 		info.tdata[pc->track2].wave_no = w2;
 	}
 
-	unsigned char uctmp;
+	/*unsigned char uctmp;
 	uctmp = def_pan[pc->track1];
 	def_pan[pc->track1] = def_pan[pc->track2];
 	def_pan[pc->track2] = uctmp;
 
 	uctmp = def_volume[pc->track1];
 	def_volume[pc->track1] = def_volume[pc->track2];
-	def_volume[pc->track2] = uctmp;
+	def_volume[pc->track2] = uctmp;*/
 
 	//char ctmp;
 	//ctmp = mute[pc->track1];

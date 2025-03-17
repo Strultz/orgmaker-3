@@ -651,12 +651,12 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	iDlgRepeat =        GetPrivateProfileInt(MIDI_EXPORT,"Repeat",1,app_path);
 
-	char strauthtmp[128];
+	char strtmp[128];
 	SYSTEMTIME stTime; GetLocalTime(&stTime); //stTime.wYear get a year in // 2014.10.18
-	sprintf(strauthtmp, "(C) AUTHOR xxxxx, %d", stTime.wYear); //, put the year after
+	sprintf(strtmp, "(C) AUTHOR xxxxx, %d", stTime.wYear); //, put the year after
 
 	//GetPrivateProfileString(MIDI_EXPORT, "Author", "(C) AUTHOR xxxxx, 2014", strMIDI_AUTHOR, 255, app_path);	// 2045.01.18 D
-	GetPrivateProfileString(MIDI_EXPORT, "Author", strauthtmp, strMIDI_AUTHOR, 255, app_path);	// 2045.01.18 A
+	GetPrivateProfileString(MIDI_EXPORT, "Author", strtmp, strMIDI_AUTHOR, 255, app_path);	// 2045.01.18 A
 	GetPrivateProfileString(MIDI_EXPORT, "Title", MessageString[IDS_DEFAULT_MIDI_TITLE], strMIDI_TITLE, 255, app_path);
 	for (i = 0; i < 8; i++) ucMIDIProgramChangeValue[i] = 255;
 
@@ -794,6 +794,14 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
 	CheckMenuItem(hMenu, IDM_FLOATTOOLBARS, MF_BYCOMMAND | (floatingToolbars ? MFS_CHECKED : MFS_UNCHECKED));
+
+	for (i = 0; i < MAXTRACK; ++i) {
+		snprintf(strtmp, 128, "Channel%dDefaultVol", i);
+		org_data.def_volume[i] = GetPrivateProfileInt(MAIN_WINDOW, strtmp, 200, app_path);
+
+		snprintf(strtmp, 128, "Channel%dDefaultPan", i);
+		org_data.def_pan[i] = GetPrivateProfileInt(MAIN_WINDOW, strtmp, 200, app_path);
+	}
 	
 	//org_data.PutMusic();//View sheet music
 
@@ -2590,6 +2598,16 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentThemePath", gSelectedTheme, app_path);
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentWavePath", gSelectedWave, app_path);
 
+	char strtmp[128];
+	for (i = 0; i < MAXTRACK; ++i) {
+		snprintf(strtmp, 128, "Channel%dDefaultVol", i);
+		wsprintf(num_buf, "%d", org_data.def_volume[i]);
+		WritePrivateProfileString(MAIN_WINDOW, strtmp, num_buf, app_path);
+
+		snprintf(strtmp, 128, "Channel%dDefaultPan", i);
+		wsprintf(num_buf, "%d", org_data.def_pan[i]);
+		WritePrivateProfileString(MAIN_WINDOW, strtmp, num_buf, app_path);
+	}
 
 	/*GetWindowRect(hDlgTrack, (LPRECT)&WinRect);
 	wsprintf(num_buf,"%d",WinRect.left);
@@ -2638,6 +2656,8 @@ void SaveIniFile()
 
 	//wsprintf(num_buf,"%d",SaveWithInitVolFile );
 	//WritePrivateProfileString(INIT_DATA,"autosave",num_buf,app_path);
+
+
 
 	SaveRecentFilesToInifile();
 	scr_data.SetIniFile();
