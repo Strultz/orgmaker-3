@@ -800,7 +800,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		org_data.def_volume[i] = GetPrivateProfileInt(MAIN_WINDOW, strtmp, 200, app_path);
 
 		snprintf(strtmp, 128, "Channel%dDefaultPan", i);
-		org_data.def_pan[i] = GetPrivateProfileInt(MAIN_WINDOW, strtmp, 200, app_path);
+		org_data.def_pan[i] = GetPrivateProfileInt(MAIN_WINDOW, strtmp, 6, app_path);
 	}
 	
 	//org_data.PutMusic();//View sheet music
