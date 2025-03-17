@@ -1231,7 +1231,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 						org_data.mute[j] = (!un && i != j);
 					}
 					UpdateToolbarStatus();
-				} else if (GetKeyState(VK_SHIFT) & 0x8000) { // Mute
+				} else if (org_data.track == i || GetKeyState(VK_SHIFT) & 0x8000) { // Mute
 					MuteTrack(i);
 				} else { // Select
 					ChangeTrack(i);
