@@ -1696,7 +1696,7 @@ BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-static unsigned long sample_rate = 0;
+static unsigned long sample_rate = 44100;
 static unsigned long loop_count = 0;
 static unsigned long fade_mseconds = 0;
 
@@ -1756,9 +1756,10 @@ bool ExportWave(unsigned int streamsize, unsigned int samples, const char *strPa
 BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	MUSICINFO mi;
-	FILE* deez;
 	char res;
 	char strPath[MAX_PATH] = {NULL};
+	LPNMHDR lpnm;
+
 	switch (message) {
 	case WM_INITDIALOG: {
 		char str[10] = { NULL };
@@ -1776,7 +1777,7 @@ BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lP
 		w = GetDlgItem(hdwnd, IDC_SPIN2);
 		SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(256, 0));
 		SendMessage(w, UDM_SETPOS, 0, loop_count);
-		w = GetDlgItem(hdwnd, IDC_SPIN3);
+		w = GetDlgItem(hdwnd, IDC_SPIN1);
 		SendMessage(w, UDM_SETRANGE32, 0, 60000);
 		SendMessage(w, UDM_SETPOS32, 0, fade_mseconds);
 
@@ -1859,17 +1860,55 @@ BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lP
 			return 1;
 		}
 		return 1;
+	case WM_NOTIFY: {
+		lpnm = (LPNMHDR)lParam;
+		switch (lpnm->code) {
+		case UDN_DELTAPOS: {
+			LPNMUPDOWN lud = (LPNMUPDOWN)lParam;
+			HWND buddy = (HWND)SendMessage(lpnm->hwndFrom, UDM_GETBUDDY, 0, 0);
+			if (buddy) {
+				int v = GetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), NULL, FALSE);
+
+				switch (lpnm->idFrom) {
+				case IDC_SPIN3:
+					v += lud->iDelta * 100;
+					if (v < 100) v = 100;
+					if (v > 192000) v = 192000;
+
+					SetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), v, FALSE);
+					SendMessage(lpnm->hwndFrom, UDM_SETPOS32, 0, v);
+					break;
+				case IDC_SPIN2:
+					v += lud->iDelta;
+					if (v < 0) v = 0;
+					if (v > 256) v = 256;
+
+					SetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), v, FALSE);
+					SendMessage(lpnm->hwndFrom, UDM_SETPOS, 0, v);
+					break;
+				case IDC_SPIN1:
+					v += lud->iDelta * 100;
+					if (v < 0) v = 0;
+					if (v > 60000) v = 60000;
+
+					SetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), v, FALSE);
+					SendMessage(lpnm->hwndFrom, UDM_SETPOS32, 0, v);
+					break;
+				}
+
+				return 0;
+			}
+			return 1;
+		}
+		}
+	}
 	}
 	return 0;
 }
 
 BOOL CALLBACK DialogDecayLength(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	MUSICINFO mi;
-	FILE* deez;
 	LPNMHDR lpnm;
-	char res;
-	char strPath[MAX_PATH] = { NULL };
 
 	switch (message) {
 	case WM_INITDIALOG: {
@@ -1922,9 +1961,6 @@ BOOL CALLBACK DialogDecayLength(HWND hdwnd, UINT message, WPARAM wParam, LPARAM 
 
 				SetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), v, FALSE);
 				SendMessage(lpnm->hwndFrom, UDM_SETPOS, 0, v);
-
-				PropSheet_Changed(GetParent(hdwnd), hdwnd);
-				gPropChanged = true;
 				return 0;
 			}
 			return 1;

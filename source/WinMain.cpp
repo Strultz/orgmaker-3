@@ -353,7 +353,7 @@ void UpdateStatusBar(bool measonly) {
 	}
 
 	if (!measonly) {
-		snprintf(msg, 256, "Preview Octave: %d", previewOctave + 1);
+		snprintf(msg, 256, "Keyboard Octave: %d", previewOctave + 1);
 		SendMessage(hwndStatus, SB_SETTEXT, 1, (LPARAM)msg);
 
 		switch (NoteWidth) {
@@ -1018,7 +1018,7 @@ LRESULT CALLBACK AreaWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 }
 
 void ClipboardPaste(int no, int flags) {
-	if (gClipboardData.track1 == -1) {
+	if (gClipboardData.track1 == -1 || no <= 0) {
 		return;
 	}
 
@@ -2433,7 +2433,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		realHeight = HIWORD(lParam);
 		SetWindowPos(hwndArea, HWND_TOP, 0, rebarHeight, realWidth, realHeight - rebarHeight - GetBarHeight(hwndStatus), 0);
 
-		int swidths[] = { realWidth - 640, realWidth - 525, realWidth - 425, realWidth - 350, realWidth - 150, -1 };
+		int swidths[] = { realWidth - 578, realWidth - 465, realWidth - 388, realWidth - 320, realWidth - 150, -1 };
 		SendMessage(hwndStatus, SB_SETPARTS, sizeof(swidths) / sizeof(int), (LPARAM)swidths);
 
 

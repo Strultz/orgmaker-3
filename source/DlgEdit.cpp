@@ -917,20 +917,27 @@ void ClipboardPaste(int no, int flags);
 
 static int copyNum = 1;
 static bool mixPaste = false;
-static bool copyNotes = false;
-static bool copyVol = false;
-static bool copyPan = false;
+static bool copyNotes = true;
+static bool copyVol = true;
+static bool copyPan = true;
 
-BOOL CALLBACK DialogAdvPaste(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
+BOOL CALLBACK DialogAdvPaste(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	LPNMHDR lpnm;
+
 	switch (message) {
-	case WM_INITDIALOG:
+	case WM_INITDIALOG: {
 		SetDlgItemInt(hdwnd, IDC_ADVCOUNT, copyNum, FALSE);
 		CheckDlgButton(hdwnd, IDC_ADVMIX, mixPaste);
 		CheckDlgButton(hdwnd, IDC_ADVNOTES, copyNotes);
 		CheckDlgButton(hdwnd, IDC_ADVVOL, copyVol);
 		CheckDlgButton(hdwnd, IDC_ADVPAN, copyPan);
+
+		HWND w = GetDlgItem(hdwnd, IDC_SPIN1);
+		SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(999, 1));
+		SendMessage(w, UDM_SETPOS, 0, traTimes);
+
 		return 1;
+	}
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDCANCEL:
@@ -955,6 +962,26 @@ BOOL CALLBACK DialogAdvPaste(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 			return 0;
 		}
 		break;
+	case WM_NOTIFY: {
+		lpnm = (LPNMHDR)lParam;
+		switch (lpnm->code) {
+		case UDN_DELTAPOS: {
+			LPNMUPDOWN lud = (LPNMUPDOWN)lParam;
+			HWND buddy = (HWND)SendMessage(lpnm->hwndFrom, UDM_GETBUDDY, 0, 0);
+			if (buddy) {
+				int v = GetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), NULL, FALSE);
+				v += lud->iDelta;
+				if (v < 1) v = 1;
+				if (v > 999) v = 999;
+
+				SetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), v, FALSE);
+				SendMessage(lpnm->hwndFrom, UDM_SETPOS, 0, v);
+				return 0;
+			}
+			return 1;
+		}
+		}
+	}
 	}
 	return 0;
 }
@@ -971,17 +998,17 @@ static int tvol_spin[MAXTRACK] = {
 	IDC_DEFVOLSPIN9, IDC_DEFVOLSPIN10, IDC_DEFVOLSPIN11, IDC_DEFVOLSPIN12,
 	IDC_DEFVOLSPIN13, IDC_DEFVOLSPIN14, IDC_DEFVOLSPIN15, IDC_DEFVOLSPIN16,
 };
-static int tpan_spin[MAXTRACK] = {
-	IDC_DEFPANSPIN1, IDC_DEFPANSPIN2, IDC_DEFPANSPIN3, IDC_DEFPANSPIN4,
-	IDC_DEFPANSPIN5, IDC_DEFPANSPIN6, IDC_DEFPANSPIN7, IDC_DEFPANSPIN8,
-	IDC_DEFPANSPIN9, IDC_DEFPANSPIN10, IDC_DEFPANSPIN11, IDC_DEFPANSPIN12,
-	IDC_DEFPANSPIN13, IDC_DEFPANSPIN14, IDC_DEFPANSPIN15, IDC_DEFPANSPIN16,
-};
 static int tpan[MAXTRACK] = {
 	IDC_DEFPAN1, IDC_DEFPAN2, IDC_DEFPAN3, IDC_DEFPAN4,
 	IDC_DEFPAN5, IDC_DEFPAN6, IDC_DEFPAN7, IDC_DEFPAN8,
 	IDC_DEFPAN9, IDC_DEFPAN10, IDC_DEFPAN11, IDC_DEFPAN12,
 	IDC_DEFPAN13, IDC_DEFPAN14, IDC_DEFPAN15, IDC_DEFPAN16,
+};
+static int tpan_spin[MAXTRACK] = {
+	IDC_DEFPANSPIN1, IDC_DEFPANSPIN2, IDC_DEFPANSPIN3, IDC_DEFPANSPIN4,
+	IDC_DEFPANSPIN5, IDC_DEFPANSPIN6, IDC_DEFPANSPIN7, IDC_DEFPANSPIN8,
+	IDC_DEFPANSPIN9, IDC_DEFPANSPIN10, IDC_DEFPANSPIN11, IDC_DEFPANSPIN12,
+	IDC_DEFPANSPIN13, IDC_DEFPANSPIN14, IDC_DEFPANSPIN15, IDC_DEFPANSPIN16,
 };
 
 BOOL CALLBACK DialogDefaults(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
