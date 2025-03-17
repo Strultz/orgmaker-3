@@ -2249,8 +2249,8 @@ BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		pmmi = (MINMAXINFO *)lParam;
 		if ( pmmi )
 		{
-			pmmi->ptMinTrackSize.x = 648;  // ç≈è¨ïù
-			pmmi->ptMinTrackSize.y = 329;  // ç≈è¨çÇ
+			pmmi->ptMinTrackSize.x = 550;  // ç≈è¨ïù
+			pmmi->ptMinTrackSize.y = 200;  // ç≈è¨çÇ
 		}
 		return 1;
 	case WM_MOUSEMOVE:

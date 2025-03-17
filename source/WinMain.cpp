@@ -2441,7 +2441,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		realHeight = HIWORD(lParam);
 		SetWindowPos(hwndArea, HWND_TOP, 0, rebarHeight, realWidth, realHeight - rebarHeight - GetBarHeight(hwndStatus), 0);
 
-		int swidths[] = { realWidth - 578, realWidth - 465, realWidth - 388, realWidth - 320, realWidth - 150, -1 };
+		int swidths[] = { realWidth - 578, realWidth - 466, realWidth - 388, realWidth - 320, realWidth - 150, -1 };
 		SendMessage(hwndStatus, SB_SETPARTS, sizeof(swidths) / sizeof(int), (LPARAM)swidths);
 
 
