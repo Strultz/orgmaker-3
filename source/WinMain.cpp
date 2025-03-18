@@ -1941,6 +1941,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		case IDM_SELECT_RESET:
 		case ID_AC_SELECT_RESET:
+		case ID_AC_SELECT_CLEAR:
 			SelectReset();
 			break;
 		case ID_AC_SOCTUP:
@@ -1989,7 +1990,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		case IDM_STOPNOWALL:
 		case ID_AC_KILLSOUND:
-			SelectReset();
 			StopPlayingSong();
 			Rxo_StopAllSoundNow();
 			memset(iKeyPhase, -1, sizeof(iKeyPhase));
@@ -2009,11 +2009,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			ChangePushStratchNOTE();
 			break;
 			//Å´	// 2010.12.01 A
-		case ID_AC_SELECT_CLEAR: //Clear selection
-			SelectReset();
-			//org_data.PutMusic();
-			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-			break;
 		case ID_AC_NUM1:
 		case ID_AC_NUM2:
 		case ID_AC_NUM3:
