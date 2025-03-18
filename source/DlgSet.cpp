@@ -1456,6 +1456,7 @@ BOOL CALLBACK DialogNoteUsed(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 		return 1;
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
+		case IDCANCEL:
 		case IDOK:
 			EnableDialogWindow(TRUE);
 			EndDialog(hdwnd,0);
@@ -1680,6 +1681,7 @@ BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 1;
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
+		case IDCANCEL:
 		case IDOK:
 			EnableDialogWindow(TRUE);
 			EndDialog(hdwnd,0);
