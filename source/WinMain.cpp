@@ -1348,15 +1348,18 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				break;*/
 			case ID_SELECTION_PANNING://
 			case ID_AC_DLG_PAN:
-				DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGSELPAN), hwnd, DialogSelPan);
+				if (tra >= 0)
+					DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGSELPAN), hwnd, DialogSelPan);
 				break;
 			case ID_SELECTION_TRANSPOSE://
 			case ID_AC_DLG_TRANS:
-				DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGSELTRA), hwnd, DialogSelTra);
+				if (tra >= 0)
+					DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGSELTRA), hwnd, DialogSelTra);
 				break;
 			case ID_SELECTION_VOLUME://
 			case ID_AC_DLG_VOL:
-				DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGSELVOL), hwnd, DialogSelVol);
+				if (tra >= 0)
+					DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGSELVOL), hwnd, DialogSelVol);
 				//DialogBox(hInst,"DLGVOLUME",hwnd,DialogVolume);
 				break;
 			case ID_AC_STPLAY:
@@ -2031,6 +2034,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			}
 			break;
 		}
+		case ID_AC_DEFAULT:
 		case IDM_DLGDEFAULT://Show Default Dialog
 			DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGDEFAULT), hwnd, DialogDefaults);
 			//DialogBox(hInst, "DLGDEFAULT", hwnd, DialogDefault);
