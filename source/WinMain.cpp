@@ -206,6 +206,12 @@ extern int volChangeLength;
 extern bool volChangeUseNoteLength;
 extern bool volChangeSetNoteLength;
 
+extern bool gLMBDown;
+extern bool gRMBDown;
+extern bool gMMBDown;
+
+static bool hasMouseCapture = false;
+
 int toolbarSavedX[2] = { 100, 100 };
 int toolbarSavedY[2] = { 100, 160 };
 
@@ -1006,6 +1012,14 @@ LRESULT CALLBACK AreaWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 		WHeight = HIWORD(lParam);
 		return 0;
 	case WM_MOUSEMOVE:
+		if (!hasMouseCapture) {
+			TRACKMOUSEEVENT tme;
+			tme.cbSize = sizeof(TRACKMOUSEEVENT);
+			tme.hwndTrack = hwndArea;
+			tme.dwFlags = TME_LEAVE;
+			TrackMouseEvent(&tme);
+			hasMouseCapture = true;
+		}
 	case WM_LBUTTONDOWN:
 	case WM_LBUTTONUP:
 	case WM_RBUTTONDOWN:
@@ -1021,6 +1035,15 @@ LRESULT CALLBACK AreaWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 	case WM_DROPFILES:
 		SendMessage(hWnd, message, wParam, lParam);
 		return 0;
+	case WM_MOUSELEAVE:
+		if (gLMBDown)
+			SendMessage(hWnd, WM_LBUTTONUP, wParam, lParam);
+		if (gRMBDown)
+			SendMessage(hWnd, WM_RBUTTONUP, wParam, lParam);
+		if (gMMBDown)
+			SendMessage(hWnd, WM_MBUTTONUP, wParam, lParam);
+		hasMouseCapture = false;
+		break;
 	}
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }
@@ -2382,6 +2405,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
     case WM_RBUTTONUP://mouse (right) released
 		RButtonUP(wParam, lParam);
 		//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+		break;
+	case WM_MBUTTONUP:
+		MButtonUP(wParam, lParam);
 		break;
 	case WM_HSCROLL:
 		ZeroMemory(&si, sizeof(si));

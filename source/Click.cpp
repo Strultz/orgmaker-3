@@ -48,6 +48,10 @@ long AdjustX = 0; //   èkè¨ï\é¶éûÅAâπïÑÇÃì™Çñ⁄óßÇΩÇπÇÈ(&O)ÇΩÇﬂÇÃï‚ê≥
 
 extern int iKeyPushDown[];
 
+bool gLMBDown = false;
+bool gRMBDown = false;
+bool gMMBDown = false;
+
 void ClearDrag()
 {
 	DragStartx = -99999;
@@ -88,6 +92,8 @@ void SelectAll(int FullTrack)
 
 void LButtonUP(WPARAM wParam, LPARAM lParam)
 {
+	gLMBDown = false;
+
 	long scr_h, scr_v;
 	RECT rect = {64,0,WWidth,WHeight};
 	RECT rectALL = { 0,0,WWidth,WHeight };
@@ -117,6 +123,8 @@ void LButtonUP(WPARAM wParam, LPARAM lParam)
 }
 void RButtonUP(WPARAM wParam, LPARAM lParam)
 {
+	gRMBDown = false;
+
 	RECT rect = {64,0,WWidth,WHeight};
 	Last_VOL_Drag_mouse_x = -99999; //2014.05.02 A
 	Last_VOL_Drag_mouse_y = -99999;
@@ -125,6 +133,11 @@ void RButtonUP(WPARAM wParam, LPARAM lParam)
 	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 	alt_down = 0; shift_down = -1;
 
+}
+
+void MButtonUP(WPARAM wParam, LPARAM lParam)
+{
+	gMMBDown = false;
 }
 
 void MouseDrag(WPARAM wParam, LPARAM lParam)
@@ -314,6 +327,8 @@ void MouseDrag(WPARAM wParam, LPARAM lParam)
 
 void ClickProcL(WPARAM wParam, LPARAM lParam)
 {
+	gLMBDown = true;
+
 	RECT rect = {64,0,WWidth,WHeight};
 	RECT rectALL = { 0,0,WWidth,WHeight };
 	long mouse_x;
@@ -477,6 +492,8 @@ void ClickProcL(WPARAM wParam, LPARAM lParam)
 }
 void ClickProcR(WPARAM wParam, LPARAM lParam)
 {
+	gRMBDown = true;
+
 	RECT rect = {64,0,WWidth,WHeight};
 	long mouse_x;
 	long mouse_y;
@@ -563,6 +580,8 @@ void ClickProcR(WPARAM wParam, LPARAM lParam)
 
 void ClickProcM(WPARAM wParam, LPARAM lParam)
 {
+	gMMBDown = true;
+
 	RECT rect = {64,0,WWidth,WHeight};
 	long mouse_x;
 	long mouse_y;

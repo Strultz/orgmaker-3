@@ -6,6 +6,7 @@ void ClearDrag();
 void MouseDrag(WPARAM wParam, LPARAM lParam);
 void LButtonUP(WPARAM wParam, LPARAM lParam);
 void RButtonUP(WPARAM wParam, LPARAM lParam);
+void MButtonUP(WPARAM wParam, LPARAM lParam);
 void SelectAll(int FullTrack);
 void SelectReset();
 
