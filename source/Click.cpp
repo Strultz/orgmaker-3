@@ -73,11 +73,6 @@ void SelectReset()
 	UpdateStatusBar(false);
 }
 
-void PrintStatusMessage(int Zensentaku){
-	
-
-}
-
 void SelectAll(int FullTrack)
 {
 	unsigned char line,dot;
@@ -546,7 +541,7 @@ void ClickProcR(WPARAM wParam, LPARAM lParam)
 		mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h;
 //		mouse_y = (428+WDWHEIGHTPLUS - mouse_y)*4;//96*12は楽譜の縦サイズ(Pixel)
 		mouse_y = (WHeight+428-WHNM - mouse_y)*4;//96*12は楽譜の縦サイズ(Pixel)
-		//if(org_data.CutVolume(mouse_x,(unsigned char)mouse_y)==FALSE)ResetLastUndo(); //2014.05.03 D //このままドラッグされるとアンドゥできない
+		if(org_data.CutVolume(mouse_x,(unsigned char)mouse_y)==FALSE)ResetLastUndo(); //2014.05.03 D //このままドラッグされるとアンドゥできない
 		//org_data.PutMusic();//楽譜の再描画
 		ClearDrag();
 		//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
