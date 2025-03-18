@@ -41,7 +41,7 @@ With the world knowing the development of "Cave Story", which increased the dema
 * [Microsoft Visual C++ 6.0 Runtime Components](https://www.google.com/search?q=visual+c%2B%2B+6+runtime+library+download)  
 
 ## &#x1F352; for Development
-* Microsoft Visual Studio 2019
+* Microsoft Visual Studio 2022
 
 
 # &#x1F34E; Usage
