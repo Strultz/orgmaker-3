@@ -1033,7 +1033,7 @@ void ClipboardPaste(int no, int flags) {
 	long x_scroll;
 	scr_data.GetScrollPosition(&x_scroll, NULL);
 
-	org_data.SetUndoData();
+	SetUndo();
 
 	nc_Select.x1_1 = (tra >= 0 && nc_Select.x1_1 == nc_Select.x1_2) ? nc_Select.x1_1 : x_scroll;
 	nc_Select.x1_2 = nc_Select.x1_1 + (gClipboardData.length * no) - 1;
@@ -1649,7 +1649,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					UpdateToolbarStatus();
 
 					if (LOWORD(wParam) == IDM_SELECT_CUT || LOWORD(wParam) == ID_AC_CUT) {
-						org_data.SetUndoData();
+						SetUndo();
 						for (int i = t1; i <= t2; ++i) {
 							PARCHANGE pc;
 							pc.track = i;
