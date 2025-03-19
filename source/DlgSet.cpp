@@ -973,6 +973,7 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 static bool gOkay = false;
 static unsigned char gWaveTrack = 0;
+static unsigned char gWaveSelect = 0;
 static unsigned char gAllWaveSel[MAXMELODY] = { 0 };
 static char* strTone[] = { "C-", "C#", "D-", "D#", "E-", "F-", "F#", "G-", "G#", "A-", "A#", "B-" };
 
@@ -983,6 +984,7 @@ BOOL CALLBACK DialogWaveSel(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 
 	switch (message) {
 	case WM_INITDIALOG: {
+		gWaveSelect = gAllWaveSel[gWaveTrack];
 
 		SendMessage(GetDlgItem(hdwnd, IDC_SLIDERPITCH), TBM_SETPOS, TRUE, SamplePlayHeight);
 		SendMessage(GetDlgItem(hdwnd, IDC_SLIDERPITCH), TBM_SETRANGE, 0, MAKELPARAM(0, 95));
@@ -1024,22 +1026,22 @@ BOOL CALLBACK DialogWaveSel(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 			if (y > 9) y = 9;
 
 			// Invalidate Old, Rect
-			int boxX = 8 + (gAllWaveSel[gWaveTrack] % 10) * 36 + ((gAllWaveSel[gWaveTrack] % 10) > 4 ? 4 : 0);
-			int boxY = 16 + (gAllWaveSel[gWaveTrack] / 10) * 48 + ((gAllWaveSel[gWaveTrack] / 10) > 4 ? 4 : 0);
+			int boxX = 8 + (gWaveSelect % 10) * 36 + ((gWaveSelect % 10) > 4 ? 4 : 0);
+			int boxY = 16 + (gWaveSelect / 10) * 48 + ((gWaveSelect / 10) > 4 ? 4 : 0);
 
 			RECT rcSel = { boxX - 4, boxY - 4, boxX + 36, boxY + 36 };
 			InvalidateRect(hdwnd, &rcSel, FALSE);
 
-			gAllWaveSel[gWaveTrack] = (unsigned char)(x % 10 + y * 10);
+			gWaveSelect = (unsigned char)(x % 10 + y * 10);
 
 			// Invalidate New, Rect
-			boxX = 8 + (gAllWaveSel[gWaveTrack] % 10) * 36 + ((gAllWaveSel[gWaveTrack] % 10) > 4 ? 4 : 0);
-			boxY = 16 + (gAllWaveSel[gWaveTrack] / 10) * 48 + ((gAllWaveSel[gWaveTrack] / 10) > 4 ? 4 : 0);
+			boxX = 8 + (gWaveSelect % 10) * 36 + ((gWaveSelect % 10) > 4 ? 4 : 0);
+			boxY = 16 + (gWaveSelect / 10) * 48 + ((gWaveSelect / 10) > 4 ? 4 : 0);
 
 			rcSel = { boxX - 4, boxY - 4, boxX + 36, boxY + 36 };
 			InvalidateRect(hdwnd, &rcSel, FALSE);
 
-			MakeOrganyaWave(gWaveTrack, gAllWaveSel[gWaveTrack], mi.tdata[gWaveTrack].pipi);
+			MakeOrganyaWave(gWaveTrack, gWaveSelect, mi.tdata[gWaveTrack].pipi);
 			PlayOrganKey(SamplePlayHeight, gWaveTrack, mi.tdata[gWaveTrack].freq, 240);
 		}
 		break;
@@ -1057,8 +1059,8 @@ BOOL CALLBACK DialogWaveSel(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 
 		HBRUSH hbr = CreateSolidBrush(RGB(0, 255, 0));
 
-		int boxX = 8 + (gAllWaveSel[gWaveTrack] % 10) * 36 + ((gAllWaveSel[gWaveTrack] % 10) > 4 ? 4 : 0);
-		int boxY = 16 + (gAllWaveSel[gWaveTrack] / 10) * 48 + ((gAllWaveSel[gWaveTrack] / 10) > 4 ? 4 : 0);
+		int boxX = 8 + (gWaveSelect % 10) * 36 + ((gWaveSelect % 10) > 4 ? 4 : 0);
+		int boxY = 16 + (gWaveSelect / 10) * 48 + ((gWaveSelect / 10) > 4 ? 4 : 0);
 
 		RECT rc = { boxX - 2, boxY - 2, boxX, boxY + 34 };
 		FillRect(hdc, &rc, hbr);
@@ -1164,13 +1166,15 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				gOkay = false;
 				DialogBox(hInst, "DLGWAVESEL", hdwnd, DialogWaveSel);
 				if (gOkay) {
+					gAllWaveSel[i] = gWaveSelect;
+
 					snprintf(bfr, 256, "Wave-%02d", gAllWaveSel[i]);
 					SetDlgItemText(hdwnd, btn_wave[i], bfr);
-					gOkay = false;
+
 					PropSheet_Changed(GetParent(hdwnd), hdwnd);
 					gPropChanged = true;
-				} else {
-					gAllWaveSel[i] = mi.tdata[i].wave_no;
+
+					gOkay = false;
 				}
 			}
 			break;
