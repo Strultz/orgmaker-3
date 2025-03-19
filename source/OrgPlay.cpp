@@ -114,11 +114,14 @@ void StartPlayingSong(void) {
 		// Set up mid note track stuff
 		if (gPlayMidNote) {
 			for (int i = 0; i < MAXMELODY; i++) {
+				if (s_solo != -1 && s_solo != i)
+					continue;
+
 				unsigned char vol = VOLDUMMY;
 				unsigned char pan = PANDUMMY;
 
 				NOTELIST* note = org_data.FindOrgNoteLength(i, play_p);
-				if (note != NULL && note->x < play_p) {
+				if (note != NULL && note->x < play_p && org_data.mute[i] == 0) {
 					unsigned char y = note->y;
 
 					now_leng[i] = (note->x + note->length) - play_p;
@@ -141,11 +144,14 @@ void StartPlayingSong(void) {
 				}
 			}
 			for (int i = MAXMELODY; i < MAXTRACK; i++) {
+				if (s_solo != -1 && s_solo != i)
+					continue;
+
 				unsigned char vol = VOLDUMMY;
 				unsigned char pan = PANDUMMY;
 
 				NOTELIST* note = org_data.FindLastOrgNoteKey(i, play_p);
-				if (note != NULL && note->x < play_p) {
+				if (note != NULL && note->x < play_p && org_data.mute[i] == 0) {
 					int played_len = (play_p - note->x) * mi.wait;
 
 					ResumeDramObject(note->y, i - MAXMELODY, played_len);
