@@ -847,13 +847,14 @@
 #define ID_AC_LU                        40367
 #define ID_AC_LI                        40368
 #define IDM_SELECT_ALL_ALL              40369
+#define IDM_PLAY_NOTES_MID              40370
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        264
-#define _APS_NEXT_COMMAND_VALUE         40370
+#define _APS_NEXT_COMMAND_VALUE         40371
 #define _APS_NEXT_CONTROL_VALUE         1308
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

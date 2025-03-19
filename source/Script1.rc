@@ -718,13 +718,15 @@ BEGIN
         BEGIN
             MENUITEM "Confirm &Unsaved Changes",    IDM_CHANGEFINISH,MFT_STRING,MFS_ENABLED
             MENUITEM "&Pop Out Toolbars",           IDM_FLOATTOOLBARS,MFT_STRING,MFS_ENABLED
-            MENUITEM "&Automatically Check for Updates", IDM_AUTOCHECKUPDATES,MFT_STRING,MFS_ENABLED
+            MENUITEM "Auto&matically Check for Updates", IDM_AUTOCHECKUPDATES,MFT_STRING,MFS_ENABLED
             MENUITEM MFT_SEPARATOR
-            MENUITEM "Allow Keyboard During &Playback", IDM_ENABLEPLAYING,MFT_STRING,MFS_ENABLED
-            MENUITEM "&Playback Smooth Scrolling",  IDM_SMOOTHSCROLL,MFT_STRING,MFS_ENABLED
+            MENUITEM "Allow &Keyboard During Playback", IDM_ENABLEPLAYING,MFT_STRING,MFS_ENABLED
+            MENUITEM "Playback &Smooth Scrolling",  IDM_SMOOTHSCROLL,MFT_STRING,MFS_ENABLED
             MENUITEM "Extend &Note Heads",          IDM_NOTE_ENLARGE,MFT_STRING,MFS_ENABLED
-            MENUITEM "S&lide Overlapping Notes",    IDM_SLIDEOVERLAPNOTES,MFT_STRING,MFS_ENABLED
+            MENUITEM "Slide &Overlapping Notes",    IDM_SLIDEOVERLAPNOTES,MFT_STRING,MFS_ENABLED
             MENUITEM "Show &All Channels",          IDM_DRAWDOUBLE,MFT_STRING,MFS_ENABLED
+            MENUITEM MFT_SEPARATOR
+            MENUITEM "&Resume Notes After Head",    IDM_PLAY_NOTES_MID,MFT_STRING,MFS_ENABLED
             MENUITEM "&Metronome",                  IDM_METRONOME,MFT_STRING,MFS_ENABLED
             MENUITEM MFT_SEPARATOR
             MENUITEM "&Default Volume/Panning...",  IDM_DLGDEFAULT,MFT_STRING,MFS_ENABLED
