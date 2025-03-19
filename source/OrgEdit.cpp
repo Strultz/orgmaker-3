@@ -344,6 +344,50 @@ void OrgData::DeleteOrgNote(char track,NOTELIST* note) {
 	note->length = 0;
 }
 
+NOTELIST* OrgData::FindLastOrgNoteKey(char track, int x) {
+	if (track < 0 || track > 15) return NULL;
+
+	NOTELIST* rnp = info.tdata[track].note_list;
+
+	if (rnp == NULL) return NULL;
+
+	while (rnp->to != NULL && rnp->to->x < x) {
+		rnp = rnp->to;
+	}
+
+	while (rnp != NULL && rnp->y == KEYDUMMY) {
+		rnp = rnp->from;
+	}
+
+	if (rnp == NULL) return NULL;
+
+	if (x >= rnp->x) return rnp;
+
+	return NULL;
+}
+
+NOTELIST* OrgData::FindOrgNoteLength(char track, int x) {
+	if (track < 0 || track > 15) return NULL;
+
+	NOTELIST* rnp = info.tdata[track].note_list;
+
+	if (rnp == NULL) return NULL;
+
+	while (rnp->to != NULL && rnp->to->x < x) {
+		rnp = rnp->to;
+	}
+
+	while (rnp != NULL && rnp->y == KEYDUMMY) {
+		rnp = rnp->from;
+	}
+
+	if (rnp == NULL) return NULL;
+
+	if (x >= rnp->x && x < rnp->x + rnp->length) return rnp;
+
+	return NULL;
+}
+
 BOOL OrgData::PasteNoteData(SAVEDNOTE* sn, char track, long x, long num, int pasteFlags)
 {
 	int i, j, k;

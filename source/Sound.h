@@ -34,6 +34,7 @@ void ChangeOrganFrequency(unsigned char key,char track,DWORD a);//9999‚ªMAX‚Å219
 void ChangeOrganVolume(int no, long volume,char track);//300‚ªMAX‚Å300‚ªÉ°ÏÙ
 void ChangeOrganPan(unsigned char key, unsigned char pan,char track);//0‚ª©‚Å6‚ªÉ°ÏÙ11‚ª¨
 void PlayOrganObject(unsigned char key, int mode,char track,DWORD freq, bool pipi);
+void ResumeOrganObject(unsigned char key, char track, DWORD freq, bool pipi, int played_ms);
 void PlayOrganKey(unsigned char key,char track,DWORD freq, int Nagasa = 80);
 BOOL LoadWaveData100(const char *file);
 BOOL InitWaveData100(void);
@@ -48,6 +49,7 @@ void ChangeDramFrequency(unsigned char key,char track);
 void ChangeDramPan(unsigned char pan,char track);//512‚ªMAX‚Å256‚ªÉ°ÏÙ
 void ChangeDramVolume(long volume,char track);//300‚ªMAX‚Å300‚ªÉ°ÏÙ
 void PlayDramObject(unsigned char key, int mode,char track);
+void ResumeDramObject(unsigned char key, char track, int played_ms);
 
 
 void Rxo_ShowDirectSoundObject(HWND hwnd);

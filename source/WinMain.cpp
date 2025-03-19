@@ -176,6 +176,8 @@ HWND hWnd;//main window handle
 HWND hDlgHelp = NULL;
 BOOL actApp;
 
+bool gPlayMidNote = true;
+
 bool gIsDrawing = false;
 bool gFileModified = false;
 bool gFileUnsaved = true;
@@ -797,6 +799,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	autoCheckUpdate = GetPrivateProfileInt(MAIN_WINDOW, "AutoCheckUpdates", 1, app_path);
 	floatingToolbars = GetPrivateProfileInt(MAIN_WINDOW, "FloatingToolbars", 0, app_path);
+
+	gPlayMidNote = GetPrivateProfileInt(MAIN_WINDOW, "PlayMidNote", 1, app_path);
 
 	CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
 	CheckMenuItem(hMenu, IDM_FLOATTOOLBARS, MF_BYCOMMAND | (floatingToolbars ? MFS_CHECKED : MFS_UNCHECKED));
@@ -2619,6 +2623,10 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW, "AutoCheckUpdates", num_buf, app_path);
 	wsprintf(num_buf, "%d", floatingToolbars);
 	WritePrivateProfileString(MAIN_WINDOW, "FloatingToolbars", num_buf, app_path);
+	wsprintf(num_buf, "%d", gPlayMidNote);
+	WritePrivateProfileString(MAIN_WINDOW, "PlayMidNote", num_buf, app_path);
+
+	
 
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentThemePath", gSelectedTheme, app_path);
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentWavePath", gSelectedWave, app_path);

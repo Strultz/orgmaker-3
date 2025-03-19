@@ -818,6 +818,29 @@ void ChangeOrganVolume(int no, long volume,char track)//300‚ªMAX‚Å300‚ª
 	if(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]] != NULL && old_key[track] != 255)
 		S_SetSoundVolume(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], (volume-255)*8);
 }
+
+void ResumeOrganObject(unsigned char key, char track, DWORD freq, bool pipi, int played_ms) {
+	S_Sound* sound = lpORGANBUFFER[track][key / 12][key_twin[track]];
+	if (sound != NULL) {
+		ChangeOrganFrequency(key % 12, track, freq);
+
+		ma_mutex_lock(&mutex);
+
+		sound->playing = true;
+
+		sound->position = sound->advance_delta * ((played_ms * output_frequency) / 1000);
+		sound->sub_position = 0.0F;
+
+		sound->looping = !pipi /* || gCompatFlags & COMPAT_CS_PIPI */;
+		sound->stop_in = 0;
+
+		ma_mutex_unlock(&mutex);
+
+		old_key[track] = key;
+		key_on[track] = 1;
+	}
+}
+
 // ƒTƒEƒ“ƒh‚ÌÄ¶ 
 void PlayOrganObject(unsigned char key, int mode,char track,DWORD freq, bool pipi)
 {
@@ -1141,10 +1164,28 @@ void ChangeDramVolume(long volume,char track)//
 	if (lpDRAMBUFFER[track] != NULL)
 		S_SetSoundVolume(lpDRAMBUFFER[track], (volume-255)*8);
 }
+
+void ResumeDramObject(unsigned char key, char track, int played_ms) {
+	S_Sound* sound = lpDRAMBUFFER[track];
+	if (sound != NULL) {
+		ChangeDramFrequency(key, track);
+
+		ma_mutex_lock(&mutex);
+
+		sound->playing = true;
+
+		sound->position = sound->advance_delta * ((played_ms * output_frequency) / 1000);
+		sound->sub_position = 0.0F;
+
+		sound->looping = false;
+		sound->stop_in = 0;
+
+		ma_mutex_unlock(&mutex);
+	}
+}
 // ƒTƒEƒ“ƒh‚ÌÄ¶ 
 void PlayDramObject(unsigned char key, int mode,char track)
 {
-	
     if(lpDRAMBUFFER[track] != NULL){
 		switch(mode){
 		case 0: // ’âŽ~

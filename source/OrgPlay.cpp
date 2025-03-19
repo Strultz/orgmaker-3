@@ -7,6 +7,7 @@
 #include "Timer.h"
 #include "CommCtrl.h"
 
+extern bool gPlayMidNote;
 extern HWND hwndToolbar;
 char timer_sw = 0;
 long oplay_p;
@@ -109,6 +110,61 @@ void StartPlayingSong(void) {
 		InitMMTimer();
 		org_data.GetMusicInfo(&mi);
 		StartTimer(mi.wait);
+
+		// Set up mid note track stuff
+		if (gPlayMidNote) {
+			for (int i = 0; i < MAXMELODY; i++) {
+				unsigned char vol = VOLDUMMY;
+				unsigned char pan = PANDUMMY;
+
+				NOTELIST* note = org_data.FindOrgNoteLength(i, play_p);
+				if (note != NULL && note->x < play_p) {
+					unsigned char y = note->y;
+
+					now_leng[i] = (note->x + note->length) - play_p;
+					int played_len = (note->length - now_leng[i]) * mi.wait;
+
+					ResumeOrganObject(y, i, mi.tdata[i].freq, mi.tdata[i].pipi, played_len);
+
+					while (note != NULL && note->x < play_p) {
+						if (note->volume != VOLDUMMY)
+							vol = note->volume;
+
+						if (note->pan != PANDUMMY)
+							pan = note->pan;
+
+						note = note->to;
+					}
+
+					if (pan != PANDUMMY) ChangeOrganPan(y, pan, i);
+					if (vol != VOLDUMMY) ChangeOrganVolume(y, vol * 100 / 0x7F, i);
+				}
+			}
+			for (int i = MAXMELODY; i < MAXTRACK; i++) {
+				unsigned char vol = VOLDUMMY;
+				unsigned char pan = PANDUMMY;
+
+				NOTELIST* note = org_data.FindLastOrgNoteKey(i, play_p);
+				if (note != NULL && note->x < play_p) {
+					int played_len = (play_p - note->x) * mi.wait;
+
+					ResumeDramObject(note->y, i - MAXMELODY, played_len);
+
+					while (note != NULL && note->x < play_p) {
+						if (note->volume != VOLDUMMY)
+							vol = note->volume;
+
+						if (note->pan != PANDUMMY)
+							pan = note->pan;
+
+						note = note->to;
+					}
+
+					if (pan != PANDUMMY) ChangeDramPan(pan, i - MAXMELODY);
+					if (vol != VOLDUMMY) ChangeDramVolume(vol * 100 / 0x7F, i - MAXMELODY);
+				}
+			}
+		}
 
 		timer_sw = 1;
 		UpdateToolbarStatus();
