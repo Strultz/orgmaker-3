@@ -120,12 +120,14 @@ void StartPlayingSong(void) {
 				unsigned char vol = VOLDUMMY;
 				unsigned char pan = PANDUMMY;
 
-				NOTELIST* note = org_data.FindOrgNoteLength(i, play_p);
+				// Pizzicato channels still have weird behavior that this doesn't account for,
+				// but I'm not gonna fix it because I don't feel like it
+				NOTELIST* note = mi.tdata[i].pipi ? org_data.FindLastOrgNoteKey(i, play_p) : org_data.FindOrgNoteLength(i, play_p);
 				if (note != NULL && note->x < play_p && org_data.mute[i] == 0) {
 					unsigned char y = note->y;
 
 					now_leng[i] = (note->x + note->length) - play_p;
-					int played_len = (note->length - now_leng[i]) * mi.wait;
+					int played_len = (play_p - note->x) * mi.wait;
 
 					ResumeOrganObject(y, i, mi.tdata[i].freq, mi.tdata[i].pipi, played_len);
 

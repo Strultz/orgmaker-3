@@ -829,14 +829,17 @@ void ResumeOrganObject(unsigned char key, char track, DWORD freq, bool pipi, int
 		sound->playing = true;
 		sound->silence_count = 0;
 
-		sound->position = sound->advance_delta * ((played_ms * output_frequency) / 1000);
-		sound->sub_position = 0.0F;
+		float fpos = sound->advance_delta * ((float)(played_ms * output_frequency) / 1000);
+		sound->position = (int)fpos;
+		sound->sub_position = fpos - sound->position;
 
 		sound->looping = !pipi /* || gCompatFlags & COMPAT_CS_PIPI */;
 		sound->stop_in = 0;
 
 		if (!sound->looping && sound->position >= sound->frames) {
 			sound->playing = false;
+		} else if (sound->looping) {
+			sound->position = sound->position % sound->frames;
 		}
 
 		ma_mutex_unlock(&mutex);
@@ -1180,14 +1183,17 @@ void ResumeDramObject(unsigned char key, char track, int played_ms) {
 		sound->playing = true;
 		sound->silence_count = 0;
 
-		sound->position = sound->advance_delta * ((played_ms * output_frequency) / 1000);
-		sound->sub_position = 0.0F;
+		float fpos = sound->advance_delta * ((float)(played_ms * output_frequency) / 1000);
+		sound->position = (int)fpos;
+		sound->sub_position = fpos - sound->position;
 
 		sound->looping = false;
 		sound->stop_in = 0;
 
 		if (!sound->looping && sound->position >= sound->frames) {
 			sound->playing = false;
+		} else if (sound->looping) {
+			sound->position = sound->position % sound->frames;
 		}
 
 		ma_mutex_unlock(&mutex);
