@@ -308,8 +308,8 @@ void UpdateToolbarStatus() {
 	}
 
 	// special cases
-	EnableMenuItem(hMenu, IDM_SAVEOVER, MF_BYCOMMAND | (enabled && gFileModified ? MF_ENABLED : MF_GRAYED));
-	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_SAVEOVER, enabled && gFileModified);
+	EnableMenuItem(hMenu, IDM_SAVEOVER, MF_BYCOMMAND | (gFileModified ? MF_ENABLED : MF_GRAYED));
+	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_SAVEOVER, gFileModified);
 
 	EnableMenuItem(hMenu, IDM_UNDO, MF_BYCOMMAND | (enabled && org_data.UndoEnable ? MF_ENABLED : MF_GRAYED));
 	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_UNDO, enabled && org_data.UndoEnable);
