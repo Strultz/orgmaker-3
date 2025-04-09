@@ -1058,12 +1058,15 @@ void ClipboardPaste(int no, int flags) {
 		return;
 	}
 
+	MUSICINFO mi;
 	long x_scroll;
+	org_data.GetMusicInfo(&mi);
 	scr_data.GetScrollPosition(&x_scroll, NULL);
 
 	SetUndo();
 
-	nc_Select.x1_1 = (tra >= 0 && nc_Select.x1_1 == nc_Select.x1_2) ? nc_Select.x1_1 : x_scroll;
+	int mel = sGrid ? mi.dot - 1 : 0;
+	nc_Select.x1_1 = (tra >= 0 && (nc_Select.x1_2 - nc_Select.x1_1) == mel) ? nc_Select.x1_1 : x_scroll;
 	nc_Select.x1_2 = nc_Select.x1_1 + (gClipboardData.length * no) - 1;
 	org_data.PasteNoteData(&gClipboardData, org_data.track, nc_Select.x1_1, no, flags);
 
@@ -1216,14 +1219,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					snprintf(str, 128, "%s", "Solo");
 					AppendMenu(hMenu, MF_STRING, iSoloKey[i], str);
 				}
-				/*if (IsAnyUnmuted()) {
-					snprintf(str, 128, "%s", "Mute All");
-					AppendMenu(hMenu, MF_STRING, IDC_MUTE_ALL, str);
-				}*/
-				if (IsAnyMuted()) {
-					snprintf(str, 128, "%s", "Unmute All");
-					AppendMenu(hMenu, MF_STRING, IDC_UNMUTE_ALL, str);
-				}
 				if (IsAnyUnmutedSide(i / 8)) {
 					snprintf(str, 128, "Mute %s Channels", (i < MAXMELODY) ? "Melody" : "Percussion");
 					AppendMenu(hMenu, MF_STRING, (i < MAXMELODY) ? IDC_MUTE_MELO : IDC_MUTE_PERC, str);
@@ -1231,6 +1226,14 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				if (IsAnyMutedSide(i / 8)) {
 					snprintf(str, 128, "Unmute %s Channels", (i < MAXMELODY) ? "Melody" : "Percussion");
 					AppendMenu(hMenu, MF_STRING, (i < MAXMELODY) ? IDC_UNMUTE_MELO : IDC_UNMUTE_PERC, str);
+				}
+				/*if (IsAnyUnmuted()) {
+					snprintf(str, 128, "%s", "Mute All");
+					AppendMenu(hMenu, MF_STRING, IDC_MUTE_ALL, str);
+				}*/
+				if (IsAnyMuted()) {
+					snprintf(str, 128, "%s", "Unmute All");
+					AppendMenu(hMenu, MF_STRING, IDC_UNMUTE_ALL, str);
 				}
 
 				TrackPopupMenu(hMenu, TPM_RIGHTBUTTON, LOWORD(lParam), HIWORD(lParam), 0, hwnd, NULL);
