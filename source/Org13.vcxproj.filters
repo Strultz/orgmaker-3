@@ -19,6 +19,9 @@
     <Filter Include="Resource Files\Wave">
       <UniqueIdentifier>{2fecc35b-2aa7-493e-a83b-72537f46e1fb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Text">
+      <UniqueIdentifier>{750a5862-5dfb-4187-9eac-8cd573ffbcb4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Click.cpp">
@@ -249,6 +252,9 @@
     <Image Include="Bitmap\TOOLBAR_ICONS.bmp">
       <Filter>Resource Files\Bitmap</Filter>
     </Image>
+    <Image Include="Bitmap\org_splash.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Media Include="Wave\Bass01.wav">
@@ -421,9 +427,6 @@
     </Media>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="help.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <CustomBuild Include="Bitmap\cursor.cur">
       <Filter>Resource Files\Bitmap</Filter>
     </CustomBuild>
@@ -436,5 +439,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Wave\WAVE100.wdb" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Text\help.txt">
+      <Filter>Resource Files\Text</Filter>
+    </Text>
+    <Text Include="Text\about.txt">
+      <Filter>Resource Files\Text</Filter>
+    </Text>
   </ItemGroup>
 </Project>

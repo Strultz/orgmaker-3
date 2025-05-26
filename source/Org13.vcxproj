@@ -210,6 +210,7 @@
     <Image Include="Bitmap\org_next.bmp" />
     <Image Include="Bitmap\org_next_step.bmp" />
     <Image Include="Bitmap\org_play.bmp" />
+    <Image Include="Bitmap\org_splash.bmp" />
     <Image Include="Bitmap\org_stop.bmp" />
     <Image Include="Bitmap\Pan.bmp" />
     <Image Include="Bitmap\Play.bmp" />
@@ -284,7 +285,8 @@
     <Media Include="Wave\Tom05.wav" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="help.txt" />
+    <Text Include="Text\about.txt" />
+    <Text Include="Text\help.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Wave\WAVE100.wdb" />

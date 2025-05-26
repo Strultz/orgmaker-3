@@ -190,6 +190,7 @@ int realHeight = WINDOWHEIGHT;
 
 static const char szClassName[] = "OrgMaker3";
 static const char szAreaClass[] = "OrgArea";
+static const char szSplashClass[] = "OrgSplash";
 
 char lpszName[MAX_PATH+30];// = "Organya 2 - ";//Name to register on Windows
 
@@ -446,18 +447,6 @@ int CancelDeleteCurrentData(int iMessagePattern = 1){
 	int res;
 	if(iChangeFinish!=0){	// A 2010.09.22
 		if(gFileModified){
-			//Confirm the end when there is a change. // A 2010.09.22
-			/*if(iMessagePattern == 0){
-				//if(MessageBox(hWnd,"Any unsaved content will be discarded. Initialize?", "Initialization confirmation",MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)return 1;	// 2014.10.19 D
-				res = msgbox(hWnd,IDS_NOTIFY_INITIALIZE, IDS_NOTIFY_TITLE_INITALIZE,MB_YESNOCANCEL | MB_ICONWARNING);	// 2014.10.19 A
-			}else if(iMessagePattern == 1){
-				//if(MessageBox(hWnd,"Any unsaved content will be discarded. Are you sure you want to quit?", "end confirmation",MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)return 1;	// 2014.10.19 D
-				res = msgbox(hWnd,IDS_NOTIFY_EXIT, IDS_NOTIFY_TITLE_EXIT,MB_YESNOCANCEL | MB_ICONWARNING);	// 2014.10.19 A
-			}else if(iMessagePattern == 2){
-				//if(MessageBox(hWnd,"Any unsaved content will be discarded. do you want to load the file?", "load confirmation",MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)return 1;	// 2014.10.19 D
-				res = msgbox(hWnd,IDS_NOTIFY_LOAD, IDS_NOTIFY_TITLE_LOAD,MB_YESNOCANCEL | MB_ICONWARNING);	// 2014.10.19 A
-			}*/
-			//res = msgbox(hWnd, IDS_NOTIFY_UNSAVED, IDS_NOTIFY_TITLE_UNSAVED, MB_YESNOCANCEL | MB_ICONWARNING);	// 2014.10.19 A
 			TCHAR strMesssage[2048];
 			wsprintf(strMesssage, MessageString[IDS_NOTIFY_UNSAVED], music_file);
 			res = MessageBox(hWnd, strMesssage, MessageString[IDS_NOTIFY_TITLE_UNSAVED], MB_YESNOCANCEL | MB_ICONWARNING);
@@ -550,6 +539,37 @@ void GetApplicationPath(char* path) {
 	strcpy(path, drv);
 }
 
+static constexpr int splashWidth = 375;
+static constexpr int splashHeight = 120;
+
+static HBITMAP hbSplash = NULL;
+static LRESULT CALLBACK SplashWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_PAINT:
+	{
+		if (hbSplash)
+		{
+			PAINTSTRUCT ps;
+			HDC hdc = BeginPaint(hwnd, &ps);
+			HDC hdcMem = CreateCompatibleDC(hdc);
+			HBITMAP hBitmapOld = (HBITMAP)SelectObject(hdcMem, hbSplash);
+
+			RECT rc;
+			GetWindowRect(hwnd, &rc);
+
+			StretchBlt(hdc, 0, 0, rc.right - rc.left, rc.bottom - rc.top, hdcMem, 0, 0, splashWidth, splashHeight, SRCCOPY);
+
+			SelectObject(hdcMem, hBitmapOld);
+			DeleteDC(hdcMem);
+			EndPaint(hwnd, &ps);
+		}
+	}
+	}
+	return DefWindowProc(hwnd, message, wParam, lParam);
+}
+
 // Oops!
 LONG WINAPI OrgCrashHandler(EXCEPTION_POINTERS* ep) {
 	MessageBox(NULL, "A fatal error has occurred. The program will now exit.", "OrgMaker Crash", MB_OK | MB_ICONERROR);
@@ -600,6 +620,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
     
 	LoadString(GetModuleHandle(NULL), IDS_TITLE, lpszName, sizeof(lpszName) / sizeof(lpszName[0]));
 
+	wc = { 0 };
 	wc.cbSize        = sizeof(WNDCLASSEX);
 	wc.style         = 0;//CS_DBLCLKS| CS_OWNDC;//Application style
 	wc.lpfnWndProc   = (WNDPROC)WndProc;
@@ -614,15 +635,23 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	wc.lpszClassName = szClassName;
 	if (!RegisterClassEx(&wc)) return FALSE;
 
+	wc = { 0 };
 	wc.cbSize = sizeof(WNDCLASSEX);
 	wc.lpfnWndProc = (WNDPROC)AreaWndProc;
 	wc.hInstance = hInst = hInstance;
-	wc.hIcon = NULL;
-	wc.hIconSm = NULL;
 	wc.hCursor = LoadCursor(hInst, "CURSOR");
 	wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = szAreaClass;
+	if (!RegisterClassEx(&wc)) return FALSE;
+
+	wc = { 0 };
+	wc.cbSize = sizeof(WNDCLASSEX);
+	wc.lpfnWndProc = (WNDPROC)SplashWndProc;
+	wc.hInstance = hInst = hInstance;
+	wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+	wc.lpszMenuName = NULL;
+	wc.lpszClassName = szSplashClass;
 	if (!RegisterClassEx(&wc)) return FALSE;
 
 	int wnd_width;///Specify the width of the window here.
@@ -687,11 +716,33 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	hwndStatus = CreateStatusBar(hWnd);
 	CreateToolbarClass();
 
-	hwndArea = CreateWindow(szAreaClass, "", WS_CHILD | WS_VISIBLE, 0,
-		rebarHeight, WinRect.right - WinRect.left, WinRect.bottom - WinRect.top - rebarHeight - GetBarHeight(hwndStatus),
+	hwndArea = CreateWindow(szAreaClass, "", WS_CHILD | WS_VISIBLE,
+		0, rebarHeight, WinRect.right - WinRect.left, WinRect.bottom - WinRect.top - rebarHeight - GetBarHeight(hwndStatus),
 		hWnd, NULL, hInst, NULL);
 
-//	DialogBox(hInst,"DLGFLASH",NULL,DialogFlash);
+	//	DialogBox(hInst,"DLGFLASH",NULL,DialogFlash);
+
+	HWND wndSplash = NULL;
+
+	hbSplash = (HBITMAP)LoadImage(hInst, "B_SPLASH", IMAGE_BITMAP, 0, 0, 0);
+	if (hbSplash)
+	{
+		int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+		int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+		wndSplash = CreateWindow(szSplashClass, "", WS_POPUP | WS_VISIBLE,
+			(screenWidth - splashWidth) / 2, (screenHeight - splashHeight) / 2, splashWidth, splashHeight,
+			NULL, NULL, hInst, NULL);
+
+		UpdateWindow(wndSplash);
+
+		// Update window to draw the bitmap
+		MSG msgs;
+		while (PeekMessage(&msgs, wndSplash, 0, 0, PM_REMOVE)) {
+			TranslateMessage(&msgs);
+			DispatchMessage(&msgs);
+		}
+	}
 
 	Ac = LoadAccelerators(hInstance,MAKEINTRESOURCE(IDR_ACCELERATOR1)); //アクセスキー
 
@@ -813,15 +864,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		snprintf(strtmp, 128, "Channel%dDefaultPan", i);
 		org_data.def_pan[i] = GetPrivateProfileInt(MAIN_WINDOW, strtmp, 6, app_path);
 	}
-	
-	//org_data.PutMusic();//View sheet music
-
-	if(GetPrivateProfileInt(MAIN_WINDOW,"WindowState",0,app_path)==1){
-		ShowWindow(hWnd,SW_MAXIMIZE);
-	}else{
-		ShowWindow(hWnd,nCmdShow);//Main window display
-	}
-	UpdateWindow(hWnd);//Update main window
 
 	toolbarSavedX[0] = GetPrivateProfileInt(TOOLBAR_POS, "ToolbarMainX", 100, app_path);
 	toolbarSavedY[0] = GetPrivateProfileInt(TOOLBAR_POS, "ToolbarMainY", 100, app_path);
@@ -884,36 +926,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 				strcpy(music_file, MessageString[IDS_DEFAULT_ORG_FILENAME]);
 			}
 		}
-
-		/*fp=fopen(gfn,"rb");
-		if(fp==NULL){
-			//MessageBox(hWnd,"Failed to read","Error(Load)",MB_OK); //D 2010.09.28
-		}else{
-			char pass_chek[3];
-			bool b_OrgFile = false;
-			fread(&pass_chek[0], sizeof(char), 3, fp);
-			b_OrgFile = (pass_chek[0]==0x4F) && (pass_chek[1]==0x72) && (pass_chek[2]==0x67); //'O', 'r', 'g'
-			fclose(fp);
-			//memcpy(music_file,dropfile,MAX_PATH);
-			if(b_OrgFile){ //A 2010.09.25 If the file is in Org format
-				strcpy(music_file, gfn);
-				if(org_data.LoadMusicData()==TRUE){ //C 2010.09.25 Judgment added
-					SetModified(false);//title name set
-                    gFileUnsaved = false;
-					//DetectPreciseMode();
-					org_data.GetMusicInfo( &mi );
-					SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
-					SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
-					ClearEZC_Message();
-					SelectReset();
-					org_data.PutMusic();
-				}else{
-					//Because it was not an ORG format file //A 2010.9.25
-					//File name clear
-					strcpy(music_file, MessageString[IDS_DEFAULT_ORG_FILENAME]);
-				}
-			}
-		}*/
 	}
 
 	QuitMMTimer(); //A 2010.09.21
@@ -922,6 +934,23 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	UpdateToolbarStatus();
 
 	org_data.PutMusic();
+
+	if (GetPrivateProfileInt(MAIN_WINDOW, "WindowState", 0, app_path) == 1) {
+		ShowWindow(hWnd, SW_MAXIMIZE);
+	}
+	else {
+		ShowWindow(hWnd, nCmdShow);
+	}
+
+	UpdateWindow(hWnd);
+	UpdateWindow(hwndArea);
+
+	if (wndSplash)
+		DestroyWindow(wndSplash);
+
+	if (hbSplash)
+		DeleteObject(hbSplash);
+
 	if (RefleshScreen(hWnd)) {
 		if (autoCheckUpdate) {
 			std::thread t(CheckUpdate, false);
@@ -936,30 +965,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		}
 	}
 
-	//Generate message loop (main loop)
-	/*while(GetMessage(&msg,NULL,0,0)){
-//		if(!TranslateAccelerator(hwnd,hAccel,&msg)){
-		//Unless the message is for a dialog
-		if(!TranslateAccelerator(hWnd,Ac,&msg))
-        {
-			if(!IsDialogMessage(hDlgPlayer,&msg)){
-				if(!IsDialogMessage(hDlgTrack,&msg)){
-					if(!IsDialogMessage(hDlgEZCopy,&msg)){
-						if(!IsDialogMessage(hDlgHelp,&msg)){
-							TranslateMessage(&msg);//keyboard available
-							DispatchMessage(&msg);//Return control to Windows
-						}
-					}				
-				}
-			}
-				//TranslateMessage(&msg);
-				//DispatchMessage(&msg);
-        }
-	}*/
-	//MessageBox(NULL, "message loop exited", "OK", MB_OK);
-
 	DestroyAcceleratorTable(Ac);
-	return 0; //application ends here
+	return 0;
 }
 
 BOOL SystemTask(void)

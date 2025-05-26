@@ -307,18 +307,16 @@ BEGIN
     GROUPBOX        "Percussion",IDC_STATIC,100,4,88,152
 END
 
-DLGMEMO DIALOGEX 0, 0, 117, 132
+DLGMEMO DIALOGEX 0, 0, 250, 232
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About OrgMaker"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,40,116,40,12
-    CTEXT           "OrgMaker ver.3.1.0-dev",IDC_STATIC,20,32,80,8
-    CTEXT           "2025 / 02 / 07",IDC_STATIC,20,43,80,8
-    CTEXT           "OrgMaker 1 by Studio Pixel",IDC_STATIC,2,93,114,16,SS_CENTERIMAGE | SS_SUNKEN
-    ICON            "ICON",ID_ICON_ORG,48,7,20,20,SS_NOTIFY
-    CTEXT           "OrgMaker 2 by Rxo Inverse",IDC_STATIC,2,75,114,16,SS_CENTERIMAGE | SS_SUNKEN
-    CTEXT           "OrgMaker 3 by Strultz",IDC_STATIC,2,57,114,16,SS_CENTERIMAGE | SS_SUNKEN
+    DEFPUSHBUTTON   "OK",IDOK,203,212,40,12
+    LTEXT           "OrgMaker ver.3.1.0-dev",IDC_BOLDLABEL,8,78,112,10
+    LTEXT           "2025 / 05 / 26",IDC_STATIC,8,88,112,8
+    CONTROL         "B_SPLASH",ID_ICON_ORG,"Static",SS_BITMAP,0,0,375,120
+    EDITTEXT        IDC_ABOUTTEXT,8,100,234,104,ES_MULTILINE | ES_READONLY | WS_VSCROLL
 END
 
 IDD_DLGDEFAULT DIALOGEX 0, 0, 201, 184
@@ -417,13 +415,13 @@ BEGIN
     PUSHBUTTON      "Reset",IDC_DEFRESET,104,168,44,12
 END
 
-DLGHELP DIALOGEX 0, 0, 365, 329
-STYLE DS_SETFONT | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_THICKFRAME | WS_SYSMENU
+DLGHELP DIALOGEX 0, 0, 365, 324
+STYLE DS_SETFONT | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "Help"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    EDITTEXT        IDC_HELPTEXT,0,20,364,308,ES_MULTILINE | ES_READONLY | ES_WANTRETURN | WS_VSCROLL
-    PUSHBUTTON      "Close",IDCANCEL,122,2,121,18,0,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "Close", IDCANCEL, 308, 304, 49, 12
+    EDITTEXT        IDC_HELPTEXT,8,8,348,288,ES_MULTILINE | ES_READONLY | ES_WANTRETURN | WS_VSCROLL
 END
 
 IDD_MIDI DIALOGEX 0, 0, 285, 283
@@ -702,7 +700,7 @@ BEGIN
         MENUITEM "&Drag Note to Extend\tCtrl+Alt+F9", IDM_DRAGMODE,MFT_STRING,MFS_ENABLED
         MENUITEM "Clic&k Note to Extend\tCtrl+Alt+F10", IDM_PRESSNOTE,MFT_STRING,MFS_ENABLED
         MENUITEM MFT_SEPARATOR
-        MENUITEM "Sto&p All Sounds\t~",            IDM_STOPNOWALL,MFT_STRING,MFS_ENABLED
+        MENUITEM "Sto&p All Sounds\t~",         IDM_STOPNOWALL,MFT_STRING,MFS_ENABLED
     END
     POPUP "&Song",                          65535,MFT_STRING,MFS_ENABLED
     BEGIN
@@ -818,6 +816,8 @@ B_LOUPE_MINUS           BITMAP                  "Bitmap\\Loupe_MINUS.bmp"
 TOOLBAR_ICONS           BITMAP                  "Bitmap\\TOOLBAR_ICONS.bmp"
 
 TRACKBAR_ICONS          BITMAP                  "Bitmap\\TRACKBAR_ICONS.bmp"
+
+B_SPLASH                BITMAP                  "Bitmap\\org_splash.bmp"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1037,7 +1037,9 @@ END
 // TEXT
 //
 
-TEXTHELP                TEXT                    "help.txt"
+TEXTHELP                TEXT                    "Text\\help.txt"
+
+TEXTABOUT               TEXT                    "Text\\about.txt"
 
 
 /////////////////////////////////////////////////////////////////////////////

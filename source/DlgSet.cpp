@@ -1675,23 +1675,71 @@ BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 	return 0;
 }
 
+static HFONT hFont = NULL;
 BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-//	char str[10] = {NULL};
+	RECT rc;
+
 	switch(message){
-	case WM_INITDIALOG://ダイアログが呼ばれた
+	case WM_INITDIALOG: {
+		LOGFONT lf = { 0 };
+		SystemParametersInfo(SPI_GETICONTITLELOGFONT, sizeof(LOGFONT), &lf, 0);
+		lf.lfWeight = FW_BOLD;
+		hFont = CreateFontIndirect(&lf);
+
+		HWND hText = GetDlgItem(hdwnd, IDC_BOLDLABEL);
+		SendMessage(hText, WM_SETFONT, (WPARAM)hFont, TRUE);
 
 		EnableDialogWindow(FALSE);
+
+		RECT rc;
+		GetWindowRect(hdwnd, &rc);
+
+		DWORD style = (DWORD)GetWindowLong(hdwnd, GWL_STYLE);
+		DWORD exStyle = (DWORD)GetWindowLong(hdwnd, GWL_EXSTYLE);
+
+		RECT rcNew = { 0, 0, 375, 0 };
+		AdjustWindowRectEx(&rcNew, style, FALSE, exStyle);
+
+		SetWindowPos(hdwnd, NULL, 0, 0, rcNew.right - rcNew.left, rc.bottom - rc.top, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
+
+		HRSRC hrscr = FindResource(NULL, "TEXTABOUT", "TEXT");// リソースの検索
+		if (hrscr)
+		{
+			DWORD len = SizeofResource(NULL, hrscr);
+
+			char* text = (char *)malloc(len + 1);
+			if (text == NULL) {
+				// Ooops!
+				return 0;
+			}
+
+			char *cc = (char *)LockResource(LoadResource(NULL, hrscr));// リソースのアドレスを取得
+			memcpy(text, cc, len);
+			text[len] = '\0';
+
+			SetDlgItemText(hdwnd, IDC_ABOUTTEXT, text);
+			free(text);
+		}
+
+		SendMessage(GetDlgItem(hdwnd, IDC_ABOUTTEXT), EM_SETSEL, -1, 0);
+		SendMessage(GetDlgItem(hdwnd, IDC_ABOUTTEXT), EM_SCROLLCARET, 0, 0);
+
 		return 1;
+
+		return 1;
+	}
+	case WM_DESTROY: {
+		if (hFont)
+			DeleteObject(hFont);
+		break;
+	}
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
 		case IDCANCEL:
 		case IDOK:
 			EnableDialogWindow(TRUE);
 			EndDialog(hdwnd,0);
-			return 1;
-		case ID_ICON_ORG:
-			PlaySoundObject(3, 1);
 			return 1;
 		}
 
@@ -2202,9 +2250,6 @@ BOOL CALLBACK DialogDefault(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 }*/
 BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-//	char str[10] = {NULL};
-//	char HelpString[10000]; //とりあえず10kB
-	char *HelpString; //A 2010.9.22 ヘルプファイルの容量拡大に伴い、動的確保に変更。
 	HRSRC hrscr;
 	HWND haDlg;
 	MINMAXINFO *pmmi;
@@ -2212,38 +2257,34 @@ BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	char *cc,*ce,*cf;
 	//int i;
 	int DlgWidth, DlgHeight;
-	static int t=0;
-	if(GetDlgItem(hdwnd, IDC_HELPTEXT)!=NULL){
-		t++;
-		if(t<5)SendMessage(GetDlgItem(hdwnd, IDC_HELPTEXT), EM_SETSEL, 0, 0);
-		//SendMessage(GetDlgItem(hdwnd, IDC_HELPTEXT), EM_SCROLLCARET, 0, 0);
-	}
-	switch(message){
-	case WM_INITDIALOG://ダイアログが呼ばれた
-		t = 0;
-		HelpString = (char *)malloc(1048576 * sizeof(char));//動的容量確保(とりあえず1MB) A 2010.09.22
-		//EnableDialogWindow(FALSE); //D 2014.05.25
-		hrscr = FindResource(NULL, "TEXTHELP" , "TEXT");// リソースの検索
-		cc = (char*)LockResource(LoadResource(NULL, hrscr));// リソースのアドレスを取得
-		cf = HelpString; ce = cc;
-		do{
-			if(*ce=='\n'){ //改行コード変換（ラインフィードを加えないといけないらしい）
-				*cf='\r';
-				cf++;
-			}
-			*cf = *ce;
-			cf++;
-			ce++;
-		}while(*ce !=0);
-		*cf = *ce;
-		SetDlgItemText(hdwnd,IDC_HELPTEXT,HelpString);
-		free(HelpString); //開放 A 2010.09.22
 
-		if(GetDlgItem(hdwnd, IDC_HELPTEXT)!=NULL)
-			SendMessage(GetDlgItem(hdwnd, IDC_HELPTEXT), EM_SETSEL, 1, 2);
-			SendMessage(GetDlgItem(hdwnd, IDC_HELPTEXT), EM_SCROLLCARET, 0, 0);
+	switch(message){
+	case WM_INITDIALOG: {//ダイアログが呼ばれた
+		//EnableDialogWindow(FALSE); //D 2014.05.25
+		hrscr = FindResource(NULL, "TEXTHELP", "TEXT");// リソースの検索
+		if (hrscr)
+		{
+			DWORD len = SizeofResource(NULL, hrscr);
+
+			char* text = (char*)malloc(len + 1);
+			if (text == NULL) {
+				// Ooops!
+				return 0;
+			}
+
+			cc = (char*)LockResource(LoadResource(NULL, hrscr));// リソースのアドレスを取得
+			memcpy(text, cc, len);
+			text[len] = '\0';
+
+			SetDlgItemText(hdwnd, IDC_HELPTEXT, text);
+			free(text);
+		}
+
+		SendMessage(GetDlgItem(hdwnd, IDC_HELPTEXT), EM_SETSEL, -1, 0);
+		SendMessage(GetDlgItem(hdwnd, IDC_HELPTEXT), EM_SCROLLCARET, 0, 0);
 
 		return 1;
+	}
 	case WM_SIZE:
 		DlgWidth  = LOWORD(lParam);	//クライアント領域のサイズ
 		DlgHeight = HIWORD(lParam);
@@ -2259,9 +2300,6 @@ BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pmmi->ptMinTrackSize.y = 200;  // 最小高
 		}
 		return 1;
-	case WM_MOUSEMOVE:
-		SendMessage(GetDlgItem(hdwnd, IDC_HELPTEXT), EM_SETSEL, 0,0);
-		break;
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
 		case IDCANCEL:

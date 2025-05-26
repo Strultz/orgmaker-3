@@ -513,6 +513,9 @@
 #define IDC_DEFPANSPIN16                1306
 #define IDC_BUTTON1                     1307
 #define IDC_DEFRESET                    1307
+#define IDC_ABOUTEDIT                   1308
+#define IDC_ABOUTTEXT                   1308
+#define IDC_BOLDLABEL                   1309
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005
@@ -855,7 +858,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        264
 #define _APS_NEXT_COMMAND_VALUE         40371
-#define _APS_NEXT_CONTROL_VALUE         1308
+#define _APS_NEXT_CONTROL_VALUE         1310
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
