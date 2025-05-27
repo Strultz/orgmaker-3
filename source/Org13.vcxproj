@@ -49,7 +49,7 @@
     <ExecutablePath>$(VC_ExecutablePath_x86);$(CommonExecutablePath);</ExecutablePath>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
-    <TargetName>OrgMaker</TargetName>
+    <TargetName>OrgMaker3</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>.\Release\</OutDir>
@@ -58,7 +58,7 @@
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);C:\Program Files (x86)\Microsoft DirectX 9.0 SDK (Summer 2004)\Include</IncludePath>
     <ExecutablePath>$(VC_ExecutablePath_x86);$(CommonExecutablePath);C:\Program Files (x86)\Microsoft DirectX 9.0 SDK (Summer 2004)\Utilities</ExecutablePath>
     <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);C:\Program Files (x86)\Microsoft DirectX 9.0 SDK (Summer 2004)\Lib</LibraryPath>
-    <TargetName>OrgMaker</TargetName>
+    <TargetName>OrgMaker3</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

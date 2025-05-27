@@ -144,6 +144,7 @@
 #define IDD_DLGDEFAULT                  258
 #define IDR_MENU1                       263
 #define IDR_CHBTNMENU                   263
+#define IDD_EXPORTPROG                  264
 #define IDD_LB1                         1001
 #define IDM_DIALOG1                     1002
 #define IDM_DLGGRID                     1002
@@ -516,6 +517,9 @@
 #define IDC_ABOUTEDIT                   1308
 #define IDC_ABOUTTEXT                   1308
 #define IDC_BOLDLABEL                   1309
+#define IDC_EXPFILENAME                 1310
+#define IDC_EXPRFILENAME                1310
+#define IDC_EXPRPROGRESS                1311
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005
@@ -856,9 +860,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        264
+#define _APS_NEXT_RESOURCE_VALUE        266
 #define _APS_NEXT_COMMAND_VALUE         40371
-#define _APS_NEXT_CONTROL_VALUE         1310
+#define _APS_NEXT_CONTROL_VALUE         1312
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

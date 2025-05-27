@@ -60,5 +60,7 @@ void Rxo_StopKey(unsigned char key,char track, int Phase);
 
 void S_SetOrganyaTimer(unsigned short timer);
 
-void ExportOrganyaBuffer(unsigned long sample_rate, float* output_stream, size_t frames_total, size_t fade_frames);
+void SetupExportBuffer(unsigned long sample_rate, size_t frames_total, size_t fade_frames);
+void EndExportBuffer(void);
+void ExportOrganyaBuffer(float* output_stream, size_t do_frames);
 void SetExportChannel(int track);

@@ -143,22 +143,22 @@ BEGIN
     LTEXT           "Finetune",IDC_STATIC,98,98,28,8
     LTEXT           "Finetune",IDC_STATIC,98,114,28,8
     LTEXT           "Finetune",IDC_STATIC,98,130,28,8
-    LTEXT           "Channel &1", IDC_STATIC, 13, 17, 36, 8
-    PUSHBUTTON      "Wave-00", IDC_WAVE1, 49, 16, 40, 12
-    LTEXT           "Channel &2", IDC_STATIC, 13, 33, 36, 8
-    PUSHBUTTON      "Wave-00", IDC_WAVE2, 49, 32, 40, 12
-    LTEXT           "Channel &3", IDC_STATIC, 13, 49, 36, 8
-    PUSHBUTTON      "Wave-00", IDC_WAVE3, 49, 48, 40, 12
-    LTEXT           "Channel &4", IDC_STATIC, 13, 65, 36, 8
-    PUSHBUTTON      "Wave-00", IDC_WAVE4, 49, 64, 40, 12
-    LTEXT           "Channel &5", IDC_STATIC, 13, 81, 36, 8
-    PUSHBUTTON      "Wave-00", IDC_WAVE5, 49, 80, 40, 12
-    LTEXT           "Channel &6", IDC_STATIC, 13, 97, 36, 8
-    PUSHBUTTON      "Wave-00", IDC_WAVE6, 49, 96, 40, 12
-    LTEXT           "Channel &7", IDC_STATIC, 13, 113, 36, 8
-    PUSHBUTTON      "Wave-00", IDC_WAVE7, 49, 112, 40, 12
-    LTEXT           "Channel &8", IDC_STATIC, 13, 129, 36, 8
-    PUSHBUTTON      "Wave-00", IDC_WAVE8, 49, 128, 40, 12
+    LTEXT           "Channel &1",IDC_STATIC,13,17,36,8
+    PUSHBUTTON      "Wave-00",IDC_WAVE1,49,16,40,12
+    LTEXT           "Channel &2",IDC_STATIC,13,33,36,8
+    PUSHBUTTON      "Wave-00",IDC_WAVE2,49,32,40,12
+    LTEXT           "Channel &3",IDC_STATIC,13,49,36,8
+    PUSHBUTTON      "Wave-00",IDC_WAVE3,49,48,40,12
+    LTEXT           "Channel &4",IDC_STATIC,13,65,36,8
+    PUSHBUTTON      "Wave-00",IDC_WAVE4,49,64,40,12
+    LTEXT           "Channel &5",IDC_STATIC,13,81,36,8
+    PUSHBUTTON      "Wave-00",IDC_WAVE5,49,80,40,12
+    LTEXT           "Channel &6",IDC_STATIC,13,97,36,8
+    PUSHBUTTON      "Wave-00",IDC_WAVE6,49,96,40,12
+    LTEXT           "Channel &7",IDC_STATIC,13,113,36,8
+    PUSHBUTTON      "Wave-00",IDC_WAVE7,49,112,40,12
+    LTEXT           "Channel &8",IDC_STATIC,13,129,36,8
+    PUSHBUTTON      "Wave-00",IDC_WAVE8,49,128,40,12
 END
 
 IDD_DLGPERC DIALOGEX 0, 0, 229, 104
@@ -420,7 +420,7 @@ STYLE DS_SETFONT | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CA
 CAPTION "Help"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    PUSHBUTTON      "Close", IDCANCEL, 308, 304, 49, 12
+    PUSHBUTTON      "Close",IDCANCEL,308,304,49,12
     EDITTEXT        IDC_HELPTEXT,8,8,348,288,ES_MULTILINE | ES_READONLY | ES_WANTRETURN | WS_VSCROLL
 END
 
@@ -532,6 +532,16 @@ BEGIN
     CONTROL         "Volume",IDC_ADVVOL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,56,28,36,10
     CONTROL         "Panning",IDC_ADVPAN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,28,40,10
     CONTROL         "Mix Paste",IDC_ADVMIX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,94,11,44,10
+END
+
+IDD_EXPORTPROG DIALOGEX 0, 0, 161, 60
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_VISIBLE
+CAPTION "Exporting"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Cancel",IDCANCEL,104,40,50,14
+    LTEXT           "Static",IDC_EXPRFILENAME,8,8,144,8
+    CONTROL         "",IDC_EXPRPROGRESS,"msctls_progress32",WS_BORDER,8,20,144,14
 END
 
 
@@ -739,7 +749,7 @@ BEGIN
         MENUITEM "Open &GitHub Page",           IDM_GITHUB,MFT_STRING,MFS_ENABLED
         MENUITEM MFT_SEPARATOR
         MENUITEM "&Check for Updates",          IDM_CHECKUPD,MFT_STRING,MFS_ENABLED
-        MENUITEM "&About OrgMaker",             IDM_DLGMEMO,MFT_STRING,MFS_ENABLED
+        MENUITEM "&About OrgMaker 3",           IDM_DLGMEMO,MFT_STRING,MFS_ENABLED
     END
 END
 
@@ -873,8 +883,8 @@ BEGIN
             VALUE "FileDescription", "OrgMaker 3"
             VALUE "FileVersion", "3.1.0"
             VALUE "LegalCopyright", "Copyright (C) 2005-2025 Pixel and Rxo Inverse"
-            VALUE "OriginalFilename", "OrgMaker.exe"
-            VALUE "ProductName", "OrgMaker"
+            VALUE "OriginalFilename", "OrgMaker3.exe"
+            VALUE "ProductName", "OrgMaker 3"
             VALUE "ProductVersion", "3.1.0"
         END
     END
@@ -1137,6 +1147,11 @@ BEGIN
     0
 END
 
+IDD_EXPORTPROG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1232,6 +1247,14 @@ BEGIN
         RIGHTMARGIN, 142
         TOPMARGIN, 7
         BOTTOMMARGIN, 57
+    END
+
+    IDD_EXPORTPROG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 154
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 53
     END
 END
 #endif    // APSTUDIO_INVOKED

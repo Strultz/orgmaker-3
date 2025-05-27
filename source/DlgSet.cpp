@@ -1481,6 +1481,27 @@ BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 static unsigned long sample_rate = 44100;
 static unsigned long loop_count = 0;
 static unsigned long fade_mseconds = 0;
+static BOOL isEnded = FALSE;
+
+BOOL CALLBACK DialogExportProgress(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message) {
+	case WM_INITDIALOG: {
+		return 1;
+	}
+	case WM_DESTROY: {
+		isEnded = TRUE;
+		return 1;
+	}
+	case WM_COMMAND:
+		if (LOWORD(wParam) == IDCANCEL) {
+			DestroyWindow(hdwnd);
+			isEnded = TRUE;
+		}
+		return 1;
+	}
+	return 0;
+}
 
 #define WRITE_16_LE(p, v) \
     do { \
@@ -1496,43 +1517,127 @@ static unsigned long fade_mseconds = 0;
         *p++ = ((v) >> 24 & 0xFF); \
     } while(0)
 
-bool ExportWave(unsigned int streamsize, unsigned int samples, const char *strPath) {
-	char* stream = (char*)malloc(44 + streamsize);
-	if (stream != NULL) {
-		char* p = stream;
+int ExportWave(unsigned int samples, char* strPath) {
+	char header[44] = { 0 };
+	unsigned int streamsize = samples * sizeof(float) * 2;
 
-		WRITE_32_LE(p, 0x46464952); /* "RIFF" */
-		WRITE_32_LE(p, 36 + streamsize); /* "RIFF" length */
-		WRITE_32_LE(p, 0x45564157); /* "WAVE" */
-		WRITE_32_LE(p, 0x20746D66); /* "fmt " */
-		WRITE_32_LE(p, 0x10); /* "fmt " length */
-		WRITE_16_LE(p, 3); /* floating point PCM format */
-		WRITE_16_LE(p, 2); /* 2 channels for stereo */
-		WRITE_32_LE(p, sample_rate); /* Samples per second */
-		WRITE_32_LE(p, sample_rate * sizeof(float) * 2); /* Bytes per second */
-		WRITE_16_LE(p, 8); /* Bytes per sample */
-		WRITE_16_LE(p, 32); /* Bits per sample */
-		WRITE_32_LE(p, 0x61746164); /* "data" */
-		WRITE_32_LE(p, streamsize); /* "data" length */
+	FILE* fl = fopen(strPath, "wb");
 
-		memset(p, 0, streamsize);
-		ExportOrganyaBuffer(sample_rate, (float*)p, samples, (fade_mseconds * sample_rate / 1000));
+	if (fl != NULL)
+	{
+		isEnded = false;
 
-		FILE* fl = fopen(strPath, "wb");
-		if (fl != NULL) {
-			fwrite(stream, 1, 44 + streamsize, fl);
+		HWND window = CreateDialog(hInst, MAKEINTRESOURCE(IDD_EXPORTPROG), hWnd, DialogExportProgress);
+		if (window == NULL)
+		{
 			fclose(fl);
+			return 1;
 		}
-		else {
-			free(stream);
-			return false;
+
+		char displayText[MAX_PATH + 30];
+
+		char* slash = strrchr(strPath, '/');
+		char* backslash = strrchr(strPath, '\\');
+
+		char* name = strPath;
+		if (slash == NULL && backslash != NULL) {
+			name = &backslash[1];
 		}
-		free(stream);
+		else if (slash != NULL && backslash == NULL) {
+			name = &slash[1];
+		}
+		else if (slash != NULL && backslash != NULL) {
+			name = slash < backslash ? &backslash[1] : &slash[1];
+		}
+
+		snprintf(displayText, MAX_PATH + 30, "Exporting to %s (0%%)", name);
+		SetDlgItemText(window, IDC_EXPRFILENAME, displayText);
+
+		HWND hProg = GetDlgItem(window, IDC_EXPRPROGRESS);
+		if (hProg == NULL) {
+			fclose(fl);
+			return 1;
+		}
+
+		SendMessage(hProg, PBM_SETRANGE32, 0, samples);
+		SendMessage(hProg, PBM_SETSTEP, 0x400, 0);
+
+		MSG msg;
+		while (PeekMessage(&msg, window, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+
+		if (isEnded) {
+			fclose(fl);
+			DeleteFile(strPath);
+			return 2;
+		}
+
+		char* hp = header;
+		WRITE_32_LE(hp, 0x46464952); /* "RIFF" */
+		WRITE_32_LE(hp, 36 + streamsize); /* "RIFF" length */
+		WRITE_32_LE(hp, 0x45564157); /* "WAVE" */
+		WRITE_32_LE(hp, 0x20746D66); /* "fmt " */
+		WRITE_32_LE(hp, 0x10); /* "fmt " length */
+		WRITE_16_LE(hp, 3); /* floating point PCM format */
+		WRITE_16_LE(hp, 2); /* 2 channels for stereo */
+		WRITE_32_LE(hp, sample_rate); /* Samples per second */
+		WRITE_32_LE(hp, sample_rate * sizeof(float) * 2); /* Bytes per second */
+		WRITE_16_LE(hp, 8); /* Bytes per sample */
+		WRITE_16_LE(hp, 32); /* Bits per sample */
+		WRITE_32_LE(hp, 0x61746164); /* "data" */
+		WRITE_32_LE(hp, streamsize); /* "data" length */
+		fwrite(header, 1, 44, fl);
+
+		SetupExportBuffer(sample_rate, samples, fade_mseconds * sample_rate / 1000);
+
+		float sampleData[0x400 * 2] = { 0 };
+		unsigned int samplesLeft = samples;
+
+		while (samplesLeft > 0)
+		{
+			unsigned int todo = min(0x400, samplesLeft);
+			ExportOrganyaBuffer(sampleData, todo);
+			fwrite(sampleData, sizeof(float), todo * 2, fl);
+			samplesLeft -= todo;
+
+			unsigned int progress = ((samples - samplesLeft) * 100) / samples;
+
+			// Update label
+			snprintf(displayText, MAX_PATH + 30, "Exporting to %s (%d%%)", name, progress);
+			SetDlgItemText(window, IDC_EXPRFILENAME, displayText);
+
+			// Update progress bar
+			SendMessage(hProg, PBM_STEPIT, 0, 0);
+
+			// Update dialog
+			while (PeekMessage(&msg, window, 0, 0, PM_REMOVE))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+
+			if (isEnded) {
+				// Window was closed Cancel.
+				EndExportBuffer();
+				fclose(fl);
+
+				// Delete the unfinished export
+				DeleteFile(strPath);
+				return 2;
+			}
+		}
+
+		EndExportBuffer();
+
+		DestroyWindow(window);
+		fclose(fl);
+		return 0;
 	}
-	else {
-		return false;
-	}
-	return true;
+
+	return 1;
 }
 
 BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -1594,11 +1699,10 @@ BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lP
 				if (msgbox(hdwnd, IDS_NOTIFY_OVERWRITE, IDS_INFO_SAME_FILE, MB_YESNO | MB_ICONEXCLAMATION) == IDNO) return 1;
 			}
 
-			SetDlgItemText(hdwnd, IDC_EXPORTTEXT, "Exporting...");
+			EndDialog(hdwnd, 0);
 
 			org_data.GetMusicInfo(&mi, 1);
 			unsigned int samples = ((mi.wait * sample_rate) / 1000) * (mi.end_x + ((mi.end_x - mi.repeat_x) * loop_count)) + (fade_mseconds * sample_rate / 1000);
-			unsigned int streamsize = samples * sizeof(float) * 2;
 			
 			if (separateChannels) {
 				for (int i = 0; i < MAXTRACK; ++i) {
@@ -1619,21 +1723,32 @@ BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lP
 					strncat(chPath, tstr, MAX_PATH - 1);
 
 					SetExportChannel(i);
-					if (!ExportWave(streamsize, samples, chPath)) {
-						msgbox(hdwnd, IDS_STRING121, IDS_STRING120, MB_OK);
-						break;
+
+					int res = ExportWave(samples, chPath);
+					if (res != 0) {
+						if (res == 1) { // error
+							msgbox(hdwnd, IDS_STRING121, IDS_STRING120, MB_OK);
+						}
+
+						// end now
+						SetExportChannel(-1);
+						EnableDialogWindow(TRUE);
+						return 1;
 					}
 				}
 
 				SetExportChannel(-1);
 			}
-			
-			if (!ExportWave(streamsize, samples, strPath)) {
-				msgbox(hdwnd, IDS_STRING121, IDS_STRING120, MB_OK);
+
+			int res = ExportWave(samples, strPath);
+			if (res != 0) {
+				if (res == 1) { // error
+					msgbox(hdwnd, IDS_STRING121, IDS_STRING120, MB_OK);
+				}
+				break;
 			}
 
 			EnableDialogWindow(TRUE);
-			EndDialog(hdwnd, 0);
 			return 1;
 		}
 		case IDCANCEL:

@@ -262,6 +262,7 @@ static void S_ResetSounds() {
 	ma_mutex_lock(&mutex);
 
 	for (S_Sound* sound = sound_list_head; sound != NULL; sound = sound->next) {
+		memset(sound->samples, 0, 4);
 		sound->playing = false;
 		sound->looping = false;
 		sound->played_before = false;
@@ -1310,8 +1311,13 @@ void Rxo_StopAllSoundNow(void)
 }
 
 extern int sMetronome;
+static int lastMetro = 0;
+static size_t totalFrames = 0;
+static size_t fadeFrames = 0;
+static size_t doneFrames = 0;
 
-void ExportOrganyaBuffer(unsigned long sample_rate, float* output_stream, size_t frames_total, size_t fade_frames) {
+void SetupExportBuffer(unsigned long sample_rate, size_t frames_total, size_t fade_frames)
+{
 	MUSICINFO mi;
 	org_data.GetMusicInfo(&mi);
 
@@ -1327,52 +1333,19 @@ void ExportOrganyaBuffer(unsigned long sample_rate, float* output_stream, size_t
 
 	ma_mutex_lock(&organya_mutex);
 
-	int lastMetro = sMetronome;
+	lastMetro = sMetronome;
 	sMetronome = 0;
 
 	organya_timer = mi.wait;
 	organya_countdown = 0;
 
-	float* stream = output_stream;
-	size_t frames_done = 0;
-	while (frames_done != frames_total) {
-		float mix_buffer[0x400 * 2];
-		size_t subframes = MIN(0x400, frames_total - frames_done);
-		memset(mix_buffer, 0, subframes * sizeof(float) * 2);
-		if (organya_timer == 0) {
-			ma_mutex_lock(&mutex);
-			S_MixSounds(mix_buffer, subframes);
-			ma_mutex_unlock(&mutex);
-		}
-		else {
-			unsigned int subframes_done = 0;
-			while (subframes_done != subframes) {
-				if (organya_countdown == 0) {
-					organya_countdown = (organya_timer * output_frequency) / 1000;
-					org_data.PlayData();
-				}
-				const unsigned int frames_to_do = MIN(organya_countdown, subframes - subframes_done);
-				ma_mutex_lock(&mutex);
-				S_MixSounds(mix_buffer + subframes_done * 2, frames_to_do);
-				ma_mutex_unlock(&mutex);
-				subframes_done += frames_to_do;
-				organya_countdown -= frames_to_do;
-			}
-		}
+	totalFrames = frames_total;
+	fadeFrames = fade_frames;
+	doneFrames = 0;
+}
 
-		float fd = 1.0F;
-		for (size_t i = 0; i < subframes * 2; ++i) {
-			if (fade_frames > 0 && frames_done + i / 2 > frames_total - fade_frames) {
-				if (i % 2 == 0)
-					fd = ((float)(fade_frames - ((frames_done + i / 2) - (frames_total - fade_frames))) / (float)fade_frames);
-				mix_buffer[i] = mix_buffer[i] * fd;
-			}
-
-			*stream++ = mix_buffer[i];
-		}
-		frames_done += subframes;
-	}
-
+void EndExportBuffer(void)
+{
 	Rxo_StopAllSoundNow();
 	S_ResetSounds();
 
@@ -1380,13 +1353,59 @@ void ExportOrganyaBuffer(unsigned long sample_rate, float* output_stream, size_t
 	organya_timer = 0;
 
 	sMetronome = lastMetro;
+	lastMetro = 0;
 
 	ma_mutex_unlock(&organya_mutex);
 
 	output_frequency = device.sampleRate;
 	vol_ticks = (long)((float)output_frequency * 0.004F);
 
+	totalFrames = 0;
+	fadeFrames = 0;
+	doneFrames = 0;
+
 	exporting = false;
+}
+
+void ExportOrganyaBuffer(float* output_stream, size_t do_frames) {
+	if (!exporting) return;
+
+	memset(output_stream, 0, do_frames * sizeof(float) * 2);
+
+	size_t frames_done = 0;
+	while (frames_done != do_frames) {
+		if (organya_timer == 0) {
+			ma_mutex_lock(&mutex);
+			S_MixSounds(output_stream, do_frames);
+			ma_mutex_unlock(&mutex);
+		}
+		else {
+			if (organya_countdown == 0) {
+				organya_countdown = (organya_timer * output_frequency) / 1000;
+				org_data.PlayData();
+			}
+			const unsigned int frames_to_do = MIN(organya_countdown, do_frames - frames_done);
+			ma_mutex_lock(&mutex);
+			S_MixSounds(output_stream + frames_done * 2, frames_to_do);
+			ma_mutex_unlock(&mutex);
+			frames_done += frames_to_do;
+			organya_countdown -= frames_to_do;
+		}
+	}
+
+	doneFrames += do_frames;
+	size_t fadeTimeFrames = totalFrames - fadeFrames;
+
+	if (fadeFrames > 0) {
+		for (size_t i = 0; i < do_frames; ++i)
+		{
+			if (doneFrames + i > fadeTimeFrames) {
+				float fd = doneFrames + i > totalFrames ? 0.0f : ((float)(fadeFrames - ((doneFrames + i) - fadeTimeFrames)) / (float)fadeFrames);
+				output_stream[i * 2 + 0] = output_stream[i * 2 + 0] * fd;
+				output_stream[i * 2 + 1] = output_stream[i * 2 + 1] * fd;
+			}
+		}
+	}
 }
 
 void SetExportChannel(int track) {
