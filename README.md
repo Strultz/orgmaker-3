@@ -36,7 +36,7 @@ With the world knowing the development of "Cave Story", which increased the dema
 
 # &#x1F34E; Requirements
 ## &#x1F352; for Utilization
-* Windows 2000, XP, Vista, 7, 8, 8.1, 10, maybe more...  
+* Windows 7 and up (Vista may work but is untested)
 * [DirectX](https://www.google.com/search?q=DirectX+download) 8, 9, 10, 11, maybe more...  
 * [Microsoft Visual C++ 6.0 Runtime Components](https://www.google.com/search?q=visual+c%2B%2B+6+runtime+library+download)  
 
