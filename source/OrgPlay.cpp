@@ -9,6 +9,8 @@
 
 extern bool gPlayMidNote;
 extern HWND hwndToolbar;
+extern int sSmoothScroll;
+
 char timer_sw = 0;
 long oplay_p;
 long play_p;//現在再生位置（キャンバス）
@@ -182,8 +184,15 @@ void StopPlayingSong(void) {
 	if (timer_sw) {
 		QuitMMTimer();
 		Rxo_StopAllSoundNow();
-
 		timer_sw = 0;
+
+		MUSICINFO mi;
+		org_data.GetMusicInfo(&mi);
+
+		long playPos;
+		org_data.GetPlayPos(NULL, &playPos);
+		scr_data.SetHorzScroll(sSmoothScroll ? playPos : ((playPos / (mi.dot * mi.line)) * (mi.dot * mi.line)));
+
 		UpdateToolbarStatus();
 	}
 }
