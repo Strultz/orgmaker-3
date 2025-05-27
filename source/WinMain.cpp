@@ -2128,7 +2128,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_SAVENEW:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Save the active document with a new name"); break;
 		case IDM_EXPORT_MIDI:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Export the active document to a MIDI file"); break;
 		case IDM_EXPORT_WAV:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Export the active document to a WAV file"); break;
-		case IDM_EXIT:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Exit OrgMaker"); break;
+		case IDM_EXIT:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Exit OrgMaker 3"); break;
 
 		case IDM_UNDO:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Undo the last action"); break;
 		case IDM_REDO:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Redo the previously undone action"); break;
@@ -2210,8 +2210,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 		case IDM_DLGHELP:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open the Help menu"); break;
 		case IDM_GITHUB:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open the GitHub page for OrgMaker 3"); break;
-		case IDM_CHECKUPD:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Check for a new version of OrgMaker"); break;
-		case IDM_DLGMEMO:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"About OrgMaker"); break;
+		case IDM_CHECKUPD:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Check for a new version of OrgMaker 3"); break;
+		case IDM_DLGMEMO:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"About OrgMaker 3"); break;
 		}
 		break;
 	case WM_DROPFILES://file drop
