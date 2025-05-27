@@ -1609,10 +1609,13 @@ int ExportWave(unsigned int samples, char* strPath) {
 			snprintf(displayText, MAX_PATH + 30, "Exporting to %s (%d%%)", name, progress);
 			SetDlgItemText(window, IDC_EXPRFILENAME, displayText);
 
+			// Hack to make the bar update immediately
+			SendMessage(hProg, PBM_SETPOS, (samples - samplesLeft) + 1, 0);
 			// Update progress bar
-			SendMessage(hProg, PBM_STEPIT, 0, 0);
+			SendMessage(hProg, PBM_SETPOS, (samples - samplesLeft), 0);
 
 			// Update dialog
+			// TODO doing this here is kinda bad. The rendering should probably be on a separate thread
 			while (PeekMessage(&msg, window, 0, 0, PM_REMOVE))
 			{
 				TranslateMessage(&msg);
@@ -1629,7 +1632,7 @@ int ExportWave(unsigned int samples, char* strPath) {
 				return 2;
 			}
 		}
-
+			
 		EndExportBuffer();
 
 		DestroyWindow(window);
