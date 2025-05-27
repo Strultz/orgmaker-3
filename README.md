@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="/.github/img/banner.png" alt="OrgMaker 3">
-</p>
+<img src="/.github/img/banner.png" alt="OrgMaker 3">
 
 OrgMaker 3 is an updated fork of OrgMaker, a simple piano roll music sequencer. It was the software used to create the music for [Cave Story](https://www.cavestory.org/game-info/about-cave-story.php).
 
