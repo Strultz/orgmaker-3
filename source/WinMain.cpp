@@ -2300,6 +2300,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			if (timer_sw == 0) StartPlayingSong();
 			else StopPlayingSong();
 			break;
+		case VK_F6:
+			StopPlayingSong();
+			scr_data.SetHorzScroll(0);
+			StartPlayingSong();
+			break;
 		//case VK_HOME:
 		//	SendMessage(hDlgPlayer , WM_COMMAND , IDC_START , NULL);
 		//	break;

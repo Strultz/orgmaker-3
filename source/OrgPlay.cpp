@@ -104,10 +104,10 @@ void OrgData::GetPlayPos(long* playpos, long *oplaypos) {
 
 void StartPlayingSong(void) {
 	MUSICINFO mi;
-	long hp, vp;
+	long hp;
 	if (!timer_sw) {
 		Rxo_StopAllSoundNow();
-		scr_data.GetScrollPosition(&hp, &vp);
+		scr_data.GetScrollPosition(&hp, NULL);
 		org_data.SetPlayPointer(hp);
 		InitMMTimer();
 		org_data.GetMusicInfo(&mi);
