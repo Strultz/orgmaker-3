@@ -256,23 +256,40 @@ void RestoreSurfaces(void) {
     }
 }
 
-BOOL RefleshScreen(HWND hwnd) {
+BOOL RefleshScreen(HWND hwnd, BOOL mainLoopUpdate) {
 	static DWORD timePrev;
 	static DWORD timeNow;
 	static DWORD lek = 0;
-	lek += 1;
 
-	while (TRUE)
+	if (!mainLoopUpdate)
 	{
-		if (!SystemTask())
-			return FALSE;
-
+		// for WM_TIMER
 		timeNow = timeGetTime();
 
-		if (timeNow >= timePrev + (lek % 3 != 0) + 0x10)
-			break;
+		if (timeNow < timePrev + (lek % 3 != 0) + 0x10)
+		{
+			return FALSE;
+		}
 
-		Sleep(1);
+		lek += 1;
+		org_data.PutMusic();
+	}
+	else
+	{
+		lek += 1;
+
+		while (TRUE)
+		{
+			if (!SystemTask())
+				return FALSE;
+
+			timeNow = timeGetTime();
+
+			if (timeNow >= timePrev + (lek % 3 != 0) + 0x10)
+				break;
+
+			Sleep(1);
+		}
 	}
 	
 	if (timeNow >= timePrev + 100)

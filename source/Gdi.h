@@ -14,7 +14,7 @@ HBITMAP GetThemedBitmap(const char* name, int flags);
 BOOL InitBitmap(char *name, int no);
 void InitCursor();
 //‚¢‚í‚ä‚éƒtƒŠƒbƒv
-BOOL RefleshScreen(HWND hwnd);
+BOOL RefleshScreen(HWND hwnd, BOOL mainLoopUpdate);
 void PutRect(RECT* rect, int color);
 void PutBitmap(long x, long y, RECT *rect, int bmp_no);
 void PutBitmap2(long x, long y, RECT* rect, int bmp_no);

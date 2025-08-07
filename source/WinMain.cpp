@@ -630,7 +630,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	wc.hIcon         = LoadIcon(hInst,"ICON");//big icon
 	wc.hIconSm       = LoadIcon(hInst,"ICON");//small icon
 	wc.hCursor       = LoadCursor(hInst,"CURSOR");//default cursor
-	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);//window color
+	wc.hbrBackground = GetSysColorBrush(COLOR_3DFACE);//window color
 	wc.lpszMenuName  = "ORGANYAMENU";//menu
 	wc.lpszClassName = szClassName;
 	if (!RegisterClassEx(&wc)) return FALSE;
@@ -716,7 +716,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	hwndStatus = CreateStatusBar(hWnd);
 	CreateToolbarClass();
 
-	hwndArea = CreateWindow(szAreaClass, "", WS_CHILD | WS_VISIBLE,
+	hwndArea = CreateWindowEx(0L, szAreaClass, "", WS_CHILD | WS_VISIBLE,
 		0, rebarHeight, WinRect.right - WinRect.left, WinRect.bottom - WinRect.top - rebarHeight - GetBarHeight(hwndStatus),
 		hWnd, NULL, hInst, NULL);
 
@@ -951,7 +951,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	if (hbSplash)
 		DeleteObject(hbSplash);
 
-	if (RefleshScreen(hWnd)) {
+	if (RefleshScreen(hWnd, TRUE)) {
 		if (autoCheckUpdate) {
 			std::thread t(CheckUpdate, false);
 			t.detach();
@@ -959,7 +959,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 		while (TRUE) {
 			org_data.PutMusic();
-			if (!RefleshScreen(hWnd)) {
+			if (!RefleshScreen(hWnd, TRUE)) {
 				break;
 			}
 		}
@@ -1165,6 +1165,8 @@ static bool IsAnyUnmutedSide(int side) {
 }
 
 //main procedure
+static int gLoopIn = 0;
+
 LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
 //	char str[64];
@@ -1246,6 +1248,43 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				TrackPopupMenu(hMenu, TPM_RIGHTBUTTON, LOWORD(lParam), HIWORD(lParam), 0, hwnd, NULL);
 				DestroyMenu(hMenu);
 			}
+		}
+		break;
+	}
+	case WM_TIMER:
+	{
+		if (wParam == (UINT_PTR)RefleshScreen)
+		{
+			RefleshScreen(hwnd, FALSE);
+		}
+		break;
+	}
+	case WM_ENTERMENULOOP:
+		SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"");
+		// Fallthrough
+	case WM_ENTERSIZEMOVE:
+	{
+		if (gLoopIn == 0)
+		{
+			SetTimer(hwnd, (UINT_PTR)RefleshScreen, USER_TIMER_MINIMUM, NULL);
+		}
+		++gLoopIn;
+		break;
+	}
+	case WM_EXITMENULOOP:
+		SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"For help, press F1");
+		// Fallthrough
+	case WM_EXITSIZEMOVE:
+	{
+		if (gLoopIn == 0)
+		{
+			break;
+		}
+
+		--gLoopIn;
+		if (gLoopIn == 0)
+		{
+			KillTimer(hwnd, (UINT_PTR)RefleshScreen);
 		}
 		break;
 	}
@@ -1387,17 +1426,26 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case ID_SELECTION_PANNING://
 			case ID_AC_DLG_PAN:
 				if (tra >= 0)
+				{
+					StopPlayingSong();
 					DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGSELPAN), hwnd, DialogSelPan);
+				}
 				break;
 			case ID_SELECTION_TRANSPOSE://
 			case ID_AC_DLG_TRANS:
 				if (tra >= 0)
+				{
+					StopPlayingSong();
 					DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGSELTRA), hwnd, DialogSelTra);
+				}
 				break;
 			case ID_SELECTION_VOLUME://
 			case ID_AC_DLG_VOL:
 				if (tra >= 0)
+				{
+					StopPlayingSong();
 					DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGSELVOL), hwnd, DialogSelVol);
+				}
 				//DialogBox(hInst,"DLGVOLUME",hwnd,DialogVolume);
 				break;
 			case ID_AC_STPLAY:
@@ -1409,6 +1457,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				//break;
 			case IDM_DLGSWAP:
 			case ID_AC_DLG_SWAP:
+				StopPlayingSong();
 				DialogBox(hInst,"DLGSWAP",hwnd,DialogSwap);
 				break;
 			
@@ -1723,7 +1772,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				if (gClipboardData.track1 == -1) {
 					break;
 				}
-
+				StopPlayingSong();
 				DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGADVPASTE), hWnd, DialogAdvPaste);
 				break;
 			}
@@ -1843,13 +1892,16 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			PostQuitMessage(0);
 			break;
 		case IDM_DLGUSED://
+			StopPlayingSong();
 			DialogBox(hInst, "DLGUSED", hwnd, DialogNoteUsed);
 			break;
 		case IDM_DLGMEMO://
+			StopPlayingSong();
 			//PlaySoundObject(3, 1);
 			DialogBox(hInst, "DLGMEMO", hwnd, DialogMemo);
 			break;
 		case IDM_DLGTHEMES:
+			StopPlayingSong();
 			DialogBox(hInst, "DLGTHEMES", hwnd, DialogTheme);
 			break;
 		case IDM_DLGWAVEDBS:
@@ -1868,6 +1920,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				hDlgHelp = CreateDialog(hInst, "DLGHELP", hwnd, DialogHelp);
 			}
 			ShowWindow(hDlgHelp, SW_SHOWNOACTIVATE);
+			//StopPlayingSong();
 			//DialogBox(hInst,"DLGHELP",hwnd,DialogHelp);
 			break;
 		case IDM_SAVEOVER:
@@ -1914,6 +1967,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			SendMessage(hWnd, WM_COMMAND, Menu_Recent[0], 0);
 			break;
 		case IDM_DCLEN:
+			StopPlayingSong();
 			DialogBox(hInst, "DLGDCLEN", hwnd, DialogDecayLength);
 			break;
 		case IDM_DUMMY_TATE_SEPARATOR: //do nothing
@@ -2069,6 +2123,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		}
 		case ID_AC_DEFAULT:
 		case IDM_DLGDEFAULT://Show Default Dialog
+			StopPlayingSong();
 			DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGDEFAULT), hwnd, DialogDefaults);
 			//DialogBox(hInst, "DLGDEFAULT", hwnd, DialogDefault);
 			break;
@@ -2101,12 +2156,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		break;
 	case WM_ACTIVATEAPP:
 		actApp = wParam;
-		break;
-	case WM_ENTERMENULOOP:
-		SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"");
-		break;
-	case WM_EXITMENULOOP:
-		SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"For help, press F1");
 		break;
 	case WM_MENUSELECT:
 		switch(LOWORD(wParam)){
