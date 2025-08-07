@@ -16,6 +16,11 @@ static WNDPROC oldTbProc = NULL;
 
 LRESULT CALLBACK ToolbarWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
     // Defer commands to main window
+    if (message == WM_CLOSE)
+    {
+        SendMessage(hWnd, WM_CLOSE, wParam, lParam);
+        return 0;
+    }
     if (message == WM_COMMAND) {
         SendMessage(hWnd, WM_COMMAND, wParam, lParam);
         SetFocus(hWnd);
@@ -24,7 +29,7 @@ LRESULT CALLBACK ToolbarWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
     return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
-// This is obnoxious, I am unaware of an easier way to just do this though
+// Subclass to add the ability to right click channels to bring up a context menu
 LRESULT CALLBACK TbscWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
     if (message == WM_CONTEXTMENU) {
         // Get mouse coords
@@ -61,7 +66,7 @@ static void CreateToolbar(int id, HWND hwndRebar, const char *iconBitmap, int bu
     bool rebar = true;
     if (!hwndRebar) {
         rebar = false;
-        hwndRebar = CreateWindowEx(WS_EX_PALETTEWINDOW, szTbClassName, toolbarName, WS_VISIBLE | WS_POPUP | WS_BORDER | WS_CAPTION, 0, 0, 0, 0, hWnd, NULL, hInst, NULL);
+        hwndRebar = CreateWindowEx(WS_EX_WINDOWEDGE | WS_EX_TOOLWINDOW | WS_EX_CONTROLPARENT, szTbClassName, toolbarName, WS_VISIBLE | WS_POPUP | WS_BORDER | WS_CAPTION, 0, 0, 0, 0, hWnd, NULL, hInst, NULL);
         if (!hwndRebar) {
             return;
         }
@@ -156,7 +161,7 @@ void CreateToolbarClass(void) {
     ot.hIcon = NULL;
     ot.hIconSm = NULL;
     ot.hCursor = LoadCursor(NULL, IDC_ARROW);
-    ot.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+    ot.hbrBackground = GetSysColorBrush(COLOR_3DFACE);
     ot.lpszMenuName = NULL;
     ot.lpszClassName = szTbClassName;
     RegisterClassEx(&ot);

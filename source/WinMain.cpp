@@ -678,8 +678,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	WinRect.left=       GetPrivateProfileInt(MAIN_WINDOW,"left",0,app_path);
 	WinRect.top=        GetPrivateProfileInt(MAIN_WINDOW,"top",0,app_path);
-	WinRect.right=      GetPrivateProfileInt(MAIN_WINDOW,"right",640,app_path);
-	WinRect.bottom=     GetPrivateProfileInt(MAIN_WINDOW,"bottom",480,app_path);
+	WinRect.right=      GetPrivateProfileInt(MAIN_WINDOW,"right",800,app_path);
+	WinRect.bottom=     GetPrivateProfileInt(MAIN_WINDOW,"bottom",600,app_path);
 
 	/*CmnDialogWnd.left = GetPrivateProfileInt(COMMON_WINDOW, "left", 20, app_path);
 	CmnDialogWnd.top=	GetPrivateProfileInt(COMMON_WINDOW,"top",	20,app_path);
@@ -708,7 +708,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 			ul,
 			WinRect.left, WinRect.top, realWidth, realHeight,
             NULL, NULL, hInst, NULL);
-
 
 	if (!hWnd)
 		return FALSE;
