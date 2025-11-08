@@ -151,6 +151,7 @@ static S_Sound* S_CreateSound(unsigned int frequency, const unsigned char* sampl
 	sound->ring = 0;
 	sound->sub_position = 0;
 	sound->silence_count = 0;
+    sound->stop_in = 0;
 
 	S_SetSoundFrequency(sound, frequency);
 	S_SetSoundVolume(sound, 0);
@@ -255,6 +256,19 @@ static void S_RewindSound(S_Sound* sound) {
 	sound->position = 0;
 
 	ma_mutex_unlock(&mutex);
+}
+
+static bool S_IsPlaying(S_Sound* sound) {
+	if (sound == NULL)
+		return false;
+
+	ma_mutex_lock(&mutex);
+
+	bool playing = sound->playing;
+
+	ma_mutex_unlock(&mutex);
+
+	return playing;
 }
 
 // This is for exporting
@@ -408,6 +422,7 @@ S_Sound *lpDRAMBUFFER[8] = {NULL};
 //DWORD						OutBufSize;				//!< ƒXƒgƒŠ[ƒ€ƒoƒbƒtƒ@EƒTƒCƒY.
 
 extern int s_solo;
+extern int iKeyPushDown[256];
 
 static void S_Callback(ma_device* device, void* output_stream, const void* input_stream, ma_uint32 frames_total)
 {
@@ -806,7 +821,7 @@ void ChangeOrganFrequency(unsigned char key,char track, DWORD a)
 		}
 }
 short pan_tbl[13] = {0,43,86,129,172,215,256,297,340,383,426,469,512}; 
-unsigned char old_key[MAXTRACK] = {255,255,255,255,255,255,255,255};//Ä¶’†‚Ì‰¹
+unsigned char old_key[MAXTRACK] = {255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255};//Ä¶’†‚Ì‰¹
 unsigned char key_on[MAXTRACK] = {0,0,0,0,0,0,0,0};//ƒL[ƒXƒCƒbƒ`
 unsigned char key_twin[MAXTRACK] = {0,0,0,0,0,0,0,0};//¡Žg‚Á‚Ä‚¢‚éƒL[(˜A‘±Žž‚ÌƒmƒCƒY–hŽ~‚Ìˆ×‚É“ñ‚Â—pˆÓ)
 void ChangeOrganPan(unsigned char key, unsigned char pan,char track)//512‚ªMAX‚Å256‚ªÉ°ÏÙ
@@ -1206,10 +1221,12 @@ void PlayDramObject(unsigned char key, int mode,char track)
     if(lpDRAMBUFFER[track] != NULL){
 		switch(mode){
 		case 0: // ’âŽ~
+			old_key[track + MAXMELODY] = 255;
 			S_StopSound(lpDRAMBUFFER[track]);
 			S_RewindSound(lpDRAMBUFFER[track]);
 			break;
 		case 1: // Ä¶
+			old_key[track + MAXMELODY] = key;
 			S_StopSound(lpDRAMBUFFER[track]);
 			S_RewindSound(lpDRAMBUFFER[track]);
 			ChangeDramFrequency(key,track);//Žü”g”‚ðÝ’è‚µ‚Ä
@@ -1221,6 +1238,10 @@ void PlayDramObject(unsigned char key, int mode,char track)
 			break;
 		}
     }
+}
+
+bool IsDramPlaying(char track) {
+	return lpDRAMBUFFER[track] != NULL && S_IsPlaying(lpDRAMBUFFER[track]);
 }
 
 void PlayOrganKey(unsigned char key,char track,DWORD freq,int Nagasa)
@@ -1285,6 +1306,8 @@ void Rxo_ShowDirectSoundObject(HWND hwnd)
 //‰¹‚ð‚·‚®‚É‘S•”Ž~‚ß‚é
 void Rxo_StopAllSoundNow(void)
 {
+	memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
+
 	int i,j,k;
 	for (i = 0; i < SE_MAX; i++)
 		if (lpSECONDARYBUFFER[i] != NULL) {

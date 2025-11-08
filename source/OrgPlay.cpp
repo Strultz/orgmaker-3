@@ -10,6 +10,9 @@
 extern bool gPlayMidNote;
 extern HWND hwndToolbar;
 extern int sSmoothScroll;
+extern int iKeyPushDown[256];
+extern unsigned char old_key[];
+extern bool gNoteHighlights;
 
 char timer_sw = 0;
 long oplay_p;
@@ -28,37 +31,52 @@ void OrgData::PlayData(void)
 	//メロディの再生
 	for(int i = 0; i < MAXMELODY; i++){
 //	int i = 6;
-		if(np[i] != NULL &&play_p == np[i]->x ){//音が来た。
+		if(np[i] != NULL && play_p == np[i]->x) {//音が来た。
 			if (s_solo != -1 && s_solo != i)
 				continue;
 
-			if(mute[i] == 0){
-				if(np[i]->y != KEYDUMMY){
+			if(mute[i] == 0) {
+				if(np[i]->y != KEYDUMMY) {
+					if (gNoteHighlights && this->track == i) {
+						if (old_key[i] != 255) iKeyPushDown[old_key[i]] = 0;
+						iKeyPushDown[np[i]->y] = 1;
+					}
 					PlayOrganObject(np[i]->y,-1,i,info.tdata[i].freq, info.tdata[i].pipi);
 					now_leng[i] = np[i]->length;
 				}
 			}
-			if(np[i]->pan != PANDUMMY)ChangeOrganPan(np[i]->y,np[i]->pan,i);
-			if(np[i]->volume != VOLDUMMY)ChangeOrganVolume(np[i]->y,np[i]->volume * 100 / 0x7F,i);
+			if(np[i]->pan != PANDUMMY) ChangeOrganPan(np[i]->y,np[i]->pan,i);
+			if(np[i]->volume != VOLDUMMY) ChangeOrganVolume(np[i]->y,np[i]->volume * 100 / 0x7F,i);
 			np[i] = np[i]->to;//次の音符を指す
 		}
-		if(now_leng[i] == 0 ){
+		if(now_leng[i] == 0) {
+			if (gNoteHighlights && this->track == i && old_key[i] != 255) iKeyPushDown[old_key[i]] = 0;
 			PlayOrganObject(NULL,2,i,info.tdata[i].freq, info.tdata[i].pipi);
 		}
-		if(now_leng[i] > 0)now_leng[i]--;
+		if(now_leng[i] > 0) now_leng[i]--;
 	}
 	//ドラムの再生
-	for(int i = MAXMELODY; i < MAXTRACK; i++){
+	for(int i = MAXMELODY; i < MAXTRACK; i++) {
 		if (s_solo != -1 && s_solo != i)
 			continue;
 
-		if(np[i] != NULL &&play_p == np[i]->x ){//音が来た。
-			if(np[i]->y != KEYDUMMY){//ならす
-				if(mute[i] == 0)PlayDramObject(np[i]->y,1,i-MAXMELODY);
+		if(np[i] != NULL && play_p == np[i]->x) {//音が来た。
+			if(np[i]->y != KEYDUMMY) {//ならす
+				if (mute[i] == 0) {
+					if (gNoteHighlights && this->track == i) {
+						if (old_key[i] != 255) iKeyPushDown[old_key[i]] = 0;
+						iKeyPushDown[np[i]->y] = 1;
+					}
+					PlayDramObject(np[i]->y, 1, i - MAXMELODY);
+				}
 			}
-			if(np[i]->pan != PANDUMMY)ChangeDramPan(np[i]->pan,i-MAXMELODY);
-			if(np[i]->volume != VOLDUMMY)ChangeDramVolume(np[i]->volume * 100 / 0x7F,i-MAXMELODY);
+			if(np[i]->pan != PANDUMMY) ChangeDramPan(np[i]->pan,i-MAXMELODY);
+			if(np[i]->volume != VOLDUMMY) ChangeDramVolume(np[i]->volume * 100 / 0x7F,i-MAXMELODY);
 			np[i] = np[i]->to;//次の音符を指す
+		}
+
+		if (gNoteHighlights && this->track == i && !IsDramPlaying(i - MAXMELODY) && old_key[i] != 255) {
+			iKeyPushDown[old_key[i]] = 0;
 		}
 	}
 	//プレイヤーに表示

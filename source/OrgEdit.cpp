@@ -37,6 +37,8 @@ extern bool volChangeSetNoteLength;
 extern char timer_sw;
 extern int sACrnt;
 
+extern int iKeyPushDown[256];
+
 void ChangeTrackPlus(int iValue) {
 	MUSICINFO mi;
 	org_data.GetMusicInfo(&mi);
@@ -56,6 +58,8 @@ void ChangeTrackPlus(int iValue) {
 			tra = org_data.track;
 		}
 	}
+
+	memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
 	//選択トラック表示
 	//itoa(org_data.track, str, 10);
 
@@ -107,6 +111,8 @@ void ChangeTrack(int iTrack) {
 			tra = org_data.track;
 		}
 	}
+
+	memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
 	//選択トラック表示
 	/*itoa(org_data.track, str, 10);
 	if(sACrnt){

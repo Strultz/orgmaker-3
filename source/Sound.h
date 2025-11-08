@@ -36,6 +36,7 @@ void ChangeOrganPan(unsigned char key, unsigned char pan,char track);//0Ç™Å©Ç≈6Ç
 void PlayOrganObject(unsigned char key, int mode,char track,DWORD freq, bool pipi);
 void ResumeOrganObject(unsigned char key, char track, DWORD freq, bool pipi, int played_ms);
 void PlayOrganKey(unsigned char key,char track,DWORD freq, int Nagasa = 80);
+bool IsDramPlaying(char track);
 BOOL LoadWaveData100(const char *file);
 BOOL InitWaveData100(void);
 BOOL DeleteWaveData100(void);

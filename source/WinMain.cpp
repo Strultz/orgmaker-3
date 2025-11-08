@@ -50,6 +50,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 static char tVerName[64];
 static bool canUpdateCheck = true;
 
+// Ts is ass
 void CheckUpdate(bool act) {
 	if (!canUpdateCheck) return;
 	canUpdateCheck = false;
@@ -177,6 +178,7 @@ HWND hDlgHelp = NULL;
 BOOL actApp;
 
 bool gPlayMidNote = true;
+bool gNoteHighlights = true;
 
 bool gIsDrawing = false;
 bool gFileModified = false;
@@ -851,10 +853,12 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	floatingToolbars = GetPrivateProfileInt(MAIN_WINDOW, "FloatingToolbars", 0, app_path);
 	gPlayMidNote = GetPrivateProfileInt(MAIN_WINDOW, "PlayMidNote", 1, app_path);
 
+	gNoteHighlights = GetPrivateProfileInt(MAIN_WINDOW, "NoteHighlights", 1, app_path);
 	
 	CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
 	CheckMenuItem(hMenu, IDM_FLOATTOOLBARS, MF_BYCOMMAND | (floatingToolbars ? MFS_CHECKED : MFS_UNCHECKED));
 	CheckMenuItem(hMenu, IDM_PLAY_NOTES_MID, MF_BYCOMMAND | (gPlayMidNote ? MFS_CHECKED : MFS_UNCHECKED));
+	CheckMenuItem(hMenu, IDM_NOTE_HIGHLIGHT, MF_BYCOMMAND | (gNoteHighlights ? MFS_CHECKED : MFS_UNCHECKED));
 
 	for (i = 0; i < MAXTRACK; ++i) {
 		snprintf(strtmp, 128, "Channel%dDefaultVol", i);
@@ -2150,6 +2154,12 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			gPlayMidNote = !gPlayMidNote;
 			CheckMenuItem(hMenu, IDM_PLAY_NOTES_MID, MF_BYCOMMAND | (gPlayMidNote ? MFS_CHECKED : MFS_UNCHECKED));
 			break;
+		case IDM_NOTE_HIGHLIGHT:
+			hMenu = GetMenu(hWnd);
+			gNoteHighlights = !gNoteHighlights;
+			CheckMenuItem(hMenu, IDM_NOTE_HIGHLIGHT, MF_BYCOMMAND | (gNoteHighlights ? MFS_CHECKED : MFS_UNCHECKED));
+			memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
+			break;
 		}
 
 		break;
@@ -2694,7 +2704,8 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW, "FloatingToolbars", num_buf, app_path);
 	wsprintf(num_buf, "%d", gPlayMidNote);
 	WritePrivateProfileString(MAIN_WINDOW, "PlayMidNote", num_buf, app_path);
-
+	wsprintf(num_buf, "%d", gNoteHighlights);
+	WritePrivateProfileString(MAIN_WINDOW, "NoteHighlights", num_buf, app_path);
 	
 
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentThemePath", gSelectedTheme, app_path);
