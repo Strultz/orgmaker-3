@@ -9,37 +9,37 @@
 #include "Scroll.h"
 #include "rxoFunction.h"
 
-//‹È‚ÌPATH‚Í‚±‚±‚É’u‚¢‚Ä‚¨‚­
+//æ›²ã®PATHã¯ã“ã“ã«ç½®ã„ã¦ãŠã
 char music_file[MAX_PATH]; //NewData.org
 char pass[7] = "Org-01";
 char pass2[7] = "Org-02";//Pipi
-char pass3[7] = "Org-03";//Ÿè‚ÉŠeí‰¹F’Ç‰ÁB
+char pass3[7] = "Org-03";//å‹æ‰‹ã«å„ç¨®éŸ³è‰²è¿½åŠ ã€‚
 
-////ˆÈ‰º‚ÍƒIƒ‹ƒK[ƒjƒƒ‹Èƒf[ƒ^\‘¢‘ÌiƒtƒBƒ‹‚ÉŠÜ‚Ü‚ê‚é€–Új
+////ä»¥ä¸‹ã¯ã‚ªãƒ«ã‚¬ãƒ¼ãƒ‹ãƒ£æ›²ãƒ‡ãƒ¼ã‚¿æ§‹é€ ä½“ï¼ˆãƒ•ã‚£ãƒ«ã«å«ã¾ã‚Œã‚‹é …ç›®ï¼‰
 typedef struct{
-	long x;//ˆÊ’u
-	unsigned char y;//‰¹‚Ì‚‚³
-	unsigned char length;//‰¹‚Ì’·‚³
-	unsigned char volume;//ƒ”ƒHƒŠƒ…[ƒ€
-	unsigned char pan;//ƒpƒ“
+	long x;//ä½ç½®
+	unsigned char y;//éŸ³ã®é«˜ã•
+	unsigned char length;//éŸ³ã®é•·ã•
+	unsigned char volume;//ãƒ´ã‚©ãƒªãƒ¥ãƒ¼ãƒ 
+	unsigned char pan;//ãƒ‘ãƒ³
 }ORGANYANOTE;
 typedef struct{
-	unsigned short freq;//+ƒ¿ü”g”(1000‚ªDefault)
-	unsigned char wave_no;//”gŒ`No
-	unsigned char pipi;//™
-	unsigned short note_num;//‰¹•„‚Ì”
+	unsigned short freq;//+Î±å‘¨æ³¢æ•°(1000ãŒDefault)
+	unsigned char wave_no;//æ³¢å½¢No
+	unsigned char pipi;//â˜†
+	unsigned short note_num;//éŸ³ç¬¦ã®æ•°
 }ORGANYATRACK;
 typedef struct{
 	unsigned short wait;
 	unsigned char line;
 	unsigned char dot;
-	long repeat_x;//ƒŠƒs[ƒg
-	long end_x;//‹È‚ÌI‚í‚è(ƒŠƒs[ƒg‚É–ß‚é)
+	long repeat_x;//ãƒªãƒ”ãƒ¼ãƒˆ
+	long end_x;//æ›²ã®çµ‚ã‚ã‚Š(ãƒªãƒ”ãƒ¼ãƒˆã«æˆ»ã‚‹)
 	ORGANYATRACK tdata[MAXTRACK];
 }ORGANYADATA;
 
 
-//‚»‚Ìƒgƒ‰ƒbƒN‚Ég‚í‚ê‚Ä‚¢‚é‰¹•„‚Ì”‚ğŒŸo
+//ãã®ãƒˆãƒ©ãƒƒã‚¯ã«ä½¿ã‚ã‚Œã¦ã„ã‚‹éŸ³ç¬¦ã®æ•°ã‚’æ¤œå‡º
 unsigned short OrgData::GetNoteNumber(char track, long x1, long x2)
 {
 	NOTELIST *np;
@@ -52,12 +52,12 @@ unsigned short OrgData::GetNoteNumber(char track, long x1, long x2)
 		}
 		return num;
 	}else{
-		//”ÍˆÍ‚Ü‚Å‚Æ‚Ô
+		//ç¯„å›²ã¾ã§ã¨ã¶
 		while(np != NULL && np->x < x1){
 			np = np->to;
 		}
 		if(np == NULL)return 0;
-		//”ÍˆÍ‚ğ’´‚¦‚½‚ç(Å‘åX‚ª“¯‚¶•¨‚àŒŸo)
+		//ç¯„å›²ã‚’è¶…ãˆãŸã‚‰(æœ€å¤§XãŒåŒã˜ç‰©ã‚‚æ¤œå‡º)
 		while(np != NULL && np->x <= x2){
 			num++;
 			np = np->to;
@@ -65,13 +65,13 @@ unsigned short OrgData::GetNoteNumber(char track, long x1, long x2)
 		return num;
 	}
 }
-//‹Èƒf[ƒ^‚ğ•Û‘¶
+//æ›²ãƒ‡ãƒ¼ã‚¿ã‚’ä¿å­˜
 BOOL OrgData::SaveMusicData(void)
 {
 	ORGANYADATA org_data;
 	NOTELIST *np;
 	int i,j;
-	//‹L˜^—p‹Èî•ñ‚Ì¶¬
+	//è¨˜éŒ²ç”¨æ›²æƒ…å ±ã®ç”Ÿæˆ
 	org_data.wait = info.wait;
 	org_data.line = info.line;
 	org_data.dot = info.dot;
@@ -84,46 +84,46 @@ BOOL OrgData::SaveMusicData(void)
 		org_data.tdata[i].pipi = info.tdata[i].pipi;
 		org_data.tdata[i].note_num = GetNoteNumber(i, -1, -1);
 	}
-	//£££££££££££££££ƒZ[ƒu
+	//ï½£ï½£ï½£ï½£ï½£ï½£ï½£ï½£ï½£ï½£ï½£ï½£ï½£ï½£ï½£ã‚»ãƒ¼ãƒ–
 	FILE *fp;
 	if((fp=fopen(music_file,"wb"))==NULL){
-		//MessageBox(hWnd,"ƒtƒ@ƒCƒ‹‚ÉƒAƒNƒZƒX‚Å‚«‚Ü‚¹‚ñ","Error (Save)",MB_OK);	// 2014.10.19 D
+		//MessageBox(hWnd,"ãƒ•ã‚¡ã‚¤ãƒ«ã«ã‚¢ã‚¯ã‚»ã‚¹ã§ãã¾ã›ã‚“","Error (Save)",MB_OK);	// 2014.10.19 D
 		msgbox(hWnd,IDS_WARNING_ACCESS_FILE,IDS_ERROR_SAVE,MB_OK);	// 2014.10.19 A
 		return(FALSE);
 	}
-	//ƒpƒXƒ[ƒh
+	//ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
 	j=2;
 	for(i=8;i<16;i++){ // iT JUST KEEPS GETTING WORSE !! WHY WAS IT < 15
-		if(org_data.tdata[i].wave_no>=12)j=3;	//ƒhƒ‰ƒ€‚ÌV‚µ‚¢‰¹‚ğg‚Á‚Ä‚¢‚ê‚ÎVer.3
+		if(org_data.tdata[i].wave_no>=12)j=3;	//ãƒ‰ãƒ©ãƒ ã®æ–°ã—ã„éŸ³ã‚’ä½¿ã£ã¦ã„ã‚Œã°Ver.3
 	}
 	if(j==2)fwrite(&pass2[0], sizeof(char), 6, fp);
 	else fwrite(&pass3[0], sizeof(char), 6, fp);
-	//‹Èî•ñ‚Ì‘‚«‚İ
+	//æ›²æƒ…å ±ã®æ›¸ãè¾¼ã¿
 	fwrite(&org_data, sizeof(ORGANYADATA), 1, fp);
-	//‰¹•„‚Ì•Û‘¶
+	//éŸ³ç¬¦ã®ä¿å­˜
 	for(j = 0; j < MAXTRACK; j++){
 		if(info.tdata[j].note_list == NULL)continue;
-		np = info.tdata[j].note_list;//‚wÀ•W
+		np = info.tdata[j].note_list;//ï¼¸åº§æ¨™
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
 			fwrite(&np->x,      sizeof(long), 1, fp);
 			np = np->to;
 		}
-		np = info.tdata[j].note_list;//‚xÀ•W
+		np = info.tdata[j].note_list;//ï¼¹åº§æ¨™
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
 			fwrite(&np->y,      sizeof(unsigned char), 1, fp);
 			np = np->to;
 		}
-		np = info.tdata[j].note_list;//’·‚³
+		np = info.tdata[j].note_list;//é•·ã•
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
 			fwrite(&np->length, sizeof(unsigned char), 1, fp);
 			np = np->to;
 		}
-		np = info.tdata[j].note_list;//ƒ{ƒŠƒ…[ƒ€
+		np = info.tdata[j].note_list;//ãƒœãƒªãƒ¥ãƒ¼ãƒ 
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
 			fwrite(&np->volume, sizeof(unsigned char), 1, fp);
 			np = np->to;
 		}
-		np = info.tdata[j].note_list;//ƒpƒ“
+		np = info.tdata[j].note_list;//ãƒ‘ãƒ³
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
 			fwrite(&np->pan,    sizeof(unsigned char), 1, fp);
 			np = np->to;
@@ -131,25 +131,25 @@ BOOL OrgData::SaveMusicData(void)
 	}	
 	fclose(fp);
 	PutRecentFile(music_file);
-//	MessageBox(hWnd,"•Û‘¶‚µ‚Ü‚µ‚½","Message (Save)",MB_OK);
-	//«2014.05.06 A
+//	MessageBox(hWnd,"ä¿å­˜ã—ã¾ã—ãŸ","Message (Save)",MB_OK);
+	//â†“2014.05.06 A
 	/*if (SaveWithInitVolFile != 0) {
 		AutoSavePVIFile();
 	}*/
 
 	return TRUE;
 }
-//‹Èƒf[ƒ^‚ğ“Ç‚İ‚İ
+//æ›²ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¿
 extern char *dram_name[];
 
-//ƒtƒ@ƒCƒ‹‚ªƒ[ƒh‰Â”\‚Å‚ ‚ê‚Î0ˆÙí‚Å‚ ‚ê‚Î1‚ğ•Ô‚·BÃŞ°Àƒ[ƒh‚Í‚³‚ê‚È‚¢B 2014.05.22
+//ãƒ•ã‚¡ã‚¤ãƒ«ãŒãƒ­ãƒ¼ãƒ‰å¯èƒ½ã§ã‚ã‚Œã°0ç•°å¸¸ã§ã‚ã‚Œã°1ã‚’è¿”ã™ã€‚ï¾ƒï¾ï½°ï¾€ãƒ­ãƒ¼ãƒ‰ã¯ã•ã‚Œãªã„ã€‚ 2014.05.22
 int OrgData::FileCheckBeforeLoad(char *checkfile)
 {
 	FILE *fp;
 	char pass_check[6];
 	char ver = 0;
 	if((fp=fopen(checkfile,"rb"))==NULL){
-		//MessageBox(hWnd,"ƒtƒ@ƒCƒ‹‚ÉƒAƒNƒZƒX‚Å‚«‚Ü‚¹‚ñ","Error (Load)",MB_OK);
+		//MessageBox(hWnd,"ãƒ•ã‚¡ã‚¤ãƒ«ã«ã‚¢ã‚¯ã‚»ã‚¹ã§ãã¾ã›ã‚“","Error (Load)",MB_OK);
 		return 1;
 	}
 
@@ -159,7 +159,7 @@ int OrgData::FileCheckBeforeLoad(char *checkfile)
 	if( !memcmp( pass_check, pass3, 6 ) )ver = 3;
 	if( !ver ){
 		fclose(fp);
-		//MessageBox(hWnd,"‚±‚Ìƒtƒ@ƒCƒ‹‚Íg‚¦‚Ü‚¹‚ñ","Error (Load)",MB_OK);
+		//MessageBox(hWnd,"ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯ä½¿ãˆã¾ã›ã‚“","Error (Load)",MB_OK);
 		return 1;
 	}
 	fclose(fp);
@@ -175,35 +175,35 @@ BOOL OrgData::LoadMusicData(void)
 	char ver = 0;
 	bool cflag = false;
 
-	//£££££££££££££££ƒ[ƒh
+	//ï½£ï½£ï½£ï½£ï½£ï½£ï½£ï½£ï½£ï½£ï½£ï½£ï½£ï½£ï½£ãƒ­ãƒ¼ãƒ‰
 	FILE *fp;
 	if((fp=fopen(music_file,"rb"))==NULL){
-		//MessageBox(hWnd,"ƒtƒ@ƒCƒ‹‚ÉƒAƒNƒZƒX‚Å‚«‚Ü‚¹‚ñ","Error (Load)",MB_OK);	// 2014.10.19 D
+		//MessageBox(hWnd,"ãƒ•ã‚¡ã‚¤ãƒ«ã«ã‚¢ã‚¯ã‚»ã‚¹ã§ãã¾ã›ã‚“","Error (Load)",MB_OK);	// 2014.10.19 D
 		msgbox(hWnd,IDS_WARNING_ACCESS_FILE,IDS_ERROR_LOAD,MB_OK);	// 2014.10.19 A
 		return(FALSE);
 	}
-	//ƒpƒXƒ[ƒhƒ`ƒFƒbƒN
+	//ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãƒã‚§ãƒƒã‚¯
 	fread(&pass_check[0], sizeof(char), 6, fp);
 	if( !memcmp( pass_check, pass, 6 ) )ver = 1;
 	if( !memcmp( pass_check, pass2, 6 ) )ver = 2;
 	if( !memcmp( pass_check, pass3, 6 ) )ver = 3; // are you JOKING why was this 2
 	if( !ver ){
 		fclose(fp);
-		//MessageBox(hWnd,"‚±‚Ìƒtƒ@ƒCƒ‹‚Íg‚¦‚Ü‚¹‚ñ","Error (Load)",MB_OK);	// 2014.10.19 D
+		//MessageBox(hWnd,"ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯ä½¿ãˆã¾ã›ã‚“","Error (Load)",MB_OK);	// 2014.10.19 D
 		msgbox(hWnd,IDS_ERROR_FILE,IDS_ERROR_LOAD,MB_OK);	// 2014.10.19 A
 		return FALSE;
 	}
 //	for(i = 0; i < 4; i++){
 //		if(pass[i] != pass_check[i]){
-//			MessageBox(hWnd,"‚±‚Ìƒtƒ@ƒCƒ‹‚Íg‚¦‚Ü‚¹‚ñ","Error (Load)",MB_OK);
+//			MessageBox(hWnd,"ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯ä½¿ãˆã¾ã›ã‚“","Error (Load)",MB_OK);
 //			fclose(fp);
 //			return FALSE;
 //		}
 //	}
-	//‹Èî•ñ‚Ì“Ç‚İ‚İ
+	//æ›²æƒ…å ±ã®èª­ã¿è¾¼ã¿
 	fread(&org_data, sizeof(ORGANYADATA), 1, fp);
 
-	//‹È‚Ìî•ñ‚ğİ’è
+	//æ›²ã®æƒ…å ±ã‚’è¨­å®š
 	info.wait = org_data.wait;
 	info.line = org_data.line;
 	info.dot = org_data.dot;
@@ -216,9 +216,9 @@ BOOL OrgData::LoadMusicData(void)
 		info.tdata[i].wave_no = org_data.tdata[i].wave_no;
 	}
 
-	//‰¹•„‚Ìƒ[ƒh
+	//éŸ³ç¬¦ã®ãƒ­ãƒ¼ãƒ‰
 	for(j = 0; j < MAXTRACK; j++){
-		//Å‰‚Ì‰¹•„‚Ífrom‚ªNULL‚Æ‚È‚é
+		//æœ€åˆã®éŸ³ç¬¦ã¯fromãŒNULLã¨ãªã‚‹
 		if(org_data.tdata[j].note_num == 0){
 			info.tdata[j].note_list = NULL;
 			continue;
@@ -229,7 +229,7 @@ BOOL OrgData::LoadMusicData(void)
 				cflag = true;
 			}
 		}
-		//ƒŠƒXƒg‚ğì‚é
+		//ãƒªã‚¹ãƒˆã‚’ä½œã‚‹
 		np = info.tdata[j].note_p;
 		info.tdata[j].note_list = info.tdata[j].note_p;
 		np->from = NULL;
@@ -240,38 +240,38 @@ BOOL OrgData::LoadMusicData(void)
 			np->to = (np + 1);
 			np++;
 		}
-		//ÅŒã‚Ì‰¹•„‚Ìto‚ÍNULL
+		//æœ€å¾Œã®éŸ³ç¬¦ã®toã¯NULL
 		np--;
 		np->to = NULL;
 
-		//“à—e‚ğ‘ã“ü
-		np = info.tdata[j].note_p;//‚wÀ•W
+		//å†…å®¹ã‚’ä»£å…¥
+		np = info.tdata[j].note_p;//ï¼¸åº§æ¨™
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
 			if (i >= info.alloc_note) { fseek(fp, sizeof(long), SEEK_CUR); continue; }
 			fread(&np->x,      sizeof(long), 1, fp);
 			np++;
 		}
-		np = info.tdata[j].note_p;//‚xÀ•W
+		np = info.tdata[j].note_p;//ï¼¹åº§æ¨™
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
 			if (i >= info.alloc_note) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
 			fread(&np->y,      sizeof(unsigned char), 1, fp);
 			if (np->y >= 96) np->y = KEYDUMMY; // another fix
 			np++;
 		}
-		np = info.tdata[j].note_p;//’·‚³
+		np = info.tdata[j].note_p;//é•·ã•
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
 			if (i >= info.alloc_note) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
 			fread(&np->length, sizeof(unsigned char), 1, fp);
 			if (np->length == 0) np->length = 1; // org corruption fix
 			np++;
 		}
-		np = info.tdata[j].note_p;//ƒ{ƒŠƒ…[ƒ€
+		np = info.tdata[j].note_p;//ãƒœãƒªãƒ¥ãƒ¼ãƒ 
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
 			if (i >= info.alloc_note) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
 			fread(&np->volume, sizeof(unsigned char), 1, fp);
 			np++;
 		}
-		np = info.tdata[j].note_p;//ƒpƒ“
+		np = info.tdata[j].note_p;//ãƒ‘ãƒ³
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
 			if (i >= info.alloc_note) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
 			fread(&np->pan,    sizeof(unsigned char), 1, fp);
@@ -279,16 +279,16 @@ BOOL OrgData::LoadMusicData(void)
 		}
 	}
 	fclose(fp);
-	//ƒf[ƒ^‚ğ—LŒø‚É
+	//ãƒ‡ãƒ¼ã‚¿ã‚’æœ‰åŠ¹ã«
 	for(j = 0; j < MAXMELODY; j++)
 		MakeOrganyaWave(j,info.tdata[j].wave_no, info.tdata[j].pipi);
 	for(j = MAXMELODY; j < MAXTRACK; j++){
 		i = info.tdata[j].wave_no;
 		InitDramObject(i,j-MAXMELODY);
 	}
-	//ƒvƒŒƒCƒ„[‚É•\¦
+	//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«è¡¨ç¤º
 	char str[32];
-	SetPlayPointer(0);//“ªo‚µ
+	SetPlayPointer(0);//é ­å‡ºã—
 	scr_data.SetHorzScroll(0);
 	itoa(info.wait,str,10);
 	/*SetDlgItemText(hDlgPlayer, IDE_VIEWWAIT, str);
@@ -296,10 +296,10 @@ BOOL OrgData::LoadMusicData(void)
 	SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,"0");*/
 
 	scr_data.ChangeHorizontalRange(info.end_x);
-	//MakeMusicParts(info.line,info.dot);//ƒp[ƒc‚ğ¶¬
+	//MakeMusicParts(info.line,info.dot);//ãƒ‘ãƒ¼ãƒ„ã‚’ç”Ÿæˆ
 	//MakePanParts(info.line,info.dot);
 	PutRecentFile(music_file);
-	//«2014.05.06 A
+	//â†“2014.05.06 A
 	/*if (SaveWithInitVolFile != 0) {
 		AutoLoadPVIFile();
 	}*/
@@ -325,12 +325,12 @@ void OrgData::SortNotes()
 		org_data.tdata[i].note_num = GetNoteNumber(i, -1, -1);
 	}
 
-	pNtls = new NOTELIST[4096]; //‘Ş”ğ—p
+	pNtls = new NOTELIST[4096]; //é€€é¿ç”¨
 	
 	for(j = 0; j < MAXTRACK; j++){
 		if(info.tdata[j].note_list == NULL)continue;
 		pntl = pNtls;
-		np = info.tdata[j].note_list;//‰¹•„‚Ìæ“ª
+		np = info.tdata[j].note_list;//éŸ³ç¬¦ã®å…ˆé ­
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
 			pNtls[i].x = np->x;
 			pNtls[i].y = np->y;
@@ -339,9 +339,9 @@ void OrgData::SortNotes()
 			pNtls[i].length = np->length;
 			np = np->to;
 		}
-		//ƒŠƒXƒg‚ğì‚é
+		//ãƒªã‚¹ãƒˆã‚’ä½œã‚‹
 		if(true){
-			np = info.tdata[j].note_p; //—Ìˆæ‚Ìæ“ª
+			np = info.tdata[j].note_p; //é ˜åŸŸã®å…ˆé ­
 			info.tdata[j].note_list = info.tdata[j].note_p;
 			np->from = NULL;
 			np->to = (np + 1);
@@ -351,10 +351,10 @@ void OrgData::SortNotes()
 				np->to = (np + 1);
 				np++;
 			}
-			//ÅŒã‚Ì‰¹•„‚Ìto‚ÍNULL
+			//æœ€å¾Œã®éŸ³ç¬¦ã®toã¯NULL
 			np--;
 			np->to = NULL;
-			np = info.tdata[j].note_p;//‚wÀ•W
+			np = info.tdata[j].note_p;//ï¼¸åº§æ¨™
 			for(i = 0; i < org_data.tdata[j].note_num; i++){
 				np->x = pNtls[i].x;
 				np->y = pNtls[i].y;
@@ -363,8 +363,8 @@ void OrgData::SortNotes()
 				np->volume = pNtls[i].volume;
 				np++;
 			}
-		}else{ //ÀŒ±“I‚ÉƒTƒJƒV‚É‚·‚é
-			np = info.tdata[j].note_p+4095; //—Ìˆæ‚Ìæ“ª
+		}else{ //å®Ÿé¨“çš„ã«ã‚µã‚«ã‚·ã«ã™ã‚‹
+			np = info.tdata[j].note_p+4095; //é ˜åŸŸã®å…ˆé ­
 			info.tdata[j].note_list = info.tdata[j].note_p;
 			np->from = NULL;
 			np->to = (np - 1);
@@ -374,10 +374,10 @@ void OrgData::SortNotes()
 				np->to = (np - 1);
 				np--;
 			}
-			//ÅŒã‚Ì‰¹•„‚Ìto‚ÍNULL
+			//æœ€å¾Œã®éŸ³ç¬¦ã®toã¯NULL
 			np++;
 			np->to = NULL;
-			np = info.tdata[j].note_p;//‚wÀ•W
+			np = info.tdata[j].note_p;//ï¼¸åº§æ¨™
 			for(i = 0; i < org_data.tdata[j].note_num; i++){
 				np->x = pNtls[i].x;
 				np->y = pNtls[i].y;
@@ -389,17 +389,17 @@ void OrgData::SortNotes()
 
 		}
 	}	
-	delete [] pNtls;	// 2014.10.18 ‰ğ•ú‚ğ’Ç‰Á‚µ‚½B
-	//ƒvƒŒƒCƒ„[‚É•\¦
+	delete [] pNtls;	// 2014.10.18 è§£æ”¾ã‚’è¿½åŠ ã—ãŸã€‚
+	//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«è¡¨ç¤º
 	char str[32];
-	SetPlayPointer(0);//“ªo‚µ
+	SetPlayPointer(0);//é ­å‡ºã—
 	scr_data.SetHorzScroll(0);
 	itoa(info.wait,str,10);
 	/*SetDlgItemText(hDlgPlayer, IDE_VIEWWAIT, str);
 	SetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,"0");
 	SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,"0");*/
 
-	//MakeMusicParts(info.line,info.dot);//ƒp[ƒc‚ğ¶¬
+	//MakeMusicParts(info.line,info.dot);//ãƒ‘ãƒ¼ãƒ„ã‚’ç”Ÿæˆ
 	//MakePanParts(info.line,info.dot);
 
 }

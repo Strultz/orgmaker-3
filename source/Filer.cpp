@@ -9,7 +9,7 @@
 
 //RECT CmnDialogWnd;
 int count_of_INIT_DONE;
-int iDlgRepeat; //ƒ_ƒCƒAƒƒO‚©‚çæ“¾‚µ‚½ŒJ‚è•Ô‚µ‰ñ”
+int iDlgRepeat; //ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‹ã‚‰å–å¾—ã—ãŸç¹°ã‚Šè¿”ã—å›æ•°
 extern char strMIDI_TITLE[256];
 extern char strMIDI_AUTHOR[256];
 LPCTSTR  MIDIPC[]={
@@ -34,17 +34,17 @@ LPCTSTR  MIDIPC[]={
 extern unsigned char ucMIDIProgramChangeValue[MAXTRACK];
 
 char GetFileNameSave(HWND hwnd,char *title)
-{//ƒtƒ@ƒCƒ‹–¼‚ğæ“¾(ƒZ[ƒu)
+{//ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å–å¾—(ã‚»ãƒ¼ãƒ–)
 	OPENFILENAME ofn;
 	//FILE *fp;
-//	char res;//ƒtƒ@ƒCƒ‹ƒI[ƒvƒ“‚ÌŒ‹‰Ê
+//	char res;//ãƒ•ã‚¡ã‚¤ãƒ«ã‚ªãƒ¼ãƒ—ãƒ³ã®çµæœ
 
 	memset(&ofn,0,sizeof(OPENFILENAME));
 //	strcpy(GetName,"*.pmd");
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner   = hwnd;
 	ofn.hInstance   = hInst;
-	//ofn.lpstrFilter = "OrganyaData[*.org]\0*.org\0‘S‚Ä‚ÌŒ`® [*.*]\0*.*\0\0";	// 2014.10.19 D
+	//ofn.lpstrFilter = "OrganyaData[*.org]\0*.org\0å…¨ã¦ã®å½¢å¼ [*.*]\0*.*\0\0";	// 2014.10.19 D
 	ofn.lpstrFilter = MessageString[IDS_STRING109];	// 2014.10.19 A
 	ofn.lpstrFile   = music_file;
 	ofn.nMaxFile    = MAX_PATH;
@@ -52,20 +52,20 @@ char GetFileNameSave(HWND hwnd,char *title)
 	ofn.Flags       = OFN_NOREADONLYRETURN | OFN_OVERWRITEPROMPT | OFN_CREATEPROMPT | OFN_HIDEREADONLY;
 	ofn.lpstrDefExt = "org";
 
-	//ƒtƒ@ƒCƒ‹–¼æ“¾‚ğ‚İ‚éB
+	//ãƒ•ã‚¡ã‚¤ãƒ«åå–å¾—ã‚’è©¦ã¿ã‚‹ã€‚
 	if(GetSaveFileName(&ofn));//InvalidateRect(hwnd,NULL,TRUE);
-	else return MSGCANCEL;//ƒLƒƒƒ“ƒZƒ‹‚Å0‚ª•Ô‚é
+	else return MSGCANCEL;//ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã§0ãŒè¿”ã‚‹
 	//fp = fopen(music_file,"rb");
-	//Šù‘¶ƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚éH OFN_OVERWRITEPROMPT w’è‚Å•s—v‚Æ‚µ‚½B
+	//æ—¢å­˜ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚‹ï¼Ÿ OFN_OVERWRITEPROMPT æŒ‡å®šã§ä¸è¦ã¨ã—ãŸã€‚
 	//if(fp != NULL){
 	//	fclose(fp);
-	//	return MSGEXISFILE;//Šù‘¶ƒtƒ@ƒCƒ‹
+	//	return MSGEXISFILE;//æ—¢å­˜ãƒ•ã‚¡ã‚¤ãƒ«
 	//}
 	return MSGSAVEOK;
 }
-// ƒOƒ‰ƒtƒBƒbƒNƒX•`‰æ 
+// ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹æç”» 
 int DrawGr(HWND hWnd, HDC hdc) {
-	return 0; //‚à‚¤‰½‚à‚µ‚È‚¢‚æB
+	return 0; //ã‚‚ã†ä½•ã‚‚ã—ãªã„ã‚ˆã€‚
 	HPEN hPen, hOldPen;
 	RECT rt;
 	GetClientRect(hWnd, &rt);
@@ -83,7 +83,7 @@ int DrawGr(HWND hWnd, HDC hdc) {
 	DeleteObject(hPen);
 	return 0;
 } 
-//ƒtƒbƒNƒvƒƒV[ƒWƒƒ
+//ãƒ•ãƒƒã‚¯ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£
 UINT CALLBACK OFNHookProcMID(HWND hdlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	//RECT  rcWindow;
@@ -103,19 +103,19 @@ UINT CALLBACK OFNHookProcMID(HWND hdlg, UINT msg, WPARAM wParam, LPARAM lParam)
 			SetDlgItemText(hdlg, IDC_AUTHOR, strMIDI_AUTHOR);
 			SetDlgItemText(hdlg, IDC_TITLE,  strMIDI_TITLE);
  			for(j=0;j<8;j++){
-				SendDlgItemMessage(hdlg,IDC_MIDIPC1+j,CB_RESETCONTENT,0,0);//‰Šú‰»
+				SendDlgItemMessage(hdlg,IDC_MIDIPC1+j,CB_RESETCONTENT,0,0);//åˆæœŸåŒ–
 				for(i=0;i<128;i++){
 					SendDlgItemMessage(hdlg,IDC_MIDIPC1+j,CB_ADDSTRING,0,(LPARAM)MIDIPC[i]);
 				}
 				if(ucMIDIProgramChangeValue[j] == 255){
-					ucMIDIProgramChangeValue[j] = mi.tdata[j].wave_no; //‚±‚ñ‚È‚Æ‚±‚ë‚Å‰Šú‰»
+					ucMIDIProgramChangeValue[j] = mi.tdata[j].wave_no; //ã“ã‚“ãªã¨ã“ã‚ã§åˆæœŸåŒ–
 				}
 				SendDlgItemMessage(hdlg,IDC_MIDIPC1+j,CB_SETCURSEL,ucMIDIProgramChangeValue[j],0);
 			}
            return TRUE;
 
 		case WM_SIZE:
-			DlgWidth  = LOWORD(lParam);	//ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚ÌƒTƒCƒY
+			DlgWidth  = LOWORD(lParam);	//ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã®ã‚µã‚¤ã‚º
 			DlgHeight = HIWORD(lParam);
 			haDlg = GetDlgItem(hdlg, IDC_TITLE);
 			SetWindowPos(haDlg, HWND_TOP, 1, 1, DlgWidth-150, 18, SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER );
@@ -162,16 +162,16 @@ UINT CALLBACK OFNHookProcMID(HWND hdlg, UINT msg, WPARAM wParam, LPARAM lParam)
 
 				//MessageBox(NULL,ctmp,"Message",MB_OK);
 			}
-			//MessageBox(NULL,"‰Šú‰»‚µ‚Ü‚µ‚½","Message",MB_OK);
+			//MessageBox(NULL,"åˆæœŸåŒ–ã—ã¾ã—ãŸ","Message",MB_OK);
 			return TRUE;
     }
     return FALSE;
 }
 char GetFileNameMIDI(HWND hwnd,char *title, char *filename)
-{//ƒtƒ@ƒCƒ‹–¼‚ğæ“¾(MIDI)
+{//ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å–å¾—(MIDI)
 	OPENFILENAME ofn;
 	//FILE *fp;
-//	char res;//ƒtƒ@ƒCƒ‹ƒI[ƒvƒ“‚ÌŒ‹‰Ê
+//	char res;//ãƒ•ã‚¡ã‚¤ãƒ«ã‚ªãƒ¼ãƒ—ãƒ³ã®çµæœ
 
 	memset(&ofn,0,sizeof(OPENFILENAME));
 	strcpy(filename, music_file);
@@ -184,7 +184,7 @@ char GetFileNameMIDI(HWND hwnd,char *title, char *filename)
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner   = hwnd;
 	ofn.hInstance   = hInst;
-	//ofn.lpstrFilter = "•W€MIDIƒtƒ@ƒCƒ‹[*.mid]\0*.mid\0‘S‚Ä‚ÌŒ`® [*.*]\0*.*\0\0";	// 2014.10.19 D
+	//ofn.lpstrFilter = "æ¨™æº–MIDIãƒ•ã‚¡ã‚¤ãƒ«[*.mid]\0*.mid\0å…¨ã¦ã®å½¢å¼ [*.*]\0*.*\0\0";	// 2014.10.19 D
 	ofn.lpstrFilter = MessageString[IDS_STRING110];	// 2014.10.19 A
 	ofn.lpstrFile   = filename;
 	ofn.nMaxFile    = MAX_PATH;
@@ -194,7 +194,7 @@ char GetFileNameMIDI(HWND hwnd,char *title, char *filename)
                       OFN_CREATEPROMPT |
                       OFN_HIDEREADONLY |
                       OFN_ENABLESIZING |
-                      OFN_ENABLEHOOK |     //ƒtƒbƒNƒvƒƒV[ƒWƒƒ‚ğg‚¤
+                      OFN_ENABLEHOOK |     //ãƒ•ãƒƒã‚¯ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ã‚’ä½¿ã†
                       OFN_ENABLETEMPLATE;
 	ofn.lpfnHook = OFNHookProcMID;
 	ofn.lpTemplateName = MAKEINTRESOURCE(IDD_MIDI);
@@ -202,20 +202,20 @@ char GetFileNameMIDI(HWND hwnd,char *title, char *filename)
 
 	ofn.lpstrDefExt = "mid";
 
-	//ƒtƒ@ƒCƒ‹–¼æ“¾‚ğ‚İ‚éB
+	//ãƒ•ã‚¡ã‚¤ãƒ«åå–å¾—ã‚’è©¦ã¿ã‚‹ã€‚
 	if(GetSaveFileName(&ofn));//InvalidateRect(hwnd,NULL,TRUE);
-	else return MSGCANCEL;//ƒLƒƒƒ“ƒZƒ‹‚Å0‚ª•Ô‚é
+	else return MSGCANCEL;//ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã§0ãŒè¿”ã‚‹
 	//fp = fopen(filename,"rb");
 
-	//Šù‘¶ƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚éH  OFN_OVERWRITEPROMPT w’è‚Å•s—v‚Æ‚µ‚½B
+	//æ—¢å­˜ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚‹ï¼Ÿ  OFN_OVERWRITEPROMPT æŒ‡å®šã§ä¸è¦ã¨ã—ãŸã€‚
 	//if(fp != NULL){
 	//	fclose(fp);
-	//	return MSGEXISFILE;//Šù‘¶ƒtƒ@ƒCƒ‹
+	//	return MSGEXISFILE;//æ—¢å­˜ãƒ•ã‚¡ã‚¤ãƒ«
 	//}
 	return MSGSAVEOK;
 }
 
-//ƒtƒbƒNƒvƒƒV[ƒWƒƒ
+//ãƒ•ãƒƒã‚¯ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£
 /*UINT CALLBACK OFNHookProc(HWND hdlg, UINT msg, WPARAM wParam,LPARAM lParam)
 {
 	RECT  rcWindow;
@@ -238,7 +238,7 @@ char GetFileNameMIDI(HWND hwnd,char *title, char *filename)
 						CmnDialogWnd.right,CmnDialogWnd.bottom, SWP_NOZORDER ); 
 					count_of_INIT_DONE = -9999999;
 				}
-			//MessageBox(NULL,"‰Šú‰»‚µ‚Ü‚µ‚½","Message",MB_OK);
+			//MessageBox(NULL,"åˆæœŸåŒ–ã—ã¾ã—ãŸ","Message",MB_OK);
 			return TRUE;
         case WM_COMMAND:
             switch(LOWORD(wParam)){
@@ -257,11 +257,11 @@ char GetFileNameMIDI(HWND hwnd,char *title, char *filename)
 }*/
 
 char GetFileNameLoad(HWND hwnd,char *title/*, int OpenType*/)
-{//ƒtƒ@ƒCƒ‹–¼‚ğæ“¾(ƒ[ƒh)
+{//ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å–å¾—(ãƒ­ãƒ¼ãƒ‰)
 	OPENFILENAME ofn;
 	//FILE *fp;
 	char mfile[MAX_PATH];
-//	char res;//ƒtƒ@ƒCƒ‹ƒI[ƒvƒ“‚ÌŒ‹‰Ê
+//	char res;//ãƒ•ã‚¡ã‚¤ãƒ«ã‚ªãƒ¼ãƒ—ãƒ³ã®çµæœ
 
 	memset(&ofn, 0, sizeof(OPENFILENAME));
 	memset(&mfile, '\0', MAX_PATH);
@@ -269,7 +269,7 @@ char GetFileNameLoad(HWND hwnd,char *title/*, int OpenType*/)
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner   = hwnd;
 	ofn.hInstance   = hInst;
-	//ofn.lpstrFilter = "OrganyaData[*.org]\0*.org\0‘S‚Ä‚ÌŒ`® [*.*]\0*.*\0\0";	// 2014.10.19 D
+	//ofn.lpstrFilter = "OrganyaData[*.org]\0*.org\0å…¨ã¦ã®å½¢å¼ [*.*]\0*.*\0\0";	// 2014.10.19 D
 	ofn.lpstrFilter = MessageString[IDS_STRING111];	// 2014.10.19 A
 	ofn.lpstrFile   = mfile;
 	ofn.nMaxFile    = MAX_PATH;
@@ -277,7 +277,7 @@ char GetFileNameLoad(HWND hwnd,char *title/*, int OpenType*/)
 	ofn.Flags       = OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 	/*if(OpenType==1){
 		ofn.Flags       = OFN_CREATEPROMPT | OFN_HIDEREADONLY |OFN_EXPLORER | 
-						OFN_ENABLESIZING | OFN_ENABLEHOOK |     //ƒtƒbƒNƒvƒƒV[ƒWƒƒ‚ğg‚¤
+						OFN_ENABLESIZING | OFN_ENABLEHOOK |     //ãƒ•ãƒƒã‚¯ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ã‚’ä½¿ã†
 							OFN_ENABLETEMPLATE; 
 		ofn.lpfnHook = OFNHookProc;
 		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_DIALOGOPEN);
@@ -286,13 +286,13 @@ char GetFileNameLoad(HWND hwnd,char *title/*, int OpenType*/)
 	ofn.lpstrDefExt = "org";
 	
 	count_of_INIT_DONE = 0;
-	//ƒtƒ@ƒCƒ‹–¼æ“¾‚ğ‚İ‚éB
+	//ãƒ•ã‚¡ã‚¤ãƒ«åå–å¾—ã‚’è©¦ã¿ã‚‹ã€‚
 	if(GetOpenFileName(&ofn));//InvalidateRect(hwnd,NULL,TRUE);
-	else return MSGCANCEL;//ƒLƒƒƒ“ƒZƒ‹‚Å0‚ª•Ô‚é
+	else return MSGCANCEL;//ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã§0ãŒè¿”ã‚‹
 	if(org_data.FileCheckBeforeLoad(mfile)){
-		//MessageBox(hwnd,"ƒtƒ@ƒCƒ‹‚ÉƒAƒNƒZƒX‚Å‚«‚Ü‚¹‚ñ","",MB_OK);	// 2014.10.19 D
+		//MessageBox(hwnd,"ãƒ•ã‚¡ã‚¤ãƒ«ã«ã‚¢ã‚¯ã‚»ã‚¹ã§ãã¾ã›ã‚“","",MB_OK);	// 2014.10.19 D
 		msgbox(hwnd, IDS_STRING64, IDS_ERROR_LOAD, MB_OK | MB_ICONWARNING); // 2014.10.19 A
-		return MSGCANCEL;//w’èƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢
+		return MSGCANCEL;//æŒ‡å®šãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ãªã„
 	}
 	strcpy(music_file, mfile);
 
@@ -314,7 +314,7 @@ char GetFileNameExportWav(HWND hwnd, char* title, char* filename)
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner = hwnd;
 	ofn.hInstance = hInst;
-	//ofn.lpstrFilter = "OrganyaData[*.org]\0*.org\0‘S‚Ä‚ÌŒ`® [*.*]\0*.*\0\0";	// 2014.10.19 D
+	//ofn.lpstrFilter = "OrganyaData[*.org]\0*.org\0å…¨ã¦ã®å½¢å¼ [*.*]\0*.*\0\0";	// 2014.10.19 D
 	ofn.lpstrFilter = MessageString[IDS_STRING119];	// 2014.10.19 A
 	ofn.lpstrFile = filename;
 	ofn.nMaxFile = MAX_PATH;
@@ -322,14 +322,14 @@ char GetFileNameExportWav(HWND hwnd, char* title, char* filename)
 	ofn.Flags = OFN_NOREADONLYRETURN | OFN_OVERWRITEPROMPT | OFN_CREATEPROMPT | OFN_HIDEREADONLY;
 	ofn.lpstrDefExt = "wav";
 
-	//ƒtƒ@ƒCƒ‹–¼æ“¾‚ğ‚İ‚éB
+	//ãƒ•ã‚¡ã‚¤ãƒ«åå–å¾—ã‚’è©¦ã¿ã‚‹ã€‚
 	if (GetSaveFileName(&ofn));//InvalidateRect(hwnd,NULL,TRUE);
-	else return MSGCANCEL;//ƒLƒƒƒ“ƒZƒ‹‚Å0‚ª•Ô‚é
+	else return MSGCANCEL;//ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã§0ãŒè¿”ã‚‹
 	//fp = fopen(filename, "rb");
-	//Šù‘¶ƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚éH OFN_OVERWRITEPROMPT w’è‚Å•s—v‚Æ‚µ‚½B
+	//æ—¢å­˜ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚‹ï¼Ÿ OFN_OVERWRITEPROMPT æŒ‡å®šã§ä¸è¦ã¨ã—ãŸã€‚
 	//if(fp != NULL){
 	//	fclose(fp);
-	//	return MSGEXISFILE;//Šù‘¶ƒtƒ@ƒCƒ‹
+	//	return MSGEXISFILE;//æ—¢å­˜ãƒ•ã‚¡ã‚¤ãƒ«
 	//}
 	return MSGSAVEOK;
 }

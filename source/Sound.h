@@ -1,13 +1,13 @@
 /*****							  *****/
-/*****   DirectSoundƒTƒ|[ƒgŠÖ”   *****/
+/*****   DirectSoundã‚µãƒãƒ¼ãƒˆé–¢æ•°   *****/
 /*****							  *****/
 
 //#include <dsound.h>
 
 typedef struct {
-	short wave_size;//”gŒ`‚ÌƒTƒCƒY
-	short oct_par;//ƒIƒNƒ^[ƒu‚ğÀŒ»‚·‚éŠ|‚¯—¦(/8)
-	short oct_size;//ƒIƒNƒ^[ƒu‚ğÀŒ»‚·‚éŠ|‚¯—¦(/8)
+	short wave_size;//æ³¢å½¢ã®ã‚µã‚¤ã‚º
+	short oct_par;//ã‚ªã‚¯ã‚¿ãƒ¼ãƒ–ã‚’å®Ÿç¾ã™ã‚‹æ›ã‘ç‡(/8)
+	short oct_size;//ã‚ªã‚¯ã‚¿ãƒ¼ãƒ–ã‚’å®Ÿç¾ã™ã‚‹æ›ã‘ç‡(/8)
 } OCTWAVE;
 
 extern OCTWAVE oct_wave[8];
@@ -15,24 +15,24 @@ extern short freq_tbl[12];
 extern short pan_tbl[13];
 extern char *wave_data;
 
-// DirectSound‚ÌŠJn
+// DirectSoundã®é–‹å§‹
 BOOL InitDirectSound(HWND hwnd);
 BOOL LoadSoundObject( char *file_name, int no);
-// DirectSound‚ÌI—¹
+// DirectSoundã®çµ‚äº†
 void EndDirectSound(void);
-void ReleaseSoundObject(int no);//ƒoƒbƒtƒ@‚ÌŠJ•ú
+void ReleaseSoundObject(int no);//ãƒãƒƒãƒ•ã‚¡ã®é–‹æ”¾
 BOOL InitSoundObject(LPCSTR resname, int no);
-// ƒTƒEƒ“ƒh‚ÌÄ¶
+// ã‚µã‚¦ãƒ³ãƒ‰ã®å†ç”Ÿ
 void PlaySoundObject(int no, int mode);
-void ChangeSoundVolume(int no, long volume);//9999‚ªMAX2195?‚ªÉ°ÏÙ
-void ChangeSoundFrequency(int no, DWORD rate);//300‚ªMAX300‚ªÉ°ÏÙ
+void ChangeSoundVolume(int no, long volume);//9999ãŒMAX2195?ãŒï¾‰ï½°ï¾ï¾™
+void ChangeSoundFrequency(int no, DWORD rate);//300ãŒMAX300ãŒï¾‰ï½°ï¾ï¾™
 void ChangeSoundPan(int no, long pan);
 
 BOOL MakeSoundObject8(char *wavep,char track, char pipi);
 
-void ChangeOrganFrequency(unsigned char key,char track,DWORD a);//9999‚ªMAX‚Å2195?‚ªÉ°ÏÙ
-void ChangeOrganVolume(int no, long volume,char track);//300‚ªMAX‚Å300‚ªÉ°ÏÙ
-void ChangeOrganPan(unsigned char key, unsigned char pan,char track);//0‚ª©‚Å6‚ªÉ°ÏÙ11‚ª¨
+void ChangeOrganFrequency(unsigned char key,char track,DWORD a);//9999ãŒMAXã§2195?ãŒï¾‰ï½°ï¾ï¾™
+void ChangeOrganVolume(int no, long volume,char track);//300ãŒMAXã§300ãŒï¾‰ï½°ï¾ï¾™
+void ChangeOrganPan(unsigned char key, unsigned char pan,char track);//0ãŒâ†ã§6ãŒï¾‰ï½°ï¾ï¾™11ãŒâ†’
 void PlayOrganObject(unsigned char key, int mode,char track,DWORD freq, bool pipi);
 void ResumeOrganObject(unsigned char key, char track, DWORD freq, bool pipi, int played_ms);
 void PlayOrganKey(unsigned char key,char track,DWORD freq, int Nagasa = 80);
@@ -47,8 +47,8 @@ BOOL MakeOrganyaWave(char track,char wave_no, char pipi);
 BOOL InitDramObject(char drum, int no);
 void ReleaseDramObject(char track);
 void ChangeDramFrequency(unsigned char key,char track);
-void ChangeDramPan(unsigned char pan,char track);//512‚ªMAX‚Å256‚ªÉ°ÏÙ
-void ChangeDramVolume(long volume,char track);//300‚ªMAX‚Å300‚ªÉ°ÏÙ
+void ChangeDramPan(unsigned char pan,char track);//512ãŒMAXã§256ãŒï¾‰ï½°ï¾ï¾™
+void ChangeDramVolume(long volume,char track);//300ãŒMAXã§300ãŒï¾‰ï½°ï¾ï¾™
 void PlayDramObject(unsigned char key, int mode,char track);
 void ResumeDramObject(unsigned char key, char track, int played_ms);
 

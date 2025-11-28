@@ -1,5 +1,5 @@
 
-//タイマー関数
+//繧ｿ繧､繝槭�ｼ髢｢謨ｰ
 
 BOOL InitMMTimer();
 BOOL StartTimer(DWORD dwTimer);

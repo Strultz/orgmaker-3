@@ -27,10 +27,10 @@ static RECT screenRect;
 
 HBITMAP waveBmp; // for dialog
 
-extern int gDrawDouble;	//両方のトラックグループを描画する
+extern int gDrawDouble;	//荳｡譁ｹ縺ｮ繝医Λ繝�繧ｯ繧ｰ繝ｫ繝ｼ繝励ｒ謠冗判縺吶ｋ
 extern int rebarHeight;
 
-extern RECT WinRect; //ウィンドウサイズ保存用 A 2010.09.22
+extern RECT WinRect; //繧ｦ繧｣繝ｳ繝峨え繧ｵ繧､繧ｺ菫晏ｭ倡畑 A 2010.09.22
 extern int NoteWidth;
 extern int NoteEnlarge_Until_16px;
 extern char gSelectedTheme[MAX_PATH];

@@ -16,9 +16,9 @@ extern bool gNoteHighlights;
 
 char timer_sw = 0;
 long oplay_p;
-long play_p;//Œ»İÄ¶ˆÊ’uiƒLƒƒƒ“ƒoƒXj
-NOTELIST *np[MAXTRACK];//Œ»İÄ¶€”õ‚Ì‰¹•„
-long now_leng[MAXMELODY] = {NULL};//Ä¶’†‰¹•„‚Ì’·‚³
+long play_p;//ç¾åœ¨å†ç”Ÿä½ç½®ï¼ˆã‚­ãƒ£ãƒ³ãƒã‚¹ï¼‰
+NOTELIST *np[MAXTRACK];//ç¾åœ¨å†ç”Ÿæº–å‚™ã®éŸ³ç¬¦
+long now_leng[MAXMELODY] = {NULL};//å†ç”Ÿä¸­éŸ³ç¬¦ã®é•·ã•
 int s_solo = -1;
 //DWORD lastDrawTime = -1;
 //DWORD drawCatch = 0;
@@ -28,10 +28,10 @@ void OrgData::PlayData(void)
 {
 	char end_cnt = MAXTRACK;
 //	PlaySoundObject(1,1);
-	//ƒƒƒfƒB‚ÌÄ¶
+	//ãƒ¡ãƒ­ãƒ‡ã‚£ã®å†ç”Ÿ
 	for(int i = 0; i < MAXMELODY; i++){
 //	int i = 6;
-		if(np[i] != NULL && play_p == np[i]->x) {//‰¹‚ª—ˆ‚½B
+		if(np[i] != NULL && play_p == np[i]->x) {//éŸ³ãŒæ¥ãŸã€‚
 			if (s_solo != -1 && s_solo != i)
 				continue;
 
@@ -47,7 +47,7 @@ void OrgData::PlayData(void)
 			}
 			if(np[i]->pan != PANDUMMY) ChangeOrganPan(np[i]->y,np[i]->pan,i);
 			if(np[i]->volume != VOLDUMMY) ChangeOrganVolume(np[i]->y,np[i]->volume * 100 / 0x7F,i);
-			np[i] = np[i]->to;//Ÿ‚Ì‰¹•„‚ğw‚·
+			np[i] = np[i]->to;//æ¬¡ã®éŸ³ç¬¦ã‚’æŒ‡ã™
 		}
 		if(now_leng[i] == 0) {
 			if (gNoteHighlights && this->track == i && old_key[i] != 255) iKeyPushDown[old_key[i]] = 0;
@@ -55,13 +55,13 @@ void OrgData::PlayData(void)
 		}
 		if(now_leng[i] > 0) now_leng[i]--;
 	}
-	//ƒhƒ‰ƒ€‚ÌÄ¶
+	//ãƒ‰ãƒ©ãƒ ã®å†ç”Ÿ
 	for(int i = MAXMELODY; i < MAXTRACK; i++) {
 		if (s_solo != -1 && s_solo != i)
 			continue;
 
-		if(np[i] != NULL && play_p == np[i]->x) {//‰¹‚ª—ˆ‚½B
-			if(np[i]->y != KEYDUMMY) {//‚È‚ç‚·
+		if(np[i] != NULL && play_p == np[i]->x) {//éŸ³ãŒæ¥ãŸã€‚
+			if(np[i]->y != KEYDUMMY) {//ãªã‚‰ã™
 				if (mute[i] == 0) {
 					if (gNoteHighlights && this->track == i) {
 						if (old_key[i] != 255) iKeyPushDown[old_key[i]] = 0;
@@ -72,16 +72,16 @@ void OrgData::PlayData(void)
 			}
 			if(np[i]->pan != PANDUMMY) ChangeDramPan(np[i]->pan,i-MAXMELODY);
 			if(np[i]->volume != VOLDUMMY) ChangeDramVolume(np[i]->volume * 100 / 0x7F,i-MAXMELODY);
-			np[i] = np[i]->to;//Ÿ‚Ì‰¹•„‚ğw‚·
+			np[i] = np[i]->to;//æ¬¡ã®éŸ³ç¬¦ã‚’æŒ‡ã™
 		}
 
 		if (gNoteHighlights && this->track == i && !IsDramPlaying(i - MAXMELODY) && old_key[i] != 255) {
 			iKeyPushDown[old_key[i]] = 0;
 		}
 	}
-	//ƒvƒŒƒCƒ„[‚É•\¦
-	//©“®ƒXƒNƒ[ƒ‹
-	/*if(actApp){//ƒAƒNƒeƒBƒu‚Ì‚¾‚¯
+	//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«è¡¨ç¤º
+	//è‡ªå‹•ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«
+	/*if(actApp){//ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã®æ™‚ã ã‘
 		
 	}*/
 
@@ -99,7 +99,7 @@ void OrgData::PlayData(void)
 	play_p++;
 	if(play_p >= info.end_x) {
 		int p = oplay_p;
-		play_p = info.repeat_x; // ++‚³‚ê‚é‚Ì‚Å
+		play_p = info.repeat_x; // ++ã•ã‚Œã‚‹ã®ã§
 		SetPlayPointer(play_p);
 		oplay_p = p;
 	}
@@ -110,7 +110,7 @@ void OrgData::SetPlayPointer(long x)
 	int i;
 	for(i = 0; i < MAXTRACK; i++){
 		np[i] = info.tdata[i].note_list;
-		while(np[i] != NULL && np[i]->x < x)np[i] = np[i]->to; // Œ©‚é‚×‚«‰¹•„‚ğİ’è		
+		while(np[i] != NULL && np[i]->x < x)np[i] = np[i]->to; // è¦‹ã‚‹ã¹ãéŸ³ç¬¦ã‚’è¨­å®š		
 	}
 	play_p = x;
 	oplay_p = x;

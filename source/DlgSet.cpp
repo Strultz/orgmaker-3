@@ -41,7 +41,7 @@ typedef struct{
 	char dot;
 }GRID;
 GRID grid[NUMGRIDA] = {
-	{"│Custom",0,0},
+	{"О╪▄ustom",0,0},
 	{"4/4",4,4},
 	{"4/3",4,3},
 	{"3/4",3,4},
@@ -95,16 +95,16 @@ int Preset1_Vol[]={
 };
 
 
-//char *strTrack[] ={"┌P", "┌Q", "┌R", "┌S", "┌T", "┌U", "┌V", "┌W",  "┌p", "┌v", "┌d", "┌q", "┌s", "┌x", "┌t", "┌h"};	// 2014.10.19 D
+//char *strTrack[] ={"О╪▒", "О╪▓", "О╪⌠", "О╪■", "О╪∙", "О╪√", "О╪≈", "О╪≤",  "О╪╠", "О╪╥", "О╪╔", "О╪╡", "О╪╢", "О╪╧", "О╪╣", "О╪╘"};	// 2014.10.19 D
 char *strTrack[MAXTRACK];	// 2014.10.19 A
-//char *strNNNTrack[] ={"[┌P]", "[┌Q]", "[┌R]", "[┌S]", "[┌T]", "[┌U]", "[┌V]", "[┌W]",  "[┌p]", "[┌v]", "[┌d]", "[┌q]", "[┌s]", "[┌x]", "[┌t]", "[┌h]"};	// 2014.10.19 D
+//char *strNNNTrack[] ={"[О╪▒]", "[О╪▓]", "[О╪⌠]", "[О╪■]", "[О╪∙]", "[О╪√]", "[О╪≈]", "[О╪≤]",  "[О╪╠]", "[О╪╥]", "[О╪╔]", "[О╪╡]", "[О╪╢]", "[О╪╧]", "[О╪╣]", "[О╪╘]"};	// 2014.10.19 D
 char *strNNNTrack[MAXTRACK];	// 2014.10.19 A
 
-int SamplePlayHeight = 36; //┐T┐⌠┐v┐▀┴╧┌П√б┌Г┌╥█┌┌Ё
+int SamplePlayHeight = 36; //Ц┌╣Ц┐ЁЦ┐≈Ц┐╚И÷ЁЦ┌▓ИЁ╢Ц┌┴Ц│≥И╚≤Ц│∙
 
-//int SaveWithInitVolFile;	//▀х┐f│[┐^┌ф│c┐Z│[┐u┌╥┌И┌╘│B
+//int SaveWithInitVolFile;	//Ф⌡╡Ц┐┤Ц┐╪Ц┌©Ц│╗Б─╕Ц┌╩Ц┐╪Ц┐√Ц│≥Ц┌▀Ц│▀Ц─┌
 
-extern HINSTANCE hInst;//┐C┐⌠┐X┐^┐⌠┐X┐n┐⌠┐h┐▀
+extern HINSTANCE hInst;//Ц┌╓Ц┐ЁЦ┌╧Ц┌©Ц┐ЁЦ┌╧Ц┐▐Ц┐ЁЦ┐┴Ц┐╚
 extern void ReloadBitmaps();
 extern void GetApplicationPath(char* path);
 
@@ -113,15 +113,15 @@ double GetNormDistRand(){
 	double s, t;
 	double r1, r2;
 
-	// ┬Й≈l∙╙∙z┌и▐]┌╓▀[▌≈≈░░■ x, y ┌П█Л┌И
-	do { x = (double)rand()/(double)RAND_MAX; } while (x == 0.0); // x ┌╙ 0 ┌и┌х┌И┌л┌П■П┌╞┌И
+	// Д╦─Ф╖≤Е┬├Е╦┐Ц│╚Е╬⌠Ц│├Ф⌠╛Д╪╪Д╧╠Ф∙╟ x, y Ц┌▓Д╫°Ц┌▀
+	do { x = (double)rand()/(double)RAND_MAX; } while (x == 0.0); // x Ц│▄ 0 Ц│╚Ц│╙Ц┌▀Ц│╝Ц┌▓И│©Ц│▒Ц┌▀
 	y = (double)rand()/(double)RAND_MAX;
 
-	// s, t ┌л▄v▌Z
-	s = sqrt(-2.0 * log(x)); // C, Java ┌е┌м log ┌╙▌╘▒R▒н░■
+	// s, t Ц│╝Х╗┬Г╝≈
+	s = sqrt(-2.0 * log(x)); // C, Java Ц│╖Ц│╞ log Ц│▄Х┤╙Г└╤Е╞╬Ф∙╟
 	t = 2.0 * PI * y;
 
-	// ∙W▐─░Ё▀K∙╙∙z┌и▐]┌╓▀[▌≈≈░░■ r1, r2
+	// Ф╗≥Ф╨√Ф╜ёХ╕▐Е┬├Е╦┐Ц│╚Е╬⌠Ц│├Ф⌠╛Д╪╪Д╧╠Ф∙╟ r1, r2
 	r1 = s * cos(t);  r2 = s * sin(t);
 	return r2;
 }
@@ -156,7 +156,7 @@ void EnableDialogWindow(int iValue = TRUE)
 }
 
 
-//┐_┐C┐A┐█┐O⌠Ю≈e┌л▐┴┼З┴╩
+//Ц┐─Ц┌╓Ц┌╒Ц┐╜Ц┌╟Е├┘Е╝╧Ц│╝Е┬²Ф°÷Е▄√
 static bool gPropChanged = false;
 
 void InitSettingDialog(HWND hdwnd)
@@ -250,7 +250,7 @@ void InitSettingDialog(HWND hdwnd)
 	SendMessage(w, UDM_SETPOS, 0, (mi.dot > 0) ? mi.end_x % mi.dot : 0);
 }
 
-//┐E┐G┐C┐g┌л░щ▓Х
+//Ц┌╕Ц┌╗Ц┌╓Ц┐┬Ц│╝Х╗╜Е╝ 
 BOOL SetWait(HWND hdwnd, MUSICINFO *mi)
 {
 	char str[128] = {NULL};
@@ -258,7 +258,7 @@ BOOL SetWait(HWND hdwnd, MUSICINFO *mi)
 	GetDlgItemText(hdwnd,IDD_SETWAIT,str,7);
 	a = atol(str);
 	if(a > 2000 || a < 1){
-		//MessageBox(hdwnd,"1│`2000┌и┌╣┌д┌╜┌╬┌Ё┌╒","ERROR(┐E┐G┐C┐g)",MB_OK);	// 2014.10.19 D
+		//MessageBox(hdwnd,"1О╫·2000Ц│╚Ц│≈Ц│╕Ц│▐Ц│═Ц│∙Ц│└","ERROR(Ц┌╕Ц┌╗Ц┌╓Ц┐┬)",MB_OK);	// 2014.10.19 D
 		msgbox(hdwnd,IDS_VALUESET12000,IDS_ERROR_WAIT,MB_OK | MB_ICONWARNING);	// 2014.10.19 A
 		return FALSE;
 	}
@@ -266,12 +266,12 @@ BOOL SetWait(HWND hdwnd, MUSICINFO *mi)
 	return TRUE;
 }
 
-//∙\▌╕┐O┐┼┐b┐h┌л░щ▓Х
+//Х║╗Г╓╨Ц┌╟Ц┐╙Ц┐┐Ц┐┴Ц│╝Х╗╜Е╝ 
 BOOL SetGrid(HWND hdwnd,MUSICINFO *mi)
 {
 	int i;
-	//▒I▒П┐O┐┼┐b┐h┌л░щ▓Х///////////////////////
-	i = SendDlgItemMessage(hdwnd, IDD_LB1,LB_GETCURSEL,0,0);//┐C┐⌠┐f┐b┐N┐X┌П⌠╬┌И
+	//И│╦Ф┼·Ц┌╟Ц┐╙Ц┐┐Ц┐┴Ц│╝Х╗╜Е╝ ///////////////////////
+	i = SendDlgItemMessage(hdwnd, IDD_LB1,LB_GETCURSEL,0,0);//Ц┌╓Ц┐ЁЦ┐┤Ц┐┐Ц┌╞Ц┌╧Ц┌▓Е╬≈Ц┌▀
 //	EndDialog(hdwnd,0);
 	if(i>0){
 		mi->dot = grid[i].dot;
@@ -282,14 +282,14 @@ BOOL SetGrid(HWND hdwnd,MUSICINFO *mi)
 		GetDlgItemText(hdwnd,IDD_GRIDEDIT1,str,3);
 		a = atol(str);
 		if(a<=0 || a>=128){
-			//MessageBox(hdwnd,"■▐▌q┌л░■▓l┌╙┌╗┌╘┌╣┌╒┌е┌╥│B","ERROR(■▐▌q)",MB_OK);	// 2014.10.19 D
+			//MessageBox(hdwnd,"Ф▀█Е╜░Ц│╝Ф∙╟Е─╓Ц│▄Ц│┼Ц│▀Ц│≈Ц│└Ц│╖Ц│≥Ц─┌","ERROR(Ф▀█Е╜░)",MB_OK);	// 2014.10.19 D
 			msgbox(hdwnd,IDS_WARNING_HYOUSHI,IDS_ERROR_HYOUSHI,MB_OK | MB_ICONWARNING);	// 2014.10.19 A
 			return FALSE;
 		}
 		GetDlgItemText(hdwnd,IDD_GRIDEDIT2,str,3);
 		b = atol(str);
 		if(b<=0 || b>=128){
-			//MessageBox(hdwnd,"∙╙┼└┌л░■▓l┌╙┌╗┌╘┌╣┌╒┌е┌╥│B","ERROR(∙╙┼└)",MB_OK);	// 2014.10.19 D
+			//MessageBox(hdwnd,"Е┬├Е┴╡Ц│╝Ф∙╟Е─╓Ц│▄Ц│┼Ц│▀Ц│≈Ц│└Ц│╖Ц│≥Ц─┌","ERROR(Е┬├Е┴╡)",MB_OK);	// 2014.10.19 D
 			msgbox(hdwnd,IDS_WARNING_BUNKATSU,IDS_ERROR_BUNKATSU,MB_OK | MB_ICONWARNING);	// 2014.10.19 A
 			return FALSE;
 		}
@@ -300,7 +300,7 @@ BOOL SetGrid(HWND hdwnd,MUSICINFO *mi)
 	}
 	return TRUE;
 }
-//┐┼┐s│[┐g■м┬м┌л░щ▓Х
+//Ц┐╙Ц┐■Ц┐╪Ц┐┬Г╞└Е⌡╡Ц│╝Х╗╜Е╝ 
 BOOL SetRepeat(HWND hdwnd, MUSICINFO *mi)
 {
 	char str[128] = {NULL};
@@ -316,13 +316,13 @@ BOOL SetRepeat(HWND hdwnd, MUSICINFO *mi)
 	b = atol(str);
 	mi->end_x = (unsigned short)a * (mi->dot * mi->line) + b;
 	if(mi->end_x <= mi->repeat_x){
-		//MessageBox(hdwnd,"┌═┌╫┌э│┐┌╗┌М┌Х ┌и░щ▓Х┌╣┌д┌╜┌╬┌Ё┌╒","ERROR(┐┼┐s│[┐g■м┬м)",MB_OK);	// 2014.10.19 D
+		//MessageBox(hdwnd,"Ц│┌Ц│÷Ц│╬О╪°Ц│┼Ц┌▐Ц┌┼ Ц│╚Х╗╜Е╝ Ц│≈Ц│╕Ц│▐Ц│═Ц│∙Ц│└","ERROR(Ц┐╙Ц┐■Ц┐╪Ц┐┬Г╞└Е⌡╡)",MB_OK);	// 2014.10.19 D
 		msgbox(hdwnd,IDS_WARNING_FROM_TO,IDS_ERROR_REPERT,MB_OK | MB_ICONWARNING);	// 2014.10.19 A
 		return FALSE;
 	}
 	return TRUE;
 }
-//▓г┴а▌Э■g░■┌л░щ▓Х
+//Х©╫Е┼═Е▒╗ФЁ╒Ф∙╟Ц│╝Х╗╜Е╝ 
 /*int freqbox[MAXTRACK] = {
 	IDD_SETFREQ0,
 	IDD_SETFREQ1,
@@ -350,14 +350,14 @@ BOOL SetRepeat(HWND hdwnd, MUSICINFO *mi)
 	for(int i = 0; i < MAXMELODY; i++){
 		GetDlgItemText(hdwnd,freqbox[i],str,7);
 		a = (unsigned short)atol(str);
-//█М▐° 2014.05.02
+//Е┴┼И≥╓ 2014.05.02
 //		if(a < 100 || a > 1900){
-//			MessageBox(hdwnd,"100│`1900┌и░щ▓Х","ERROR(▌Э■g░■)",MB_OK);
+//			MessageBox(hdwnd,"100О╫·1900Ц│╚Х╗╜Е╝ ","ERROR(Е▒╗ФЁ╒Ф∙╟)",MB_OK);
 //			return FALSE;
 //		}
 		if(!msg && (a < 100 || a > 1900)){
 			msg = true;
-			//MessageBox(hdwnd,"100│`1900┌и░щ▓Х┌╣┌╫┌ы┌╓┌╙┌╒┌╒┌е┌╥┌Ф│B","┌╗▓m┌Г┌╧(▌Э■g░■)",MB_OK);	// 2014.10.19 D
+			//MessageBox(hdwnd,"100О╫·1900Ц│╚Х╗╜Е╝ Ц│≈Ц│÷Ц│╩Ц│├Ц│▄Ц│└Ц│└Ц│╖Ц│≥Ц┌┬Ц─┌","Ц│┼Г÷╔Ц┌┴Ц│⌡(Е▒╗ФЁ╒Ф∙╟)",MB_OK);	// 2014.10.19 D
 			msgbox(hdwnd,IDS_VALUESET1001900,IDS_INFO_TITLE_FREQ,MB_OK);	// 2014.10.19 A
 //			return FALSE;
 		}
@@ -376,7 +376,7 @@ BOOL SetPipiCheck(HWND hdwnd, MUSICINFO *mi)
 	return TRUE;
 }*/
 
-//▀х┌л░щ▓Х
+//Ф⌡╡Ц│╝Х╗╜Е╝ 
 
 BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -388,10 +388,10 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 	double iBPM;
 	int iWAIT;
 	char str[128] = {NULL};
-	RECT rect = {64,0,WWidth,WHeight};//█X░V┌╥┌И≈л┬Ф
+	RECT rect = {64,0,WWidth,WHeight};//Ф⌡╢Ф√╟Ц│≥Ц┌▀И═≤Е÷÷
 	MUSICINFO mi,mg;
 	switch(message){
-	case WM_INITDIALOG://┐_┐C┐A┐█┐O┌╙▄д┌н┌Й┌╫
+	case WM_INITDIALOG://Ц┐─Ц┌╓Ц┌╒Ц┐╜Ц┌╟Ц│▄Е▒╪Ц│╟Ц┌▄Ц│÷
 		updateWait = true;
 		updateBPM = true;
 		InitSettingDialog(hdwnd);
@@ -400,8 +400,8 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
 		case IDD_LB1:
-			if (HIWORD(wParam) == LBN_SELCHANGE) { //ь╫днч╞╦╫┌е┌л▒I▒П∙о█X
-				i = SendDlgItemMessage(hdwnd, IDD_LB1, LB_GETCURSEL, 0, 0);//┐C┐⌠┐f┐b┐N┐X┌П⌠╬┌И
+			if (HIWORD(wParam) == LBN_SELCHANGE) { //О╬≤О╫╫О╬└О╬▌О╬·О╫╞О╫╦О╫╫Ц│╖Ц│╝И│╦Ф┼·Е╓┴Ф⌡╢
+				i = SendDlgItemMessage(hdwnd, IDD_LB1, LB_GETCURSEL, 0, 0);//Ц┌╓Ц┐ЁЦ┐┤Ц┐┐Ц┌╞Ц┌╧Ц┌▓Е╬≈Ц┌▀
 				if (i == 0) {
 					EnableWindow(GetDlgItem(hdwnd, IDD_GRIDEDIT1), TRUE);
 					EnableWindow(GetDlgItem(hdwnd, IDD_GRIDEDIT2), TRUE);
@@ -647,7 +647,7 @@ char *dram_name[] = {
 
 	"Bass03",
 	"Tom02",
-	"Bass04", //░V▀K▓г┴а
+	"Bass04", //Ф√╟Х╕▐Х©╫Е┼═
 	"Bass05",
 	"Snare03",
 
@@ -666,7 +666,7 @@ char *dram_name[] = {
 	"OrcDrm01",	
 	"Bell",
 	"Cat" ,
-	"Bass06",		//┌Ё┌Г┌и▓г┴а
+	"Bass06",		//Ц│∙Ц┌┴Ц│╚Х©╫Е┼═
 	"Bass07",
 
 	"Snare05",
@@ -679,14 +679,14 @@ char *dram_name[] = {
 	"Clap01",
 	"Pesi01",
 	"Quick01",
-	"Bass08" ,		//▓╕┌Х┌╦┌и▓г┴а	// 2011.10.17 
+	"Bass08" ,		//Ф┤╡Ц┌┼Ц│ Ц│╚Х©╫Е┼═	// 2011.10.17 
 
 	"Snare08",
 	"HiClose05",
     //"Per03",        // 2024.08.24
 };
 
-//┐A┐▀┐t┐@┐x┐b┐g▐┤∙о┼╥▓Х▀`
+//Ц┌╒Ц┐╚Ц┐∙Ц┌║Ц┐≥Ц┐┐Ц┐┬И═├Е╓┴Ф▐⌡Е╝ Г╬╘
 unsigned char Wave_no_to_List_no[] = {
 	0,1,10,12,13,28,29,39,26,27,36,7,20,5,16,18,35,41,6,17,19,34,25,8,9,37,38,21,22,2,3,14,15,30,31,32,40,4,11,23,24,33
 };
@@ -1176,7 +1176,7 @@ BOOL CALLBACK DialogNoteUsed(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 	long u,l;
 //	unsigned short a;
 	switch(message){
-	case WM_INITDIALOG://┐_┐C┐A┐█┐O┌╙▄д┌н┌Й┌╫
+	case WM_INITDIALOG://Ц┐─Ц┌╓Ц┌╒Ц┐╜Ц┌╟Ц│▄Е▒╪Ц│╟Ц┌▄Ц│÷
 		for(i = 0; i < MAXTRACK; i++){
 			org_data.GetNoteUsed(&u,&l,i);
 			itoa(u,str,10);
@@ -1201,7 +1201,7 @@ BOOL CALLBACK DialogNoteUsed(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	int i, j;
 	switch (message) {
-	case WM_INITDIALOG://┐_┐C┐A┐█┐O┌╙▄д┌н┌Й┌╫
+	case WM_INITDIALOG://Ц┐─Ц┌╓Ц┌╒Ц┐╜Ц┌╟Ц│▄Е▒╪Ц│╟Ц┌▄Ц│÷
 	{
 		int cursel = 0;
 		SendDlgItemMessage(hdwnd, IDD_THEMES, LB_ADDSTRING, 0, (LPARAM)"OrgMaker 3 (default)");
@@ -1299,7 +1299,7 @@ BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 	MUSICINFO mi;
 	int i, j;
 	switch (message) {
-	case WM_INITDIALOG://┐_┐C┐A┐█┐O┌╙▄д┌н┌Й┌╫
+	case WM_INITDIALOG://Ц┐─Ц┌╓Ц┌╒Ц┐╜Ц┌╟Ц│▄Е▒╪Ц│╟Ц┌▄Ц│÷
 	{
 		int cursel = 0;
 		SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_ADDSTRING, 0, (LPARAM)"Organya (default)");
@@ -1431,7 +1431,7 @@ BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		SetWindowPos(hdwnd, NULL, 0, 0, rcNew.right - rcNew.left, rc.bottom - rc.top, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
-		HRSRC hrscr = FindResource(NULL, "TEXTABOUT", "TEXT");// ┐┼┐\│[┐X┌л▄÷█У
+		HRSRC hrscr = FindResource(NULL, "TEXTABOUT", "TEXT");// Ц┐╙Ц┌╫Ц┐╪Ц┌╧Ц│╝Ф╓°Г╢╒
 		if (hrscr)
 		{
 			DWORD len = SizeofResource(NULL, hrscr);
@@ -1442,7 +1442,7 @@ BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				return 0;
 			}
 
-			char *cc = (char *)LockResource(LoadResource(NULL, hrscr));// ┐┼┐\│[┐X┌л┐A┐h┐▄┐X┌П▌Ф⌠╬
+			char *cc = (char *)LockResource(LoadResource(NULL, hrscr));// Ц┐╙Ц┌╫Ц┐╪Ц┌╧Ц│╝Ц┌╒Ц┐┴Ц┐╛Ц┌╧Ц┌▓Е▐√Е╬≈
 			memcpy(text, cc, len);
 			text[len] = '\0';
 
@@ -1877,13 +1877,13 @@ BOOL CALLBACK DialogDecayLength(HWND hdwnd, UINT message, WPARAM wParam, LPARAM 
 	for(t=0;t<MAXTRACK;t++){
 		a = GetText(hdwnd , txt_Pan[t]);
 		if(a > 12 || a < 0){
-			//MessageBox(hdwnd,"0│`12┌и┌╣┌д┌╜┌╬┌Ё┌╒","ERROR(┐p┐⌠)",MB_OK);	// 2014.10.19 D
+			//MessageBox(hdwnd,"0О╫·12Ц│╚Ц│≈Ц│╕Ц│▐Ц│═Ц│∙Ц│└","ERROR(Ц┐▒Ц┐Ё)",MB_OK);	// 2014.10.19 D
 			msgbox(hdwnd,IDS_VALUESET012,IDS_ERROR_PAN,MB_OK);	// 2014.10.19 A
 			return false;
 		}
 		b = GetText(hdwnd , txt_Vol[t]);
 		if(b > 254 || b < 0){
-			//MessageBox(hdwnd,"0│`254┌и┌╣┌д┌╜┌╬┌Ё┌╒","ERROR(┐{┐┼┐┘│[┐─)",MB_OK);	// 2014.10.19 D
+			//MessageBox(hdwnd,"0О╫·254Ц│╚Ц│≈Ц│╕Ц│▐Ц│═Ц│∙Ц│└","ERROR(Ц┐°Ц┐╙Ц┐╔Ц┐╪Ц┐═)",MB_OK);	// 2014.10.19 D
 			msgbox(hdwnd,IDS_VALUESET0254,IDS_ERROR_VOLUME,MB_OK);	// 2014.10.19 A
 			return false;
 		}
@@ -1941,7 +1941,7 @@ bool GetSetPVInitFile(HWND hdwnd, int IsSave, int iQuiet)
 	strcpy(init_file, music_file);
 	ml = strlen(init_file);
 	if(ml>4){
-		if(init_file[ml-4]=='.'){ //pvi∙t┴а
+		if(init_file[ml-4]=='.'){ //pviД╩≤Е┼═
 			//init_file[ml-4]='.';
 			init_file[ml-3]='p';
 			init_file[ml-2]='v';
@@ -1953,30 +1953,30 @@ bool GetSetPVInitFile(HWND hdwnd, int IsSave, int iQuiet)
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner   = hdwnd;
 	ofn.hInstance   = hInst;
-	//ofn.lpstrFilter = "┐p┐⌠│^┐{┐┼┐┘│[┐─▐┴┼З▓l┐f│[┐^[*.pvi]\0*.pvi\0▒S┌д┌л▄`▌╝ [*.*]\0*.*\0\0"; //┐p┐⌠│^┐{┐┼┐┘│[┐─▐┴┼З▓l┐f│[┐^[*.pvi]\0*.pvi\0▒S┌д┌л▄`▌╝ [*.*]\0*.*\0\0	// 2014.10.19 D
-	ofn.lpstrFilter = MessageString[IDS_STRING108]; //┐p┐⌠│^┐{┐┼┐┘│[┐─▐┴┼З▓l┐f│[┐^[*.pvi]\0*.pvi\0▒S┌д┌л▄`▌╝ [*.*]\0*.*\0\0	// 2014.10.19 A
+	//ofn.lpstrFilter = "Ц┐▒Ц┐ЁО╪▐Ц┐°Ц┐╙Ц┐╔Ц┐╪Ц┐═Е┬²Ф°÷Е─╓Ц┐┤Ц┐╪Ц┌©[*.pvi]\0*.pvi\0Е┘╗Ц│╕Ц│╝Е╫╒Е╪▐ [*.*]\0*.*\0\0"; //Ц┐▒Ц┐ЁО╪▐Ц┐°Ц┐╙Ц┐╔Ц┐╪Ц┐═Е┬²Ф°÷Е─╓Ц┐┤Ц┐╪Ц┌©[*.pvi]\0*.pvi\0Е┘╗Ц│╕Ц│╝Е╫╒Е╪▐ [*.*]\0*.*\0\0	// 2014.10.19 D
+	ofn.lpstrFilter = MessageString[IDS_STRING108]; //Ц┐▒Ц┐ЁО╪▐Ц┐°Ц┐╙Ц┐╔Ц┐╪Ц┐═Е┬²Ф°÷Е─╓Ц┐┤Ц┐╪Ц┌©[*.pvi]\0*.pvi\0Е┘╗Ц│╕Ц│╝Е╫╒Е╪▐ [*.*]\0*.*\0\0	// 2014.10.19 A
 	ofn.lpstrFile   = init_file;
 	ofn.nMaxFile    = MAX_PATH;
 	ofn.lpstrDefExt = "pvi";
 	
-	if(IsSave>0){ //┐Z│[┐u
+	if(IsSave>0){ //Ц┌╩Ц┐╪Ц┐√
 		ofn.Flags       = OFN_CREATEPROMPT | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-		ofn.lpstrTitle  = MessageString[IDS_STRING65]; //┐p┐⌠│^┐{┐┼┐┘│[┐─▐┴┼З▓l┐f│[┐^┌л∙ш▒╤
+		ofn.lpstrTitle  = MessageString[IDS_STRING65]; //Ц┐▒Ц┐ЁО╪▐Ц┐°Ц┐╙Ц┐╔Ц┐╪Ц┐═Е┬²Ф°÷Е─╓Ц┐┤Ц┐╪Ц┌©Ц│╝Д©²Е╜≤
 		if(GetSaveFileName(&ofn));	//InvalidateRect(hwnd,NULL,TRUE);
-		else return false;			//┐L┐┐┐⌠┐Z┐▀┌е0┌╙∙т┌И
+		else return false;			//Ц┌╜Ц┐ёЦ┐ЁЦ┌╩Ц┐╚Ц│╖0Ц│▄Х©■Ц┌▀
 		
-	}else{			//┐█│[┐h
+	}else{			//Ц┐╜Ц┐╪Ц┐┴
 		ofn.Flags       = OFN_HIDEREADONLY;
-		ofn.lpstrTitle  = MessageString[IDS_STRING66]; //┐p┐⌠│^┐{┐┼┐┘│[┐─▐┴┼З▓l┐f│[┐^┌л⌠г┌щ█·┌щ
+		ofn.lpstrTitle  = MessageString[IDS_STRING66]; //Ц┐▒Ц┐ЁО╪▐Ц┐°Ц┐╙Ц┐╔Ц┐╪Ц┐═Е┬²Ф°÷Е─╓Ц┐┤Ц┐╪Ц┌©Ц│╝Х╙╜Ц│©Х╬╪Ц│©
 		if(GetOpenFileName(&ofn));	//InvalidateRect(hwnd,NULL,TRUE);
-		else return false;			//┐L┐┐┐⌠┐Z┐▀┌е0┌╙∙т┌И
+		else return false;			//Ц┌╜Ц┐ёЦ┐ЁЦ┌╩Ц┐╚Ц│╖0Ц│▄Х©■Ц┌▀
 	}
-	fp = fopen(init_file,"rb");		//▄÷█╦
+	fp = fopen(init_file,"rb");		//Ф╓°Ф÷╩
 	if(fp == NULL){
 		if(IsSave==0){
-			//if(iQuiet == 0) MessageBox(hdwnd,"┐t┐@┐C┐▀┌и┐A┐N┐Z┐X┌е┌╚┌э┌╧┌Я","",MB_OK);	// 2014.10.19 D
+			//if(iQuiet == 0) MessageBox(hdwnd,"Ц┐∙Ц┌║Ц┌╓Ц┐╚Ц│╚Ц┌╒Ц┌╞Ц┌╩Ц┌╧Ц│╖Ц│█Ц│╬Ц│⌡Ц┌⌠","",MB_OK);	// 2014.10.19 D
 			if(iQuiet == 0) msgbox(hdwnd,IDS_WARNING_ACCESS_FILE,IDS_ERROR,MB_OK);	// 2014.10.19 A
-			return false;			//▌w▓Х┐t┐@┐C┐▀┌╙▒╤█щ┌╣┌х┌╒
+			return false;			//Ф▄┤Е╝ Ц┐∙Ц┌║Ц┌╓Ц┐╚Ц│▄Е╜≤Е°╗Ц│≈Ц│╙Ц│└
 		}
 	}else{
 		fclose(fp);
@@ -1998,8 +1998,8 @@ BOOL CALLBACK DialogDefault(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 	char str[32] = {NULL};
 	int i,a,b;
 	switch(message){
-	case WM_INITDIALOG://┐_┐C┐A┐█┐O┌╙▄д┌н┌Й┌╫
-		//┐┼┐s│[┐g■м┬м┌л▐┴┼З┴╩//////////////////
+	case WM_INITDIALOG://Ц┐─Ц┌╓Ц┌╒Ц┐╜Ц┌╟Ц│▄Е▒╪Ц│╟Ц┌▄Ц│÷
+		//Ц┐╙Ц┐■Ц┐╪Ц┐┬Г╞└Е⌡╡Ц│╝Е┬²Ф°÷Е▄√//////////////////
 		/*
 		itoa(org_data.def_pan,str,10);
 		SetDlgItemText(hdwnd,IDD_DEFPAN,str);
@@ -2017,7 +2017,7 @@ BOOL CALLBACK DialogDefault(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 		switch(LOWORD(wParam)){
 		case IDC_PANPOT1: case IDC_PANPOT2: case IDC_PANPOT3: case IDC_PANPOT4: case IDC_PANPOT5: case IDC_PANPOT6: case IDC_PANPOT7: case IDC_PANPOT8: case IDC_PANPOT9: case IDC_PANPOT10: case IDC_PANPOT11: case IDC_PANPOT12: case IDC_PANPOT13: case IDC_PANPOT14: case IDC_PANPOT15: case IDC_PANPOT16:
 		case IDC_VOLUME1: case IDC_VOLUME2: case IDC_VOLUME3: case IDC_VOLUME4: case IDC_VOLUME5: case IDC_VOLUME6: case IDC_VOLUME7: case IDC_VOLUME8: case IDC_VOLUME9: case IDC_VOLUME10: case IDC_VOLUME11: case IDC_VOLUME12: case IDC_VOLUME13: case IDC_VOLUME14: case IDC_VOLUME15: case IDC_VOLUME16:
-			if(HIWORD(wParam) == EN_SETFOCUS)PostMessage(GetDlgItem(hdwnd, LOWORD(wParam)), EM_SETSEL, 0, -1); //┐t┐H│[┐J┐X▌·┌и┐e┐L┐X┐g┌П▒S▒I▒П┌╥┌И	// 2014.10.19 
+			if(HIWORD(wParam) == EN_SETFOCUS)PostMessage(GetDlgItem(hdwnd, LOWORD(wParam)), EM_SETSEL, 0, -1); //Ц┐∙Ц┌╘Ц┐╪Ц┌╚Ц┌╧Ф≥┌Ц│╚Ц┐├Ц┌╜Ц┌╧Ц┐┬Ц┌▓Е┘╗И│╦Ф┼·Ц│≥Ц┌▀	// 2014.10.19 
 			return 1;
 		case IDC_DEF_NOWLOAD:
 			GetSetPVInitFile(hdwnd, 0, 0);
@@ -2069,24 +2069,24 @@ BOOL CALLBACK DialogDefault(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 			break;
 		case IDOK:
 			/*
-			//┐p┐⌠┐f┐t┐H┐▀┐g▓l
+			//Ц┐▒Ц┐ЁЦ┐┤Ц┐∙Ц┌╘Ц┐╚Ц┐┬Е─╓
 			GetDlgItemText(hdwnd,IDD_DEFPAN,str,7);
 			i = atol(str);
 			if(i > 12 || i < 0){
-				MessageBox(hdwnd,"0│`12┌и┌╣┌д┌╜┌╬┌Ё┌╒","ERROR(┐p┐⌠)",MB_OK);
+				MessageBox(hdwnd,"0О╫·12Ц│╚Ц│≈Ц│╕Ц│▐Ц│═Ц│∙Ц│└","ERROR(Ц┐▒Ц┐Ё)",MB_OK);
 				return FALSE;
 			}
 			org_data.def_pan = (unsigned char)i;
-			//┐p┐⌠┐f┐t┐H┐▀┐g▓l
+			//Ц┐▒Ц┐ЁЦ┐┤Ц┐∙Ц┌╘Ц┐╚Ц┐┬Е─╓
 			GetDlgItemText(hdwnd,IDD_DEFVOLUME,str,7);
 			i = atol(str);
 			if(i > 254 || i < 0){
-				MessageBox(hdwnd,"0│`254┌и┌╣┌д┌╜┌╬┌Ё┌╒","ERROR(┐{┐┼┐┘│[┐─)",MB_OK);
+				MessageBox(hdwnd,"0О╫·254Ц│╚Ц│≈Ц│╕Ц│▐Ц│═Ц│∙Ц│└","ERROR(Ц┐°Ц┐╙Ц┐╔Ц┐╪Ц┐═)",MB_OK);
 				return FALSE;
 			}
 			org_data.def_volume = (unsigned char)i;
 			*
-			if( !CheckDefPanVol(hdwnd, 1) )return FALSE; //▄÷█╦┌ф┐Z┐b┐e┐B┐⌠┐O
+			if( !CheckDefPanVol(hdwnd, 1) )return FALSE; //Ф╓°Ф÷╩Ц│╗Ц┌╩Ц┐┐Ц┐├Ц┌ёЦ┐ЁЦ┌╟
 			EndDialog(hdwnd,0);
 			EnableDialogWindow(TRUE);
 			return 1;
@@ -2099,15 +2099,15 @@ BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	HRSRC hrscr;
 	HWND haDlg;
 	MINMAXINFO *pmmi;
-	//DWORD *lpdword;//┐┼┐\│[┐X┌л┐A┐h┐▄┐X
+	//DWORD *lpdword;//Ц┐╙Ц┌╫Ц┐╪Ц┌╧Ц│╝Ц┌╒Ц┐┴Ц┐╛Ц┌╧
 	char *cc,*ce,*cf;
 	//int i;
 	int DlgWidth, DlgHeight;
 
 	switch(message){
-	case WM_INITDIALOG: {//┐_┐C┐A┐█┐O┌╙▄д┌н┌Й┌╫
+	case WM_INITDIALOG: {//Ц┐─Ц┌╓Ц┌╒Ц┐╜Ц┌╟Ц│▄Е▒╪Ц│╟Ц┌▄Ц│÷
 		//EnableDialogWindow(FALSE); //D 2014.05.25
-		hrscr = FindResource(NULL, "TEXTHELP", "TEXT");// ┐┼┐\│[┐X┌л▄÷█У
+		hrscr = FindResource(NULL, "TEXTHELP", "TEXT");// Ц┐╙Ц┌╫Ц┐╪Ц┌╧Ц│╝Ф╓°Г╢╒
 		if (hrscr)
 		{
 			DWORD len = SizeofResource(NULL, hrscr);
@@ -2118,7 +2118,7 @@ BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				return 0;
 			}
 
-			cc = (char*)LockResource(LoadResource(NULL, hrscr));// ┐┼┐\│[┐X┌л┐A┐h┐▄┐X┌П▌Ф⌠╬
+			cc = (char*)LockResource(LoadResource(NULL, hrscr));// Ц┐╙Ц┌╫Ц┐╪Ц┌╧Ц│╝Ц┌╒Ц┐┴Ц┐╛Ц┌╧Ц┌▓Е▐√Е╬≈
 			memcpy(text, cc, len);
 			text[len] = '\0';
 
@@ -2132,7 +2132,7 @@ BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 1;
 	}
 	case WM_SIZE:
-		DlgWidth  = LOWORD(lParam);	//┐N┐┴┐C┐A┐⌠┐g≈л┬Ф┌л┐T┐C┐Y
+		DlgWidth  = LOWORD(lParam);	//Ц┌╞Ц┐╘Ц┌╓Ц┌╒Ц┐ЁЦ┐┬И═≤Е÷÷Ц│╝Ц┌╣Ц┌╓Ц┌╨
 		DlgHeight = HIWORD(lParam);
 		haDlg = GetDlgItem(hdwnd, IDC_HELPTEXT);
 		SetWindowPos(haDlg, HWND_TOP, 1, 1, DlgWidth-4, DlgHeight-36, SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER );
@@ -2142,8 +2142,8 @@ BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		pmmi = (MINMAXINFO *)lParam;
 		if ( pmmi )
 		{
-			pmmi->ptMinTrackSize.x = 550;  // █е▐╛∙²
-			pmmi->ptMinTrackSize.y = 200;  // █е▐╛█┌
+			pmmi->ptMinTrackSize.x = 550;  // Ф°─Е╟▐Е╧┘
+			pmmi->ptMinTrackSize.y = 200;  // Ф°─Е╟▐И╚≤
 		}
 		return 1;
 	case WM_COMMAND:

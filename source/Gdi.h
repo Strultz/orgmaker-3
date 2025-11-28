@@ -2,18 +2,18 @@
 #define MAXBITMAP		64
 
 //void PutMusic(void);
-//GDI‚Ì‰Šú‰»
+//GDIã®åˆæœŸåŒ–
 BOOL StartGDI(HWND hwnd);
 
 BOOL ResizeGDI(HWND hwnd);
 
-//GDI‚ÌŠJ•ú
+//GDIã®é–‹æ”¾
 void EndGDI(void);
-//‰æ‘œ‚Ìƒ[ƒh(ƒŠƒ\[ƒX‚©‚ç)
+//ç”»åƒã®ãƒ­ãƒ¼ãƒ‰(ãƒªã‚½ãƒ¼ã‚¹ã‹ã‚‰)
 HBITMAP GetThemedBitmap(const char* name, int flags);
 BOOL InitBitmap(char *name, int no);
 void InitCursor();
-//‚¢‚í‚ä‚éƒtƒŠƒbƒv
+//ã„ã‚ã‚†ã‚‹ãƒ•ãƒªãƒƒãƒ—
 BOOL RefleshScreen(HWND hwnd, BOOL mainLoopUpdate);
 void PutRect(RECT* rect, int color);
 void PutBitmap(long x, long y, RECT *rect, int bmp_no);

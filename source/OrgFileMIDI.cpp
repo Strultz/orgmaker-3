@@ -16,7 +16,7 @@ char strMIDI_TITLE[256];
 char strMIDI_AUTHOR[256];
 unsigned char ucMIDIProgramChangeValue[MAXTRACK];
 
-//MIDI‚Ìƒfƒ‹ƒ^ƒ^ƒCƒ€(TLast - TFirst)‚ğŒvZ‚µAƒoƒbƒtƒ@*p‚ÉŠi”[B –ß‚è’l‚Í‘‚«‚ñ‚¾ƒoƒCƒg’·
+//MIDIã®ãƒ‡ãƒ«ã‚¿ã‚¿ã‚¤ãƒ (TLast - TFirst)ã‚’è¨ˆç®—ã—ã€ãƒãƒƒãƒ•ã‚¡*pã«æ ¼ç´ã€‚ æˆ»ã‚Šå€¤ã¯æ›¸ãè¾¼ã‚“ã ãƒã‚¤ãƒˆé•·
 int setDeltaTime(long TFirst, long TLast, unsigned char *p){
 	unsigned long r, lDelta;
 	unsigned long qbit[32], tbit[32], wbit[32];
@@ -28,7 +28,7 @@ int setDeltaTime(long TFirst, long TLast, unsigned char *p){
 		lDelta = TFirst - TLast;
 	}
 
-	if(lDelta <= 0x7F){ //1ƒoƒCƒg‚Åû‚Ü‚èAŒã‘±‚Ì–Ê“|‚ÈŒvZ‚Í‚¢‚ç‚È‚¢‚Ì‚ÅB
+	if(lDelta <= 0x7F){ //1ãƒã‚¤ãƒˆã§åã¾ã‚Šã€å¾Œç¶šã®é¢å€’ãªè¨ˆç®—ã¯ã„ã‚‰ãªã„ã®ã§ã€‚
 		*p = (unsigned char)(lDelta & 0x7F);
 		return 1;
 	}
@@ -76,9 +76,9 @@ int setDeltaTime(long TFirst, long TLast, unsigned char *p){
 }
 
 
-//•W€MIDIŒ`®‚Åo—Í‚·‚é
+//æ¨™æº–MIDIå½¢å¼ã§å‡ºåŠ›ã™ã‚‹
 BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
-	long iDeltaTime = 60; //iDeltaTime < 127‚Å‚ ‚é‚×‚µB
+	long iDeltaTime = 60; //iDeltaTime < 127ã§ã‚ã‚‹ã¹ã—ã€‚
 	unsigned char tmpuc;
 	unsigned char *ucbuf,*p, lastVol = 100, *pBufLen;
 	NOTELIST *np, *npStart;
@@ -89,7 +89,7 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 
 	unsigned char flgNoteOff[MAXTRACK], flg89;
 	//unsigned char NoteY[MAXTRACK] = {0,0,0,0, 0,0,0,0, 36, 38, 42, 46,  49, 50, 59, 66};
-	unsigned char Convert_Wave_no_to_MIDI_no[] = { //ƒ^ƒ€‚Í‚í‚©‚è‚â‚·‚¢‚æ‚¤‚É99B
+	unsigned char Convert_Wave_no_to_MIDI_no[] = { //ã‚¿ãƒ ã¯ã‚ã‹ã‚Šã‚„ã™ã„ã‚ˆã†ã«99ã€‚
         36,36,38,38,99,
         42,46,57,76,77,
         35,99,35,36,40,
@@ -100,9 +100,9 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
         42,39,75,70,36,
         60,42,
         
-        36,36,36,36,36,36,36,36, //©¡Œãƒhƒ‰ƒ€‰¹F‚ğ’Ç‰Á‚·‚é‚Æ‚«‚Í‚±‚±‚àC³‚·‚é‚±‚ÆB
+        36,36,36,36,36,36,36,36, //â†ä»Šå¾Œãƒ‰ãƒ©ãƒ éŸ³è‰²ã‚’è¿½åŠ ã™ã‚‹ã¨ãã¯ã“ã“ã‚‚ä¿®æ­£ã™ã‚‹ã“ã¨ã€‚
 	};
-	unsigned char Tom_DrumMap[] = { //99‚É‚µ‚½Tom‚Ì–¡•t‚¯‰¹F
+	unsigned char Tom_DrumMap[] = { //99ã«ã—ãŸTomã®å‘³ä»˜ã‘éŸ³è‰²
 		41, //0: Low Tom 2
 		43, //1: Low Tom 1
 		45, //2: Mid Tom 2
@@ -110,7 +110,7 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 		48, //4: High Tom 2
 		50, //5: High Tom 1
 	};
-	unsigned char Tom_Threshold[] = { //Tom‚Ì–¡•t‚¯è‡’li‚±‚Ì’lˆÈã‚Ì‚Æ‚«A‚»‚ÌTom‚É‚È‚éj
+	unsigned char Tom_Threshold[] = { //Tomã®å‘³ä»˜ã‘é–¾å€¤ï¼ˆã“ã®å€¤ä»¥ä¸Šã®ã¨ãã€ãã®Tomã«ãªã‚‹ï¼‰
 		0,  //0: Low Tom 2
 		19, //1: Low Tom 1
 		27, //2: Mid Tom 2
@@ -122,19 +122,19 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 
 	FILE *fp;
 	if((fp=fopen(strMidiFileName,"wb"))==NULL){
-		//MessageBox(hWnd,"ƒtƒ@ƒCƒ‹‚ÉƒAƒNƒZƒX‚Å‚«‚Ü‚¹‚ñ","Error (Export)",MB_OK);	// 2014.10.19 D
+		//MessageBox(hWnd,"ãƒ•ã‚¡ã‚¤ãƒ«ã«ã‚¢ã‚¯ã‚»ã‚¹ã§ãã¾ã›ã‚“","Error (Export)",MB_OK);	// 2014.10.19 D
 		msgbox(hWnd,IDS_WARNING_ACCESS_FILE,IDS_ERROR_EXPORT,MB_OK);	// 2014.10.19 A
 		return(FALSE);
 	}
-	//                                                                   «Tr” + ConductorTrack + Dummy + Drum
+	//                                                                   â†“Træ•° + ConductorTrack + Dummy + Drum
 	unsigned char strMIDIHeader[] = {'M', 'T', 'h', 'd', 0,0,0,6,  0,1,  0,  9+1+1  ,0,0};
-	//‚S•ª‰¹•„‚Ì•ª‰ğ”\
+	//ï¼”åˆ†éŸ³ç¬¦ã®åˆ†è§£èƒ½
 	strMIDIHeader[12] = (unsigned char)((info.dot * iDeltaTime / 0x100) & 0x7F);
 	strMIDIHeader[13] = (unsigned char)((info.dot * iDeltaTime) & 0xFF);
 	fwrite(strMIDIHeader, 14, 1, fp);
 
 	unsigned char strConductorTrack[512] = {'M','T','r','k',0,0,0,0x0B, 0x00, 0xFF, 0x51, 0x03,  0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, };
-	//ƒeƒ“ƒ|
+	//ãƒ†ãƒ³ãƒ
 	//long ltempo, invtempo;
 	long invtempo, LastPan;
 	int i, iUseCode90, isdl;
@@ -145,7 +145,7 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 	
 	p = &strConductorTrack[8]; lenbuf = 8;
 
-	//‰Šúƒeƒ“ƒ|=999
+	//åˆæœŸãƒ†ãƒ³ãƒ=999
 	*p++=0x00; lenbuf++;
 	*p++=0xFF; lenbuf++;
 	*p++=0x51; lenbuf++;
@@ -156,7 +156,7 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 	tmpuc = (unsigned char)((invtempo / 0x100) % 0x0100);   *p++ = tmpuc; lenbuf++;
 	tmpuc = (unsigned char)((invtempo / 0x1) % 0x0100);     *p++ = tmpuc; lenbuf++;
 
-	//‹È‚Ìƒ^ƒCƒgƒ‹•\¦
+	//æ›²ã®ã‚¿ã‚¤ãƒˆãƒ«è¡¨ç¤º
 	tmpuc = (unsigned char)strlen(strMIDI_TITLE);
 	tmpuc = tmpuc > 128 ? 128 : tmpuc;
 	if(tmpuc>0){
@@ -170,7 +170,7 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 		p+=tmpuc;
 	}
 
-	//’˜ìŒ •\¦
+	//è‘—ä½œæ¨©è¡¨ç¤º
 	tmpuc = (unsigned char)strlen(strMIDI_AUTHOR);
 	tmpuc = tmpuc > 128 ? 128 : tmpuc;
 	if(tmpuc>0){
@@ -185,17 +185,17 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 		p+=tmpuc;
 	}
 	
-	//”CˆÓƒeƒLƒXƒg
+	//ä»»æ„ãƒ†ã‚­ã‚¹ãƒˆ
 	*p++=0x00; lenbuf++;
 	*p++=0xFF; lenbuf++;
 	*p++=0x01; lenbuf++;
 	*p++=0x00; pBufLen = p-1; lenbuf++;
-	strcpy((char *)p, "                        "); //‚ ‚ç‚©‚¶‚ß‹ó”’‚ÅƒNƒŠƒA
-	strcpy((char *)p, MessageString[IDS_STRING114]); //‚±‚±‚Í "Exported by Organya Twei" ‚µ‚©“ü‚ç‚È‚¢‘O’ñB
+	strcpy((char *)p, "                        "); //ã‚ã‚‰ã‹ã˜ã‚ç©ºç™½ã§ã‚¯ãƒªã‚¢
+	strcpy((char *)p, MessageString[IDS_STRING114]); //ã“ã“ã¯ "Exported by Organya Twei" ã—ã‹å…¥ã‚‰ãªã„å‰æã€‚
 	lenbuf+=24; *pBufLen=24; p+=24;	// 2014.10.19 D
 
 
-	//”q
+	//æ‹å­
 	*p++=0x00; lenbuf++;
 	*p++=0xFF; lenbuf++;
 	*p++=0x58; lenbuf++;
@@ -231,7 +231,7 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 	*p++=0xF7; lenbuf++;
 */
 
-	//ƒeƒ“ƒ|
+	//ãƒ†ãƒ³ãƒ
 	isdl = setDeltaTime((info.line - 1) * info.dot * iDeltaTime , 0, p); p+=isdl;  lenbuf+=isdl;
 	*p++=0xFF; lenbuf++;
 	*p++=0x51; lenbuf++;
@@ -242,7 +242,7 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 	tmpuc = (unsigned char)((invtempo / 0x100) % 0x0100);   *p++ = tmpuc; lenbuf++;
 	tmpuc = (unsigned char)((invtempo / 0x1) % 0x0100);     *p++ = tmpuc; lenbuf++;
 
-	//I’[
+	//çµ‚ç«¯
 	*p++=0x00; lenbuf++;
 	*p++=0xFF; lenbuf++;
 	*p++=0x2F; lenbuf++;
@@ -260,10 +260,10 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 	/*
 	//MTrk : System Setup
 	//Length 172=0xA3
-	//FF 21 01 pp : o—Íƒ|[ƒgw’è (Œ»İ‚ÌSMF‚Å‚Í–¢’è‹`) 0
-	//146:GM ƒVƒXƒeƒ€ƒIƒ“,  141:GS Reset
-	//ƒ}ƒXƒ^‚u‚n‚k
-	//ƒhƒ‰ƒ€’Ç‰Á
+	//FF 21 01 pp : å‡ºåŠ›ãƒãƒ¼ãƒˆæŒ‡å®š (ç¾åœ¨ã®SMFã§ã¯æœªå®šç¾©) 0
+	//146:GM ã‚·ã‚¹ãƒ†ãƒ ã‚ªãƒ³,  141:GS Reset
+	//ãƒã‚¹ã‚¿ï¼¶ï¼¯ï¼¬
+	//ãƒ‰ãƒ©ãƒ è¿½åŠ 
 	unsigned char strDummyTrack[] ={
 		0x4D, 0x54, 0x72, 0x6B, 
 		0x00, 0x00, 0x00, 0xAC, 
@@ -293,7 +293,7 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 
 		ucbuf = (unsigned char *)calloc(iUse * 2 * 16 * iRepeat + 1024, sizeof(char));
 		
-		//memset(ucbuf, 0, iUse * 2 * 16 * iRepeat + 1024); //ƒ[ƒƒNƒŠƒA calloc‚Å‚à‚¢‚¢‚Ì‚Å‚ÍB
+		//memset(ucbuf, 0, iUse * 2 * 16 * iRepeat + 1024); //ã‚¼ãƒ­ã‚¯ãƒªã‚¢ callocã§ã‚‚ã„ã„ã®ã§ã¯ã€‚
 		ucbuf[0]= 'M'; 
 		ucbuf[1]= 'T'; 
 		ucbuf[2]= 'r'; 
@@ -301,7 +301,7 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 		p = &ucbuf[8];
 		lenbuf = 0;
 
-		//ƒV[ƒPƒ“ƒX–¼(‹Èƒ^ƒCƒgƒ‹)Eƒgƒ‰ƒbƒN–¼ 	
+		//ã‚·ãƒ¼ã‚±ãƒ³ã‚¹å(æ›²ã‚¿ã‚¤ãƒˆãƒ«)ãƒ»ãƒˆãƒ©ãƒƒã‚¯å 	
 		*p++ = 0x00;
 		*p++ = 0xFF;
 		*p++ = 0x03; pBufLen = p;
@@ -337,38 +337,38 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 		*p++=0x00;
 		lenbuf += 4;
 
-		//‰¹—Ê(VOL)
+		//éŸ³é‡(VOL)
 		*p++=0x04;
 		*p++=0xB0 + i;
 		*p++=0x07;
 		*p++=0x64;
 		lenbuf += 4;
 
-		//ƒŠƒo[ƒu 0 
+		//ãƒªãƒãƒ¼ãƒ– 0 
 		*p++=0x00;
 		*p++=0xB0 + i;
 		*p++=0x5B;
 		*p++=0x00;
 		lenbuf += 4;
 
-		//ƒR[ƒ‰ƒX 0 
+		//ã‚³ãƒ¼ãƒ©ã‚¹ 0 
 		*p++=0x00;
 		*p++=0xB0 + i;
 		*p++=0x5D;
 		*p++=0x00;
 		lenbuf += 4;
 
-		//‰¹—Ê(Exp)
+		//éŸ³é‡(Exp)
 		*p++=0x04;
 		*p++=0xB0 + i;
 		*p++=0x0B;
 		*p++=0x7F;
 		lenbuf += 4;
 
-		//‰¹F(‹­ˆø ^^; ...)
+		//éŸ³è‰²(å¼·å¼• ^^; ...)
 		*p++=0x04;
 		*p++=0xC0 + i;
-		//ƒ_ƒCƒAƒƒO‚ÅucMIDIProgramChangeValue[i]‚ª“KØ‚Éİ’è‚³‚ê‚Ä‚¢‚é‚Í‚¸B
+		//ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§ucMIDIProgramChangeValue[i]ãŒé©åˆ‡ã«è¨­å®šã•ã‚Œã¦ã„ã‚‹ã¯ãšã€‚
 		if(ucMIDIProgramChangeValue[i]<128){
 			*p++ = ucMIDIProgramChangeValue[i];
 		}else{
@@ -376,8 +376,8 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 		}
 		lenbuf += 3;
 
-		//ƒsƒbƒ`ƒxƒ“ƒh En mm ll (3byte)
-        //ƒ`ƒƒƒ“ƒlƒ‹n‚É‘Î‚µAƒsƒbƒ`ƒxƒ“ƒh’lllmm‚ğ‘—M‚·‚é (‚³‚è‚°‚È‚­little endian‚È‚Ì‚Å’ˆÓ)B ƒsƒbƒ`ƒxƒ“ƒh‚ª-8192,0,8191‚É‘Î‰‚·‚é’lllmm‚Í‚»‚ê‚¼‚ê 0x0000, 0x4000, 0x7F7F ‚Æ‚È‚éB 
+		//ãƒ”ãƒƒãƒãƒ™ãƒ³ãƒ‰ En mm ll (3byte)
+        //ãƒãƒ£ãƒ³ãƒãƒ«nã«å¯¾ã—ã€ãƒ”ãƒƒãƒãƒ™ãƒ³ãƒ‰å€¤llmmã‚’é€ä¿¡ã™ã‚‹ (ã•ã‚Šã’ãªãlittle endianãªã®ã§æ³¨æ„)ã€‚ ãƒ”ãƒƒãƒãƒ™ãƒ³ãƒ‰ãŒ-8192,0,8191ã«å¯¾å¿œã™ã‚‹å€¤llmmã¯ãã‚Œãã‚Œ 0x0000, 0x4000, 0x7F7F ã¨ãªã‚‹ã€‚ 
 		long lPvnd = (info.tdata[i].freq - 1000) + 0x4000;
 		int iFlgOfOverRepeatPoint;
 		*p++=0x04;
@@ -406,13 +406,13 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 				}
 			}
 			
-			if(np->x >= info.repeat_x && iFlgOfOverRepeatPoint == 0){ //ƒŠƒs[ƒgŠJn“_‚ğ’Ê‰ß‚µ‚½Å‰‚ÌX
+			if(np->x >= info.repeat_x && iFlgOfOverRepeatPoint == 0){ //ãƒªãƒ”ãƒ¼ãƒˆé–‹å§‹ç‚¹ã‚’é€šéã—ãŸæœ€åˆã®X
 				npStart = np;
 				iFlgOfOverRepeatPoint = 1;
 			}
 			if(np->y != KEYDUMMY ){
 				pLast = p;
-				if(LastPan != (long)np->pan && np->pan != PANDUMMY){ //PAN•ÏX
+				if(LastPan != (long)np->pan && np->pan != PANDUMMY){ //PANå¤‰æ›´
 					CurrentX = np->x * iDeltaTime; 
 					isdl = setDeltaTime(CurrentX, LastX, p);
 					p+=isdl;
@@ -444,7 +444,7 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 					*p++ = lastVol;
 				}
 				//xx = np->length;
-				//if(xx>=128){ //GBƒfƒ‹ƒ^ƒ^ƒCƒ€‚Íƒƒ“ƒhƒCB
+				//if(xx>=128){ //é›‘ã€‚ãƒ‡ãƒ«ã‚¿ã‚¿ã‚¤ãƒ ã¯ãƒ¡ãƒ³ãƒ‰ã‚¤ã€‚
 					//*p++ = (unsigned char)(xx/128)|0x80;
 					//*p++ = (unsigned char)xx%128;
 				//}else{
@@ -464,7 +464,7 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 					iUseCode90 = 1;
 				}
 				*p++ = 12 + np->y;
-				*p++ = 0; // ‰¹‚ğÁ‚· 
+				*p++ = 0; // éŸ³ã‚’æ¶ˆã™ 
 				lenbuf += (p - pLast);
 			}
 			np = np->to;
@@ -476,7 +476,7 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 		*p++=0x00;
 		lenbuf += 4;
 
-		//ƒuƒƒbƒN’·
+		//ãƒ–ãƒ­ãƒƒã‚¯é•·
 		tmpuc = (unsigned char)((lenbuf / 0x1000000) & 0xFF);
 		ucbuf[4] = tmpuc;
 		tmpuc = (unsigned char)((lenbuf / 0x10000) & 0xFF);
@@ -508,7 +508,7 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 			if(np->y != KEYDUMMY && np->volume>0 && np->volume<VOLDUMMY){
 				w = t * 256 * info.line * info.dot * 2 + np->x * 2 ;
 				*(bufv + w) = np->volume;
-				*(bufv + w + 1) = np->y; //Tom‚Ì‚‚³‚ª’m‚è‚½‚¢‚Ì‚Å
+				*(bufv + w + 1) = np->y; //Tomã®é«˜ã•ãŒçŸ¥ã‚ŠãŸã„ã®ã§
 				//if(np->x > FinalNoteX) FinalNoteX = np->x;
 			}
 		}
@@ -516,11 +516,11 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 	FinalNoteX = info.end_x;
 
 	ucbuf = (unsigned char *)calloc(iUse * 2 * 8 * 16 * iRepeat + 1024, sizeof(char));
-	//memset(ucbuf, 0, iUse * 2 * 8 * 16 * iRepeat + 1024); //ƒ[ƒƒNƒŠƒA calloc‚Å‚à‚¢‚¢‚Ì‚Å‚ÍB
+	//memset(ucbuf, 0, iUse * 2 * 8 * 16 * iRepeat + 1024); //ã‚¼ãƒ­ã‚¯ãƒªã‚¢ callocã§ã‚‚ã„ã„ã®ã§ã¯ã€‚
 	ucbuf[0]= 'M'; ucbuf[1]= 'T'; ucbuf[2]= 'r'; ucbuf[3]= 'k';
 	p = &ucbuf[8];
 	lenbuf = 0;
-	//ƒV[ƒPƒ“ƒX–¼(‹Èƒ^ƒCƒgƒ‹)Eƒgƒ‰ƒbƒN–¼ 	
+	//ã‚·ãƒ¼ã‚±ãƒ³ã‚¹å(æ›²ã‚¿ã‚¤ãƒˆãƒ«)ãƒ»ãƒˆãƒ©ãƒƒã‚¯å 	
 	*p++ = 0x00;
 	*p++ = 0xFF;
 	*p++ = 0x03; pBufLen = p;
@@ -530,7 +530,7 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 	*pBufLen = 5;
 	lenbuf += 5;
 
-	//o—Íƒ|[ƒgw’è
+	//å‡ºåŠ›ãƒãƒ¼ãƒˆæŒ‡å®š
 	*p++=0x00;
 	*p++=0xFF;
 	*p++=0x21;
@@ -545,21 +545,21 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 	*p++=0x00;
 	lenbuf += 4;
 
-	//‰¹—Ê(VOL)
+	//éŸ³é‡(VOL)
 	*p++=0x04;
-	*p++=0xB9; //B0 + 9‚Å Aƒ|[ƒg 10ƒ`ƒƒƒlƒ‹ = Drum Set
+	*p++=0xB9; //B0 + 9ã§ Aãƒãƒ¼ãƒˆ 10ãƒãƒ£ãƒãƒ« = Drum Set
 	*p++=0x07;
 	*p++=0x64;
 	lenbuf += 4;
 
-	//ƒŠƒo[ƒu 80 
+	//ãƒªãƒãƒ¼ãƒ– 80 
 	*p++=0x00;
 	*p++=0xB9;
 	*p++=0x5B;
 	*p++=0x50;
 	lenbuf += 4;
 
-	//‰¹—Ê(Exp)
+	//éŸ³é‡(Exp)
 	*p++=0x04;
 	*p++=0xB9;
 	*p++=0x0B;
@@ -577,7 +577,7 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 			x = info.repeat_x;
 			rp++;
 			if(rp >= iRepeat)break;
-			x--; //forˆ—‚Å x++‚³‚ê‚é‚Ì‚ÅB
+			x--; //forå‡¦ç†ã§ x++ã•ã‚Œã‚‹ã®ã§ã€‚
 			LastX -=(info.end_x - info.repeat_x)* iDeltaTime;
 			continue;
 		}
@@ -606,13 +606,13 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 				p+=isdl;
 				LastX = CurrentX;
 				ucCurrentDrumKey[i] = Convert_Wave_no_to_MIDI_no[info.tdata[i].wave_no];
-				if(ucCurrentDrumKey[i] == 99){ //Tom‚Ì‚Æ‚«
+				if(ucCurrentDrumKey[i] == 99){ //Tomã®ã¨ã
 					ucCurrentDrumKey[i] = Tom_DrumMap[0];
 					for(j = 1; j< 6; j++){
 						if( (*(bufv+w+1)) >= Tom_Threshold[j]) ucCurrentDrumKey[i] = Tom_DrumMap[j];
 					}
 				}else if(ucCurrentDrumKey[i] == 57){ //Crash Symbal 2
-					if((*(bufv+w+1)) < 36)ucCurrentDrumKey[i] = 49; //Crash Symbal 1(’á‚¢‚Ù‚¤‚É‚·‚é)
+					if((*(bufv+w+1)) < 36)ucCurrentDrumKey[i] = 49; //Crash Symbal 1(ä½ã„ã»ã†ã«ã™ã‚‹)
 				}
 				*p++ = 0x99;
 				*p++ = ucCurrentDrumKey[i];
@@ -623,7 +623,7 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 		}
 		lenbuf += (p - pLast);
 	}
-	//I’[
+	//çµ‚ç«¯
 	*p++=0x00;
 	*p++=0xFF;
 	*p++=0x2F;
@@ -631,7 +631,7 @@ BOOL OrgData::ExportMIDIData(char *strMidiFileName, int iRepeat){
 	lenbuf += 4;
 
 
-	//ƒuƒƒbƒN’·
+	//ãƒ–ãƒ­ãƒƒã‚¯é•·
 	tmpuc = (unsigned char)((lenbuf / 0x1000000) & 0xFF);
 	ucbuf[4] = tmpuc;
 	tmpuc = (unsigned char)((lenbuf / 0x10000) & 0xFF);

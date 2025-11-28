@@ -1,14 +1,14 @@
 
-#define MAXNOTELENGTH	255//�����̍ő咷
+#define MAXNOTELENGTH	255//音符の最大長
 #define MAXMELODY		8
 #define MAXDRAM			8
 #define MAXTRACK		16
 
-#define KEYDUMMY		255//�L�[�̕ύX�͉����Ȃ�����
-#define PANDUMMY		255//�p���̕ύX�͉����Ȃ�����
-#define VOLDUMMY		255//�{�����[���̕ύX�͉����Ȃ�����
-//�ȏ����Z�b�g���鎞�̃t���O
-#define SETALL		0xffffffff//�S�Ă��Z�b�g
+#define KEYDUMMY		255//キーの変更は加えない音符
+#define PANDUMMY		255//パンの変更は加えない音符
+#define VOLDUMMY		255//ボリュームの変更は加えない音符
+//曲情報をセットする時のフラグ
+#define SETALL		0xffffffff//全てをセット
 #define SETWAIT		0x00000001
 #define SETGRID		0x00000002
 #define SETALLOC	0x00000004
@@ -34,9 +34,9 @@
 #define OWM_TBCONTEXTMENU (WM_USER + 2)
 
 
-//#define NUMDRAMITEM		39	//�P�Q�{�T�{�X�{�P(�L)�{�P�P	    // 2011.10.17 D
-#define NUMDRAMITEM		42	//�P�Q�{�T�{�X�{�P(�L)�{�P�P�{�R	// 2011.10.17 A
-//#define NUMDRAMITEM		43	//�P�Q�{�T�{�X�{�P(�L)�{�P�P�{�R�{�P    // 2024.08.24 A
+//#define NUMDRAMITEM		39	//１２＋５＋９＋１(猫)＋１１	    // 2011.10.17 D
+#define NUMDRAMITEM		42	//１２＋５＋９＋１(猫)＋１１＋３	// 2011.10.17 A
+//#define NUMDRAMITEM		43	//１２＋５＋９＋１(猫)＋１１＋３＋１    // 2024.08.24 A
 
 #define MAXHORZMEAS	999 // Increased from 256 to 999
 

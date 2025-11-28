@@ -9,23 +9,23 @@
 
 #include "rxoFunction.h"
 
-extern int sACrnt;	//”ÍˆÍ‘I‘ğ‚Íí‚É¶ÚİÄÄ×¯¸
+extern int sACrnt;	//ç¯„å›²é¸æŠã¯å¸¸ã«ï½¶ï¾šï¾ï¾„ï¾„ï¾—ï½¯ï½¸
 
 extern char timer_sw;
 extern int sSmoothScroll;
 
-//ŸŸ•\¦•”ŸŸŸŸŸŸŸŸŸŸŸŸŸŸŸŸŸŸŸŸŸŸŸŸŸŸŸ
+//â—†â—†è¡¨ç¤ºéƒ¨â—†â—†â—†â—†â—†â—†â—†â—†â—†â—†â—†â—†â—†â—†â—†â—†â—†â—†â—†â—†â—†â—†â—†â—†â—†â—†â—†
 RECT note_rect[] = {
-	{  0,  0, 16,  6},//ƒL[‰¹•„(•ÒW)
-	{  0,  6, 16, 12},//ƒL[‰¹•„
-	{ 16,  0, 32,  4},//K”ö(•ÒW)
-	{ 16,  4, 32,  8},//K”ö
-	{ 16, 16, 32, 21},//ƒpƒ“Eƒ{ƒŠƒ…[ƒ€
+	{  0,  0, 16,  6},//ã‚­ãƒ¼éŸ³ç¬¦(ç·¨é›†)
+	{  0,  6, 16, 12},//ã‚­ãƒ¼éŸ³ç¬¦
+	{ 16,  0, 32,  4},//å°»å°¾(ç·¨é›†)
+	{ 16,  4, 32,  8},//å°»å°¾
+	{ 16, 16, 32, 21},//ãƒ‘ãƒ³ãƒ»ãƒœãƒªãƒ¥ãƒ¼ãƒ 
 	{  0, 32, 16, 44},//Repeat(5)
 	{ 16, 32, 32, 44},//end
 };
 
-RECT note_blue_rect[]={ //”š“ü‚è‚ÌƒL[‰¹•„i“ªj
+RECT note_blue_rect[]={ //æ•°å­—å…¥ã‚Šã®ã‚­ãƒ¼éŸ³ç¬¦ï¼ˆé ­ï¼‰
 	{ 0,  48, 16,  54},
 	{16,  48, 32,  54},
 	{ 0,  56, 16,  62},
@@ -61,7 +61,7 @@ RECT note_blue_rect[]={ //”š“ü‚è‚ÌƒL[‰¹•„i“ªj
 };
 
 /*
-RECT note_tail_rect[]={ //‚µ‚Á‚Û
+RECT note_tail_rect[]={ //ã—ã£ã½
 	{32,   0, 64,   4},
 	{32,   4, 64,   8},
 	{32,   8, 64,  12},
@@ -81,7 +81,7 @@ RECT note_tail_rect[]={ //‚µ‚Á‚Û
 	{32,  64, 64,  68}, //yobun
 };
 */
-RECT note_tail_rect[]={ //‚µ‚Á‚Û
+RECT note_tail_rect[]={ //ã—ã£ã½
 	{32,   0, 48,   4},
 	{32,   4, 48,   8},
 	{32,   8, 48,  12},
@@ -101,14 +101,14 @@ RECT note_tail_rect[]={ //‚µ‚Á‚Û
 	{32,  64, 48,  68}, //yobun
 };
 RECT msc_rect[] = {
-	{  0,  0, 64,144+16},//Œ®”Õ
-	{ 64,  0, 80,144+16},//¬ßƒ‰ƒCƒ“
-	{ 80,  0, 96,144+16},//ˆê”ƒ‰ƒCƒ“
-	{ 96,  0,112,144+16},//1/16ƒ‰ƒCƒ“
-	{112+  0,  0,112+ 64,144+16},//Œ®”Õ
-	{112+ 64,  0,112+ 80,144+16},//¬ßƒ‰ƒCƒ“
-	{112+ 80,  0,112+ 96,144+16},//ˆê”ƒ‰ƒCƒ“
-	{112+ 96,  0,112+112,144+16},//1/16ƒ‰ƒCƒ“
+	{  0,  0, 64,144+16},//éµç›¤
+	{ 64,  0, 80,144+16},//å°ç¯€ãƒ©ã‚¤ãƒ³
+	{ 80,  0, 96,144+16},//ä¸€æ‹ãƒ©ã‚¤ãƒ³
+	{ 96,  0,112,144+16},//1/16ãƒ©ã‚¤ãƒ³
+	{112+  0,  0,112+ 64,144+16},//éµç›¤
+	{112+ 64,  0,112+ 80,144+16},//å°ç¯€ãƒ©ã‚¤ãƒ³
+	{112+ 80,  0,112+ 96,144+16},//ä¸€æ‹ãƒ©ã‚¤ãƒ³
+	{112+ 96,  0,112+112,144+16},//1/16ãƒ©ã‚¤ãƒ³
 };
 RECT num_rect[] = {
 	{  0,  0,  8, 12},
@@ -134,14 +134,14 @@ RECT num_rect[] = {
 	{ 72, 12, 80, 24},
 };
 RECT rc_SelArea[] ={
-	{0, 176, 16, 187}, //‘I‘ğ”ÍˆÍ
-	{16, 176, 32, 187}, //‘I‘ğ”ÍˆÍ
-	{32, 176, 48, 187}, //‘I‘ğ”ÍˆÍ
-	{0, 192, 16, 203},  //‘I‘ğ”ÍˆÍ(‘¼‚ÌTr)
-	{16, 192, 32, 203}, //‘I‘ğ”ÍˆÍ(‘¼‚ÌTr)
-	{32, 192, 48, 203}, //‘I‘ğ”ÍˆÍ(‘¼‚ÌTr)
+	{0, 176, 16, 187}, //é¸æŠç¯„å›²
+	{16, 176, 32, 187}, //é¸æŠç¯„å›²
+	{32, 176, 48, 187}, //é¸æŠç¯„å›²
+	{0, 192, 16, 203},  //é¸æŠç¯„å›²(ä»–ã®Tr)
+	{16, 192, 32, 203}, //é¸æŠç¯„å›²(ä»–ã®Tr)
+	{32, 192, 48, 203}, //é¸æŠç¯„å›²(ä»–ã®Tr)
 	{32, 160, 48, 171}, //FULL
-	{32, 144, 48, 155}, //‚Pƒ}ƒX
+	{32, 144, 48, 155}, //ï¼‘ãƒã‚¹
 };
 
 RECT rc_CurrentSelect = {0, 208, 64, 224}; //2014.04.30
@@ -155,7 +155,7 @@ RECT rc_TCPY[]={
 	{32,100,48,104},
 };
 
-RECT rc_PushKB[] ={    // 2010.09.23 A ‰Ÿ‚³‚ê‚½Œ®”Õ
+RECT rc_PushKB[] ={    // 2010.09.23 A æŠ¼ã•ã‚ŒãŸéµç›¤
 	{112, 132, 208, 144}, //
 	{112, 120, 208, 132}, //
 	{112, 108, 208, 120}, //
@@ -170,7 +170,7 @@ RECT rc_PushKB[] ={    // 2010.09.23 A ‰Ÿ‚³‚ê‚½Œ®”Õ
 	{112, 0, 208, 12}, //
 };
 
-RECT rc_PushKB2[] ={	// 2010.09.23 A ‰Ÿ‚³‚ê‚½Œ®”ÕiŒõ‚éŒ®”Õ”wŒi‚Â‚«j
+RECT rc_PushKB2[] ={	// 2010.09.23 A æŠ¼ã•ã‚ŒãŸéµç›¤ï¼ˆå…‰ã‚‹éµç›¤èƒŒæ™¯ã¤ãï¼‰
 	{112, 132, 176, 144}, //
 	{112, 120, 176, 132}, //
 	{112, 108, 176, 120}, //
@@ -185,7 +185,7 @@ RECT rc_PushKB2[] ={	// 2010.09.23 A ‰Ÿ‚³‚ê‚½Œ®”ÕiŒõ‚éŒ®”Õ”wŒi‚Â‚«j
 	{112, 0, 176, 12}, //
 };
 
-RECT rc_PushKB3[] ={    // 2010.09.24 A ‰Ÿ‚³‚ê‚½Œ®”Õ(ƒIƒNƒ^[ƒuˆá‚¢j
+RECT rc_PushKB3[] ={    // 2010.09.24 A æŠ¼ã•ã‚ŒãŸéµç›¤(ã‚ªã‚¯ã‚¿ãƒ¼ãƒ–é•ã„ï¼‰
 	{208, 132, 272, 144}, //
 	{208, 120, 272, 132}, //
 	{208, 108, 272, 120}, //
@@ -201,14 +201,14 @@ RECT rc_PushKB3[] ={    // 2010.09.24 A ‰Ÿ‚³‚ê‚½Œ®”Õ(ƒIƒNƒ^[ƒuˆá‚¢j
 };
 
 
-extern NOTECOPY nc_Select; //‘I‘ğ”ÍˆÍ
+extern NOTECOPY nc_Select; //é¸æŠç¯„å›²
 extern int tra, ful ,haba; 
-extern int gDrawDouble;	//—¼•û‚Ìƒgƒ‰ƒbƒNƒOƒ‹[ƒv‚ğ•`‰æ‚·‚é
+extern int gDrawDouble;	//ä¸¡æ–¹ã®ãƒˆãƒ©ãƒƒã‚¯ã‚°ãƒ«ãƒ¼ãƒ—ã‚’æç”»ã™ã‚‹
 
-extern int iKeyPushDown[256]; // 2010.09.22 A ƒsƒAƒmƒL[‚Ì‰Ÿ‚³‚ê‹ï‡
+extern int iKeyPushDown[256]; // 2010.09.22 A ãƒ”ã‚¢ãƒã‚­ãƒ¼ã®æŠ¼ã•ã‚Œå…·åˆ
 
 
-//ƒL[ƒ{[ƒh‚ÆƒsƒAƒmƒ[ƒ‹‚ÌˆÊ’u
+//ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã¨ãƒ”ã‚¢ãƒãƒ­ãƒ¼ãƒ«ã®ä½ç½®
 void OrgData::PutNumber(void)
 {
 	MUSICINFO mi;
@@ -261,7 +261,7 @@ void OrgData::PutRepeat(void)
 		PutBitmap(x,WHeight+276-WHNM-(WHeight > 550 ? 12 : 0),&note_rect[6],BMPNOTE);
 }
 
-//‰¹•„‚Ì•\¦
+//éŸ³ç¬¦ã®è¡¨ç¤º
 void OrgData::PutNotes(int TPCY, bool vol)
 {
 	int i,j,k,t,addY;
@@ -282,29 +282,29 @@ void OrgData::PutNotes(int TPCY, bool vol)
 		trkmaskUpper[i] = (unsigned char)(256-2*k); // 254, 252, 248, 240,  224, ...
 	}
 	*/
-	//•K—v‚Èƒf[ƒ^‚ğæ“¾
+	//å¿…è¦ãªãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—
 	GetMusicInfo(&mi);line = mi.line;dot = mi.dot;
 	scr_data.GetScrollPosition(&scr_h,&scr_v);
 
 	//for(i=0;i<128*92;i++)noteon[i] = 0;
 
 	/*
-	//‰¹•„‚Ìd‚È‚è‹ï‡‚ğŠm”F‚·‚é //A 2014.05.03
+	//éŸ³ç¬¦ã®é‡ãªã‚Šå…·åˆã‚’ç¢ºèªã™ã‚‹ //A 2014.05.03
 	memset((void *)noteon, 0, 128*12*8);
 	for(n = 0; n < MAXMELODY; n++){
 		k = getRecentTrack(n , 0);
 		if(k == track)continue;
-		if((p = info.tdata[k].note_list) == NULL)continue;//‰¹•„‚ª–³‚¯‚ê‚Î’†~
-		while(p != NULL && p->to != NULL){//‚Ç‚±‚©‚ç•\¦‚·‚é‚©
+		if((p = info.tdata[k].note_list) == NULL)continue;//éŸ³ç¬¦ãŒç„¡ã‘ã‚Œã°ä¸­æ­¢
+		while(p != NULL && p->to != NULL){//ã©ã“ã‹ã‚‰è¡¨ç¤ºã™ã‚‹ã‹
 			xpos = (p->x - line*dot*scr_h)*16 + KEYWIDTH;
-			if(xpos >= KEYWIDTH)break;//•\¦—Ìˆæ‚É“ü‚Á‚½
+			if(xpos >= KEYWIDTH)break;//è¡¨ç¤ºé ˜åŸŸã«å…¥ã£ãŸ
 			p = p->to;
 		}
-		//K”ö‚ğ•\¦‚·‚éˆ×‚ÉAˆê‚Â‘O‚Ì‰¹•„‚©‚çEEEB
+		//å°»å°¾ã‚’è¡¨ç¤ºã™ã‚‹ç‚ºã«ã€ä¸€ã¤å‰ã®éŸ³ç¬¦ã‹ã‚‰ãƒ»ãƒ»ãƒ»ã€‚
 		if(p == NULL)continue;
 		if(p->from != NULL)p = p->from;
 		while(p->from != NULL && p->y == KEYDUMMY)p = p->from;
-		//‰¹•„‚ª‚ª‚È‚­‚È‚é‚©AXÀ•W‚ª•\¦—Ìˆæ‚ğ’´‚¦‚é‚Ü‚Å•\¦B
+		//éŸ³ç¬¦ãŒãŒãªããªã‚‹ã‹ã€Xåº§æ¨™ãŒè¡¨ç¤ºé ˜åŸŸã‚’è¶…ãˆã‚‹ã¾ã§è¡¨ç¤ºã€‚
 		while(p != NULL){
 			//xmax128
 			if(p->y != KEYDUMMY){
@@ -317,36 +317,36 @@ void OrgData::PutNotes(int TPCY, bool vol)
 	}
 	*/
 
-	//•ÒW‚µ‚È‚¢‰¹•„‚ğæ‚É•\¦///////////
+	//ç·¨é›†ã—ãªã„éŸ³ç¬¦ã‚’å…ˆã«è¡¨ç¤º///////////
 	if (!vol) {
 		for (n = 0; n < MAXMELODY; n++) {
 			k = getRecentTrack(n, 0);
 			if (k == track)continue;
-			if ((p = info.tdata[k].note_list) == NULL)continue;//‰¹•„‚ª–³‚¯‚ê‚Î’†~
-			while (p != NULL && p->to != NULL) {//‚Ç‚±‚©‚ç•\¦‚·‚é‚©
+			if ((p = info.tdata[k].note_list) == NULL)continue;//éŸ³ç¬¦ãŒç„¡ã‘ã‚Œã°ä¸­æ­¢
+			while (p != NULL && p->to != NULL) {//ã©ã“ã‹ã‚‰è¡¨ç¤ºã™ã‚‹ã‹
 				xpos = (p->x - scr_h) * NoteWidth + KEYWIDTH;
-				if (xpos >= KEYWIDTH)break;//•\¦—Ìˆæ‚É“ü‚Á‚½
+				if (xpos >= KEYWIDTH)break;//è¡¨ç¤ºé ˜åŸŸã«å…¥ã£ãŸ
 				p = p->to;
 			}
-			//K”ö‚ğ•\¦‚·‚éˆ×‚ÉAˆê‚Â‘O‚Ì‰¹•„‚©‚çEEEB
+			//å°»å°¾ã‚’è¡¨ç¤ºã™ã‚‹ç‚ºã«ã€ä¸€ã¤å‰ã®éŸ³ç¬¦ã‹ã‚‰ãƒ»ãƒ»ãƒ»ã€‚
 			if (p == NULL)continue;
 			if (p->from != NULL)p = p->from;
 			while (p->from != NULL && p->y == KEYDUMMY)p = p->from;
-			//‰¹•„‚ª‚ª‚È‚­‚È‚é‚©AXÀ•W‚ª•\¦—Ìˆæ‚ğ’´‚¦‚é‚Ü‚Å•\¦B
+			//éŸ³ç¬¦ãŒãŒãªããªã‚‹ã‹ã€Xåº§æ¨™ãŒè¡¨ç¤ºé ˜åŸŸã‚’è¶…ãˆã‚‹ã¾ã§è¡¨ç¤ºã€‚
 			while (p != NULL) {
-				ypos = (95 - p->y - scr_v) * 12;//‰º‚ª0‚É‚È‚é95‚ªÅ‘å
+				ypos = (95 - p->y - scr_v) * 12;//ä¸‹ãŒ0ã«ãªã‚‹95ãŒæœ€å¤§
 				xpos = (p->x - scr_h) * NoteWidth + KEYWIDTH;
 				t = (p->y % 12); if (t == 1 || t == 3 || t == 6 || t == 8 || t == 10)t = 1;else t = 0;
-				if (xpos > WWidth)break;//•\¦—Ìˆæ‚ğ’´‚¦‚½B
-				if (ypos >= 0 && ypos < WHeight + 286 - WHNM) {//•\¦”ÍˆÍYPOS
+				if (xpos > WWidth)break;//è¡¨ç¤ºé ˜åŸŸã‚’è¶…ãˆãŸã€‚
+				if (ypos >= 0 && ypos < WHeight + 286 - WHNM) {//è¡¨ç¤ºç¯„å›²YPOS
 					addY = 0;
 					/*
-					for(i = p->length-1; i >= 0; i--){//K”ö‚Ó‚­‚ß‚Ä(>0)“ª‚Ü‚Å(==0)ŒŸõ //A 2014.05.06
+					for(i = p->length-1; i >= 0; i--){//å°»å°¾ãµãã‚ã¦(>0)é ­ã¾ã§(==0)æ¤œç´¢ //A 2014.05.06
 						e = p->x - line*dot*scr_h + i;
 						unsigned char uct = noteon[p->y * 128 + e];
-						if((uct & trkmaskLower[track]) && track < n){ //©Tr‚æ‚è¬‚³‚¢Tr”Ô†‚Ì‰¹•„‚ª‚ ‚Á‚½
+						if((uct & trkmaskLower[track]) && track < n){ //è‡ªTrã‚ˆã‚Šå°ã•ã„Trç•ªå·ã®éŸ³ç¬¦ãŒã‚ã£ãŸ
 							addY-=2; break;
-						}else if((uct & trkmaskLower[track]) && track > n){ //©Tr‚æ‚è‘å‚«‚¢Tr”Ô†‚Ì‰¹•„‚ª‚ ‚Á‚½
+						}else if((uct & trkmaskLower[track]) && track > n){ //è‡ªTrã‚ˆã‚Šå¤§ãã„Trç•ªå·ã®éŸ³ç¬¦ãŒã‚ã£ãŸ
 							addY+=2; break;
 						}
 					}
@@ -357,52 +357,52 @@ void OrgData::PutNotes(int TPCY, bool vol)
 						if (k >= 4)addY--;
 					}
 
-					for (j = 0, i = p->length - 1; i > 0; i--, j++) {//K”ö
+					for (j = 0, i = p->length - 1; i > 0; i--, j++) {//å°»å°¾
 						if (TPCY == 0) PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &note_tail_rect[k + 8], BMPNOTE);
 						else PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &rc_TCPY[2 + t], BMPNOTE);
 					}
-					if (TPCY == 0) PutBitmapHead(xpos, ypos + 2 + addY, &note_blue_rect[k], BMPNOTE, p->length);//‰¹•„(V)
-					else PutBitmapHead(xpos, ypos + 2 + addY, &rc_TCPY[t], BMPNOTE, p->length);//‰¹•„(V)
+					if (TPCY == 0) PutBitmapHead(xpos, ypos + 2 + addY, &note_blue_rect[k], BMPNOTE, p->length);//éŸ³ç¬¦(æ–°)
+					else PutBitmapHead(xpos, ypos + 2 + addY, &rc_TCPY[t], BMPNOTE, p->length);//éŸ³ç¬¦(æ–°)
 				}
 				p = p->to;
 			}
 		}
 	}
-	//•ÒW‚·‚é‰¹•„‚ğ•\¦///////////
+	//ç·¨é›†ã™ã‚‹éŸ³ç¬¦ã‚’è¡¨ç¤º///////////
 	if((p = info.tdata[track].note_list) == NULL || TPCY==1){
-		//return;//‰¹•„‚ª–³‚¯‚ê‚Î’†~
+		//return;//éŸ³ç¬¦ãŒç„¡ã‘ã‚Œã°ä¸­æ­¢
 	}else{
-		while(p != NULL && p->to != NULL){//‚Ç‚±‚©‚ç•\¦‚·‚é‚©
+		while(p != NULL && p->to != NULL){//ã©ã“ã‹ã‚‰è¡¨ç¤ºã™ã‚‹ã‹
 			xpos = (p->x - scr_h)*NoteWidth + KEYWIDTH;
 			if(xpos >= KEYWIDTH)break;
 			p = p->to;
 		}
-		//K”ö‚ğ•\¦‚·‚éˆ×‚ÉAˆê‚Â‘O‚Ì‰¹•„‚©‚çEEEB
+		//å°»å°¾ã‚’è¡¨ç¤ºã™ã‚‹ç‚ºã«ã€ä¸€ã¤å‰ã®éŸ³ç¬¦ã‹ã‚‰ãƒ»ãƒ»ãƒ»ã€‚
 		if(p == NULL){
 			//return;
 		}else{
 			if(p->from != NULL)p = p->from;
 			while(p->from != NULL && p->y == KEYDUMMY)p = p->from;
-			//‰¹•„‚ª‚ª‚È‚­‚È‚é‚©AXÀ•W‚ª•\¦—Ìˆæ‚ğ’´‚¦‚é‚Ü‚Å•\¦B
+			//éŸ³ç¬¦ãŒãŒãªããªã‚‹ã‹ã€Xåº§æ¨™ãŒè¡¨ç¤ºé ˜åŸŸã‚’è¶…ãˆã‚‹ã¾ã§è¡¨ç¤ºã€‚
 			while(p != NULL){
-				ypos = (95 - p->y - scr_v)*12;//‰º‚ª0‚É‚È‚é95‚ªÅ‘å
+				ypos = (95 - p->y - scr_v)*12;//ä¸‹ãŒ0ã«ãªã‚‹95ãŒæœ€å¤§
 				xpos = (p->x - scr_h)*NoteWidth + KEYWIDTH;
-				if(xpos > WWidth)break;//•\¦—Ìˆæ‚ğ’´‚¦‚½B
-				if(!vol && ypos >= 0 && ypos < WHeight+286-WHNM){//•\¦”ÍˆÍYPOS
-					//tBitmap(xpos,ypos+2,&note_rect[0],BMPNOTE);//‰¹•„
-					for(j = 0,i = p->length-1; i > 0; i--,j++){//K”ö
+				if(xpos > WWidth)break;//è¡¨ç¤ºé ˜åŸŸã‚’è¶…ãˆãŸã€‚
+				if(!vol && ypos >= 0 && ypos < WHeight+286-WHNM){//è¡¨ç¤ºç¯„å›²YPOS
+					//tBitmap(xpos,ypos+2,&note_rect[0],BMPNOTE);//éŸ³ç¬¦
+					for(j = 0,i = p->length-1; i > 0; i--,j++){//å°»å°¾
 						//PutBitmap(xpos+j*16+16,ypos+3,&note_rect[2],BMPNOTE);
 						PutBitmap2(xpos+j*NoteWidth+NoteWidth,ypos+3,&note_tail_rect[track],BMPNOTE);
 					}
-					PutBitmapHead(xpos,ypos+2,&note_blue_rect[track+16],BMPNOTE,p->length);//‰¹•„(V)
+					PutBitmapHead(xpos,ypos+2,&note_blue_rect[track+16],BMPNOTE,p->length);//éŸ³ç¬¦(æ–°)
 				}
 				if (vol) {
 					if (p->pan != PANDUMMY) {
-						ypos = WHeight + 351 - WHNM - (p->pan * 5);//ƒpƒ“
+						ypos = WHeight + 351 - WHNM - (p->pan * 5);//ãƒ‘ãƒ³
 						PutBitmapCenter(xpos, ypos, &note_rect[4], BMPNOTE);
 					}
 					if (p->volume != VOLDUMMY) {
-						ypos = WHeight + 426 - WHNM - (p->volume / 4);//ƒ{ƒŠƒ…[ƒ€
+						ypos = WHeight + 426 - WHNM - (p->volume / 4);//ãƒœãƒªãƒ¥ãƒ¼ãƒ 
 						PutBitmapCenter(xpos, ypos, &note_rect[4], BMPNOTE);
 					}
 				}
@@ -411,7 +411,7 @@ void OrgData::PutNotes(int TPCY, bool vol)
 		}
 	}
 }
-//‰¹•„(ƒhƒ‰ƒ€)‚Ì•\¦
+//éŸ³ç¬¦(ãƒ‰ãƒ©ãƒ )ã®è¡¨ç¤º
 void OrgData::PutNotes2(int TPCY, bool vol)
 {
 	int i,j,k,t,addY;
@@ -421,87 +421,87 @@ void OrgData::PutNotes2(int TPCY, bool vol)
 	long scr_h,scr_v;
 	unsigned char line,dot;
 	MUSICINFO mi;
-	//•K—v‚Èƒf[ƒ^‚ğæ“¾
+	//å¿…è¦ãªãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—
 	GetMusicInfo(&mi);line = mi.line;dot = mi.dot;
 	scr_data.GetScrollPosition(&scr_h,&scr_v);
 
-	//•ÒW‚µ‚È‚¢‰¹•„‚ğæ‚É•\¦///////////
+	//ç·¨é›†ã—ãªã„éŸ³ç¬¦ã‚’å…ˆã«è¡¨ç¤º///////////
 	if (!vol) {
 		for (n = MAXMELODY; n < MAXTRACK; n++) {
 			k = getRecentTrack(n - MAXMELODY, 1);
 			if (k == track)continue;
 			if ((p = info.tdata[k].note_list) == NULL) {
 				//			MessageBox(hWnd,"","",MB_OK);
-				continue;//‰¹•„‚ª–³‚¯‚ê‚Î’†~
+				continue;//éŸ³ç¬¦ãŒç„¡ã‘ã‚Œã°ä¸­æ­¢
 			}
-			while (p != NULL && p->to != NULL) {//‚Ç‚±‚©‚ç•\¦‚·‚é‚©
+			while (p != NULL && p->to != NULL) {//ã©ã“ã‹ã‚‰è¡¨ç¤ºã™ã‚‹ã‹
 				xpos = (p->x - scr_h) * NoteWidth + KEYWIDTH;
 				if (xpos >= KEYWIDTH)break;
 				p = p->to;
 			}
-			//K”ö‚ğ•\¦‚·‚éˆ×‚ÉAˆê‚Â‘O‚Ì‰¹•„‚©‚çEEEB
+			//å°»å°¾ã‚’è¡¨ç¤ºã™ã‚‹ç‚ºã«ã€ä¸€ã¤å‰ã®éŸ³ç¬¦ã‹ã‚‰ãƒ»ãƒ»ãƒ»ã€‚
 			if (p == NULL)continue;
 			if (p->from != NULL)p = p->from;
 			while (p->from != NULL && p->y == KEYDUMMY)p = p->from;
-			//‰¹•„‚ª‚ª‚È‚­‚È‚é‚©AXÀ•W‚ª•\¦—Ìˆæ‚ğ’´‚¦‚é‚Ü‚Å•\¦B
+			//éŸ³ç¬¦ãŒãŒãªããªã‚‹ã‹ã€Xåº§æ¨™ãŒè¡¨ç¤ºé ˜åŸŸã‚’è¶…ãˆã‚‹ã¾ã§è¡¨ç¤ºã€‚
 			while (p != NULL) {
-				ypos = (95 - p->y - scr_v) * 12;//‰º‚ª0‚É‚È‚é95‚ªÅ‘å
+				ypos = (95 - p->y - scr_v) * 12;//ä¸‹ãŒ0ã«ãªã‚‹95ãŒæœ€å¤§
 				xpos = (p->x - scr_h) * NoteWidth + KEYWIDTH;
 				t = (p->y % 12); if (t == 1 || t == 3 || t == 6 || t == 8 || t == 10)t = 1;else t = 0;
-				if (xpos > WWidth)break;//•\¦—Ìˆæ‚ğ’´‚¦‚½B
-	//			if(ypos >= 0 && ypos < 286+WDWHEIGHTPLUS){//•\¦”ÍˆÍYPOS
-				if (ypos >= 0 && ypos < WHeight + 286 - WHNM) {//•\¦”ÍˆÍYPOS
+				if (xpos > WWidth)break;//è¡¨ç¤ºé ˜åŸŸã‚’è¶…ãˆãŸã€‚
+	//			if(ypos >= 0 && ypos < 286+WDWHEIGHTPLUS){//è¡¨ç¤ºç¯„å›²YPOS
+				if (ypos >= 0 && ypos < WHeight + 286 - WHNM) {//è¡¨ç¤ºç¯„å›²YPOS
 					addY = 0;
 					/*if(iSlideOverlapNotes!=0){
 						addY=-(k-MAXMELODY)/2+2; //if(addY>=0)addY++;
 						if((k-MAXMELODY)>=4)addY--;
 					}*/
-					for (j = 0, i = p->length - 1; i > 0; i--, j++) {//K”ö
+					for (j = 0, i = p->length - 1; i > 0; i--, j++) {//å°»å°¾
 						if (TPCY == 0) PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &note_tail_rect[k], BMPNOTE);
 						else PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &rc_TCPY[2 + t], BMPNOTE);
 					}
-					if (TPCY == 0) PutBitmapHead(xpos, ypos + 2 + addY, &note_blue_rect[k], BMPNOTE, p->length);//‰¹•„
-					else PutBitmapHead(xpos, ypos + 2 + addY, &rc_TCPY[0 + t], BMPNOTE, p->length);//‰¹•„
+					if (TPCY == 0) PutBitmapHead(xpos, ypos + 2 + addY, &note_blue_rect[k], BMPNOTE, p->length);//éŸ³ç¬¦
+					else PutBitmapHead(xpos, ypos + 2 + addY, &rc_TCPY[0 + t], BMPNOTE, p->length);//éŸ³ç¬¦
 				}
 				p = p->to;
 			}
 		}
 	}
-	//•ÒW‚·‚é‰¹•„‚ğ•\¦///////////
+	//ç·¨é›†ã™ã‚‹éŸ³ç¬¦ã‚’è¡¨ç¤º///////////
 	if((p = info.tdata[track].note_list) == NULL || TPCY==1){
-		//return;//‰¹•„‚ª–³‚¯‚ê‚Î’†~
+		//return;//éŸ³ç¬¦ãŒç„¡ã‘ã‚Œã°ä¸­æ­¢
 	}else{
-		while(p != NULL && p->to != NULL){//‚Ç‚±‚©‚ç•\¦‚·‚é‚©
+		while(p != NULL && p->to != NULL){//ã©ã“ã‹ã‚‰è¡¨ç¤ºã™ã‚‹ã‹
 			xpos = (p->x - scr_h)*16 + KEYWIDTH;
 			if(xpos >= KEYWIDTH)break;
 			p = p->to;
 		}
-		//K”ö‚ğ•\¦‚·‚éˆ×‚ÉAˆê‚Â‘O‚Ì‰¹•„‚©‚çEEEB
+		//å°»å°¾ã‚’è¡¨ç¤ºã™ã‚‹ç‚ºã«ã€ä¸€ã¤å‰ã®éŸ³ç¬¦ã‹ã‚‰ãƒ»ãƒ»ãƒ»ã€‚
 		if(p == NULL){
 			//return;
 		}else{
 			if(p->from != NULL)p = p->from;
 			while(p->from != NULL && p->y == KEYDUMMY)p = p->from;
-			//‰¹•„‚ª‚ª‚È‚­‚È‚é‚©AXÀ•W‚ª•\¦—Ìˆæ‚ğ’´‚¦‚é‚Ü‚Å•\¦B
+			//éŸ³ç¬¦ãŒãŒãªããªã‚‹ã‹ã€Xåº§æ¨™ãŒè¡¨ç¤ºé ˜åŸŸã‚’è¶…ãˆã‚‹ã¾ã§è¡¨ç¤ºã€‚
 			while(p != NULL){
-				ypos = (95 - p->y - scr_v)*12;//‰º‚ª0‚É‚È‚é95‚ªÅ‘å
+				ypos = (95 - p->y - scr_v)*12;//ä¸‹ãŒ0ã«ãªã‚‹95ãŒæœ€å¤§
 				xpos = (p->x - scr_h)*NoteWidth + KEYWIDTH;
-				if(xpos > WWidth)break;//•\¦—Ìˆæ‚ğ’´‚¦‚½B
-				if(!vol && ypos >= 0 && ypos < WHeight+286-WHNM){//•\¦”ÍˆÍYPOS
-					//PutBitmap(xpos,ypos+2,&note_rect[0],BMPNOTE);//‰¹•„
-					//PutBitmap2(xpos,ypos+2,&note_blue_rect[track+16],BMPNOTE);//‰¹•„	// 2014.05.27 D
-					for(j = 0,i = p->length-1; i > 0; i--,j++){//K”ö
+				if(xpos > WWidth)break;//è¡¨ç¤ºé ˜åŸŸã‚’è¶…ãˆãŸã€‚
+				if(!vol && ypos >= 0 && ypos < WHeight+286-WHNM){//è¡¨ç¤ºç¯„å›²YPOS
+					//PutBitmap(xpos,ypos+2,&note_rect[0],BMPNOTE);//éŸ³ç¬¦
+					//PutBitmap2(xpos,ypos+2,&note_blue_rect[track+16],BMPNOTE);//éŸ³ç¬¦	// 2014.05.27 D
+					for(j = 0,i = p->length-1; i > 0; i--,j++){//å°»å°¾
 						PutBitmap2(xpos+j*NoteWidth+NoteWidth,ypos+3,&note_tail_rect[track-8],BMPNOTE);
 					}
-					PutBitmapHead(xpos,ypos+2,&note_blue_rect[track+16],BMPNOTE,p->length);//‰¹•„	// 2014.05.27 A
+					PutBitmapHead(xpos,ypos+2,&note_blue_rect[track+16],BMPNOTE,p->length);//éŸ³ç¬¦	// 2014.05.27 A
 				}
 				if (vol) {
 					if (p->pan != PANDUMMY) {
-						ypos = WHeight + 351 - WHNM - (p->pan * 5);//ƒpƒ“
+						ypos = WHeight + 351 - WHNM - (p->pan * 5);//ãƒ‘ãƒ³
 						PutBitmapCenter(xpos, ypos, &note_rect[4], BMPNOTE);
 					}
 					if (p->volume != VOLDUMMY) {
-						ypos = WHeight + 426 - WHNM - (p->volume / 4);//ƒ{ƒŠƒ…[ƒ€
+						ypos = WHeight + 426 - WHNM - (p->volume / 4);//ãƒœãƒªãƒ¥ãƒ¼ãƒ 
 						PutBitmapCenter(xpos, ypos, &note_rect[4], BMPNOTE);
 					}
 				}
@@ -510,7 +510,7 @@ void OrgData::PutNotes2(int TPCY, bool vol)
 		}
 	}
 }
-//Šy•ˆ‚Ì•\¦
+//æ¥½è­œã®è¡¨ç¤º
 void OrgData::PutMusic(void)
 {
 	//if (gIsDrawing) return;
@@ -528,7 +528,7 @@ void OrgData::PutMusic(void)
 	scr_data.GetScrollPosition(&hpos,&vpos);
 	vpos2=vpos;
 	vpos = -(vpos%12)*12;
-	//‚±‚±ˆÈ~‚ÉŠy•ˆ•\¦‚ğ‹Lq
+	//ã“ã“ä»¥é™ã«æ¥½è­œè¡¨ç¤ºã‚’è¨˜è¿°
 	x = (-(hpos % (info.dot * info.line)) * NoteWidth) + KEYWIDTH;
 
 	for (j = 0; j < (WHeight / 144) + 1; ++j) {
@@ -554,16 +554,16 @@ void OrgData::PutMusic(void)
 		}
 	}
 
-	//for (j = 0; j < 8; j++) PutMusicParts(x, j * 144 + vpos);//Šy•ˆ
+	//for (j = 0; j < 8; j++) PutMusicParts(x, j * 144 + vpos);//æ¥½è­œ
 	/*if (x < KEYWIDTH) {
-		for (j = 0; j < 8; j++)PutMusicParts(x + WWidth, j * 144 + vpos);//Šy•ˆ
-		PutPanParts(x + WWidth);//ƒpƒ“ƒ‰ƒCƒ“
+		for (j = 0; j < 8; j++)PutMusicParts(x + WWidth, j * 144 + vpos);//æ¥½è­œ
+		PutPanParts(x + WWidth);//ãƒ‘ãƒ³ãƒ©ã‚¤ãƒ³
 	}*/
 
-	//ƒL[ƒ{[ƒhŒ®”Õi•ˆ–Ê”wŒi‚ğŒõ‚ç‚·•”•ªj
+	//ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰éµç›¤ï¼ˆè­œé¢èƒŒæ™¯ã‚’å…‰ã‚‰ã™éƒ¨åˆ†ï¼‰
 	for(j = 0; j < 96; j++){ // 2010.09.22 A
 		if(iKeyPushDown[j]!=0){
-			PutBitmap(0,  (95 - j - vpos2)*12, &rc_PushKB[j%12],BMPMUSIC);//Œ®”Õ
+			PutBitmap(0,  (95 - j - vpos2)*12, &rc_PushKB[j%12],BMPMUSIC);//éµç›¤
 		}
 	}
 
@@ -572,12 +572,12 @@ void OrgData::PutMusic(void)
 		else PutNotes2(0, false);
 	}else{
 		if(track < MAXMELODY){
-			PutNotes2(1, false);	//”¼“§–¾•\¦
-			PutNotes(0, false);		//À‘Ì•\¦
+			PutNotes2(1, false);	//åŠé€æ˜è¡¨ç¤º
+			PutNotes(0, false);		//å®Ÿä½“è¡¨ç¤º
 		}
 		else{
-			PutNotes(1, false);	//”¼“§–¾•\¦
-			PutNotes2(0, false);	//À‘Ì•\¦
+			PutNotes(1, false);	//åŠé€æ˜è¡¨ç¤º
+			PutNotes2(0, false);	//å®Ÿä½“è¡¨ç¤º
 		}
 		
 	}
@@ -587,14 +587,14 @@ void OrgData::PutMusic(void)
 
 	for(j = 0; j < (WHeight / 144) + 1; j++) PutBitmap(0, j*144 + vpos, &msc_rect[0], BMPMUSIC);
 
-	//ƒL[ƒ{[ƒhŒ®”ÕiŒ®”Õ•”•ªj
+	//ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰éµç›¤ï¼ˆéµç›¤éƒ¨åˆ†ï¼‰
 	for(j = 0; j < 96 ; j++){ // 2010.09.22 A
 		if(iKeyPushDown[j]!=0){
 			//A 2010.09.24
 			for(i = 0; i < (WHeight / 144) + 1; i++){
-				PutBitmap(0,  (95 - (j%12)- i*12 - vpos2)*12, &rc_PushKB3[j%12],BMPMUSIC);//ƒIƒNƒ^[ƒuˆá‚¢Œ®”Õ
+				PutBitmap(0,  (95 - (j%12)- i*12 - vpos2)*12, &rc_PushKB3[j%12],BMPMUSIC);//ã‚ªã‚¯ã‚¿ãƒ¼ãƒ–é•ã„éµç›¤
 			}
-			PutBitmap(0,  (95 - j - vpos2)*12, &rc_PushKB2[j%12],BMPMUSIC);//Œ®”Õ
+			PutBitmap(0,  (95 - j - vpos2)*12, &rc_PushKB2[j%12],BMPMUSIC);//éµç›¤
 		}
 	}
 
@@ -620,7 +620,7 @@ void OrgData::PutMusic(void)
 		}
 	}
 
-	//PutPanParts(x);//ƒpƒ“ƒ‰ƒCƒ“
+	//PutPanParts(x);//ãƒ‘ãƒ³ãƒ©ã‚¤ãƒ³
 
 	if (gDrawDouble == 0) {
 		if (track < MAXMELODY)PutNotes(0, true);
@@ -628,22 +628,22 @@ void OrgData::PutMusic(void)
 	}
 	else {
 		if (track < MAXMELODY) {
-			PutNotes2(1, true);	//”¼“§–¾•\¦
-			PutNotes(0, true);		//À‘Ì•\¦
+			PutNotes2(1, true);	//åŠé€æ˜è¡¨ç¤º
+			PutNotes(0, true);		//å®Ÿä½“è¡¨ç¤º
 		}
 		else {
-			PutNotes(1, true);	//”¼“§–¾•\¦
-			PutNotes2(0, true);	//À‘Ì•\¦
+			PutNotes(1, true);	//åŠé€æ˜è¡¨ç¤º
+			PutNotes2(0, true);	//å®Ÿä½“è¡¨ç¤º
 		}
 
 	}
 
 	PutSelectArea();
 
-	PutBitmap(0,WHeight+288-WHNM,&msc_rect[0],BMPPAN);//ƒpƒ“
+	PutBitmap(0,WHeight+288-WHNM,&msc_rect[0],BMPPAN);//ãƒ‘ãƒ³
 
 	if(sACrnt){ //2014.04.30
-		PutBitmap(0,WHeight+288-WHNM+144,&rc_CurrentSelect,BMPNOTE);//”ÍˆÍ‘I‘ğ‚Íí‚É¶ÚİÄÄ×¯¸‚Ì‚Æ‚«
+		PutBitmap(0,WHeight+288-WHNM+144,&rc_CurrentSelect,BMPNOTE);//ç¯„å›²é¸æŠã¯å¸¸ã«ï½¶ï¾šï¾ï¾„ï¾„ï¾—ï½¯ï½¸ã®ã¨ã
 	}
 	if(iActivatePAN){ //2014.05.01
 		PutBitmap(0,WHeight+288-WHNM,&rc_ActivePAN, BMPNOTE);
@@ -688,22 +688,22 @@ void OrgData::PutMusic(void)
 	//gIsDrawing = false;
 }
 
-//‘I‘ğ”ÍˆÍ‚Ì•\¦
+//é¸æŠç¯„å›²ã®è¡¨ç¤º
 void OrgData::PutSelectArea()
 {
-	if(tra<0)return; //‘I‘ğ‚³‚ê‚Ä‚Ö‚ñ
+	if(tra<0)return; //é¸æŠã•ã‚Œã¦ã¸ã‚“
 	long ypos;
 	long scr_h,scr_v;
 	unsigned char line,dot;
 	MUSICINFO mi;
-	//•K—v‚Èƒf[ƒ^‚ğæ“¾
+	//å¿…è¦ãªãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—
 	GetMusicInfo(&mi);line = mi.line;dot = mi.dot;
 	scr_data.GetScrollPosition(&scr_h,&scr_v);
 
 	int xSelS, xSelE,xx,t;
 	t = 0; if(ful==0 && tra!=track)t=3;
-	xSelS = (nc_Select.x1_1 - scr_h)*NoteWidth + KEYWIDTH; //‘I‘ğŠJn“_
-	xSelE = (nc_Select.x1_2 - scr_h)*NoteWidth + KEYWIDTH; //‘I‘ğI—¹“_
+	xSelS = (nc_Select.x1_1 - scr_h)*NoteWidth + KEYWIDTH; //é¸æŠé–‹å§‹ç‚¹
+	xSelE = (nc_Select.x1_2 - scr_h)*NoteWidth + KEYWIDTH; //é¸æŠçµ‚äº†ç‚¹
 	ypos = WHeight - 13;
 	for(xx=KEYWIDTH;xx<=WWidth+NoteWidth;xx+=NoteWidth){
 		if(xx==xSelS){
@@ -729,7 +729,7 @@ void OrgData::RedrawSelectArea()
 	//long hpos, vpos;
 	//scr_data.GetScrollPosition(&hpos, &vpos);
 	//x = (-(hpos % (info.dot * info.line)) * NoteWidth) + KEYWIDTH;
-	//PutSelectParts(x);//ƒpƒ“ƒ‰ƒCƒ“
+	//PutSelectParts(x);//ãƒ‘ãƒ³ãƒ©ã‚¤ãƒ³
 	//PutSelectArea();
 
 }

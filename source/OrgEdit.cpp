@@ -11,22 +11,22 @@
 
 #define PI 3.14159265358979323846
 /*
-//•ÒW—p\‘¢‘Ì///////////////
-typedef struct{//œƒRƒs[\‘¢‘Ì
-	char track1;//‚±‚Ìƒgƒ‰ƒbƒN‚Ì
-	long x1_1;//‚±‚±‚©‚ç
-	long x1_2;//‚±‚±‚Ü‚Å‚ğ
-	char track2;//‚±‚Ìƒgƒ‰ƒbƒN‚Ì
-	long x2;//‚±‚±‚É
-	long num;//‰½‰ñ
+//ç·¨é›†ç”¨æ§‹é€ ä½“///////////////
+typedef struct{//â—ã‚³ãƒ”ãƒ¼æ§‹é€ ä½“
+	char track1;//ã“ã®ãƒˆãƒ©ãƒƒã‚¯ã®
+	long x1_1;//ã“ã“ã‹ã‚‰
+	long x1_2;//ã“ã“ã¾ã§ã‚’
+	char track2;//ã“ã®ãƒˆãƒ©ãƒƒã‚¯ã®
+	long x2;//ã“ã“ã«
+	long num;//ä½•å›
 }NOTECOPY;
 
-typedef struct{//œƒgƒ‰ƒ“ƒXƒ|[ƒg‚âƒpƒ“ƒ|ƒbƒg
-	char track;//‚±‚Ìƒgƒ‰ƒbƒN‚Ì
-	long x1;//‚±‚±‚©‚ç
-	long x2;//‚±‚±‚Ü‚Å‚ğ
-	unsigned char a;//‚±‚ê‚¾‚¯ 
-	unsigned char mode;//‚½‚·i‚Ğ‚­j
+typedef struct{//â—ãƒˆãƒ©ãƒ³ã‚¹ãƒãƒ¼ãƒˆã‚„ãƒ‘ãƒ³ãƒãƒƒãƒˆ
+	char track;//ã“ã®ãƒˆãƒ©ãƒƒã‚¯ã®
+	long x1;//ã“ã“ã‹ã‚‰
+	long x2;//ã“ã“ã¾ã§ã‚’
+	unsigned char a;//ã“ã‚Œã ã‘ 
+	unsigned char mode;//ãŸã™ï¼ˆã²ãï¼‰
 }PARCHANGE;
 */
 
@@ -45,7 +45,7 @@ void ChangeTrackPlus(int iValue) {
 
 	char str[8];
 
-	RECT rect = { 64,0,WWidth,WHeight };//XV‚·‚é—Ìˆæ(ƒgƒ‰ƒbƒN•ÏX)
+	RECT rect = { 64,0,WWidth,WHeight };//æ›´æ–°ã™ã‚‹é ˜åŸŸ(ãƒˆãƒ©ãƒƒã‚¯å¤‰æ›´)
 
 
 	org_data.track += iValue;
@@ -60,7 +60,7 @@ void ChangeTrackPlus(int iValue) {
 	}
 
 	memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
-	//‘I‘ğƒgƒ‰ƒbƒN•\¦
+	//é¸æŠãƒˆãƒ©ãƒƒã‚¯è¡¨ç¤º
 	//itoa(org_data.track, str, 10);
 
 	/*if (sACrnt) {
@@ -99,7 +99,7 @@ void ChangeTrack(int iTrack) {
 
 	char str[8];
 	int i;
-	RECT rect = { 64,0,WWidth,WHeight };//XV‚·‚é—Ìˆæ(ƒgƒ‰ƒbƒN•ÏX)
+	RECT rect = { 64,0,WWidth,WHeight };//æ›´æ–°ã™ã‚‹é ˜åŸŸ(ãƒˆãƒ©ãƒƒã‚¯å¤‰æ›´)
 
 	i = iTrack;
 	org_data.track = i;
@@ -113,7 +113,7 @@ void ChangeTrack(int iTrack) {
 	}
 
 	memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
-	//‘I‘ğƒgƒ‰ƒbƒN•\¦
+	//é¸æŠãƒˆãƒ©ãƒƒã‚¯è¡¨ç¤º
 	/*itoa(org_data.track, str, 10);
 	if(sACrnt){
 		if(tra>=0){
@@ -147,49 +147,49 @@ void ChangeTrack(int iTrack) {
 BOOL OrgData::DelateNoteData(PARCHANGE *pc)
 {
 	NOTELIST *np;
-	NOTELIST *np_from;//‚±‚¢‚Â‚Æ
-	NOTELIST *np_to;//‚±‚¢‚Â‚ğŒq‚®
-	NOTELIST *np_clear;//K”öíœ—p
-	long note_x1,note_x2;//‹È‚Ì”ÍˆÍ‚ğ•Û‘¶
+	NOTELIST *np_from;//ã“ã„ã¤ã¨
+	NOTELIST *np_to;//ã“ã„ã¤ã‚’ç¹‹ã
+	NOTELIST *np_clear;//å°»å°¾å‰Šé™¤ç”¨
+	long note_x1,note_x2;//æ›²ã®ç¯„å›²ã‚’ä¿å­˜
 	np = info.tdata[pc->track].note_list;
-	if(np == NULL)return FALSE;//‰¹•„‚ª–³‚¯‚ê‚ÎI—¹
+	if(np == NULL)return FALSE;//éŸ³ç¬¦ãŒç„¡ã‘ã‚Œã°çµ‚äº†
 
 	np = info.tdata[pc->track].note_list;
-	note_x1 = np->x;//Å‰‚Ì‚˜‚ğ‹L˜^
-	while(np->to != NULL)np = np->to;//‚¨‚í‚è‚ğŒŸõ
-	note_x2 = np->x;//‚¨‚í‚è‚ğ•Û‘¶
-	if(note_x1 > pc->x2 || pc->x1 > note_x2){//”ÍˆÍ‚ªŠy•ˆ‚©‚ç—£‚ê‚Ä‚¢‚é
+	note_x1 = np->x;//æœ€åˆã®ï½˜ã‚’è¨˜éŒ²
+	while(np->to != NULL)np = np->to;//ãŠã‚ã‚Šã‚’æ¤œç´¢
+	note_x2 = np->x;//ãŠã‚ã‚Šã‚’ä¿å­˜
+	if(note_x1 > pc->x2 || pc->x1 > note_x2){//ç¯„å›²ãŒæ¥½è­œã‹ã‚‰é›¢ã‚Œã¦ã„ã‚‹
 		return FALSE;
-	}else if(note_x1 < pc->x1 && pc->x2 < note_x2){//”ÍˆÍ‚ªŠy•ˆ‚É“à•ï‚³‚ê‚Ä‚¢‚éB
+	}else if(note_x1 < pc->x1 && pc->x2 < note_x2){//ç¯„å›²ãŒæ¥½è­œã«å†…åŒ…ã•ã‚Œã¦ã„ã‚‹ã€‚
 		np = info.tdata[pc->track].note_list;
-		while(np->x < pc->x1)np = np->to;//”ÍˆÍ‚Ì“ª‚ğŒŸõ
-		np_from = np->from;//¶’[‚ğ•Û‘¶(Ú‘±—p)
+		while(np->x < pc->x1)np = np->to;//ç¯„å›²ã®é ­ã‚’æ¤œç´¢
+		np_from = np->from;//å·¦ç«¯ã‚’ä¿å­˜(æ¥ç¶šç”¨)
 		while(np->x <= pc->x2){
 			np->length = 0;
 			np->y=KEYDUMMY; np->pan=PANDUMMY; np->volume=VOLDUMMY;
-			np = np->to;//”ÍˆÍ‚ÌK‚ğŒŸõ
+			np = np->to;//ç¯„å›²ã®å°»ã‚’æ¤œç´¢
 		}
-		np_to = np;//‰E’[‚ğ•Û‘¶(Ú‘±—p)
-		//—¼’[‚ğÚ‘±
+		np_to = np;//å³ç«¯ã‚’ä¿å­˜(æ¥ç¶šç”¨)
+		//ä¸¡ç«¯ã‚’æ¥ç¶š
 		np_from->to = np_to;
 		np_to->from = np_from;
 		return TRUE;
 
-	}else if(pc->x1 <= note_x1 && pc->x2 < note_x2){//Á‚·”ÍˆÍ‚Ì“ª‚É‰¹‚ª‘¶İ‚µ‚È‚¢B
+	}else if(pc->x1 <= note_x1 && pc->x2 < note_x2){//æ¶ˆã™ç¯„å›²ã®é ­ã«éŸ³ãŒå­˜åœ¨ã—ãªã„ã€‚
 		np = info.tdata[pc->track].note_list;
 		while(np->x <= pc->x2){
 			np->length = 0;
 			np->y=KEYDUMMY; np->pan=PANDUMMY; np->volume=VOLDUMMY;
-			np = np->to;//”ÍˆÍ‚ÌK‚ğŒŸõ
+			np = np->to;//ç¯„å›²ã®å°»ã‚’æ¤œç´¢
 		}
-		np_to = np;//‰E’[‚ğ•Û‘¶(Ú‘±—p)
-		np->from = NULL;//‚±‚¢‚Â‚ğ“ª‚É‚·‚é
-		info.tdata[pc->track].note_list = np;//ƒŠƒXƒg‚É“o˜^
+		np_to = np;//å³ç«¯ã‚’ä¿å­˜(æ¥ç¶šç”¨)
+		np->from = NULL;//ã“ã„ã¤ã‚’é ­ã«ã™ã‚‹
+		info.tdata[pc->track].note_list = np;//ãƒªã‚¹ãƒˆã«ç™»éŒ²
 		return TRUE;
-	}else if(note_x1 < pc->x1 && note_x2 <= pc->x2 ){//Á‚·”ÍˆÍ‚ÌK‚É‰¹‚ª‘¶İ‚µ‚È‚¢B
+	}else if(note_x1 < pc->x1 && note_x2 <= pc->x2 ){//æ¶ˆã™ç¯„å›²ã®å°»ã«éŸ³ãŒå­˜åœ¨ã—ãªã„ã€‚
 		np = info.tdata[pc->track].note_list;
-		while(np->to->x < pc->x1)np = np->to;//”ÍˆÍ‚Ì“ª‚ğŒŸõ
-		np_clear = np;//ÅŒã‚É‚È‚é‰¹•ˆ‚ÌƒAƒhƒŒƒX
+		while(np->to->x < pc->x1)np = np->to;//ç¯„å›²ã®é ­ã‚’æ¤œç´¢
+		np_clear = np;//æœ€å¾Œã«ãªã‚‹éŸ³è­œã®ã‚¢ãƒ‰ãƒ¬ã‚¹
 		np = np->to;
 		while(np != NULL){
 			np->length = 0;
@@ -198,7 +198,7 @@ BOOL OrgData::DelateNoteData(PARCHANGE *pc)
 		}
 		np_clear->to = NULL;
 		return TRUE;
-	}else if(note_x1 >= pc->x1 && note_x2 <= pc->x2 ){//Š®‘SÁ‹
+	}else if(note_x1 >= pc->x1 && note_x2 <= pc->x2 ){//å®Œå…¨æ¶ˆå»
 		np = info.tdata[pc->track].note_list;
 		while(np != NULL){
 			np->length = 0;
@@ -507,59 +507,59 @@ BOOL OrgData::CopyNoteData(NOTECOPY *nc)
 		free( work );
 		return TRUE;
 	}
-	for(i = 0; i < copy_num; i++){//‚Pƒy[ƒXƒg
+	for(i = 0; i < copy_num; i++){//ï¼‘ãƒšãƒ¼ã‚¹ãƒˆ
 		wp->length = np->length;
 		wp->pan    = np->pan;
 		wp->volume = np->volume;
 		wp->y      = np->y;
-		//ƒCƒ“ƒfƒbƒNƒX’l‚Í·‚µˆø‚­
+		//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹å€¤ã¯å·®ã—å¼•ã
 		wp->x      = np->x - ind_x;
-		//Ÿ‚Ö
+		//æ¬¡ã¸
 		np = np->to;
 		wp++;
 	}
 
-	//ƒy[ƒXƒgæ‚ğƒNƒŠƒA
-	pc.track = nc->track2;//‚±‚Ìƒgƒ‰ƒbƒN‚Ì
-	pc.x1 = nc->x2;//‚±‚±‚©‚ç
-	pc.x2 = nc->x2 + (nc->x1_2+1 - nc->x1_1)*nc->num-1;//‚±‚±‚Ü‚Å‚ğx1_1+1(x1_2‚Í|‚P‚µ‚½’l)
-	DelateNoteData(&pc);//Á‚·
+	//ãƒšãƒ¼ã‚¹ãƒˆå…ˆã‚’ã‚¯ãƒªã‚¢
+	pc.track = nc->track2;//ã“ã®ãƒˆãƒ©ãƒƒã‚¯ã®
+	pc.x1 = nc->x2;//ã“ã“ã‹ã‚‰
+	pc.x2 = nc->x2 + (nc->x1_2+1 - nc->x1_1)*nc->num-1;//ã“ã“ã¾ã§ã‚’x1_1+1(x1_2ã¯ï¼ï¼‘ã—ãŸå€¤)
+	DelateNoteData(&pc);//æ¶ˆã™
 
-	//ƒy[ƒXƒgƒŠƒXƒg‚Ì¶¬
+	//ãƒšãƒ¼ã‚¹ãƒˆãƒªã‚¹ãƒˆã®ç”Ÿæˆ
 	np = p_list1 = p_list2 = SearchNote(nc->track2);
-	if(np == NULL){//–¢g—p‰¹•ˆ‚ª•s‘«
+	if(np == NULL){//æœªä½¿ç”¨éŸ³è­œãŒä¸è¶³
 		free( work );
 		return FALSE;
 	}
-	np->length = 1;//‰¼¶¬
+	np->length = 1;//ä»®ç”Ÿæˆ
 	for(i = 1; i < copy_num*nc->num; i++){
 		np = SearchNote(nc->track2);
-		if(np == NULL){//–¢g—p‰¹•ˆ‚ª•s‘«
+		if(np == NULL){//æœªä½¿ç”¨éŸ³è­œãŒä¸è¶³
 			//free( work );
 			//return FALSE;
 			break;
 		}
-		np->length = 1;//‰¼¶¬
+		np->length = 1;//ä»®ç”Ÿæˆ
 		p_list2->to = np;
 		np->from = p_list2;
 		p_list2 = np;
 	}
 
 	long index;
-	//ƒy[ƒXƒgƒŠƒXƒg‚Éƒy[ƒXƒg
+	//ãƒšãƒ¼ã‚¹ãƒˆãƒªã‚¹ãƒˆã«ãƒšãƒ¼ã‚¹ãƒˆ
 	np = p_list1;
-	for(j = 0; j < nc->num;j++){//ƒy[ƒXƒg‰ñ”
+	for(j = 0; j < nc->num;j++){//ãƒšãƒ¼ã‚¹ãƒˆå›æ•°
 		wp = work;
 		index = nc->x2+ (nc->x1_2 - nc->x1_1 +1)*j;
-		for(i = 0; i < copy_num; i++){//‚Pƒy[ƒXƒg
+		for(i = 0; i < copy_num; i++){//ï¼‘ãƒšãƒ¼ã‚¹ãƒˆ
 			np->length    = wp->length;
 			np->pan       = wp->pan;
 			np->volume    = wp->volume; 
 			np->y         = wp->y; 
-			//ƒCƒ“ƒfƒbƒNƒX’l‚ğ‰Á‚¦‚é
+			//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹å€¤ã‚’åŠ ãˆã‚‹
 			np->x         = wp->x + index;
 
-			//Ÿ‚Ö
+			//æ¬¡ã¸
 			np = np->to;
 			wp++;
 			if (np == NULL) break;
@@ -570,14 +570,14 @@ BOOL OrgData::CopyNoteData(NOTECOPY *nc)
 
 
 	np = info.tdata[nc->track2].note_list;
-	if(np == NULL){//Š®‘SV‹K
+	if(np == NULL){//å®Œå…¨æ–°è¦
 		info.tdata[nc->track2].note_list = p_list1;
 		p_list1->from = NULL;
 		p_list2->to = NULL;
 	}else{
-		//‘}“ü‚·‚×‚«êŠ‚ğŒŸo
+		//æŒ¿å…¥ã™ã¹ãå ´æ‰€ã‚’æ¤œå‡º
 //		np = info.tdata[nc->track2].note_list;
-		if(np->x > p_list2->x){//“ª‚É’Ç‰Á
+		if(np->x > p_list2->x){//é ­ã«è¿½åŠ 
 			np->from = p_list2;
 			p_list2->to = np;
 			p_list1->from = NULL;
@@ -586,13 +586,13 @@ BOOL OrgData::CopyNoteData(NOTECOPY *nc)
 			return TRUE;
 		}
 		while(np->to != NULL && np->to->x < nc->x2)np = np->to;
-		if(np->to == NULL){//K‚É’Ç‰Á
+		if(np->to == NULL){//å°»ã«è¿½åŠ 
 			np->to = p_list1;
 			p_list1->from = np;
 			p_list2->to = NULL;
 			free( work );
 			return TRUE;
-		}else{//‘}“ü
+		}else{//æŒ¿å…¥
 			np->to->from = p_list2;
 			p_list2->to = np->to;
 			np->to = p_list1;
@@ -605,14 +605,14 @@ BOOL OrgData::CopyNoteData(NOTECOPY *nc)
 	free( work );
 	return TRUE;
 }
-//ƒpƒ“‚ÍÅ¬‚Å‚OÅ‘å‚ª‚P‚Q‚Æ‚È‚é
+//ãƒ‘ãƒ³ã¯æœ€å°ã§ï¼æœ€å¤§ãŒï¼‘ï¼’ã¨ãªã‚‹
 BOOL OrgData::ChangePanData(PARCHANGE *pc)
 {
 	int i;
 	long num = 0;
 	NOTECOPY nc;
 	NOTELIST *np;
-	//‰¹•ˆ‚Ì”‚ğŒŸo
+	//éŸ³è­œã®æ•°ã‚’æ¤œå‡º
 	nc.x1_1 = pc->x1;
 	nc.x1_2 = pc->x2;
 	num = GetNoteNumber(pc->track, nc.x1_1, nc.x1_2);
@@ -620,7 +620,7 @@ BOOL OrgData::ChangePanData(PARCHANGE *pc)
 	np = info.tdata[pc->track].note_list;
 	if(np == NULL || num == 0)return FALSE;
 	while(np != NULL && np->x < pc->x1)np = np->to;
-	if(pc->a == 254){ //2014.05.03 ‹t“]
+	if(pc->a == 254){ //2014.05.03 é€†è»¢
 		for(i = 0; i < num; i++){
 			if(np->pan == PANDUMMY);
 			else np->pan = 12 - np->pan;
@@ -628,14 +628,14 @@ BOOL OrgData::ChangePanData(PARCHANGE *pc)
 		}
 		
 	}else{
-		if(pc->mode == MODEPARADD){//‰ÁZƒ‚[ƒh
+		if(pc->mode == MODEPARADD){//åŠ ç®—ãƒ¢ãƒ¼ãƒ‰
 			for(i = 0; i < num; i++){
 				if(np->pan == PANDUMMY);
 				else if(np->pan + pc->a > 12)np->pan = 12;
 				else np->pan += pc->a;
 				np = np->to;
 			}
-		}else{//Œ¸Zƒ‚[ƒh
+		}else{//æ¸›ç®—ãƒ¢ãƒ¼ãƒ‰
 			for(i = 0; i < num; i++){
 				if(np->pan == PANDUMMY);
 				else if(np->pan - pc->a < 0)np->pan = 0;
@@ -647,14 +647,14 @@ BOOL OrgData::ChangePanData(PARCHANGE *pc)
 	return TRUE;
 }
 
-//ƒL[‚Í95‚ªMAX
+//ã‚­ãƒ¼ã¯95ãŒMAX
 BOOL OrgData::ChangeTransData(PARCHANGE *pc)
 {
 	int i;
 	long num = 0;
 	NOTECOPY nc;
 	NOTELIST *np;
-	//‰¹•ˆ‚Ì”‚ğŒŸo
+	//éŸ³è­œã®æ•°ã‚’æ¤œå‡º
 	nc.x1_1 = pc->x1;
 	nc.x1_2 = pc->x2;
 	num = GetNoteNumber(pc->track, nc.x1_1, nc.x1_2);
@@ -662,14 +662,14 @@ BOOL OrgData::ChangeTransData(PARCHANGE *pc)
 	np = info.tdata[pc->track].note_list;
 	if(np == NULL || num == 0)return FALSE;
 	while(np != NULL && np->x < pc->x1)np = np->to;
-	if(pc->mode == MODEPARADD){//‰ÁZƒ‚[ƒh
+	if(pc->mode == MODEPARADD){//åŠ ç®—ãƒ¢ãƒ¼ãƒ‰
 		for(i = 0; i < num; i++){
 			if(np->y == KEYDUMMY);
 			else if(np->y + pc->a > 95)np->y = 95;
 			else np->y += pc->a;
 			np = np->to;
 		}
-	}else{//Œ¸Zƒ‚[ƒh
+	}else{//æ¸›ç®—ãƒ¢ãƒ¼ãƒ‰
 		for(i = 0; i < num; i++){
 			if(np->y == KEYDUMMY);
 			else if(np->y - pc->a < 0)np->y = 0;
@@ -679,7 +679,7 @@ BOOL OrgData::ChangeTransData(PARCHANGE *pc)
 	}
 	return TRUE;
 }
-//ƒ”ƒHƒŠƒ…[ƒ€‚Í254‚ªMAX
+//ãƒ´ã‚©ãƒªãƒ¥ãƒ¼ãƒ ã¯254ãŒMAX
 BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 {
 	int i,j;
@@ -688,7 +688,7 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 	NOTELIST *np;
 	unsigned char uc, ucMax = 0, ucMin = 254, ucFirstFlg = 255, ucFirst, ucLast;
 	double d = VOLDUMMY, dnum, di, dnorm = 0, dnormnum = 0, dt;
-	//‰¹•ˆ‚Ì”‚ğŒŸo
+	//éŸ³è­œã®æ•°ã‚’æ¤œå‡º
 	nc.x1_1 = pc->x1;
 	nc.x1_2 = pc->x2;
 	num = GetNoteNumber(pc->track, nc.x1_1, nc.x1_2);
@@ -730,10 +730,10 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 	np = info.tdata[pc->track].note_list;
 	if (np == NULL || num == 0 || vlen == 0)return FALSE;
 
-	//“ª‚¾‚µ
+	//é ­ã ã—
 	while (np != NULL && np->x < pc->x1)np = np->to;
 
-	//ucMax, ucMin‚ğ’²‚×‚é
+	//ucMax, ucMinã‚’èª¿ã¹ã‚‹
 	for(i = 0; i < vnum; i++){
 		if(np->volume != VOLDUMMY){
 			if(ucFirstFlg == 255){ucFirst = np->volume; lFirstx = np->x; ucFirstFlg = 0;}
@@ -745,9 +745,9 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 		}
 		np = np->to;
 	}
-	if(dnormnum > 0)dnorm = dnorm / dnormnum; //•½‹Ï’l
+	if(dnormnum > 0)dnorm = dnorm / dnormnum; //å¹³å‡å€¤
 
-	//Šª‚«–ß‚µ ‚Æ “ª‚¾‚µ
+	//å·»ãæˆ»ã— ã¨ é ­ã ã—
 	np = info.tdata[pc->track].note_list;
 	while(np != NULL && np->x < pc->x1)np = np->to;
 
@@ -755,22 +755,22 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 		lLastx = lFirstx + vlen - 1;
 	}
 
-	if(pc->mode == MODEPARADD){//‰ÁZƒ‚[ƒh
+	if(pc->mode == MODEPARADD){//åŠ ç®—ãƒ¢ãƒ¼ãƒ‰
 		for(i = 0; i < num; i++){
 			if(np->volume == VOLDUMMY);
 			else if(np->volume + pc->a > 254)np->volume = 254;
 			else np->volume += pc->a;
 			np = np->to;
 		}
-	}else if(pc->mode == MODEPARSUB){//Œ¸Zƒ‚[ƒh
+	}else if(pc->mode == MODEPARSUB){//æ¸›ç®—ãƒ¢ãƒ¼ãƒ‰
 		for(i = 0; i < num; i++){
 			if(np->volume == VOLDUMMY);
 			else if(np->volume - pc->a < 0)np->volume = 0;
 			else np->volume -= pc->a;
 			np = np->to;
 		}
-	}else if(pc->mode == MODEMULTIPLY){//æZƒ‚[ƒh
-		// Šù‘¶‚Ìvolume‚ğ a / 128”{ ‚·‚é
+	}else if(pc->mode == MODEMULTIPLY){//ä¹—ç®—ãƒ¢ãƒ¼ãƒ‰
+		// æ—¢å­˜ã®volumeã‚’ a / 128å€ ã™ã‚‹
 		for(i = 0; i < num; i++){
 			d = (double)np->volume * (double) pc->a / (double)128.0;
 			if(d>254.0)d=254.0; else if(d<0)d=0;
@@ -781,7 +781,7 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 			else np->volume = uc;
 			np = np->to;
 		}
-	}else if(pc->mode == (MODEDECAY + 3)){ //üŒ`Œ¸Š 2014.05.01
+	}else if(pc->mode == (MODEDECAY + 3)){ //ç·šå½¢æ¸›è¡° 2014.05.01
 		for(i = 0; i < vnum; i++){
 			if(np->volume != VOLDUMMY){
 				d = ((double)ucMax - (double)0) / (double)(vlen - 0) * (double)(vlen - 0 - i); if(d>254.0)d=254.0; else if(d<0)d=0;
@@ -790,7 +790,7 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 			np = np->to;
 		}
 	}
-	/*else if (pc->mode == (MODEDECAY + 14)) { // LINEAR 10 L
+	/*else if (pc->mode == (MODEDECAY + 14)) { //ãƒ»LINEAR 10 L
 		for (i = 0; i < num; i++) {
 			if (np->volume != VOLDUMMY) {
 				if (d == 0) {
@@ -808,7 +808,7 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 			}
 			np = np->to;
 		}*/
-	else if(pc->mode == (MODEDECAY + 12)){ //‚Qæã¸ 2014.05.17
+	else if(pc->mode == (MODEDECAY + 12)){ //ï¼’ä¹—ä¸Šæ˜‡ 2014.05.17
 		for(i = 0; i < vnum; i++){
 			if(np->volume != VOLDUMMY){
 				if(vlen > 1){
@@ -820,7 +820,7 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 			}
 			np = np->to;
 		}
-	}else if(pc->mode == (MODEDECAY + 13)){ //üŒ`ã¸ 2014.05.17
+	}else if(pc->mode == (MODEDECAY + 13)){ //ç·šå½¢ä¸Šæ˜‡ 2014.05.17
 		for(i = 0; i < vnum; i++){
 			if(np->volume != VOLDUMMY){
 				if(vlen > 1){
@@ -832,7 +832,7 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 			}
 			np = np->to;
 		}
-	}else if(pc->mode == (MODEDECAY + 2)){ //ã‚É“ÊŒ¸Š 2014.05.01
+	}else if(pc->mode == (MODEDECAY + 2)){ //ä¸Šã«å‡¸æ¸›è¡° 2014.05.01
 		if(vlen < 4)dnum = (double)vlen;
 		else if(vlen == 4)dnum = (double)vlen-0.5f;
 		for(i = 0; i < vnum; i++){
@@ -846,7 +846,7 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 			}
 			np = np->to;
 		}
-	}else if(pc->mode == (MODEDECAY + 1)){ //ã‚É“ÊŒ¸Š 2014.05.01
+	}else if(pc->mode == (MODEDECAY + 1)){ //ä¸Šã«å‡¸æ¸›è¡° 2014.05.01
 		if(vlen < 4)dnum = (double)vlen -0.4f;
 		else if(vlen == 4)dnum = (double)vlen -0.5f;
 		else dnum = vlen - 0.8f;
@@ -861,7 +861,7 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 			}
 			np = np->to;
 		}
-	}else if(pc->mode == (MODEDECAY + 4)){ //‰º‚É“ÊŒ¸Š 2014.05.01
+	}else if(pc->mode == (MODEDECAY + 4)){ //ä¸‹ã«å‡¸æ¸›è¡° 2014.05.01
 		for(i = 0; i < vnum; i++){
 			di = (double)i; dnum = (double)vlen;
 			if(np->volume != VOLDUMMY){
@@ -873,7 +873,7 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 			}
 			np = np->to;
 		}
-	}else if(pc->mode == (MODEDECAY + 5)){ //‰º‚É“ÊŒ¸Š 2014.05.01
+	}else if(pc->mode == (MODEDECAY + 5)){ //ä¸‹ã«å‡¸æ¸›è¡° 2014.05.01
 		for(i = 0; i < vnum; i++){
 			di = (double)i; dnum = (double)vlen;
 			if(np->volume != VOLDUMMY){
@@ -885,16 +885,16 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 			}
 			np = np->to;
 		}
-	}else if(pc->mode == (MODEDECAY + 6)){ //ƒm[ƒ}ƒ‰ƒCƒY 2014.05.01
+	}else if(pc->mode == (MODEDECAY + 6)){ //ãƒãƒ¼ãƒãƒ©ã‚¤ã‚º 2014.05.01
 		for(i = 0; i < vnum; i++){
 			//di = (double)i; dnum = (double)num;
 			if(np->volume != VOLDUMMY){
 				//np->volume = (unsigned char)dnorm;
-				np->volume = org_data.def_volume[pc->track];//‰Šú‰»
+				np->volume = org_data.def_volume[pc->track];//åˆæœŸåŒ–
 			}
 			np = np->to;
 		}
-	}else if(pc->mode == (MODEDECAY + 11)){ //ƒOƒ‰ƒf[ƒVƒ‡ƒ“ 2014.05.01
+	}else if(pc->mode == (MODEDECAY + 11)){ //ã‚°ãƒ©ãƒ‡ãƒ¼ã‚·ãƒ§ãƒ³ 2014.05.01
 		for(i = 0; i < vnum; i++){
 			di = (double)i; dnum = (double)vlen;
 			if(np->volume != VOLDUMMY && vlen > 1){
@@ -904,7 +904,7 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 			}
 			np = np->to;
 		}
-	}else if(pc->mode == (MODEDECAY + 8)){ //ÅŒã‚ÅŒ¸Š
+	}else if(pc->mode == (MODEDECAY + 8)){ //æœ€å¾Œã§æ¸›è¡°
 		dt = (double)np->volume;
 		j = lLastx - lFirstx; 
 		for(i = 0; i < vnum; i++){
@@ -946,7 +946,7 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 			}
 			np = np->to;
 		}
-	}else if(pc->mode == (MODEDECAY + 9)){ //ƒrƒuƒ‰[ƒg(ƒx[ƒX‚Íã‚É“ÊŒ¸Šƒpƒ^[ƒ“) 2014.05.01
+	}else if(pc->mode == (MODEDECAY + 9)){ //ãƒ“ãƒ–ãƒ©ãƒ¼ãƒˆ(ãƒ™ãƒ¼ã‚¹ã¯ä¸Šã«å‡¸æ¸›è¡°ãƒ‘ã‚¿ãƒ¼ãƒ³) 2014.05.01
 		dt = 1.02;
 		for(i = 0; i < vnum; i++){
 			di = (double)i; dnum = (double)vlen - 0.8f;
@@ -963,22 +963,22 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 			}
 			np = np->to;
 		}
-	}else if(pc->mode == (MODEDECAY + 10)){ //ƒ‰ƒ“ƒ_ƒ€ 2014.05.15
+	}else if(pc->mode == (MODEDECAY + 10)){ //ãƒ©ãƒ³ãƒ€ãƒ  2014.05.15
 		for(i = 0; i < vnum; i++){
 			double x, y;
 			double s, t;
 			double r1, r2;
 			di = (double)i; dnum = (double)vlen;
 			if(np->volume != VOLDUMMY){
-				// ˆê—l•ª•z‚É]‚¤‹[——” x, y ‚ğì‚é
-				do { x = (double)rand()/(double)RAND_MAX; } while (x == 0.0); // x ‚ª 0 ‚É‚È‚é‚Ì‚ğ”ğ‚¯‚é
+				// ä¸€æ§˜åˆ†å¸ƒã«å¾“ã†æ“¬ä¼¼ä¹±æ•° x, y ã‚’ä½œã‚‹
+				do { x = (double)rand()/(double)RAND_MAX; } while (x == 0.0); // x ãŒ 0 ã«ãªã‚‹ã®ã‚’é¿ã‘ã‚‹
 				y = (double)rand()/(double)RAND_MAX;
     
-				// s, t ‚ÌŒvZ
-				s = sqrt(-2.0 * log(x)); // C, Java ‚Å‚Í log ‚ª©‘R‘Î”
+				// s, t ã®è¨ˆç®—
+				s = sqrt(-2.0 * log(x)); // C, Java ã§ã¯ log ãŒè‡ªç„¶å¯¾æ•°
 				t = 2.0 * PI * y;
     
-				// •W€³‹K•ª•z‚É]‚¤‹[——” r1, r2
+				// æ¨™æº–æ­£è¦åˆ†å¸ƒã«å¾“ã†æ“¬ä¼¼ä¹±æ•° r1, r2
 				r1 = s * cos(t);  r2 = s * sin(t);
 				double dval = (double)np->volume + (i%2==1 ? r1 : r2) * 12.0;
 				if(dval < 0)dval = 0; else if(dval > 250)dval = 250.0f;
@@ -988,13 +988,13 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 			}
 			np = np->to;
 		}
-	}else if(pc->mode == (MODEDECAY + 7)){ //ƒÔ‚Ì‚æ‚¤‚È‚rš‹Èü 2014.05.15
+	}else if(pc->mode == (MODEDECAY + 7)){ //Ï‡ã®ã‚ˆã†ãªï¼³å­—æ›²ç·š 2014.05.15
 		//if(num < 4)dnum = (double)num;
 		//else if(num == 4)dnum = (double)num-0.5f;
 		dnum = (double)vlen / 2.0;
 		long halfnum = (vlen +1) / 2; if (halfnum <= 0) halfnum = 1;
 
-		for(i = 0; i < halfnum && i < vnum; i++){ //ã‚É“Ê
+		for(i = 0; i < halfnum && i < vnum; i++){ //ä¸Šã«å‡¸
 			di = (double)i;
 			if(np->volume != VOLDUMMY){
 				if(dnum > 0){
@@ -1006,7 +1006,7 @@ BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 			np = np->to;
 		}
 
-		for(i = halfnum; i < vnum; i++){ //‰º‚É“Ê
+		for(i = halfnum; i < vnum; i++){ //ä¸‹ã«å‡¸
 			di = (double)(i - halfnum); dnum = (double)vlen / 2.0;
 			if(np->volume != VOLDUMMY){
 				if(dnum > 0){
@@ -1039,7 +1039,7 @@ char *test[16]={
 	"14",
 	"15",
 };
-//‰¹•ˆ‚ÌK”ö‚ğ‘ƒ`ƒFƒbƒN
+//éŸ³è­œã®å°»å°¾ã‚’ç·ãƒã‚§ãƒƒã‚¯
 BOOL OrgData::CheckNoteTail(char tr)
 {
 	NOTELIST *np;
@@ -1047,7 +1047,7 @@ BOOL OrgData::CheckNoteTail(char tr)
 	np = info.tdata[tr].note_list;
 //	MessageBox(hWnd,test[track],test[track],MB_OK);
 	while(np != NULL){
-		if(np->y != KEYDUMMY){//’·‚³‚Ì‚ ‚é‰¹•ˆ‚È‚ç
+		if(np->y != KEYDUMMY){//é•·ã•ã®ã‚ã‚‹éŸ³è­œãªã‚‰
 			tail = np;
 			head = np->to;
 			while(head != NULL && head->y == KEYDUMMY){
@@ -1059,7 +1059,7 @@ BOOL OrgData::CheckNoteTail(char tr)
 				if(tail->x + tail->length > head->x){
 					tail->length = (unsigned char)(head->x - tail->x);
 				}
-//				np = head->from;// =to ‚ğŒ©‰z‚µ‚Ä
+//				np = head->from;// =to ã‚’è¦‹è¶Šã—ã¦
 			}
 		}
 		np = np->to;
@@ -1067,18 +1067,18 @@ BOOL OrgData::CheckNoteTail(char tr)
 	return TRUE;	
 }
 
-//[V]‰¹•„‚ğPower”{‚Éˆø‚«L‚Î‚·
+//[æ–°]éŸ³ç¬¦ã‚’Powerå€ã«å¼•ãä¼¸ã°ã™
 BOOL OrgData::EnlargeAllNotes(int Power)
 {
 	if(Power<=0) return FALSE;
 	int i,j;
 	NOTELIST *np;
 	for(i=0;i<16;i++){
-		np = info.tdata[i].note_list; //‰‚ß‚Ì‰¹•„
+		np = info.tdata[i].note_list; //åˆã‚ã®éŸ³ç¬¦
 		if(np != NULL){
 			while(np != NULL){
 				j = np->x * Power;
-				np->x = j; //”{‚µƒ}[ƒX
+				np->x = j; //å€ã—ãƒãƒ¼ã‚¹
 				j = np->length * Power;
 				if(j>255)j=255;
 				if(info.tdata[i].pipi != 0)j = np->length;
@@ -1088,7 +1088,7 @@ BOOL OrgData::EnlargeAllNotes(int Power)
 		}
 		
 	}
-	for(i=0;i<16;i++){ //”O‚Ì‚½‚ßK”ö‚ğŒ©‚Æ‚­‚©B
+	for(i=0;i<16;i++){ //å¿µã®ãŸã‚å°»å°¾ã‚’è¦‹ã¨ãã‹ã€‚
 		CheckNoteTail(i);
 	}
 	info.wait = info.wait / Power; if(info.wait <=0) info.wait = 1;
@@ -1097,32 +1097,32 @@ BOOL OrgData::EnlargeAllNotes(int Power)
 	j = info.dot * Power;
 	if(j < 256 && j > 0) info.dot = (unsigned char)j;
 	scr_data.ChangeHorizontalRange(info.end_x);
-	//MakeMusicParts(info.line,info.dot);//ƒp[ƒc‚ğ¶¬
+	//MakeMusicParts(info.line,info.dot);//ãƒ‘ãƒ¼ãƒ„ã‚’ç”Ÿæˆ
 	//MakePanParts(info.line,info.dot);
 
 	return TRUE;
 }
-//[V]‰¹•„‚ğ1/Power”{‚Ék‚±‚ß‚é
+//[æ–°]éŸ³ç¬¦ã‚’1/Powerå€ã«ç¸®ã“ã‚ã‚‹
 BOOL OrgData::ShortenAllNotes(int Power)
 {
 	if(Power<=1)return FALSE;
 	int i,j,k;
 	NOTELIST *np, *np2;
 	for(i=0;i<16;i++){
-		np = info.tdata[i].note_list; //‰‚ß‚Ì‰¹•„
+		np = info.tdata[i].note_list; //åˆã‚ã®éŸ³ç¬¦
 		if(np != NULL){
 			while(np != NULL){
 				np2 = np->to;
-				k = np->x % Power; //‚±‚ê‚ª0‚Å‚È‚¢‚Æ‚«‚Í–³ğŒ‚ÅÁ‚·‚æB
+				k = np->x % Power; //ã“ã‚ŒãŒ0ã§ãªã„ã¨ãã¯ç„¡æ¡ä»¶ã§æ¶ˆã™ã‚ˆã€‚
 				if(k==0){
 					j = np->x / Power;			
-					np->x = j; //”{‚µƒ}[ƒX
+					np->x = j; //å€ã—ãƒãƒ¼ã‚¹
 
 					j = np->length / Power;
-					//’·‚³‚P‚Ì‰¹•„‚Í‚©‚í‚¢‚»‚¤‚¾c‚µ‚Ä‚â‚ë‚¤B
+					//é•·ã•ï¼‘ã®éŸ³ç¬¦ã¯ã‹ã‚ã„ãã†ã æ®‹ã—ã¦ã‚„ã‚ã†ã€‚
 					np->length = (unsigned char)(j <= 0 ? 1 : j);
 				}else{
-					//‰¹•„‚ğÁ‚·‚æB
+					//éŸ³ç¬¦ã‚’æ¶ˆã™ã‚ˆã€‚
 					PARCHANGE p;
 					p.track = i;
 					p.x1 = np->x;
@@ -1134,7 +1134,7 @@ BOOL OrgData::ShortenAllNotes(int Power)
 		}
 		
 	}
-	for(i=0;i<16;i++){ //”O‚Ì‚½‚ßK”ö‚ğŒ©‚Æ‚­‚©B
+	for(i=0;i<16;i++){ //å¿µã®ãŸã‚å°»å°¾ã‚’è¦‹ã¨ãã‹ã€‚
 		CheckNoteTail(i);
 	}
 
@@ -1146,14 +1146,14 @@ BOOL OrgData::ShortenAllNotes(int Power)
 	j = info.dot / Power;
 	if(j < 256 && j > 0) info.dot = (unsigned char)j;
 	scr_data.ChangeHorizontalRange(info.end_x);
-	//MakeMusicParts(info.line,info.dot);//ƒp[ƒc‚ğ¶¬
+	//MakeMusicParts(info.line,info.dot);//ãƒ‘ãƒ¼ãƒ„ã‚’ç”Ÿæˆ
 	//MakePanParts(info.line,info.dot);
 
 	return TRUE;
 	
 }
 
-//[V]‹ó”’‚ğ–„‚ß‚é 2014.05.01
+//[æ–°]ç©ºç™½ã‚’åŸ‹ã‚ã‚‹ 2014.05.01
 BOOL OrgData::EnsureEmptyArea(PARCHANGE *pc, int Function)
 {
 	int j, iLength, iFlg;
@@ -1188,7 +1188,7 @@ BOOL OrgData::EnsureEmptyArea(PARCHANGE *pc, int Function)
 
 				int l_len = (volChangeUseNoteLength ? iLength : volChangeLength);
 				if(Function == 8 && iFlg == 1 && (tmpx >= np->x + l_len || tmpx < np->x + l_len - 3))
-					iFlg = 0; //ÅŒã‚Å‚È‚¯‚ê‚Î‚í‚´‚í‚´’Ç‰Á‚µ‚È‚­‚Ä‚à‚¢‚¢‚Å‚µ‚å‚¤B
+					iFlg = 0; //æœ€å¾Œã§ãªã‘ã‚Œã°ã‚ã–ã‚ã–è¿½åŠ ã—ãªãã¦ã‚‚ã„ã„ã§ã—ã‚‡ã†ã€‚
 
 				if(Function < 20){
 					if(iFlg == 1){
@@ -1198,7 +1198,7 @@ BOOL OrgData::EnsureEmptyArea(PARCHANGE *pc, int Function)
 					}
 				}else if(Function == 20){
 					if(iFlg == 0){
-						if(FALSE == CutVolume(tmpx, 0)){ //‘æ“ñˆø”‚ÍˆÓ–¡‚È‚¢‚Æv‚¤B
+						if(FALSE == CutVolume(tmpx, 0)){ //ç¬¬äºŒå¼•æ•°ã¯æ„å‘³ãªã„ã¨æ€ã†ã€‚
 							return FALSE;
 						}
 					}
@@ -1210,65 +1210,65 @@ BOOL OrgData::EnsureEmptyArea(PARCHANGE *pc, int Function)
 			tmpc.track = pc->track;  tmpc.x1 = np->x;  tmpc.x2 = np->x + np->length - 1;  tmpc.a = 1;  
 			tmpc.mode = (unsigned char)(MODEDECAY + Function);
 			if(np->y!=KEYDUMMY)ChangeVolumeData(&tmpc, 1);
-		}else if(Function == 20){ //¸Ø±
-			//‰½‚à‚µ‚È‚¢
+		}else if(Function == 20){ //ï½¸ï¾˜ï½±
+			//ä½•ã‚‚ã—ãªã„
 		}
 	}
 	return TRUE;
 }
 
-//iFullTrack==1‚Ì‚Æ‚«‚ÍiTrack‚Í–³‹B
+//iFullTrack==1ã®ã¨ãã¯iTrackã¯ç„¡è¦–ã€‚
 bool OrgData::CopyNoteDataToCB(NOTECOPY *nc, int iTrack, int iFullTrack )
 {
 	/*
 	int i,j,t,n;
-	PARCHANGE pc;//ƒy[ƒXƒg—ÌˆæƒNƒŠƒA—p
+	PARCHANGE pc;//ãƒšãƒ¼ã‚¹ãƒˆé ˜åŸŸã‚¯ãƒªã‚¢ç”¨
 	NOTELIST *np;
-//	NOTELIST *p_in1,*p_in2;//‘}“ü‚·‚×‚«êŠ
-	NOTELIST *p_list1,*p_list2;//‘}“ü‚·‚×‚«ƒŠƒXƒg
-	NOTELIST *work;//ƒ[ƒNƒGƒŠƒA
-	NOTELIST *wp;//ƒ[ƒNƒ|ƒCƒ“ƒ^
-	long ind_x;//ƒCƒ“ƒfƒbƒNƒX’lix)
-	long copy_num;//ƒRƒs[‚·‚é‰¹•ˆ‚Ì”
+//	NOTELIST *p_in1,*p_in2;//æŒ¿å…¥ã™ã¹ãå ´æ‰€
+	NOTELIST *p_list1,*p_list2;//æŒ¿å…¥ã™ã¹ããƒªã‚¹ãƒˆ
+	NOTELIST *work;//ãƒ¯ãƒ¼ã‚¯ã‚¨ãƒªã‚¢
+	NOTELIST *wp;//ãƒ¯ãƒ¼ã‚¯ãƒã‚¤ãƒ³ã‚¿
+	long ind_x;//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹å€¤ï¼ˆx)
+	long copy_num;//ã‚³ãƒ”ãƒ¼ã™ã‚‹éŸ³è­œã®æ•°
 
 	ClearVirtualCB();
-	AddStartToVirtualCB(); //ƒNƒŠƒbƒvƒ{[ƒh‚É‘ã“üŠJn
+	AddStartToVirtualCB(); //ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã«ä»£å…¥é–‹å§‹
 	AddIntegerToVirtualCB(iFullTrack);
 	AddIntegerToVirtualCB(iTrack);
-	AddIntegerToVirtualCB(nc->x1_1); //‚±‚±‚©‚ç
-	AddIntegerToVirtualCB(nc->x1_2); //‚±‚±‚Ü‚Å
+	AddIntegerToVirtualCB(nc->x1_1); //ã“ã“ã‹ã‚‰
+	AddIntegerToVirtualCB(nc->x1_2); //ã“ã“ã¾ã§
 
-	//‚ ‚Æ‚Í‚Æ‚É‚©‚­AƒNƒŠƒbƒvƒ{[ƒh‚É“à—e‚ğˆÚ‚·
+	//ã‚ã¨ã¯ã¨ã«ã‹ãã€ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã«å†…å®¹ã‚’ç§»ã™
 
 	ind_x = nc->x1_1;
 
 	for(t=0;t<MAXTRACK;t++){
 		if(iFullTrack==1 || iTrack==t){
-			copy_num = GetNoteNumber(t,nc);//‚»‚Ì”ÍˆÍ‚Ég‚í‚ê‚Ä‚¢‚é‰¹•„‚Ì”‚ğŒŸo
-			AddIntegerToVirtualCB(copy_num); //‰¹•„‚Í‰½ŒÂH
+			copy_num = GetNoteNumber(t,nc);//ãã®ç¯„å›²ã«ä½¿ã‚ã‚Œã¦ã„ã‚‹éŸ³ç¬¦ã®æ•°ã‚’æ¤œå‡º
+			AddIntegerToVirtualCB(copy_num); //éŸ³ç¬¦ã¯ä½•å€‹ï¼Ÿ
 
 			if(copy_num == 0){
-				AddTrackSeparater(); //—‚ğ‘}“ü
+				AddTrackSeparater(); //ï¼ ã‚’æŒ¿å…¥
 				continue;
 			}
 
-			//wp = work = (NOTELIST *)malloc(sizeof(NOTELIST)*copy_num);//ƒ[ƒN—p‚É—Ìˆæ‚ğŠm•Û
-			//ƒ[ƒN—Ìˆæ‚ÉƒRƒs[
+			//wp = work = (NOTELIST *)malloc(sizeof(NOTELIST)*copy_num);//ãƒ¯ãƒ¼ã‚¯ç”¨ã«é ˜åŸŸã‚’ç¢ºä¿
+			//ãƒ¯ãƒ¼ã‚¯é ˜åŸŸã«ã‚³ãƒ”ãƒ¼
 			np = info.tdata[nc->track1].note_list;
 			while(np != NULL && np->x < nc->x1_1)np = np->to;
 			if(np == NULL){
 				//free( work );
-				AddTrackSeparater(); //—‚ğ‘}“ü
-				continue;//ƒRƒs[Œ³‚É‰¹•ˆ–³‚µ(“ª‚ğŒŸõ’†‚ÉOUT)...‚»‚ñ‚Èó‹µ‚ ‚é‚Ì‚©H
+				AddTrackSeparater(); //ï¼ ã‚’æŒ¿å…¥
+				continue;//ã‚³ãƒ”ãƒ¼å…ƒã«éŸ³è­œç„¡ã—(é ­ã‚’æ¤œç´¢ä¸­ã«OUT)...ãã‚“ãªçŠ¶æ³ã‚ã‚‹ã®ã‹ï¼Ÿ
 			}
-			for(i = 0; i < copy_num; i++){//‚Pƒy[ƒXƒg
+			for(i = 0; i < copy_num; i++){//ï¼‘ãƒšãƒ¼ã‚¹ãƒˆ
 				//wp->length = np->length;
 				//wp->pan    = np->pan;
 				//wp->volume = np->volume;
 				//wp->y      = np->y;
-				//ƒCƒ“ƒfƒbƒNƒX’l‚Í·‚µˆø‚­
+				//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹å€¤ã¯å·®ã—å¼•ã
 				//wp->x      = np->x - ind_x;
-				//Ÿ‚Ö
+				//æ¬¡ã¸
 				AddIntegerToVirtualCB((int)np->length);
 				AddIntegerToVirtualCB((int)np->pan);
 				AddIntegerToVirtualCB((int)np->volume);
@@ -1279,10 +1279,10 @@ bool OrgData::CopyNoteDataToCB(NOTECOPY *nc, int iTrack, int iFullTrack )
 				//wp++;
 			}
 			//free( work );
-			AddTrackSeparater(); //—‚ğ‘}“ü
+			AddTrackSeparater(); //ï¼ ã‚’æŒ¿å…¥
 		}
 	}
-	SetClipBoardFromVCB(); //^‚ÌƒNƒŠƒbƒvƒ{[ƒh‚É
+	SetClipBoardFromVCB(); //çœŸã®ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã«
 */
 	return true;
 }

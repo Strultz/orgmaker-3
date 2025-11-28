@@ -606,7 +606,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	iCast['S']= 1;
 	iCast['X']= 2;
 	iCast['D'] = 3;
-	iCast['C']= 4; //C Åc C sound
+	iCast['C']= 4; //C ‚Ä¶ C sound
 	iCast['V']= 5; //     D
 	iCast['G']= 6;
 	iCast['B']= 7; //     E
@@ -617,7 +617,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	iCast[VK_OEM_COMMA]=12; //,    A
 	iCast['L']= 13;
 	iCast[VK_OEM_PERIOD]=14; //.    B
-	iCast[VK_OEM_1]=15; //Å^   C
+	iCast[VK_OEM_1]=15; //Ôºè   C
 	iCast[VK_OEM_2]=16; //:
     
 	LoadString(GetModuleHandle(NULL), IDS_TITLE, lpszName, sizeof(lpszName) / sizeof(lpszName[0]));
@@ -745,7 +745,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		}
 	}
 
-	Ac = LoadAccelerators(hInstance,MAKEINTRESOURCE(IDR_ACCELERATOR1)); //ÉAÉNÉZÉXÉLÅ[
+	Ac = LoadAccelerators(hInstance,MAKEINTRESOURCE(IDR_ACCELERATOR1)); //„Ç¢„ÇØ„Çª„Çπ„Ç≠„Éº
 
 	char sDir[MAX_PATH];
 	GetApplicationPath(sDir);
@@ -1467,7 +1467,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_2BAI:
 				SetUndo();
 				org_data.EnlargeAllNotes(2);
-				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//ì™èoÇµ
+				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//È†≠Âá∫„Åó
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				UpdateStatusBar(false);
@@ -1475,7 +1475,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_3BAI:
 				SetUndo();
 				org_data.EnlargeAllNotes(3);
-				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//ì™èoÇµ
+				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//È†≠Âá∫„Åó
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				UpdateStatusBar(false);
@@ -1483,7 +1483,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_2BUNNO1:
 				SetUndo();
 				org_data.ShortenAllNotes(2);
-				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//ì™èoÇµ				
+				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//È†≠Âá∫„Åó				
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				UpdateStatusBar(false);
@@ -1491,7 +1491,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_3BUNNO1:
 				SetUndo();
 				org_data.ShortenAllNotes(3);
-				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//ì™èoÇµ				
+				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//È†≠Âá∫„Åó				
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				UpdateStatusBar(false);
@@ -2080,7 +2080,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case ID_AC_PRESSNOTE:
 			ChangePushStratchNOTE();
 			break;
-			//Å´	// 2010.12.01 A
+			//‚Üì	// 2010.12.01 A
 		case ID_AC_NUM1:
 		case ID_AC_NUM2:
 		case ID_AC_NUM3:
@@ -2098,26 +2098,26 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			for (i = 0;i < 12;i++) {
 				if (LOWORD(wParam) == Bn[i])bt = i;
 			}
-			if (bt >= 0) { //Å{ÇPÇ∆Ç©ÇÃÉ{É^ÉìÇ™âüÇ≥ÇÍÇΩÅB
+			if (bt >= 0) { //ÔºãÔºë„Å®„Åã„ÅÆ„Éú„Çø„É≥„ÅåÊäº„Åï„Çå„Åü„ÄÇ
 				int a, b, d, bb;
 				//char str[5];
 				org_data.GetMusicInfo(&mi);
 				scr_data.GetScrollPosition(&scr_h, &scr_v);
-				//GetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,str,4);//îÕàÕfrom
+				//GetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,str,4);//ÁØÑÂõ≤from
 				//b = atol(str);
 				b = scr_h / (mi.dot * mi.line);
 				bb = b + Hni[bt];
 				haba = Hni[bt];
-				a = b * mi.dot * mi.line; //äJénì_
-				d = bb * mi.dot * mi.line - 1; //èIóπì_
+				a = b * mi.dot * mi.line; //ÈñãÂßãÁÇπ
+				d = bb * mi.dot * mi.line - 1; //ÁµÇ‰∫ÜÁÇπ
 				nc_Select.x1_1 = a;
 				nc_Select.x1_2 = d;
-				if (bt >= 6)ful = 1;else ful = 0; //ëSÉgÉâÉbÉNÅH
+				if (bt >= 6)ful = 1;else ful = 0; //ÂÖ®„Éà„É©„ÉÉ„ÇØÔºü
 				tra = org_data.track;
 				//org_data.CopyNoteDataToCB(&nc_Select, tra, ful);
-				//if(ful==0)wsprintf(CpHelp,"ÉgÉâÉbÉN%c ÇÃ%dè¨êﬂÅ`%dè¨êﬂÇ‹Ç≈Ç",TrackN[tra],b,bb);	// 2014.10.19 D
+				//if(ful==0)wsprintf(CpHelp,"„Éà„É©„ÉÉ„ÇØ%c „ÅÆ%dÂ∞èÁØÄÔΩû%dÂ∞èÁØÄ„Åæ„Åß„Çí",TrackN[tra],b,bb);	// 2014.10.19 D
 				//if (ful == 0)wsprintf(CpHelp, MessageString[IDS_STRING74], TrackN[tra], b, bb);	// 2014.10.19 A
-				//else wsprintf(CpHelp,"ëSÉgÉâÉbÉNÇÃ%dè¨êﬂÅ`%dè¨êﬂÇ‹Ç≈Ç",b,bb);	// 2014.10.19 D
+				//else wsprintf(CpHelp,"ÂÖ®„Éà„É©„ÉÉ„ÇØ„ÅÆ%dÂ∞èÁØÄÔΩû%dÂ∞èÁØÄ„Åæ„Åß„Çí",b,bb);	// 2014.10.19 D
 				//else wsprintf(CpHelp, MessageString[IDS_STRING75], b, bb);	// 2014.10.19 A
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
@@ -2324,7 +2324,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 	case WM_DESTROY://for post-processing
 		EndDirectSound();
 		org_data.ReleaseNote();
-		DeleteWaveData100(); //Added 20140401 Normally, it seems to be called in the order of WM_CLOSE ÅE> WM_DESTROY ÅE> WM_QUIT.
+		DeleteWaveData100(); //Added 20140401 Normally, it seems to be called in the order of WM_CLOSE „Éª> WM_DESTROY „Éª> WM_QUIT.
 		EndGDI();
 		//if(!hDlgPlayer)DestroyWindow(hDlgPlayer);
 		//if(!hDlgTrack)DestroyWindow(hDlgTrack);
@@ -2518,10 +2518,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 	case 0x020C: //weird button press
 		//MessageBox(hWnd,"Failed to read","Error(Load)",MB_OK);
 		switch HIWORD(wParam){
-		case 0x0001: //Å•
+		case 0x0001: //‚ñº
 			ChangeTrackPlus(1);
 			break;
-		case 0x0002: //Å£
+		case 0x0002: //‚ñ≤
 			ChangeTrackPlus(-1);
 			break;
 		}
@@ -2585,7 +2585,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		ReleaseDC(hWnd,hdc);
 		break;
 */
-	default: return DefWindowProc(hwnd, message, wParam, lParam);//à»äOÇæÇ¡ÇΩÇÁ
+	default: return DefWindowProc(hwnd, message, wParam, lParam);//‰ª•Â§ñ„Å†„Å£„Åü„Çâ
 	}
 
 	return FALSE;

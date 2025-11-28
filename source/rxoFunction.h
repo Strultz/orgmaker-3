@@ -15,13 +15,13 @@ void VolumeDecayEdit(int AddNotes , int Track , int Function ); //2014.05.01 A
 void PanEdit(int AddNotes , int Track );
 void MuteTrack(int Track);
 
-extern char *TrackCode[]; //ƒgƒ‰ƒbƒN–¼‚Æ”š‚Ì’u‚«Š·‚¦—p
+extern char *TrackCode[]; //ãƒˆãƒ©ãƒƒã‚¯åã¨æ•°å­—ã®ç½®ãæ›ãˆç”¨
 extern int Menu_Recent[];
-extern char RecentFileName[10][MAX_PATH];	//Å‹ßg‚Á‚½ƒtƒ@ƒCƒ‹–¼
+extern char RecentFileName[10][MAX_PATH];	//æœ€è¿‘ä½¿ã£ãŸãƒ•ã‚¡ã‚¤ãƒ«å
 
-extern int ReverseTrackCode(char *strTrack); //‚»‚Ì‹t”Ÿ”
+extern int ReverseTrackCode(char *strTrack); //ãã®é€†å‡½æ•°
 extern void ShowMemoryState();
-extern void SortMusicNote(void); //‰¹•„‚Ì®—
+extern void SortMusicNote(void); //éŸ³ç¬¦ã®æ•´ç†
 
 
 /*extern void ClearVirtualCB(void);
@@ -38,7 +38,7 @@ extern void ReplaseUndo();
 extern void SetUndo();
 extern void ClearUndo();
 extern void ReplaceRedo();
-extern void ResetLastUndo(); //æ‚è‚¯‚µ
+extern void ResetLastUndo(); //å–ã‚Šã‘ã—
 int GetSelectMeasBeat(int GetToValue, int addValue=1);
 int MinimumGrid(int x);
 int MaximumGrid(int x);
@@ -63,18 +63,18 @@ void ClearRecentFile();
 
 int msgbox(HWND hWnd , int MessageID, int TitleID, UINT uType);		// 2014.10.18 
 
-//ƒƒbƒZ[ƒWƒe[ƒuƒ‹‚Ì‰ğ•ú‚Æ‰Šú‰»
+//ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ†ãƒ¼ãƒ–ãƒ«ã®è§£æ”¾ã¨åˆæœŸåŒ–
 void FreeMessageStringBuffer(void);	// 2014.10.19 
 int AllocMessageStringBuffer(void);	// 2014.10.19 
-//ƒƒbƒZ[ƒWƒe[ƒuƒ‹
+//ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ†ãƒ¼ãƒ–ãƒ«
 extern TCHAR *MessageString[MESSAGE_STRING_MAX];	// 2014.10.19 
 
 
 extern int iChangeEnablePlaying; //2010.09.23 A
 extern int iChangeFinish; //2010.09.23 A
 
-extern void setRecentTrack(int iNewTrack); //Å‹ßg‚Á‚½ƒgƒ‰ƒbƒN”Ô†‚ğXV‚·‚é //2010.09.23 A
-extern int getRecentTrack(int iOrder, int isDrumTrack); //Å‹ßg‚Á‚½ƒgƒ‰ƒbƒN‚ğ•Ô‚· //2010.09.23 A
+extern void setRecentTrack(int iNewTrack); //æœ€è¿‘ä½¿ã£ãŸãƒˆãƒ©ãƒƒã‚¯ç•ªå·ã‚’æ›´æ–°ã™ã‚‹ //2010.09.23 A
+extern int getRecentTrack(int iOrder, int isDrumTrack); //æœ€è¿‘ä½¿ã£ãŸãƒˆãƒ©ãƒƒã‚¯ã‚’è¿”ã™ //2010.09.23 A
 
 extern int iActivatePAN; //2014.05.01 A
 extern int iActivateVOL; //2014.05.01 A
@@ -86,8 +86,8 @@ extern int iSlideOverlapNotes; //2014.05.06 A
 //extern void ChangeAutoLoadMode(int iValue = -1);
 extern int tra;
 
-extern int NoteWidth; //‰¹•„‚Ì• 2014.05.26
-extern int NoteEnlarge_Until_16px; //•\¦‚ÌÛANOTE‚Ì“ª‚ğÅ‘å16ƒsƒNƒZƒ‹‚Ü‚ÅL‚Î‚·B
+extern int NoteWidth; //éŸ³ç¬¦ã®å¹… 2014.05.26
+extern int NoteEnlarge_Until_16px; //è¡¨ç¤ºã®éš›ã€NOTEã®é ­ã‚’æœ€å¤§16ãƒ”ã‚¯ã‚»ãƒ«ã¾ã§ä¼¸ã°ã™ã€‚
 extern void ChangeNoteEnlarge(int iValue = -1);
 extern int iPushStratch;
 extern int iLastEditNoteLength;

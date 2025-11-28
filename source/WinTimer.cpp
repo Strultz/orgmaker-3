@@ -2,7 +2,7 @@
 //include  : mmsystem.h
 //Import   : WinMM.lib
 //
-//Contents : uƒ}ƒ‹ƒ`ƒƒfƒBƒAƒ^ƒCƒ}[‚ÌŽg—p•û–@v
+//Contents : ã€Œãƒžãƒ«ãƒãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒžãƒ¼ã®ä½¿ç”¨æ–¹æ³•ã€
 //
 
 #include <windows.h>  //Win32n API's
@@ -10,38 +10,38 @@
 #include "OrgData.h"
 #include "Sound.h"
 
-//ƒGƒ‰[ƒ`ƒFƒbƒNƒ}ƒNƒ
+//ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯ãƒžã‚¯ãƒ­
 //#define MMInspect(ret)  if((ret) != TIMERR_NOERROR) return FALSE;
 
-/*¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡*/
-//ƒvƒƒgƒ^ƒCƒvéŒ¾
-/*¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡*/
+/*â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– */
+//ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€
+/*â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– */
 
 BOOL InitMMTimer();
 BOOL StartTimer(DWORD dwTimer);
 //VOID CALLBACK TimerProc(UINT uTID,UINT uMsg,DWORD dwUser,DWORD dwParam1,DWORD dwParam2);
 BOOL QuitMMTimer();
 
-/*¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡*/
-//ƒOƒ[ƒoƒ‹•Ï”
-/*¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡*/
-static UINT ExactTime   = 13;//Å¬¸“x
+/*â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– */
+//ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°
+/*â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– */
+static UINT ExactTime   = 13;//æœ€å°ç²¾åº¦
 static UINT TimerID     = NULL;
 
-/*¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡*/
-//ƒ^ƒCƒ}[¸“x‚ðÝ’è‚·‚éB
-//‚±‚ÌŠÖ”‚ÍƒAƒvƒŠƒP[ƒVƒ‡ƒ“‰Šú‰»Žž‚Éˆê“xŒÄ‚Ño‚·B
-/*¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡*/
+/*â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– */
+//ã‚¿ã‚¤ãƒžãƒ¼ç²¾åº¦ã‚’è¨­å®šã™ã‚‹ã€‚
+//ã“ã®é–¢æ•°ã¯ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³åˆæœŸåŒ–æ™‚ã«ä¸€åº¦å‘¼ã³å‡ºã™ã€‚
+/*â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– */
 BOOL InitMMTimer()
 {
 	/*TIMECAPS tc;
 	MMRESULT ret;
 
-	//ƒ^ƒCƒ}[‚Ì¸“xî•ñ‚ðŽæ“¾‚·‚é
+	//ã‚¿ã‚¤ãƒžãƒ¼ã®ç²¾åº¦æƒ…å ±ã‚’å–å¾—ã™ã‚‹
 	ret = timeGetDevCaps(&tc,sizeof(TIMECAPS));
 	if(ret != TIMERR_NOERROR) return FALSE;
 	if(ExactTime < tc.wPeriodMin)ExactTime = tc.wPeriodMin;
-	//‚±‚Ì¸“x‚Å‰Šú‰»‚·‚é
+	//ã“ã®ç²¾åº¦ã§åˆæœŸåŒ–ã™ã‚‹
 	ret = timeBeginPeriod(ExactTime);
 	if(ret != TIMERR_NOERROR) return FALSE;
 	return TRUE;*/
@@ -49,22 +49,22 @@ BOOL InitMMTimer()
 	return TRUE;
 }
 
-/*¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡*/
-//ƒ^ƒCƒ}[‚ð‹N“®‚·‚éB
-//dwTimer   Ý’è‚·‚éƒ^ƒCƒ}[ŠÔŠu
-/*¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡*/
+/*â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– */
+//ã‚¿ã‚¤ãƒžãƒ¼ã‚’èµ·å‹•ã™ã‚‹ã€‚
+//dwTimer   è¨­å®šã™ã‚‹ã‚¿ã‚¤ãƒžãƒ¼é–“éš”
+/*â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– */
 BOOL StartTimer(DWORD dwTimer)
 {
 	/*MMRESULT ret = NULL;
 	ExactTime = dwTimer;
-	//ƒ^ƒCƒ}[‚ð¶¬‚·‚é
+	//ã‚¿ã‚¤ãƒžãƒ¼ã‚’ç”Ÿæˆã™ã‚‹
 	TimerID = timeSetEvent
 	(
-		dwTimer,       //ƒ^ƒCƒ}[ŽžŠÔ
-		1,             //‹–—e‚Å‚«‚éƒ^ƒCƒ}[¸“x
-		(LPTIMECALLBACK)TimerProc, //ƒR[ƒ‹ƒoƒbƒNƒvƒƒV[ƒWƒƒ
-		NULL,          //ƒ†[ƒU[‚ªƒR[ƒ‹ƒoƒbƒNŠÖ”‚ÌdwUser‚É‘—‚éî•ñ’l
-		TIME_PERIODIC //ƒ^ƒCƒ}[ŽžŠÔ–ˆ‚ÉƒCƒxƒ“ƒg‚ð”­¶‚³‚¹‚é
+		dwTimer,       //ã‚¿ã‚¤ãƒžãƒ¼æ™‚é–“
+		1,             //è¨±å®¹ã§ãã‚‹ã‚¿ã‚¤ãƒžãƒ¼ç²¾åº¦
+		(LPTIMECALLBACK)TimerProc, //ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£
+		NULL,          //ãƒ¦ãƒ¼ã‚¶ãƒ¼ãŒã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°ã®dwUserã«é€ã‚‹æƒ…å ±å€¤
+		TIME_PERIODIC //ã‚¿ã‚¤ãƒžãƒ¼æ™‚é–“æ¯Žã«ã‚¤ãƒ™ãƒ³ãƒˆã‚’ç™ºç”Ÿã•ã›ã‚‹
 	);
 	if(ret != TIMERR_NOERROR) return FALSE;
 	return TRUE;*/
@@ -72,35 +72,35 @@ BOOL StartTimer(DWORD dwTimer)
 	S_SetOrganyaTimer(dwTimer);
 	return TRUE;
 }
-/*¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡*/
-//ƒ^ƒCƒ}[‚ÌƒR[ƒ‹ƒoƒbƒNŠÖ”
-/*¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡*/
+/*â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– */
+//ã‚¿ã‚¤ãƒžãƒ¼ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
+/*â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– */
 /*VOID CALLBACK TimerProc(UINT uTID,UINT uMsg,DWORD dwUser,DWORD dwParam1,DWORD dwParam2)
 {
 	DWORD dwNowTime;
 	dwNowTime = timeGetTime();
 	//===================================================================================
-	//‚±‚±‚Éƒ†[ƒU[’è‹`‚Ìƒ\[ƒX‚ð‘‚­B
-	//Šî–{“I‚ÉŠÖ”‚ðŒÄ‚Ño‚·‚¾‚¯‚Åˆ—‚Í‘¼‚ÌŠÖ”‚Å‚·‚é‚×‚«‚¾‚ë‚¤B
+	//ã“ã“ã«ãƒ¦ãƒ¼ã‚¶ãƒ¼å®šç¾©ã®ã‚½ãƒ¼ã‚¹ã‚’æ›¸ãã€‚
+	//åŸºæœ¬çš„ã«é–¢æ•°ã‚’å‘¼ã³å‡ºã™ã ã‘ã§å‡¦ç†ã¯ä»–ã®é–¢æ•°ã§ã™ã‚‹ã¹ãã ã‚ã†ã€‚
 	//===================================================================================
 	org_data.PlayData();
 }*/
 
-/*¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡*/
-//ƒ^ƒCƒ}[ƒŠƒ\[ƒX‚ðŠJ•ú‚·‚éB
-//ƒAƒvƒŠƒP[ƒVƒ‡ƒ“I—¹Žž‚Éˆê“xŒÄ‚Ño‚·B
-/*¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡*/
+/*â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– */
+//ã‚¿ã‚¤ãƒžãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã‚’é–‹æ”¾ã™ã‚‹ã€‚
+//ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³çµ‚äº†æ™‚ã«ä¸€åº¦å‘¼ã³å‡ºã™ã€‚
+/*â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– */
 BOOL QuitMMTimer()
 {
 	/*MMRESULT ret;
 
 	if(TimerID != TIMERR_NOERROR)
 	{
-		//ƒ^ƒCƒ}[‚ðŽg—p’†‚È‚çI—¹‚³‚¹‚é
+		//ã‚¿ã‚¤ãƒžãƒ¼ã‚’ä½¿ç”¨ä¸­ãªã‚‰çµ‚äº†ã•ã›ã‚‹
 		ret = timeKillEvent(TimerID);
 		if((ret) != TIMERR_NOERROR) return FALSE;
 	}
-	//ƒ^ƒCƒ}[ƒŠƒ\[ƒX‚ðŠJ•ú‚·‚é
+	//ã‚¿ã‚¤ãƒžãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã‚’é–‹æ”¾ã™ã‚‹
 	ret = timeEndPeriod(ExactTime);
 	if((ret) != TIMERR_NOERROR) return FALSE;
 	return TRUE;*/
