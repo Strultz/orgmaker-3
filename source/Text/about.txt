@@ -3,6 +3,7 @@ OrgMaker 3
 GitHub Repository:
 https://github.com/Strultz/orgmaker-3/
 
+
 Thanks to:
 
 Studio Pixel: for creating Organya
@@ -19,7 +20,7 @@ https://github.com/nlohmann/json
 
 
 Copyright (c) 2023-2025 Strultz
-Copyright (c) 2003-2018 Rxo Inverse
+Copyright (c) 2004-2018 Rxo Inverse
 Copyright (c) 1999-2004 Studio Pixel
 All rights reserved.
 
