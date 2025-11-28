@@ -1,4 +1,20 @@
 
+#define VER_VS(x) #x
+#define VER_S(x) VER_VS(x)
+
+#define VER_MAJOR 3
+#define VER_MINOR 1
+#define VER_PATCH 0
+#define VER_PRE   1 // set as -1 if not prerelease
+
+#if VER_PRE != -1
+#define VER_STRING VER_S(VER_MAJOR) "." VER_S(VER_MINOR) "." VER_S(VER_PATCH) "-pre" VER_S(VER_PRE)
+#define VER_IS_PRERELEASE true
+#else
+#define VER_STRING VER_S(VER_MAJOR) "." VER_S(VER_MINOR) "." VER_S(VER_PATCH)
+#define VER_IS_PRERELEASE false
+#endif
+
 #define MAXNOTELENGTH	255//音符の最大長
 #define MAXMELODY		8
 #define MAXDRAM			8

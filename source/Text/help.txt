@@ -1,7 +1,13 @@
+Note: This help file was originally written for OrgMaker 1 and 2.
+Although some information may still be correct, much of it is now outdated due
+to changes in OrgMaker 3. Additionally, it is also missing information for new
+features added in OrgMaker 3. It will be rewritten at some point in the future
+to include updated information for OrgMaker 3.
+
 OrgMaker 3   Ver3.0.9   Simple Help
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-  Basic usage is the same as "OrgMaker 1" developed by Mr. Pixel.
+  Basic usage is the same as "OrgMaker 1" developed by Studio Pixel.
   I have added variable window size, colored notes,
   changed "Dram" wording to "Drum" wording (laugh),
   released drum objects that weren't released (smile),
@@ -11,7 +17,7 @@ OrgMaker 3   Ver3.0.9   Simple Help
   software that I'm making now.
 
   Although I didn't really intend to publish,
-  Mr. Pixel's occasional guidance in the BBS helped me modify Organya,
+  Pixel's occasional guidance in the BBS helped me modify Organya,
   with this dependence on help with anything it has been released.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -235,11 +241,15 @@ OrgMaker 3   Ver3.0.9   Simple Help
 
 
 [] Pan and Volume headers light up when you click on them.
-    They only light up in version 3.0.8. It has no significance.
+    They only light up in version 3.1.0. It has no significance.
     Clicking Select toggles the "Always Select Current Track" function.
 
 
-# Revision History 
+# Revision History
+
+  3.1.0  TBD         Program UI refactored.
+                     New features, such as the clipboard
+                     Bug fixes and other changes
 
   3.0.9  2024/10/16  Added soundbanks, which are like MIDI soundfonts but for
                        Organya
@@ -348,10 +358,6 @@ OrgMaker 3   Ver3.0.9   Simple Help
                        differences)
 
   2.0.0  2004/02/06
-
-
-# Distributor
-  http://www5b.biglobe.ne.jp/~kiss-me/aji/index.html
 
 
 # Limitations

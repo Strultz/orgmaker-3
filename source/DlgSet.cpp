@@ -1517,7 +1517,7 @@ BOOL CALLBACK DialogExportProgress(HWND hdwnd, UINT message, WPARAM wParam, LPAR
         *p++ = ((v) >> 24 & 0xFF); \
     } while(0)
 
-int ExportWave(unsigned int samples, char* strPath) {
+static int ExportWave(unsigned int samples, char* strPath) {
 	char header[44] = { 0 };
 	unsigned int streamsize = samples * sizeof(float) * 2;
 
@@ -1596,6 +1596,8 @@ int ExportWave(unsigned int samples, char* strPath) {
 		float sampleData[0x400 * 2] = { 0 };
 		unsigned int samplesLeft = samples;
 
+		int ct = 0;
+
 		while (samplesLeft > 0)
 		{
 			unsigned int todo = min(0x400, samplesLeft);
@@ -1603,23 +1605,25 @@ int ExportWave(unsigned int samples, char* strPath) {
 			fwrite(sampleData, sizeof(float), todo * 2, fl);
 			samplesLeft -= todo;
 
-			unsigned int progress = ((samples - samplesLeft) * 100) / samples;
+			if (++ct % 4 == 0) {
+				unsigned int progress = ((samples - samplesLeft) * 100) / samples;
 
-			// Update label
-			snprintf(displayText, MAX_PATH + 30, "Exporting to %s (%d%%)", name, progress);
-			SetDlgItemText(window, IDC_EXPRFILENAME, displayText);
+				// Update label
+				snprintf(displayText, MAX_PATH + 30, "Exporting to %s (%d%%)", name, progress);
+				SetDlgItemText(window, IDC_EXPRFILENAME, displayText);
 
-			// Hack to make the bar update immediately
-			SendMessage(hProg, PBM_SETPOS, (samples - samplesLeft) + 1, 0);
-			// Update progress bar
-			SendMessage(hProg, PBM_SETPOS, (samples - samplesLeft), 0);
+				// Hack to make the bar update immediately
+				SendMessage(hProg, PBM_SETPOS, (samples - samplesLeft) + 1, 0);
+				// Update progress bar
+				SendMessage(hProg, PBM_SETPOS, (samples - samplesLeft), 0);
 
-			// Update dialog
-			// TODO doing this here is kinda bad. The rendering should probably be on a separate thread
-			while (PeekMessage(&msg, window, 0, 0, PM_REMOVE))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
+				// Update dialog
+				// TODO doing this here is kinda bad. The rendering should probably be on a separate thread or something
+				while (PeekMessage(&msg, window, 0, 0, PM_REMOVE))
+				{
+					TranslateMessage(&msg);
+					DispatchMessage(&msg);
+				}
 			}
 
 			if (isEnded) {

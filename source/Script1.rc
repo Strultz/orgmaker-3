@@ -313,8 +313,8 @@ CAPTION "About OrgMaker 3"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,203,212,40,12
-    LTEXT           "OrgMaker 3.1.0-dev",IDC_BOLDLABEL,8,78,112,10
-    LTEXT           "2025 / 05 / 26",IDC_STATIC,8,88,112,8
+    LTEXT           "OrgMaker 3.1.0-pre1",IDC_BOLDLABEL,8,78,112,10
+    LTEXT           "2025 / 11 / 28",IDC_STATIC,8,88,112,8
     CONTROL         "B_SPLASH",ID_ICON_ORG,"Static",SS_BITMAP,0,0,375,120
     EDITTEXT        IDC_ABOUTTEXT,8,100,234,104,ES_MULTILINE | ES_READONLY | WS_VSCROLL
 END
@@ -863,8 +863,8 @@ CAT                     WAVE                    "Wave\\Cat.wav"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,1,0,0
- PRODUCTVERSION 3,1,0,0
+ FILEVERSION 3,1,0,1
+ PRODUCTVERSION 3,1,0,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -882,11 +882,11 @@ BEGIN
             VALUE "Comments", "Please ignore the rough parts."
             VALUE "CompanyName", "No extra taste."
             VALUE "FileDescription", "OrgMaker 3"
-            VALUE "FileVersion", "3.1.0"
+            VALUE "FileVersion", "3.1.0-pre1"
             VALUE "LegalCopyright", "Copyright (C) 2005-2025 Pixel and Rxo Inverse"
             VALUE "OriginalFilename", "OrgMaker3.exe"
             VALUE "ProductName", "OrgMaker 3"
-            VALUE "ProductVersion", "3.1.0"
+            VALUE "ProductVersion", "3.1.0-pre1"
         END
     END
     BLOCK "VarFileInfo"
@@ -1320,7 +1320,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_STRING1             "Currently, messages are grouped into a StringTable for easy multilingual support."
-    IDS_TITLE               "OrgMaker 3.1.0"
+    IDS_TITLE               "OrgMaker"
     IDS_CANCEL              "Canceled."
     IDS_CHANGE_KEY          "Changed the key for the specified range."
     IDS_CHANGE_PAN          "Changed the pan for the specified range."

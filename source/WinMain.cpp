@@ -25,7 +25,6 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include <windows.h>
 #include <winuser.h>
 #include <CommCtrl.h>
-#include <wininet.h>
 #include <string>
 #include <thread>
 
@@ -42,98 +41,11 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include "Filer.h"
 #include "rxoFunction.h"
 
+#include "Update.h"
 #include "Sound.h"
 #include "Timer.h"
 
 #include "Toolbar.h"
-
-static char tVerName[64];
-static bool canUpdateCheck = true;
-
-// Ts is ass
-void CheckUpdate(bool act) {
-	if (!canUpdateCheck) return;
-	canUpdateCheck = false;
-
-	HINTERNET hSession = NULL, hConnect = NULL, hRequest = NULL;
-	BOOL bResult = FALSE;
-	DWORD dwBytesRead;
-	char buffer[1024];
-
-	hSession = InternetOpen("OrgMaker/3.x", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
-	if (hSession == NULL) {
-		canUpdateCheck = true;
-		return;
-	}
-
-	hConnect = InternetConnect(hSession, "api.github.com", INTERNET_DEFAULT_HTTP_PORT, NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
-	if (hConnect == NULL) {
-		InternetCloseHandle(hSession);
-		if (act) PostMessage(hWnd, OWM_UPDATESTATUS, 1, 0); //MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
-		canUpdateCheck = true;
-		return;
-	}
-
-	hRequest = HttpOpenRequest(hConnect, "GET", "/repos/Strultz/orgmaker-3/releases/latest", NULL, NULL, NULL, 0, 0);
-	if (hRequest == NULL) {
-		InternetCloseHandle(hConnect);
-		InternetCloseHandle(hSession);
-		if (act) PostMessage(hWnd, OWM_UPDATESTATUS, 1, 0); //MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
-		canUpdateCheck = true;
-		return;
-	}
-
-	bResult = HttpSendRequest(hRequest, NULL, 0, NULL, 0);
-	if (!bResult) {
-		InternetCloseHandle(hRequest);
-		InternetCloseHandle(hConnect);
-		InternetCloseHandle(hSession);
-		if (act) PostMessage(hWnd, OWM_UPDATESTATUS, 1, 0); //MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
-		canUpdateCheck = true;
-		return;
-	}
-
-	std::string content;
-	while ((bResult = InternetReadFile(hRequest, buffer, sizeof(buffer), &dwBytesRead)) && dwBytesRead > 0) {
-		content.append(buffer, dwBytesRead);
-	}
-
-	InternetCloseHandle(hRequest);
-	InternetCloseHandle(hConnect);
-	InternetCloseHandle(hSession);
-
-	// I'm not adding some large ass json library so this is what you get
-	size_t f = content.find("\"tag_name\":");
-	if (f == std::string::npos) {
-		if (act) PostMessage(hWnd, OWM_UPDATESTATUS, 2, 0);
-		canUpdateCheck = true;
-		return;
-	}
-
-	std::string s1 = content.substr(f + 12);
-	if (s1.substr(0, 1) == " ") s1 = s1.substr(1);
-
-	size_t nq = s1.find_first_of('\"');
-	if (f == std::string::npos) {
-		if (act) PostMessage(hWnd, OWM_UPDATESTATUS, 2, 0);
-		canUpdateCheck = true;
-		return;
-	}
-
-	s1 = s1.substr(0, nq);
-
-	// Now we have the tag name
-	if (s1 == "3.1.0" || s1[0] != '3') { // It's never gonna be 4
-		if (act) PostMessage(hWnd, OWM_UPDATESTATUS, 3, 0); //MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
-		canUpdateCheck = true;
-		return;
-	} else {
-		strncpy(tVerName, s1.c_str(), 64);
-		PostMessage(hWnd, OWM_UPDATESTATUS, 0, (LPARAM)tVerName);
-	}
-	canUpdateCheck = true;
-	return;
-}
 
 //main procedure
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -1209,6 +1121,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		case 3:
 			MessageBox(hWnd, "No new updates are available.", "OrgMaker Update", MB_ICONINFORMATION | MB_OK);
+			break;
+		case 4:
+			MessageBox(hWnd, "Update checking is disabled in debug builds.", "OrgMaker Update", MB_ICONWARNING | MB_OK);
 			break;
 		default:
 		case 1:
@@ -2608,9 +2523,9 @@ void SetTitlebarText()
 	}
 
 #ifdef _DEBUG
-	snprintf(set_name, MAX_PATH + 30, "%s%s - %s [Debug]", gFileModified ? "*" : "", name, lpszName);
+	snprintf(set_name, MAX_PATH + 30, "%s%s - %s %s [Debug]", gFileModified ? "*" : "", name, lpszName, VER_STRING);
 #else
-	snprintf(set_name, MAX_PATH + 30, "%s%s - %s", gFileModified ? "*" : "", name, lpszName);
+	snprintf(set_name, MAX_PATH + 30, "%s%s - %s %s", gFileModified ? "*" : "", name, lpszName, VER_STRING);
 #endif
 
 	SetWindowText(hWnd, set_name);

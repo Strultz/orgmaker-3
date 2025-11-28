@@ -7,7 +7,7 @@
 
 #define MINIAUDIO_IMPLEMENTATION
 #define MA_NO_ENCODING
-#include "miniaudio.h"
+#include "vendor/miniaudio.h"
 
 #define SE_MAX	512
 

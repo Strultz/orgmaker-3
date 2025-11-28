@@ -116,6 +116,8 @@
       <PrecompiledHeaderOutputFile>.\Release\Org13.pch</PrecompiledHeaderOutputFile>
       <ObjectFileName>.\Release\</ObjectFileName>
       <ProgramDataBaseFileName>.\Release\</ProgramDataBaseFileName>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Midl>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -155,6 +157,7 @@
     <ClCompile Include="Scroll.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Toolbar.cpp" />
+    <ClCompile Include="Update.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="WinTimer.cpp" />
   </ItemGroup>
@@ -166,7 +169,6 @@
     <ClInclude Include="DefOrg.h" />
     <ClInclude Include="Filer.h" />
     <ClInclude Include="Gdi.h" />
-    <ClInclude Include="miniaudio.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="OrgData.h" />
     <ClInclude Include="resource.h" />
@@ -176,6 +178,9 @@
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Toolbar.h" />
+    <ClInclude Include="Update.h" />
+    <ClInclude Include="vendor\miniaudio.h" />
+    <ClInclude Include="vendor\json.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Bitmap\button_track_1.bmp" />
