@@ -755,9 +755,10 @@ BOOL CALLBACK DialogSelPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 	return 0;
 }
 
-static int traTimes = 1;
-static bool traUp = true;
 BOOL CALLBACK DialogSelTra(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	static int traTimes = 1;
+	static bool traUp = true;
+
 	LPNMHDR lpnm;
 
 	switch (message) {
@@ -915,13 +916,14 @@ BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 void ClipboardPaste(int no, int flags);
 
-static int copyNum = 1;
-static bool mixPaste = false;
-static bool copyNotes = true;
-static bool copyVol = true;
-static bool copyPan = true;
 
 BOOL CALLBACK DialogAdvPaste(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	static int copyNum = 1;
+	static bool mixPaste = false;
+	static bool copyNotes = true;
+	static bool copyVol = true;
+	static bool copyPan = true;
+
 	LPNMHDR lpnm;
 
 	switch (message) {
@@ -934,7 +936,7 @@ BOOL CALLBACK DialogAdvPaste(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 
 		HWND w = GetDlgItem(hdwnd, IDC_SPIN1);
 		SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(999, 1));
-		SendMessage(w, UDM_SETPOS, 0, traTimes);
+		SendMessage(w, UDM_SETPOS, 0, copyNum);
 
 		return 1;
 	}
@@ -1101,6 +1103,93 @@ BOOL CALLBACK DialogDefaults(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 					if (v > 254) v = 254;
 					break;
 				}
+
+				SetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), v, FALSE);
+				SendMessage(lpnm->hwndFrom, UDM_SETPOS, 0, v);
+				return 0;
+			}
+			return 1;
+		}
+		}
+	}
+	}
+	return 0;
+}
+
+
+BOOL CALLBACK DialogSongTra(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	static int traTimes = 1;
+	static bool traUp = true;
+	static bool traIncludeMelody = true;
+	static bool traIncludePercussion = true;
+
+	LPNMHDR lpnm;
+
+	switch (message) {
+	case WM_INITDIALOG: {
+		SetDlgItemInt(hdwnd, IDE_PAR, traTimes, FALSE);
+
+		SendDlgItemMessage(hdwnd, traUp ? IDR_ADD : IDR_SUB, BM_SETCHECK, BST_CHECKED, 0);
+
+		HWND w = GetDlgItem(hdwnd, IDC_SPIN2);
+		SendMessage(w, UDM_SETRANGE, 0, MAKELPARAM(999, 1));
+		SendMessage(w, UDM_SETPOS, 0, traTimes);
+
+		CheckDlgButton(hdwnd, IDC_TRINCMEL, traIncludeMelody);
+		CheckDlgButton(hdwnd, IDC_TRINCPERC, traIncludePercussion);
+
+		return 1;
+	}
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK: {
+			traTimes = GetDlgItemInt(hdwnd, IDE_PAR, NULL, FALSE);
+
+			if (SendDlgItemMessage(hdwnd, IDR_ADD, BM_GETCHECK, 0, 0)) {
+				traUp = true;
+			}
+			else if (SendDlgItemMessage(hdwnd, IDR_SUB, BM_GETCHECK, 0, 0)) {
+				traUp = false;
+			}
+			else {
+				// ???
+			}
+
+			traIncludeMelody = IsDlgButtonChecked(hdwnd, IDC_TRINCMEL);
+			traIncludePercussion = IsDlgButtonChecked(hdwnd, IDC_TRINCPERC);
+
+			SetUndo();
+
+			if (traIncludeMelody) {
+				for (int i = 0; i < MAXMELODY; ++i) {
+					org_data.TransposeTrack(i, traUp ? traTimes : -traTimes);
+				}
+			}
+			if (traIncludePercussion) {
+				for (int i = MAXMELODY; i < MAXTRACK; ++i) {
+					org_data.TransposeTrack(i, traUp ? traTimes : -traTimes);
+				}
+			}
+
+			EndDialog(hdwnd, 0);
+			break;
+		}
+		case IDCANCEL:
+			EndDialog(hdwnd, 0);
+			break;
+		}
+		break;
+	case WM_NOTIFY: {
+		lpnm = (LPNMHDR)lParam;
+		switch (lpnm->code) {
+		case UDN_DELTAPOS: {
+			LPNMUPDOWN lud = (LPNMUPDOWN)lParam;
+			HWND buddy = (HWND)SendMessage(lpnm->hwndFrom, UDM_GETBUDDY, 0, 0);
+			if (buddy) {
+				int v = GetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), NULL, FALSE);
+				v += lud->iDelta;
+				if (v < 1) v = 1;
+				if (v > 999) v = 999;
 
 				SetDlgItemInt(hdwnd, GetWindowLong(buddy, GWL_ID), v, FALSE);
 				SendMessage(lpnm->hwndFrom, UDM_SETPOS, 0, v);

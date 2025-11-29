@@ -230,6 +230,23 @@ BEGIN
     GROUPBOX        "",IDC_STATIC,4,0,100,44
 END
 
+IDD_DLGSONGTRA DIALOGEX 0, 0, 118, 91
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Transpose Song"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDE_PAR,44,10,32,12,ES_NUMBER
+    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,65,10,11,12
+    CONTROL         "Increase",IDR_ADD,"Button",BS_AUTORADIOBUTTON,12,28,40,10
+    CONTROL         "Decrease",IDR_SUB,"Button",BS_AUTORADIOBUTTON,60,28,44,10
+    DEFPUSHBUTTON   "OK",IDOK,30,75,40,12
+    PUSHBUTTON      "Cancel",IDCANCEL,74,75,40,12
+    LTEXT           "Change",IDC_STATIC,12,12,24,8
+    CONTROL         "Include melody channels",IDC_TRINCMEL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,44,90,8
+    CONTROL         "Include percussion channels",IDC_TRINCPERC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,57,102,8
+    GROUPBOX        "",IDC_STATIC,4,0,110,72
+END
+
 DLGSWAP DIALOGEX 0, 0, 129, 45
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Swap Channels"
@@ -695,13 +712,6 @@ BEGIN
             MENUITEM "Volume &Up\tCtrl+F11",        IDM_DR_VOL_PLUS,MFT_STRING,MFS_ENABLED
             MENUITEM "Volume &Down\tCtrl+F12",      IDM_DR_VOL_MINUS,MFT_STRING,MFS_ENABLED
         END
-        POPUP "Chan&ge Song Resolution",        65535,MFT_STRING,MFS_ENABLED
-        BEGIN
-            MENUITEM "Increase to 2x",              IDM_2BAI,MFT_STRING,MFS_ENABLED
-            MENUITEM "Increase to 3x",              IDM_3BAI,MFT_STRING,MFS_ENABLED
-            MENUITEM "Reduce to 1/2x",              IDM_2BUNNO1,MFT_STRING,MFS_ENABLED
-            MENUITEM "Reduce to 1/3x",              IDM_3BUNNO1,MFT_STRING,MFS_ENABLED
-        END
         MENUITEM MFT_SEPARATOR
         MENUITEM "&Swap Channels...\tCtrl+Shift+F4", IDM_DLGSWAP,MFT_STRING,MFS_ENABLED
         MENUITEM MFT_SEPARATOR
@@ -715,6 +725,17 @@ BEGIN
     POPUP "&Song",                          65535,MFT_STRING,MFS_ENABLED
     BEGIN
         MENUITEM "&Properties...\tF2",          IDM_DLGSETTING,MFT_STRING,MFS_ENABLED
+        MENUITEM MFT_SEPARATOR
+        MENUITEM "&Transpose Song...",          IDM_SONG_TRANSPOSE,MFT_STRING,MFS_ENABLED
+        POPUP "Change &Resolution",             65535,MFT_STRING,MFS_ENABLED
+        BEGIN
+            MENUITEM "Increase to 2x",              IDM_2BAI,MFT_STRING,MFS_ENABLED
+            MENUITEM "Increase to 3x",              IDM_3BAI,MFT_STRING,MFS_ENABLED
+            MENUITEM "Reduce to 1/2x",              IDM_2BUNNO1,MFT_STRING,MFS_ENABLED
+            MENUITEM "Reduce to 1/3x",              IDM_3BUNNO1,MFT_STRING,MFS_ENABLED
+        END
+        MENUITEM MFT_SEPARATOR
+        MENUITEM "&Estimate Song Length...",    IDM_SONGLEN,MFT_STRING,MFS_ENABLED
         MENUITEM "&Event Usage...",             IDM_DLGUSED,MFT_STRING,MFS_ENABLED
     END
     POPUP "&View",                          65535,MFT_STRING,MFS_ENABLED
@@ -722,10 +743,11 @@ BEGIN
         MENUITEM "Zoom &In\tF7",                IDM_LOUPE_PLUS,MFT_STRING,MFS_ENABLED
         MENUITEM "Zoom &Out\tF8",               IDM_LOUPE_MINUS,MFT_STRING,MFS_ENABLED
         MENUITEM MFT_SEPARATOR
+        MENUITEM "&Pop Out Toolbars",           IDM_FLOATTOOLBARS,MFT_STRING,MFS_ENABLED
+        MENUITEM MFT_SEPARATOR
         POPUP "&Preferences",                   65535,MFT_STRING,MFS_ENABLED
         BEGIN
             MENUITEM "Confirm &Unsaved Changes",    IDM_CHANGEFINISH,MFT_STRING,MFS_ENABLED
-            MENUITEM "&Pop Out Toolbars",           IDM_FLOATTOOLBARS,MFT_STRING,MFS_ENABLED
             MENUITEM "Auto&matically Check for Updates", IDM_AUTOCHECKUPDATES,MFT_STRING,MFS_ENABLED
             MENUITEM MFT_SEPARATOR
             MENUITEM "Allow &Keyboard During Playback", IDM_ENABLEPLAYING,MFT_STRING,MFS_ENABLED
@@ -1153,6 +1175,11 @@ BEGIN
     0
 END
 
+IDD_DLGSONGTRA AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1197,6 +1224,12 @@ BEGIN
 
     IDD_DLGSELTRA, DIALOG
     BEGIN
+    END
+
+    IDD_DLGSONGTRA, DIALOG
+    BEGIN
+        RIGHTMARGIN, 109
+        BOTTOMMARGIN, 84
     END
 
     "DLGSWAP", DIALOG

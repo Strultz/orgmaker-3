@@ -156,6 +156,7 @@ typedef struct OrgData{
 		NOTELIST* FindLastOrgNoteKey(char track, int x);
 		NOTELIST* CreateOrgNote(char track, int x);
 		void DeleteOrgNote(char track, NOTELIST* note);
+		void TransposeTrack(char track, int by);
 
 	bool CopyNoteDataToCB(NOTECOPY *nc, int iTrack, int iFullTrack);
 }ORGDATA;

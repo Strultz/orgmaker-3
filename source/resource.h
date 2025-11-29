@@ -856,13 +856,18 @@
 #define IDM_SELECT_ALL_ALL              40369
 #define IDM_PLAY_NOTES_MID              40370
 #define IDM_NOTE_HIGHLIGHT              40371
+#define IDM_SONG_TRANSPOSE				40372
+#define IDM_SONGLEN						40373
+#define IDD_DLGSONGTRA					40374
+#define IDC_TRINCMEL					40375
+#define IDC_TRINCPERC					40376
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        266
-#define _APS_NEXT_COMMAND_VALUE         40372
+#define _APS_NEXT_COMMAND_VALUE         40377
 #define _APS_NEXT_CONTROL_VALUE         1312
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

@@ -247,7 +247,7 @@ OrgMaker 3   Ver3.0.9   Simple Help
 
 # Revision History
 
-  3.1.0  TBD         Program UI refactored.
+  3.1.0  TBD         Program UI refactored
                      New features, such as the clipboard
                      Bug fixes and other changes
 

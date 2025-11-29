@@ -77,6 +77,7 @@ BOOL CALLBACK DialogSelPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 BOOL CALLBACK DialogSelVol(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogSelTra(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogDefaults(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK DialogSongTra(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 
 void SetModified(bool mod);
@@ -1690,8 +1691,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				if (gClipboardData.track1 == -1) {
 					break;
 				}
-				StopPlayingSong();
 				DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGADVPASTE), hWnd, DialogAdvPaste);
+				break;
+			case IDM_SONG_TRANSPOSE:
+				DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGSONGTRA), hwnd, DialogSongTra);
+				// TODO add new dialog
 				break;
 			}
 		}else{
@@ -2075,6 +2079,21 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			CheckMenuItem(hMenu, IDM_NOTE_HIGHLIGHT, MF_BYCOMMAND | (gNoteHighlights ? MFS_CHECKED : MFS_UNCHECKED));
 			memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
 			break;
+		case IDM_SONGLEN: {
+			StopPlayingSong();
+			org_data.GetMusicInfo(&mi);
+			long lengthMs = mi.end_x * mi.wait;
+			long minutes = lengthMs / 1000 / 60;
+			if (minutes >= 60) {
+				snprintf(str, 128, "Estimated song length: %dh %dm %ds",
+					minutes / 60, minutes % 60, (lengthMs / 1000) % 60);
+			} else {
+				snprintf(str, 128, "Estimated song length: %dm %ds",
+					minutes, (lengthMs / 1000) % 60);
+			}
+			MessageBox(hWnd, str, "OrgMaker 3", MB_OK | MB_ICONINFORMATION);
+			break;
+		}
 		}
 
 		break;
@@ -2152,10 +2171,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_ML_TRANS_DOWN:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Transpose all melody channels down by one semitone"); break;
 		case IDM_DR_VOL_PLUS:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Increase the volume of all percussion channels"); break;
 		case IDM_DR_VOL_MINUS:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Decrease the volume of all percussion channels"); break;
-		case IDM_2BAI:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Expand song by 2x"); break;
-		case IDM_3BAI:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Expand song by 3x"); break;
-		case IDM_2BUNNO1:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Shrink song by 1/2x"); break;
-		case IDM_3BUNNO1:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Shrink song by 1/3x"); break;
 		case IDM_GRIDMODE:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Snap the selection to the beat grid"); break;
 		case IDM_ALWAYS_CURRENT:    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Always select the current channel"); break;
 		case IDM_DRAGMODE:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Extend notes when dragging from their head"); break;
@@ -2163,13 +2178,19 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_STOPNOWALL:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Stop all playing sounds"); break;
 
 		case IDM_DLGSETTING:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Configure the active document"); break;
+		case IDM_SONG_TRANSPOSE:    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Transpose the entire song"); break;
+		case IDM_2BAI:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Expand song by 2x"); break;
+		case IDM_3BAI:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Expand song by 3x"); break;
+		case IDM_2BUNNO1:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Shrink song by 1/2x"); break;
+		case IDM_3BUNNO1:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Shrink song by 1/3x"); break;
+		case IDM_SONGLEN:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Estimate how long this song is"); break;
 		case IDM_DLGUSED:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"View how many events this song uses"); break;
 
 		case IDM_LOUPE_PLUS:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Zoom the piano roll in"); break;
 		case IDM_LOUPE_MINUS:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Zoom the piano roll out"); break;
+		case IDM_FLOATTOOLBARS:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Pop out toolbars into their own window"); break;
 		//case IDM_PREFERENCES:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open OrgMaker preferences"); break;
 		case IDM_CHANGEFINISH:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Confirm unsaved changes on exit"); break;
-		case IDM_FLOATTOOLBARS:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Pop out toolbars into their own window"); break;
 		case IDM_AUTOCHECKUPDATES:  SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Automatically check for new versions on launch"); break;
 		case IDM_ENABLEPLAYING:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Allow keyboard playback while the song is playing"); break;
 		case IDM_SMOOTHSCROLL:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Scroll by steps while the song is playing"); break;
