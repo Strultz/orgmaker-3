@@ -407,8 +407,8 @@ void S_SetOrganyaTimer(unsigned short timer)
 //LPDIRECTSOUND       lpDS = NULL;            // DirectSoundƒIƒuƒWƒFƒNƒg
 //LPDIRECTSOUNDBUFFER lpPRIMARYBUFFER = NULL; // ˆêŽžƒoƒbƒtƒ@
 S_Sound *lpSECONDARYBUFFER[SE_MAX] = {NULL};
-S_Sound *lpORGANBUFFER[8][8][2] = {NULL};
-S_Sound *lpDRAMBUFFER[8] = {NULL};
+S_Sound *lpORGANBUFFER[MAXMELODY][8][2] = {NULL};
+S_Sound *lpDRAMBUFFER[MAXDRAM] = {NULL};
 
 //˜^‰¹—p
 //HANDLE						CapEvent[2];			//!< “ü—ÍƒCƒxƒ“ƒgEƒIƒuƒWƒFƒNƒg.
@@ -1060,11 +1060,9 @@ BOOL MakeOrganyaWave(char track,char wave_no, char pipi)
 /////////////////////
 //ƒIƒ‹ƒK[ƒjƒƒƒIƒuƒWƒFƒNƒg‚ðŠJ•ú
 void ReleaseDramObject(char track){
-	for(int i = 0; i < 8; i++){
-		if(lpDRAMBUFFER[track] != NULL){
-			S_DestroySound(lpDRAMBUFFER[track]);
-			lpDRAMBUFFER[track] = NULL;
-		}
+	if(lpDRAMBUFFER[track] != NULL){
+		S_DestroySound(lpDRAMBUFFER[track]);
+		lpDRAMBUFFER[track] = NULL;
 	}
 }
 // ƒTƒEƒ“ƒh‚ÌÝ’è 
@@ -1315,7 +1313,7 @@ void Rxo_StopAllSoundNow(void)
 			S_RewindSound(lpSECONDARYBUFFER[i]);
 		}
 	
-	for (i = 0; i < 8; i++){
+	for (i = 0; i < MAXMELODY; i++){
 		for (j = 0; j < 8; j++) {
 			for (k = 0; k < 2; k++) {
 				if (lpORGANBUFFER[i][j][k] != NULL) {
@@ -1324,6 +1322,8 @@ void Rxo_StopAllSoundNow(void)
 				}
 			}
 		}
+	}
+	for (i = 0; i < MAXDRAM; i++) {
 		if (lpDRAMBUFFER[i] != NULL) {
 			S_StopSound(lpDRAMBUFFER[i]);
 			S_RewindSound(lpDRAMBUFFER[i]);

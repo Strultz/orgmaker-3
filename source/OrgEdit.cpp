@@ -1171,7 +1171,7 @@ BOOL OrgData::ShortenAllNotes(int Power)
 BOOL OrgData::EnsureEmptyArea(PARCHANGE *pc, int Function)
 {
 	int j, iLength, iFlg;
-	int iBufMax;
+	//int iBufMax;
 	long num = 0, tmpx;
 	NOTECOPY nc;
 	NOTELIST *np, *p, *npnext;
@@ -1181,7 +1181,7 @@ BOOL OrgData::EnsureEmptyArea(PARCHANGE *pc, int Function)
 	np = info.tdata[pc->track].note_list;
 	if(np == NULL || num == 0)return FALSE;
 	
-	iBufMax =  (pc->x2 - pc->x1 + 4096);
+	//iBufMax =  (pc->x2 - pc->x1 + 4096);
 
 	while(np != NULL && np->x < pc->x1)np = np->to;
 
@@ -1312,6 +1312,7 @@ BOOL OrgData::SwapTrack(NOTECOPY *pc)
 	memcpy(&info.tdata[ pc->track1 ], &info.tdata[ pc->track2 ], sizeof(TRACKDATA));
 	memcpy(&info.tdata[ pc->track2 ], &tmp, sizeof(TRACKDATA));
 
+	// TODO
 	if (pc->track1 / 8 != pc->track2 / 8) { // crash fix
 		info.tdata[pc->track1].wave_no = w1;
 		info.tdata[pc->track2].wave_no = w2;

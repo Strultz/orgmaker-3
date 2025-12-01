@@ -30,6 +30,7 @@ extern char gSelectedWave[MAX_PATH];
 extern char TrackN[];
 
 extern HBITMAP waveBmp; // azy
+extern void SetModified(bool mod);
 
 int volChangeLength = 10;
 bool volChangeUseNoteLength = true;
@@ -41,7 +42,7 @@ typedef struct{
 	char dot;
 }GRID;
 GRID grid[NUMGRIDA] = {
-	{"，ustom",0,0},
+	{"Custom",0,0},
 	{"4/4",4,4},
 	{"4/3",4,3},
 	{"3/4",3,4},
@@ -841,7 +842,7 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SendMessage(w, UDM_SETPOS, 0, mi.tdata[i].freq);
 		}
 
-		return 1;
+		return 0;
 	case WM_COMMAND:
 		switch (HIWORD(wParam)) {
 		case EN_UPDATE:
@@ -1198,6 +1199,48 @@ BOOL CALLBACK DialogNoteUsed(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 	return 0;
 }
 
+BOOL CALLBACK DialogComments(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	switch (message) {
+	case WM_INITDIALOG:
+		SetDlgItemText(hdwnd, IDC_NAMETEXT, org_data.name);
+		SetDlgItemText(hdwnd, IDC_AUTHORTEXT, org_data.author);
+		SetDlgItemText(hdwnd, IDC_COMMENTSBOX, org_data.comments.c_str());
+
+		SendDlgItemMessage(hdwnd, IDC_NAMETEXT, EM_SETLIMITTEXT, 0x20, 0);
+		SendDlgItemMessage(hdwnd, IDC_AUTHORTEXT, EM_SETLIMITTEXT, 0x20, 0);
+		SendDlgItemMessage(hdwnd, IDC_COMMENTSBOX, EM_SETLIMITTEXT, 0xFFFF, 0);
+
+		SetFocus(GetDlgItem(hdwnd, IDC_NAMETEXT));
+		PostMessage(GetDlgItem(hdwnd, IDC_NAMETEXT), EM_SETSEL, -1, 0);
+		PostMessage(GetDlgItem(hdwnd, IDC_NAMETEXT), EM_SCROLLCARET, 0, 0);
+
+		EnableDialogWindow(FALSE);
+		return 0;
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK: {
+			//SetUndo(); // TODO this doesnt work
+			SetModified(true);
+
+			GetDlgItemTextA(hdwnd, IDC_NAMETEXT, org_data.name, 0x21);
+			GetDlgItemTextA(hdwnd, IDC_AUTHORTEXT, org_data.author, 0x21);
+
+			int len = GetWindowTextLength(GetDlgItem(hdwnd, IDC_COMMENTSBOX));
+			org_data.comments.resize(len + 1, '\0');
+			GetDlgItemTextA(hdwnd, IDC_COMMENTSBOX, org_data.comments.data(), len + 1);
+			org_data.comments.pop_back();
+
+			// Fallthrough
+		}
+		case IDCANCEL:
+			EnableDialogWindow(TRUE);
+			EndDialog(hdwnd, 0);
+			return 1;
+		}
+	}
+	return 0;
+}
+
 BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	int i, j;
 	switch (message) {
@@ -1418,8 +1461,6 @@ BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		HWND hText = GetDlgItem(hdwnd, IDC_BOLDLABEL);
 		SendMessage(hText, WM_SETFONT, (WPARAM)hFont, TRUE);
 
-		EnableDialogWindow(FALSE);
-
 		RECT rc;
 		GetWindowRect(hdwnd, &rc);
 
@@ -1450,12 +1491,12 @@ BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			free(text);
 		}
 
-		SendMessage(GetDlgItem(hdwnd, IDC_ABOUTTEXT), EM_SETSEL, -1, 0);
-		SendMessage(GetDlgItem(hdwnd, IDC_ABOUTTEXT), EM_SCROLLCARET, 0, 0);
+		SetFocus(GetDlgItem(hdwnd, IDC_ABOUTTEXT));
+		PostMessage(GetDlgItem(hdwnd, IDC_ABOUTTEXT), EM_SETSEL, -1, 0);
+		PostMessage(GetDlgItem(hdwnd, IDC_ABOUTTEXT), EM_SCROLLCARET, 0, 0);
 
-		return 1;
-
-		return 1;
+		EnableDialogWindow(FALSE);
+		return 0;
 	}
 	case WM_DESTROY: {
 		if (hFont)

@@ -11,9 +11,6 @@
 
 //曲のPATHはここに置いておく
 char music_file[MAX_PATH]; //NewData.org
-char pass[7] = "Org-01";
-char pass2[7] = "Org-02";//Pipi
-char pass3[7] = "Org-03";//勝手に各種音色追加。
 
 ////以下はオルガーニャ曲データ構造体（フィルに含まれる項目）
 typedef struct{
@@ -93,11 +90,11 @@ BOOL OrgData::SaveMusicData(void)
 	}
 	//パスワード
 	j=2;
-	for(i=8;i<16;i++){ // iT JUST KEEPS GETTING WORSE !! WHY WAS IT < 15
+	for(i=MAXMELODY;i<MAXTRACK;i++){ // iT JUST KEEPS GETTING WORSE !! WHY WAS IT < 15
 		if(org_data.tdata[i].wave_no>=12)j=3;	//ドラムの新しい音を使っていればVer.3
 	}
-	if(j==2)fwrite(&pass2[0], sizeof(char), 6, fp);
-	else fwrite(&pass3[0], sizeof(char), 6, fp);
+	if (j == 2)fwrite("Org-02", sizeof(char), 6, fp);
+	else fwrite("Org-03", sizeof(char), 6, fp);
 	//曲情報の書き込み
 	fwrite(&org_data, sizeof(ORGANYADATA), 1, fp);
 	//音符の保存
@@ -128,7 +125,27 @@ BOOL OrgData::SaveMusicData(void)
 			fwrite(&np->pan,    sizeof(unsigned char), 1, fp);
 			np = np->to;
 		}
-	}	
+	}
+
+	bool compatible = false;
+	if (!compatible) {
+		fwrite("OM3MD1", sizeof(char), 6, fp);
+
+		fwrite(name, sizeof(char), 0x20, fp);
+		fwrite(author, sizeof(char), 0x20, fp);
+
+#ifdef _DEBUG
+		snprintf(version, 0x21, "OrgMaker %s-dev", VER_STRING);
+#else
+		snprintf(version, 0x21, "OrgMaker %s", VER_STRING);
+#endif
+		fwrite(version, sizeof(char), 0x20, fp);
+
+		uint16_t len = comments.size();
+		fwrite(&len, sizeof(uint16_t), 1, fp);
+		fwrite(comments.data(), sizeof(char), len, fp);
+	}
+
 	fclose(fp);
 	PutRecentFile(music_file);
 //	MessageBox(hWnd,"保存しました","Message (Save)",MB_OK);
@@ -154,9 +171,9 @@ int OrgData::FileCheckBeforeLoad(char *checkfile)
 	}
 
 	fread(&pass_check[0], sizeof(char), 6, fp);
-	if( !memcmp( pass_check, pass, 6 ) )ver = 1;
-	if( !memcmp( pass_check, pass2, 6 ) )ver = 2;
-	if( !memcmp( pass_check, pass3, 6 ) )ver = 3;
+	if( !memcmp( pass_check, "Org-01", 6))ver = 1;
+	if( !memcmp( pass_check, "Org-02", 6))ver = 2;
+	if( !memcmp( pass_check, "Org-03", 6))ver = 3;
 	if( !ver ){
 		fclose(fp);
 		//MessageBox(hWnd,"このファイルは使えません","Error (Load)",MB_OK);
@@ -184,10 +201,10 @@ BOOL OrgData::LoadMusicData(void)
 	}
 	//パスワードチェック
 	fread(&pass_check[0], sizeof(char), 6, fp);
-	if( !memcmp( pass_check, pass, 6 ) )ver = 1;
-	if( !memcmp( pass_check, pass2, 6 ) )ver = 2;
-	if( !memcmp( pass_check, pass3, 6 ) )ver = 3; // are you JOKING why was this 2
-	if( !ver ){
+	if(!memcmp(pass_check, "Org-01", 6)) ver = 1;
+	if(!memcmp(pass_check, "Org-02", 6)) ver = 2;
+	if(!memcmp(pass_check, "Org-03", 6)) ver = 3; // are you JOKING why was this 2
+	if(!ver) {
 		fclose(fp);
 		//MessageBox(hWnd,"このファイルは使えません","Error (Load)",MB_OK);	// 2014.10.19 D
 		msgbox(hWnd,IDS_ERROR_FILE,IDS_ERROR_LOAD,MB_OK);	// 2014.10.19 A
@@ -223,7 +240,7 @@ BOOL OrgData::LoadMusicData(void)
 			info.tdata[j].note_list = NULL;
 			continue;
 		}
-		if (org_data.tdata[j].note_num > info.alloc_note) {
+		if (org_data.tdata[j].note_num > ALLOCNOTE) {
 			if (!cflag) {
 				MessageBox(NULL, "Some tracks were truncated due to having too many events.", "Notice", MB_OK | MB_ICONASTERISK);
 				cflag = true;
@@ -235,7 +252,7 @@ BOOL OrgData::LoadMusicData(void)
 		np->from = NULL;
 		np->to = (np + 1);
 		np++;
-		for(i = 1; i < org_data.tdata[j].note_num && i < info.alloc_note; i++){
+		for(i = 1; i < org_data.tdata[j].note_num && i < ALLOCNOTE; i++){
 			np->from = (np - 1);
 			np->to = (np + 1);
 			np++;
@@ -247,37 +264,53 @@ BOOL OrgData::LoadMusicData(void)
 		//内容を代入
 		np = info.tdata[j].note_p;//Ｘ座標
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
-			if (i >= info.alloc_note) { fseek(fp, sizeof(long), SEEK_CUR); continue; }
+			if (i >= ALLOCNOTE) { fseek(fp, sizeof(long), SEEK_CUR); continue; }
 			fread(&np->x,      sizeof(long), 1, fp);
 			np++;
 		}
 		np = info.tdata[j].note_p;//Ｙ座標
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
-			if (i >= info.alloc_note) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
+			if (i >= ALLOCNOTE) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
 			fread(&np->y,      sizeof(unsigned char), 1, fp);
 			if (np->y >= 96) np->y = KEYDUMMY; // another fix
 			np++;
 		}
 		np = info.tdata[j].note_p;//長さ
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
-			if (i >= info.alloc_note) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
+			if (i >= ALLOCNOTE) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
 			fread(&np->length, sizeof(unsigned char), 1, fp);
 			if (np->length == 0) np->length = 1; // org corruption fix
 			np++;
 		}
 		np = info.tdata[j].note_p;//ボリューム
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
-			if (i >= info.alloc_note) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
+			if (i >= ALLOCNOTE) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
 			fread(&np->volume, sizeof(unsigned char), 1, fp);
 			np++;
 		}
 		np = info.tdata[j].note_p;//パン
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
-			if (i >= info.alloc_note) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
+			if (i >= ALLOCNOTE) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
 			fread(&np->pan,    sizeof(unsigned char), 1, fp);
 			np++;
 		}
 	}
+
+	size_t read = fread(&pass_check[0], sizeof(char), 6, fp);
+	if (read == 6 && !memcmp(pass_check, "OM3MD1", 6)) {
+		fread(name, sizeof(char), 0x20, fp);
+		fread(author, sizeof(char), 0x20, fp);
+		fread(version, sizeof(char), 0x20, fp);
+
+		uint16_t len = 0;
+		fread(&len, sizeof(uint16_t), 1, fp);
+		comments.resize(len, '\0');
+		size_t read = fread(comments.data(), 1, len, fp);
+		if (read != len) {
+			comments.resize(read);
+		}
+	}
+
 	fclose(fp);
 	//データを有効に
 	for(j = 0; j < MAXMELODY; j++)
@@ -325,7 +358,7 @@ void OrgData::SortNotes()
 		org_data.tdata[i].note_num = GetNoteNumber(i, -1, -1);
 	}
 
-	pNtls = new NOTELIST[4096]; //退避用
+	pNtls = new NOTELIST[ALLOCNOTE]; //退避用
 	
 	for(j = 0; j < MAXTRACK; j++){
 		if(info.tdata[j].note_list == NULL)continue;

@@ -78,6 +78,9 @@
     <ClCompile Include="Toolbar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Update.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Script1.rc">
@@ -121,10 +124,16 @@
     <ClInclude Include="Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="miniaudio.h">
+    <ClInclude Include="Toolbar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Toolbar.h">
+    <ClInclude Include="Update.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\miniaudio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\json.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -9,6 +9,7 @@
 #define IDC_OPNTHMFLD                   4
 #define IDS_CHANGE_PAN                  5
 #define IDS_CHANGE_VOLUME               6
+#define IDCANCEL2                       6
 #define IDS_CLEAR_RECENT                7
 #define IDS_COPY                        8
 #define IDS_ERROR_BUNKATSU              9
@@ -162,6 +163,7 @@
 #define IDC_FREQ1                       1004
 #define IDC_ADVCOUNT                    1004
 #define IDC_DEFVOL1                     1004
+#define IDC_NAMETEXT                    1004
 #define IDD_SETWAIT                     1005
 #define IDE_VIEWXPOS                    1005
 #define IDE_TRACK2                      1005
@@ -170,6 +172,7 @@
 #define IDC_AUTHOR                      1005
 #define IDC_FREQ2                       1005
 #define IDC_DEFVOL2                     1005
+#define IDC_AUTHORTEXT                  1005
 #define IDD_END_MEAS                    1006
 #define IDE_VIEWMEAS                    1006
 #define IDC_PANPOT3                     1006
@@ -520,6 +523,7 @@
 #define IDC_EXPFILENAME                 1310
 #define IDC_EXPRFILENAME                1310
 #define IDC_EXPRPROGRESS                1311
+#define IDC_COMMENTSBOX                 1312
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005
@@ -856,19 +860,21 @@
 #define IDM_SELECT_ALL_ALL              40369
 #define IDM_PLAY_NOTES_MID              40370
 #define IDM_NOTE_HIGHLIGHT              40371
-#define IDM_SONG_TRANSPOSE				40372
-#define IDM_SONGLEN						40373
-#define IDD_DLGSONGTRA					40374
-#define IDC_TRINCMEL					40375
-#define IDC_TRINCPERC					40376
+#define IDM_SONG_TRANSPOSE              40372
+#define IDM_SONGLEN                     40373
+#define IDD_DLGSONGTRA                  40374
+#define IDC_TRINCMEL                    40375
+#define IDC_TRINCPERC                   40376
+#define IDD_DLGCOMMENTS                 40377
+#define ID_SONG_COMMENTS                40378
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        266
-#define _APS_NEXT_COMMAND_VALUE         40377
-#define _APS_NEXT_CONTROL_VALUE         1312
+#define _APS_NEXT_RESOURCE_VALUE        267
+#define _APS_NEXT_COMMAND_VALUE         40379
+#define _APS_NEXT_CONTROL_VALUE         1313
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

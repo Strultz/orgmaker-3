@@ -5,7 +5,7 @@
 #define VER_MAJOR 3
 #define VER_MINOR 1
 #define VER_PATCH 0
-#define VER_PRE   1 // set as -1 if not prerelease
+#define VER_PRE   -1 // set as -1 if not prerelease
 
 #if VER_PRE != -1
 #define VER_STRING VER_S(VER_MAJOR) "." VER_S(VER_MINOR) "." VER_S(VER_PATCH) "-pre" VER_S(VER_PRE)
@@ -18,7 +18,7 @@
 #define MAXNOTELENGTH	255//音符の最大長
 #define MAXMELODY		8
 #define MAXDRAM			8
-#define MAXTRACK		16
+#define MAXTRACK		(MAXMELODY + MAXDRAM)
 
 #define KEYDUMMY		255//キーの変更は加えない音符
 #define PANDUMMY		255//パンの変更は加えない音符
@@ -32,6 +32,7 @@
 #define SETFREQ		0x00000010
 #define SETWAVE		0x00000020
 #define SETPIPI		0x00000040
+#define SETCOMMENT  0x00000080
 
 
 #define ALLOCNOTE	4096

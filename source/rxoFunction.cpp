@@ -277,7 +277,7 @@ int GetSelectMeasBeat(int GetToValue, int addValue)
 	}
 	return r;
 }
-char *TrackCode[]={"1","2","3","4","5","6","7","8","Q","W","E","R","T","Y","U","I" };
+char *TrackCode[]={"1","2","3","4","5","6","7","8","Q","W","E","R","T","Y","U","I"};
 
 //大文字小文字に注意した↑の逆函数
 int ReverseTrackCode(char *strTrack)

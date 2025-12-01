@@ -330,10 +330,25 @@ CAPTION "About OrgMaker 3"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,203,212,40,12
-    LTEXT           "OrgMaker 3.1.0-pre1",IDC_BOLDLABEL,8,78,112,10
+    LTEXT           "OrgMaker 3.1.0-dev",IDC_BOLDLABEL,8,78,112,10
     LTEXT           "2025 / 11 / 28",IDC_STATIC,8,88,112,8
     CONTROL         "B_SPLASH",ID_ICON_ORG,"Static",SS_BITMAP,0,0,375,120
     EDITTEXT        IDC_ABOUTTEXT,8,100,234,104,ES_MULTILINE | ES_READONLY | WS_VSCROLL
+END
+
+IDD_DLGCOMMENTS DIALOGEX 0, 0, 292, 172
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Song Comments"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    LTEXT           "Name:",IDC_STATIC,7,8,29,10
+    EDITTEXT        IDC_NAMETEXT,42,6,206,12,ES_AUTOHSCROLL
+    LTEXT           "Artist:",IDC_STATIC,7,23,29,8
+    EDITTEXT        IDC_AUTHORTEXT,42,21,206,12,ES_AUTOHSCROLL
+    LTEXT           "Comments:",IDC_STATIC,7,38,36,8
+    EDITTEXT        IDC_COMMENTSBOX,9,50,274,96,ES_MULTILINE | WS_VSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,200,152,40,12
+    PUSHBUTTON      "Cancel",IDCANCEL,244,152,40,12
 END
 
 IDD_DLGDEFAULT DIALOGEX 0, 0, 201, 184
@@ -567,212 +582,213 @@ END
 // Menu
 //
 
-ORGANYAMENU MENUEX
+ORGANYAMENU MENU
 BEGIN
-    POPUP "&File",                          65535,MFT_STRING,MFS_ENABLED
+    POPUP "&File"
     BEGIN
-        MENUITEM "&New\tCtrl+N",                IDM_INIT,MFT_STRING,MFS_ENABLED
-        MENUITEM "&Open...\tCtrl+O",            IDM_LOAD,MFT_STRING,MFS_ENABLED
-        POPUP "Open &Recent",                   65535,MFT_STRING,MFS_ENABLED
+        MENUITEM "&New\tCtrl+N",                IDM_INIT
+        MENUITEM "&Open...\tCtrl+O",            IDM_LOAD
+        POPUP "Open &Recent"
         BEGIN
-            MENUITEM "1",                           IDM_RECENT1,MFT_STRING,MFS_ENABLED
-            MENUITEM "2",                           IDM_RECENT2,MFT_STRING,MFS_ENABLED
-            MENUITEM "3",                           IDM_RECENT3,MFT_STRING,MFS_ENABLED
-            MENUITEM "4",                           IDM_RECENT4,MFT_STRING,MFS_ENABLED
-            MENUITEM "5",                           IDM_RECENT5,MFT_STRING,MFS_ENABLED
-            MENUITEM "6",                           IDM_RECENT6,MFT_STRING,MFS_ENABLED
-            MENUITEM "7",                           IDM_RECENT7,MFT_STRING,MFS_ENABLED
-            MENUITEM "8",                           IDM_RECENT8,MFT_STRING,MFS_ENABLED
-            MENUITEM "9",                           IDM_RECENT9,MFT_STRING,MFS_ENABLED
-            MENUITEM "0",                           IDM_RECENT0,MFT_STRING,MFS_ENABLED
-            MENUITEM MFT_SEPARATOR
-            MENUITEM "&Clear Recent Files",         IDM_RECENT_CLEAR,MFT_STRING,MFS_ENABLED
+            MENUITEM "1",                           IDM_RECENT1
+            MENUITEM "2",                           IDM_RECENT2
+            MENUITEM "3",                           IDM_RECENT3
+            MENUITEM "4",                           IDM_RECENT4
+            MENUITEM "5",                           IDM_RECENT5
+            MENUITEM "6",                           IDM_RECENT6
+            MENUITEM "7",                           IDM_RECENT7
+            MENUITEM "8",                           IDM_RECENT8
+            MENUITEM "9",                           IDM_RECENT9
+            MENUITEM "0",                           IDM_RECENT0
+            MENUITEM SEPARATOR
+            MENUITEM "&Clear Recent Files",         IDM_RECENT_CLEAR
         END
-        MENUITEM "&Save\tCtrl+S",               IDM_SAVEOVER,MFT_STRING,MFS_ENABLED
-        MENUITEM "Save &As...\tCtrl+Shift+S",   IDM_SAVENEW,MFT_STRING,MFS_ENABLED
-        MENUITEM MFT_SEPARATOR
-        MENUITEM "Export &WAV File (*.wav)...\tCtrl+Alt+W", IDM_EXPORT_WAV,MFT_STRING,MFS_ENABLED
-        MENUITEM "Export &MIDI File (*.mid)...\tCtrl+Alt+M", IDM_EXPORT_MIDI,MFT_STRING,MFS_ENABLED
-        MENUITEM MFT_SEPARATOR
-        MENUITEM "&Exit\tAlt+F4",               IDM_EXIT,MFT_STRING,MFS_ENABLED
+        MENUITEM "&Save\tCtrl+S",               IDM_SAVEOVER
+        MENUITEM "Save &As...\tCtrl+Shift+S",   IDM_SAVENEW
+        MENUITEM SEPARATOR
+        MENUITEM "Export &WAV File (*.wav)...\tCtrl+Alt+W", IDM_EXPORT_WAV
+        MENUITEM "Export &MIDI File (*.mid)...\tCtrl+Alt+M", IDM_EXPORT_MIDI
+        MENUITEM SEPARATOR
+        MENUITEM "&Exit\tAlt+F4",               IDM_EXIT
     END
-    POPUP "&Edit",                          65535,MFT_STRING,MFS_ENABLED
+    POPUP "&Edit"
     BEGIN
-        MENUITEM "&Undo\tCtrl+Z",               IDM_UNDO,MFT_STRING,MFS_GRAYED
-        MENUITEM "&Redo\tCtrl+Y",               IDM_REDO,MFT_STRING,MFS_GRAYED
-        MENUITEM MFT_SEPARATOR
-        MENUITEM "Cu&t\tCtrl+X",                IDM_SELECT_CUT,MFT_STRING,MFS_ENABLED
-        MENUITEM "&Copy\tCtrl+C",               IDM_SELECT_COPY,MFT_STRING,MFS_ENABLED
-        MENUITEM "&Paste\tCtrl+V",              IDM_SELECT_PASTE,MFT_STRING,MFS_ENABLED
-        MENUITEM "P&aste Special...\tCtrl+Shift+V", IDM_SELECT_ADVPASTE,MFT_STRING,MFS_ENABLED
-        POPUP "&Select...",                     65535,MFT_STRING,MFS_ENABLED
+        MENUITEM "&Undo\tCtrl+Z",               IDM_UNDO, GRAYED
+        MENUITEM "&Redo\tCtrl+Y",               IDM_REDO, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t\tCtrl+X",                IDM_SELECT_CUT
+        MENUITEM "&Copy\tCtrl+C",               IDM_SELECT_COPY
+        MENUITEM "&Paste\tCtrl+V",              IDM_SELECT_PASTE
+        MENUITEM "P&aste Special...\tCtrl+Shift+V", IDM_SELECT_ADVPASTE
+        POPUP "&Select..."
         BEGIN
-            MENUITEM "&All\tCtrl+A",                IDM_SELECT_ALL,MFT_STRING,MFS_ENABLED
-            MENUITEM "&None\tEsc",                  IDM_SELECT_RESET,MFT_STRING,MFS_ENABLED
-            MENUITEM MFT_SEPARATOR
-            MENUITEM "All on All &Channels",        IDM_SELECT_ALL_ALL,MFT_STRING,MFS_ENABLED
-            MENUITEM MFT_SEPARATOR
-            MENUITEM "&Measure\tNumpad1",           ID_AC_NUM1,MFT_STRING,MFS_ENABLED
-            MENUITEM "&2 Measures\tNumpad2",        ID_AC_NUM2,MFT_STRING,MFS_ENABLED
-            MENUITEM "&3 Measures\tNumpad3",        ID_AC_NUM3,MFT_STRING,MFS_ENABLED
-            MENUITEM "&4 Measures\tNumpad4",        ID_AC_NUM4,MFT_STRING,MFS_ENABLED
-            MENUITEM "&8 Measures\tNumpad5",        ID_AC_NUM5,MFT_STRING,MFS_ENABLED
-            MENUITEM "1&6 Measures\tNumpad6",       ID_AC_NUM6,MFT_STRING,MFS_ENABLED
-            MENUITEM MFT_SEPARATOR
-            MENUITEM "Measur&e on All Channels\tCtrl+Numpad1", ID_AC_C_NUM1,MFT_STRING,MFS_ENABLED
-            MENUITEM "&2 Measures on All Channels\tCtrl+Numpad2", ID_AC_C_NUM2,MFT_STRING,MFS_ENABLED
-            MENUITEM "&3 Measures on All Channels\tCtrl+Numpad3", ID_AC_C_NUM3,MFT_STRING,MFS_ENABLED
-            MENUITEM "&4 Measures on All Channels\tCtrl+Numpad4", ID_AC_C_NUM4,MFT_STRING,MFS_ENABLED
-            MENUITEM "&8 Measures on All Channels\tCtrl+Numpad5", ID_AC_C_NUM5,MFT_STRING,MFS_ENABLED
-            MENUITEM "&16 Measures on All Channels\tCtrl+Numpad6", ID_AC_C_NUM6,MFT_STRING,MFS_ENABLED
+            MENUITEM "&All\tCtrl+A",                IDM_SELECT_ALL
+            MENUITEM "&None\tEsc",                  IDM_SELECT_RESET
+            MENUITEM SEPARATOR
+            MENUITEM "All on All &Channels",        IDM_SELECT_ALL_ALL
+            MENUITEM SEPARATOR
+            MENUITEM "&Measure\tNumpad1",           ID_AC_NUM1
+            MENUITEM "&2 Measures\tNumpad2",        ID_AC_NUM2
+            MENUITEM "&3 Measures\tNumpad3",        ID_AC_NUM3
+            MENUITEM "&4 Measures\tNumpad4",        ID_AC_NUM4
+            MENUITEM "&8 Measures\tNumpad5",        ID_AC_NUM5
+            MENUITEM "1&6 Measures\tNumpad6",       ID_AC_NUM6
+            MENUITEM SEPARATOR
+            MENUITEM "Measur&e on All Channels\tCtrl+Numpad1", ID_AC_C_NUM1
+            MENUITEM "&2 Measures on All Channels\tCtrl+Numpad2", ID_AC_C_NUM2
+            MENUITEM "&3 Measures on All Channels\tCtrl+Numpad3", ID_AC_C_NUM3
+            MENUITEM "&4 Measures on All Channels\tCtrl+Numpad4", ID_AC_C_NUM4
+            MENUITEM "&8 Measures on All Channels\tCtrl+Numpad5", ID_AC_C_NUM5
+            MENUITEM "&16 Measures on All Channels\tCtrl+Numpad6", ID_AC_C_NUM6
         END
-        POPUP "&Edit Selection...",             65535,MFT_STRING,MFS_ENABLED
+        MENUITEM SEPARATOR
+        POPUP "&Note Volume (Add Volume Events)"
         BEGIN
-            MENUITEM "&Volume...\tF4",              ID_SELECTION_VOLUME,MFT_STRING,MFS_ENABLED
-            MENUITEM "&Panning...\tCtrl+F4",        ID_SELECTION_PANNING,MFT_STRING,MFS_ENABLED
-            MENUITEM "&Transpose...\tShift+F4",     ID_SELECTION_TRANSPOSE,MFT_STRING,MFS_ENABLED
-            MENUITEM "&Insert\tIns",                ID_SELECTION_INSERT,MFT_STRING,MFS_ENABLED
-            MENUITEM "&Clear\tDel",                 ID_SELECTION_CLEAR,MFT_STRING,MFS_ENABLED
-            MENUITEM "&Delete\tBackspace",          ID_SELECTION_DELETE,MFT_STRING,MFS_ENABLED
+            MENUITEM "(&1) Fade Out (very slow)\tCtrl+1", IDM_CT_S1
+            MENUITEM "(&2) Fade Out (slow)\tCtrl+2", IDM_CT_S2
+            MENUITEM "(&3) Fade Out (linear)\tCtrl+3", IDM_CT_S3
+            MENUITEM "(&4) Fade Out (fast)\tCtrl+4", IDM_CT_S4
+            MENUITEM "(&5) Fade Out (very fast)\tCtrl+5", IDM_CT_S5
+            MENUITEM "(&6) Default Value\tCtrl+6",  IDM_CT_S6
+            MENUITEM "(&7) Fade Out (s-curve)\tCtrl+7", IDM_CT_S7
+            MENUITEM "(&8) Fade Out (small, at end)\tCtrl+8", IDM_CT_S8
+            MENUITEM "(&9) Tremolo Decay\tCtrl+9",  IDM_CT_S9
+            MENUITEM SEPARATOR
+            MENUITEM "(&1) Random\tCtrl+Alt+0",     IDM_CT_S10
+            MENUITEM "(&2) Fade From Start to End\tCtrl+Alt+1", IDM_CT_S11
+            MENUITEM "(&3) Fade In (slow)\tCtrl+Alt+2", IDM_CT_S12
+            MENUITEM "(&4) Fade In (linear)\tCtrl+Alt+3", IDM_CT_S13
+            MENUITEM "(&5) (none)",                 IDM_CT_S14, GRAYED
+            MENUITEM "(&6) (none)",                 IDM_CT_S15, GRAYED
+            MENUITEM "(&7) (none)",                 IDM_CT_S16, GRAYED
+            MENUITEM "(&8) (none)",                 IDM_CT_S17, GRAYED
+            MENUITEM "(&9) (none)",                 IDM_CT_S18, GRAYED
+            MENUITEM SEPARATOR
+            MENUITEM "Clear Volume Events\tCtrl+0", IDM_CT_S20
+            MENUITEM "Setup Decay Length...",       IDM_DCLEN
         END
-        MENUITEM MFT_SEPARATOR
-        POPUP "&Note Volume (Add Volume Events)", 65535,MFT_STRING,MFS_ENABLED
+        POPUP "Note &Volume (Existing Notes Only)"
         BEGIN
-            MENUITEM "(&1) Fade Out (very slow)\tCtrl+1", IDM_CT_S1,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&2) Fade Out (slow)\tCtrl+2", IDM_CT_S2,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&3) Fade Out (linear)\tCtrl+3", IDM_CT_S3,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&4) Fade Out (fast)\tCtrl+4", IDM_CT_S4,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&5) Fade Out (very fast)\tCtrl+5", IDM_CT_S5,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&6) Default Value\tCtrl+6",  IDM_CT_S6,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&7) Fade Out (s-curve)\tCtrl+7", IDM_CT_S7,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&8) Fade Out (small, at end)\tCtrl+8", IDM_CT_S8,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&9) Tremolo Decay\tCtrl+9",  IDM_CT_S9,MFT_STRING,MFS_ENABLED
-            MENUITEM MFT_SEPARATOR
-            MENUITEM "(&1) Random\tCtrl+Alt+0",     IDM_CT_S10,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&2) Fade From Start to End\tCtrl+Alt+1", IDM_CT_S11,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&3) Fade In (slow)\tCtrl+Alt+2", IDM_CT_S12,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&4) Fade In (linear)\tCtrl+Alt+3", IDM_CT_S13,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&5) (none)",                 IDM_CT_S14,MFT_STRING,MFS_GRAYED
-            MENUITEM "(&6) (none)",                 IDM_CT_S15,MFT_STRING,MFS_GRAYED
-            MENUITEM "(&7) (none)",                 IDM_CT_S16,MFT_STRING,MFS_GRAYED
-            MENUITEM "(&8) (none)",                 IDM_CT_S17,MFT_STRING,MFS_GRAYED
-            MENUITEM "(&9) (none)",                 IDM_CT_S18,MFT_STRING,MFS_GRAYED
-            MENUITEM MFT_SEPARATOR
-            MENUITEM "Clear Volume Events\tCtrl+0", IDM_CT_S20,MFT_STRING,MFS_ENABLED
-            MENUITEM "Setup Decay Length...",       IDM_DCLEN,MFT_STRING,MFS_ENABLED
+            MENUITEM "(&1) Fade Out (very slow)",   IDM_CT_L1
+            MENUITEM "(&2) Fade Out (slow)",        IDM_CT_L2
+            MENUITEM "(&3) Fade Out (linear)",      IDM_CT_L3
+            MENUITEM "(&4) Fade Out (fast)",        IDM_CT_L4
+            MENUITEM "(&5) Fade Out (very fast)",   IDM_CT_L5
+            MENUITEM "(&6) Default Value",          IDM_CT_L6
+            MENUITEM "(&7) Fade Out (s-curve)",     IDM_CT_L7
+            MENUITEM "(&8) Fade Out (small, at end)", IDM_CT_L8
+            MENUITEM "(&9) Tremolo Decay",          IDM_CT_L9
+            MENUITEM SEPARATOR
+            MENUITEM "(&1) Random",                 IDM_CT_L10
+            MENUITEM "(&2) Fade From Start to End", IDM_CT_L11
+            MENUITEM "(&3) Fade In (slow)",         IDM_CT_L12
+            MENUITEM "(&4) Fade In (linear)",       IDM_CT_L13
+            MENUITEM "(&5) (none)",                 IDM_CT_L14, GRAYED
+            MENUITEM "(&6) (none)",                 IDM_CT_L15, GRAYED
+            MENUITEM "(&7) (none)",                 IDM_CT_L16, GRAYED
+            MENUITEM "(&8) (none)",                 IDM_CT_L17, GRAYED
+            MENUITEM "(&9) (none)",                 IDM_CT_L18, GRAYED
         END
-        POPUP "Note &Volume (Existing Notes Only)", 65535,MFT_STRING,MFS_ENABLED
+        MENUITEM SEPARATOR
+        POPUP "&Edit Selection..."
         BEGIN
-            MENUITEM "(&1) Fade Out (very slow)",   IDM_CT_L1,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&2) Fade Out (slow)",        IDM_CT_L2,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&3) Fade Out (linear)",      IDM_CT_L3,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&4) Fade Out (fast)",        IDM_CT_L4,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&5) Fade Out (very fast)",   IDM_CT_L5,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&6) Default Value",          IDM_CT_L6,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&7) Fade Out (s-curve)",     IDM_CT_L7,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&8) Fade Out (small, at end)", IDM_CT_L8,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&9) Tremolo Decay",          IDM_CT_L9,MFT_STRING,MFS_ENABLED
-            MENUITEM MFT_SEPARATOR
-            MENUITEM "(&1) Random",                 IDM_CT_L10,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&2) Fade From Start to End", IDM_CT_L11,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&3) Fade In (slow)",         IDM_CT_L12,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&4) Fade In (linear)",       IDM_CT_L13,MFT_STRING,MFS_ENABLED
-            MENUITEM "(&5) (none)",                 IDM_CT_L14,MFT_STRING,MFS_GRAYED
-            MENUITEM "(&6) (none)",                 IDM_CT_L15,MFT_STRING,MFS_GRAYED
-            MENUITEM "(&7) (none)",                 IDM_CT_L16,MFT_STRING,MFS_GRAYED
-            MENUITEM "(&8) (none)",                 IDM_CT_L17,MFT_STRING,MFS_GRAYED
-            MENUITEM "(&9) (none)",                 IDM_CT_L18,MFT_STRING,MFS_GRAYED
+            MENUITEM "&Volume...\tF4",              ID_SELECTION_VOLUME
+            MENUITEM "&Panning...\tCtrl+F4",        ID_SELECTION_PANNING
+            MENUITEM "&Transpose...\tShift+F4",     ID_SELECTION_TRANSPOSE
+            MENUITEM "&Insert\tIns",                ID_SELECTION_INSERT
+            MENUITEM "&Clear\tDel",                 ID_SELECTION_CLEAR
+            MENUITEM "&Delete\tBackspace",          ID_SELECTION_DELETE
         END
-        MENUITEM MFT_SEPARATOR
-        POPUP "Edit &Current Channel",          65535,MFT_STRING,MFS_ENABLED
+        POPUP "Edit &Current Channel"
         BEGIN
-            MENUITEM "Pan &Right\tCtrl+Shift+R",    IDM_CT_PAN_R,MFT_STRING,MFS_ENABLED
-            MENUITEM "Pan &Left\tCtrl+Shift+L",     IDM_CT_PAN_L,MFT_STRING,MFS_ENABLED
-            MENUITEM "Pan &Invert\tCtrl+Alt+R",     IDM_CT_PAN_REVERSE,MFT_STRING,MFS_ENABLED
-            MENUITEM "Volume &Up\tF11",             IDM_CT_VOL_PLUS,MFT_STRING,MFS_ENABLED
-            MENUITEM "Volume &Down\tF12",           IDM_CT_VOL_MINUS,MFT_STRING,MFS_ENABLED
-            MENUITEM "Volume &Up (12.5%)\tCtrl+Shift+F11", IDM_CT_VOLWARIAI_UP,MFT_STRING,MFS_ENABLED
-            MENUITEM "Volume &Down (12.5%)\tCtrl+Shift+F12", IDM_CT_VOLWARIAI_DOWN,MFT_STRING,MFS_ENABLED
-            MENUITEM "Transpose &Up\tCtrl+Shift+U", IDM_CT_TRANS_UP,MFT_STRING,MFS_ENABLED
-            MENUITEM "Transpose &Down\tCtrl+Shift+D", IDM_CT_TRANS_DOWN,MFT_STRING,MFS_ENABLED
-            MENUITEM "Transpose &Up (Octave)\tCtrl+Alt+U", IDM_CT_OCT_UP,MFT_STRING,MFS_ENABLED
-            MENUITEM "Transpose &Down (Octave)\tCtrl+Alt+D", IDM_CT_OCT_DOWN,MFT_STRING,MFS_ENABLED
+            MENUITEM "Pan &Right\tCtrl+Shift+R",    IDM_CT_PAN_R
+            MENUITEM "Pan &Left\tCtrl+Shift+L",     IDM_CT_PAN_L
+            MENUITEM "Pan &Invert\tCtrl+Alt+R",     IDM_CT_PAN_REVERSE
+            MENUITEM "Volume &Up\tF11",             IDM_CT_VOL_PLUS
+            MENUITEM "Volume &Down\tF12",           IDM_CT_VOL_MINUS
+            MENUITEM "Volume &Up (12.5%)\tCtrl+Shift+F11", IDM_CT_VOLWARIAI_UP
+            MENUITEM "Volume &Down (12.5%)\tCtrl+Shift+F12", IDM_CT_VOLWARIAI_DOWN
+            MENUITEM "Transpose &Up\tCtrl+Shift+U", IDM_CT_TRANS_UP
+            MENUITEM "Transpose &Down\tCtrl+Shift+D", IDM_CT_TRANS_DOWN
+            MENUITEM "Transpose &Up (Octave)\tCtrl+Alt+U", IDM_CT_OCT_UP
+            MENUITEM "Transpose &Down (Octave)\tCtrl+Alt+D", IDM_CT_OCT_DOWN
         END
-        POPUP "Edit &Melody Channels",          65535,MFT_STRING,MFS_ENABLED
+        POPUP "Edit &Melody Channels"
         BEGIN
-            MENUITEM "Pan &Right",                  IDM_ML_PAN_R,MFT_STRING,MFS_ENABLED
-            MENUITEM "Pan &Left",                   IDM_ML_PAN_L,MFT_STRING,MFS_ENABLED
-            MENUITEM "Volume &Up\tShift+F11",       IDM_ML_VOL_PLUS,MFT_STRING,MFS_ENABLED
-            MENUITEM "Volume &Down\tShift+F12",     IDM_ML_VOL_MINUS,MFT_STRING,MFS_ENABLED
-            MENUITEM "Transpose &Up\tCtrl+Shift+H", IDM_ML_TRANS_UP,MFT_STRING,MFS_ENABLED
-            MENUITEM "Transpose &Down\tCtrl+Shift+N", IDM_ML_TRANS_DOWN,MFT_STRING,MFS_ENABLED
+            MENUITEM "Pan &Right",                  IDM_ML_PAN_R
+            MENUITEM "Pan &Left",                   IDM_ML_PAN_L
+            MENUITEM "Volume &Up\tShift+F11",       IDM_ML_VOL_PLUS
+            MENUITEM "Volume &Down\tShift+F12",     IDM_ML_VOL_MINUS
+            MENUITEM "Transpose &Up\tCtrl+Shift+H", IDM_ML_TRANS_UP
+            MENUITEM "Transpose &Down\tCtrl+Shift+N", IDM_ML_TRANS_DOWN
         END
-        POPUP "Edit Perc&ussion Channels",      65535,MFT_STRING,MFS_ENABLED
+        POPUP "Edit Perc&ussion Channels"
         BEGIN
-            MENUITEM "Volume &Up\tCtrl+F11",        IDM_DR_VOL_PLUS,MFT_STRING,MFS_ENABLED
-            MENUITEM "Volume &Down\tCtrl+F12",      IDM_DR_VOL_MINUS,MFT_STRING,MFS_ENABLED
+            MENUITEM "Volume &Up\tCtrl+F11",        IDM_DR_VOL_PLUS
+            MENUITEM "Volume &Down\tCtrl+F12",      IDM_DR_VOL_MINUS
         END
-        MENUITEM MFT_SEPARATOR
-        MENUITEM "&Swap Channels...\tCtrl+Shift+F4", IDM_DLGSWAP,MFT_STRING,MFS_ENABLED
-        MENUITEM MFT_SEPARATOR
-        MENUITEM "Snap Selection to &Beat Grid\tCtrl+G", IDM_GRIDMODE,MFT_STRING,MFS_ENABLED
-        MENUITEM "A&lways Select Current Channel\tCtrl+T", IDM_ALWAYS_CURRENT,MFT_STRING,MFS_ENABLED
-        MENUITEM "&Drag Note to Extend\tCtrl+Alt+F9", IDM_DRAGMODE,MFT_STRING,MFS_ENABLED
-        MENUITEM "Clic&k Note to Extend\tCtrl+Alt+F10", IDM_PRESSNOTE,MFT_STRING,MFS_ENABLED
-        MENUITEM MFT_SEPARATOR
-        MENUITEM "Sto&p All Sounds\t~",         IDM_STOPNOWALL,MFT_STRING,MFS_ENABLED
+        MENUITEM SEPARATOR
+        MENUITEM "&Swap Channels...\tCtrl+Shift+F4", IDM_DLGSWAP
+        MENUITEM SEPARATOR
+        MENUITEM "Snap Selection to &Beat Grid\tCtrl+G", IDM_GRIDMODE
+        MENUITEM "A&lways Select Current Channel\tCtrl+T", IDM_ALWAYS_CURRENT
+        MENUITEM "&Drag Note to Extend\tCtrl+Alt+F9", IDM_DRAGMODE
+        MENUITEM "Clic&k Note to Extend\tCtrl+Alt+F10", IDM_PRESSNOTE
+        MENUITEM SEPARATOR
+        MENUITEM "Sto&p All Sounds\t~",         IDM_STOPNOWALL
     END
-    POPUP "&Song",                          65535,MFT_STRING,MFS_ENABLED
+    POPUP "&Song"
     BEGIN
-        MENUITEM "&Properties...\tF2",          IDM_DLGSETTING,MFT_STRING,MFS_ENABLED
-        MENUITEM MFT_SEPARATOR
-        MENUITEM "&Transpose Song...",          IDM_SONG_TRANSPOSE,MFT_STRING,MFS_ENABLED
-        POPUP "Change &Resolution",             65535,MFT_STRING,MFS_ENABLED
+        MENUITEM "&Properties...\tF2",          IDM_DLGSETTING
+        MENUITEM "Comments...",                 ID_SONG_COMMENTS
+        MENUITEM SEPARATOR
+        MENUITEM "&Transpose Song...",          IDM_SONG_TRANSPOSE
+        POPUP "Change &Resolution"
         BEGIN
-            MENUITEM "Increase to 2x",              IDM_2BAI,MFT_STRING,MFS_ENABLED
-            MENUITEM "Increase to 3x",              IDM_3BAI,MFT_STRING,MFS_ENABLED
-            MENUITEM "Reduce to 1/2x",              IDM_2BUNNO1,MFT_STRING,MFS_ENABLED
-            MENUITEM "Reduce to 1/3x",              IDM_3BUNNO1,MFT_STRING,MFS_ENABLED
+            MENUITEM "Increase to 2x",              IDM_2BAI
+            MENUITEM "Increase to 3x",              IDM_3BAI
+            MENUITEM "Reduce to 1/2x",              IDM_2BUNNO1
+            MENUITEM "Reduce to 1/3x",              IDM_3BUNNO1
         END
-        MENUITEM MFT_SEPARATOR
-        MENUITEM "&Estimate Song Length...",    IDM_SONGLEN,MFT_STRING,MFS_ENABLED
-        MENUITEM "&Event Usage...",             IDM_DLGUSED,MFT_STRING,MFS_ENABLED
+        MENUITEM SEPARATOR
+        MENUITEM "Estimate Song &Length...",    IDM_SONGLEN
+        MENUITEM "&Event Usage...",             IDM_DLGUSED
     END
-    POPUP "&View",                          65535,MFT_STRING,MFS_ENABLED
+    POPUP "&View"
     BEGIN
-        MENUITEM "Zoom &In\tF7",                IDM_LOUPE_PLUS,MFT_STRING,MFS_ENABLED
-        MENUITEM "Zoom &Out\tF8",               IDM_LOUPE_MINUS,MFT_STRING,MFS_ENABLED
-        MENUITEM MFT_SEPARATOR
-        MENUITEM "&Pop Out Toolbars",           IDM_FLOATTOOLBARS,MFT_STRING,MFS_ENABLED
-        MENUITEM MFT_SEPARATOR
-        POPUP "&Preferences",                   65535,MFT_STRING,MFS_ENABLED
+        MENUITEM "Zoom &In\tF7",                IDM_LOUPE_PLUS
+        MENUITEM "Zoom &Out\tF8",               IDM_LOUPE_MINUS
+        MENUITEM SEPARATOR
+        MENUITEM "&Pop Out Toolbars",           IDM_FLOATTOOLBARS
+        MENUITEM SEPARATOR
+        POPUP "&Preferences"
         BEGIN
-            MENUITEM "Confirm &Unsaved Changes",    IDM_CHANGEFINISH,MFT_STRING,MFS_ENABLED
-            MENUITEM "Auto&matically Check for Updates", IDM_AUTOCHECKUPDATES,MFT_STRING,MFS_ENABLED
-            MENUITEM MFT_SEPARATOR
-            MENUITEM "Allow &Keyboard During Playback", IDM_ENABLEPLAYING,MFT_STRING,MFS_ENABLED
-            MENUITEM "Playback &Smooth Scrolling",  IDM_SMOOTHSCROLL,MFT_STRING,MFS_ENABLED
-            MENUITEM "Extend &Note Heads",          IDM_NOTE_ENLARGE,MFT_STRING,MFS_ENABLED
-            MENUITEM "Slide &Overlapping Notes",    IDM_SLIDEOVERLAPNOTES,MFT_STRING,MFS_ENABLED
-            MENUITEM "Show &All Channels",          IDM_DRAWDOUBLE,MFT_STRING,MFS_ENABLED
-            MENUITEM "&Highlight Playing Notes",    IDM_NOTE_HIGHLIGHT,MFT_STRING,MFS_ENABLED
-            MENUITEM MFT_SEPARATOR
-            MENUITEM "&Resume Notes After Head",    IDM_PLAY_NOTES_MID,MFT_STRING,MFS_ENABLED
-            MENUITEM "&Metronome",                  IDM_METRONOME,MFT_STRING,MFS_ENABLED
-            MENUITEM MFT_SEPARATOR
-            MENUITEM "&Default Volume/Panning...",  IDM_DLGDEFAULT,MFT_STRING,MFS_ENABLED
-            MENUITEM "&Themes...",                  IDM_DLGTHEMES,MFT_STRING,MFS_ENABLED
-            MENUITEM "Sound&banks...",              IDM_DLGWAVEDBS,MFT_STRING,MFS_ENABLED
+            MENUITEM "Confirm &Unsaved Changes",    IDM_CHANGEFINISH
+            MENUITEM "Auto&matically Check for Updates", IDM_AUTOCHECKUPDATES
+            MENUITEM SEPARATOR
+            MENUITEM "Allow &Keyboard During Playback", IDM_ENABLEPLAYING
+            MENUITEM "Playback &Smooth Scrolling",  IDM_SMOOTHSCROLL
+            MENUITEM "Extend &Note Heads",          IDM_NOTE_ENLARGE
+            MENUITEM "Slide &Overlapping Notes",    IDM_SLIDEOVERLAPNOTES
+            MENUITEM "Show &All Channels",          IDM_DRAWDOUBLE
+            MENUITEM "&Highlight Playing Notes",    IDM_NOTE_HIGHLIGHT
+            MENUITEM SEPARATOR
+            MENUITEM "&Resume Notes After Head",    IDM_PLAY_NOTES_MID
+            MENUITEM "&Metronome",                  IDM_METRONOME
+            MENUITEM SEPARATOR
+            MENUITEM "&Default Volume/Panning...",  IDM_DLGDEFAULT
+            MENUITEM "&Themes...",                  IDM_DLGTHEMES
+            MENUITEM "Sound&banks...",              IDM_DLGWAVEDBS
         END
     END
-    POPUP "&Help",                          65535,MFT_STRING,MFS_ENABLED
+    POPUP "&Help"
     BEGIN
-        MENUITEM "&Help...\tF1",                IDM_DLGHELP,MFT_STRING,MFS_ENABLED
-        MENUITEM MFT_SEPARATOR
-        MENUITEM "Open &GitHub Page",           IDM_GITHUB,MFT_STRING,MFS_ENABLED
-        MENUITEM MFT_SEPARATOR
-        MENUITEM "&Check for Updates",          IDM_CHECKUPD,MFT_STRING,MFS_ENABLED
-        MENUITEM "&About OrgMaker 3",           IDM_DLGMEMO,MFT_STRING,MFS_ENABLED
+        MENUITEM "&Help...\tF1",                IDM_DLGHELP
+        MENUITEM SEPARATOR
+        MENUITEM "Open &GitHub Page",           IDM_GITHUB
+        MENUITEM SEPARATOR
+        MENUITEM "&Check for Updates",          IDM_CHECKUPD
+        MENUITEM "&About OrgMaker 3",           IDM_DLGMEMO
     END
 END
 
@@ -885,8 +901,8 @@ CAT                     WAVE                    "Wave\\Cat.wav"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,1,0,1
- PRODUCTVERSION 3,1,0,1
+ FILEVERSION 3,1,0,0
+ PRODUCTVERSION 3,1,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -904,11 +920,11 @@ BEGIN
             VALUE "Comments", "Please ignore the rough parts."
             VALUE "CompanyName", "No extra taste."
             VALUE "FileDescription", "OrgMaker 3"
-            VALUE "FileVersion", "3.1.0-pre1"
+            VALUE "FileVersion", "3.1.0-dev"
             VALUE "LegalCopyright", "Copyright (C) 2005-2025 Pixel and Rxo Inverse"
             VALUE "OriginalFilename", "OrgMaker3.exe"
             VALUE "ProductName", "OrgMaker 3"
-            VALUE "ProductVersion", "3.1.0-pre1"
+            VALUE "ProductVersion", "3.1.0-dev"
         END
     END
     BLOCK "VarFileInfo"
@@ -1180,6 +1196,11 @@ BEGIN
     0
 END
 
+IDD_DLGCOMMENTS AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1208,10 +1229,10 @@ BEGIN
 
     IDD_DLGPERC, DIALOG
     BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 187
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 97
+        LEFTMARGIN, 14
+        RIGHTMARGIN, 214
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 96
     END
 
     IDD_DLGSELVOL, DIALOG
@@ -1247,6 +1268,11 @@ BEGIN
     BEGIN
     END
 
+    IDD_DLGCOMMENTS, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 160
+    END
+
     IDD_DLGDEFAULT, DIALOG
     BEGIN
     END
@@ -1280,7 +1306,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 142
         TOPMARGIN, 7
-        BOTTOMMARGIN, 57
+        BOTTOMMARGIN, 60
     END
 
     IDD_EXPORTPROG, DIALOG

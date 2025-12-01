@@ -78,7 +78,7 @@ BOOL CALLBACK DialogSelVol(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 BOOL CALLBACK DialogSelTra(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogDefaults(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogSongTra(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
-
+BOOL CALLBACK DialogComments(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void SetModified(bool mod);
 
@@ -1695,7 +1695,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				break;
 			case IDM_SONG_TRANSPOSE:
 				DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGSONGTRA), hwnd, DialogSongTra);
-				// TODO add new dialog
 				break;
 			}
 		}else{
@@ -2092,6 +2091,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					minutes, (lengthMs / 1000) % 60);
 			}
 			MessageBox(hWnd, str, "OrgMaker 3", MB_OK | MB_ICONINFORMATION);
+			break;
+		}
+		case ID_SONG_COMMENTS: {
+			StopPlayingSong();
+			DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGCOMMENTS), hwnd, DialogComments);
 			break;
 		}
 		}
@@ -2544,7 +2548,7 @@ void SetTitlebarText()
 	}
 
 #ifdef _DEBUG
-	snprintf(set_name, MAX_PATH + 30, "%s%s - %s %s [Debug]", gFileModified ? "*" : "", name, lpszName, VER_STRING);
+	snprintf(set_name, MAX_PATH + 30, "%s%s - %s %s-dev", gFileModified ? "*" : "", name, lpszName, VER_STRING);
 #else
 	snprintf(set_name, MAX_PATH + 30, "%s%s - %s %s", gFileModified ? "*" : "", name, lpszName, VER_STRING);
 #endif

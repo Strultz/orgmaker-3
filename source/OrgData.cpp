@@ -9,6 +9,7 @@
 #include "Sound.h"
 #include "rxoFunction.h"
 #include "Scroll.h"
+#include <stdio.h>
 
 #define DEFVOLUME	200//255はVOLDUMMY。MAXは254
 #define DEFPAN		6
@@ -16,16 +17,16 @@
 extern char *dram_name[];
 extern int iKeyPushDown[];
 //指定の数だけNoteDataの領域を確保(初期化)
-BOOL OrgData::NoteAlloc(unsigned short alloc)
+BOOL OrgData::NoteAlloc(void)
 {
 	int i,j;
 	for(j = 0; j < MAXTRACK; j++){
 		info.tdata[j].wave_no = 0;
 		info.tdata[j].note_list = NULL;//コンストラクタにやらせたい
-		info.tdata[j].note_p = new NOTELIST[alloc];
+		info.tdata[j].note_p = new NOTELIST[ALLOCNOTE];
 		if(info.tdata[j].note_p == NULL)return FALSE;
 		//	info.alloc_note = alloc;
-		for(i = 0; i < alloc; i++){
+		for(i = 0; i < ALLOCNOTE; i++){
 			(info.tdata[j].note_p + i)->from = NULL;
 			(info.tdata[j].note_p + i)->to = NULL;
 			(info.tdata[j].note_p + i)->length = 0;
@@ -46,14 +47,14 @@ BOOL OrgData::NoteAlloc(unsigned short alloc)
 void OrgData::ReleaseNote(void)
 {
 	for(int i = 0; i < MAXTRACK; i++){
-		if(info.tdata[i].note_p != NULL)delete info.tdata[i].note_p;
+		if(info.tdata[i].note_p != NULL) delete info.tdata[i].note_p;
 	}
 }
 //曲情報を取得
 void OrgData::GetMusicInfo(MUSICINFO *mi, int mode) {
 	mi->dot = info.dot;
 	mi->line = info.line;
-	mi->alloc_note = info.alloc_note;
+	//mi->alloc_note = info.alloc_note;
 	mi->wait = info.wait;
 	mi->repeat_x = info.repeat_x;
 	mi->end_x = info.end_x;
@@ -95,9 +96,9 @@ BOOL OrgData::SetMusicInfo(MUSICINFO *mi,unsigned long flag)
 
 	}
 	if(flag & SETALLOC){//領域確保
-		info.alloc_note = mi->alloc_note;
+		//info.alloc_note = mi->alloc_note;
 		ReleaseNote();
-		NoteAlloc(info.alloc_note);
+		NoteAlloc();
 //		MessageBox(hWnd,"唖ロック","",MB_OK);
 	}
 	if(flag & SETWAIT){
@@ -134,7 +135,7 @@ NOTELIST *OrgData::SearchNote(char track)
 {
 	int i;
 	NOTELIST* np = info.tdata[track].note_p;
-	for(i = 0; i < info.alloc_note; i++,np++){
+	for(i = 0; i < ALLOCNOTE; i++,np++){
 		if(np->length == 0){
 			return np;
 		}
@@ -675,7 +676,7 @@ void OrgData::InitOrgData(void)
 {
 //	MUSICINFO mi;
 	track = 0;
-	info.alloc_note = ALLOCNOTE;//とりあえず10000個確保
+	//info.alloc_note = ALLOCNOTE;//とりあえず10000個確保
 	info.dot = 4;
 	info.line = 4;
 	info.wait = 125;
@@ -689,24 +690,36 @@ void OrgData::InitOrgData(void)
 		def_pan[i] = DEFPAN;
 		def_volume[i] = DEFVOLUME;
 	}
-	SetMusicInfo(&info,SETALL);
+	SetMusicInfo(&info, SETALL & ~SETCOMMENT);
 
 	// 以下 2014.05.07 追加
 	for(i=0; i<MAXMELODY; i++){
-		info.tdata[i].wave_no = i*11;
+		info.tdata[i].wave_no = (i*11)%100;
 		MakeOrganyaWave(i, info.tdata[i].wave_no, info.tdata[i].pipi);
 	}
-	info.tdata[ 8].wave_no = 0;
-	info.tdata[ 9].wave_no = 2;
-	info.tdata[10].wave_no = 5;
-	info.tdata[11].wave_no = 6;
-	info.tdata[12].wave_no = 4;
-	info.tdata[13].wave_no = 8;
-	info.tdata[14].wave_no = 0;
-	info.tdata[15].wave_no = 0;
+	info.tdata[MAXDRAM+0].wave_no = 0;
+	info.tdata[MAXDRAM+1].wave_no = 2;
+	info.tdata[MAXDRAM+2].wave_no = 5;
+	info.tdata[MAXDRAM+3].wave_no = 6;
+	info.tdata[MAXDRAM+4].wave_no = 4;
+	info.tdata[MAXDRAM+5].wave_no = 8;
+	info.tdata[MAXDRAM+6].wave_no = 0;
+	info.tdata[MAXDRAM+7].wave_no = 0;
 	for(i = MAXMELODY; i < MAXTRACK; i++){
 		InitDramObject(info.tdata[i].wave_no,i-MAXMELODY);
 	}
+
+	memset(name, '\0', 0x21);
+	memset(author, '\0', 0x21);
+	memset(version, '\0', 0x21);
+
+#ifdef _DEBUG
+	snprintf(version, 0x21, "OrgMaker %s-dev", VER_STRING);
+#else
+	snprintf(version, 0x21, "OrgMaker %s", VER_STRING);
+#endif
+
+	comments.clear();
 }
 void OrgData::GetNoteUsed(long *use,long*left,char track)
 {
@@ -736,6 +749,11 @@ OrgData::OrgData()
 	MaximumUndoCursor = 0;
 	RedoEnable = false;
 	UndoEnable = false;
+
+	memset(name, '\0', 0x21);
+	memset(author, '\0', 0x21);
+	memset(version, '\0', 0x21);
+	comments = "";
 	//noteon = new unsigned char[65536];
 }
 OrgData::~OrgData() //デストラクタ
@@ -749,9 +767,11 @@ int OrgData::SetUndoData()
 {
 	int j,cc;
 	cc = (CurrentUndoCursor % 32);
+
 	memcpy(&ud_tdata[cc] , &info, sizeof(MUSICINFO));
-	for(j=0;j<16;j++){
-		memcpy(&ud_note[cc][j] , info.tdata[j].note_p , sizeof(NOTELIST)*4096);
+
+	for(j=0;j< MAXTRACK;j++){
+		memcpy(&ud_note[cc][j] , info.tdata[j].note_p , sizeof(NOTELIST)* ALLOCNOTE);
 	}
 	CurrentUndoCursor++;
 	MaximumUndoCursor = CurrentUndoCursor;
@@ -796,9 +816,11 @@ int OrgData::ReplaceFromUndoData()
 		UndoEnable = false;
 	}
 	cc = (CurrentUndoCursor % 32);
+
 	memcpy(&info, &ud_tdata[cc] ,  sizeof(MUSICINFO));
-	for(j=0;j<16;j++){
-		memcpy(info.tdata[j].note_p , &ud_note[cc][j] ,  sizeof(NOTELIST)*4096);
+
+	for(j=0;j<MAXTRACK;j++){
+		memcpy(info.tdata[j].note_p , &ud_note[cc][j] ,  sizeof(NOTELIST)* ALLOCNOTE);
 	}
 	org_data.GetMusicInfo(&mi);
 	for (j = 0; j < MAXMELODY; j++) {
@@ -825,9 +847,11 @@ int OrgData::ReplaceFromRedoData()
 		RedoEnable = false;
 	}
 	cc = (CurrentUndoCursor % 32);
+
 	memcpy(&info, &ud_tdata[cc] ,  sizeof(MUSICINFO));
-	for(j=0;j<16;j++){
-		memcpy(info.tdata[j].note_p , &ud_note[cc][j] ,  sizeof(NOTELIST)*4096);
+
+	for(j=0;j< MAXTRACK;j++){
+		memcpy(info.tdata[j].note_p , &ud_note[cc][j] ,  sizeof(NOTELIST)* ALLOCNOTE);
 	}
 	org_data.GetMusicInfo(&mi);
 	for (j = 0; j < MAXMELODY; j++) {
