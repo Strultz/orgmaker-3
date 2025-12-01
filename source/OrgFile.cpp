@@ -140,6 +140,8 @@ BOOL OrgData::SaveMusicData(void)
 		uint16_t len = comments.size();
 		fwrite(&len, sizeof(uint16_t), 1, fp);
 		fwrite(comments.data(), sizeof(char), len, fp);
+
+		fputc('\0', fp);
 	}
 
 	fclose(fp);
@@ -305,6 +307,8 @@ BOOL OrgData::LoadMusicData(void)
 		if (read != len) {
 			comments.resize(read);
 		}
+
+		//fseek(fp, 1, SEEK_CUR);
 	}
 
 	fclose(fp);
