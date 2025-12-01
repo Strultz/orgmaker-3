@@ -690,7 +690,7 @@ void OrgData::InitOrgData(void)
 		def_pan[i] = DEFPAN;
 		def_volume[i] = DEFVOLUME;
 	}
-	SetMusicInfo(&info, SETALL & ~SETCOMMENT);
+	SetMusicInfo(&info, SETALL);
 
 	// 以下 2014.05.07 追加
 	for(i=0; i<MAXMELODY; i++){

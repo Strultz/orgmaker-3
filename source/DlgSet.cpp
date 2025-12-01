@@ -842,7 +842,7 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SendMessage(w, UDM_SETPOS, 0, mi.tdata[i].freq);
 		}
 
-		return 0;
+		return 1;
 	case WM_COMMAND:
 		switch (HIWORD(wParam)) {
 		case EN_UPDATE:

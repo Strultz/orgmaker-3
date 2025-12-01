@@ -171,7 +171,7 @@ SAVEDNOTE gClipboardData;
 NOTECOPY nc_Select;
 int tra = -256, ful = 0, haba = 0;
 
-static const int playbar_controls_menu[67 - 6 - 6] = {
+static const int playbar_controls_menu[68 - 6 - 6] = {
 	IDM_SORTMUSICNOTE, IDM_DLGDELETE, IDM_DLGCOPY, IDM_DLGCOPY2, IDM_DLGSWAP,
 	IDM_2BAI, IDM_3BAI, IDM_2BUNNO1, IDM_3BUNNO1, IDM_CT_L1, IDM_CT_L2, IDM_CT_L3,
 	IDM_CT_L4, IDM_CT_L5, IDM_CT_L6, IDM_CT_L7, IDM_CT_L8,
@@ -184,10 +184,11 @@ static const int playbar_controls_menu[67 - 6 - 6] = {
 	IDM_CT_S20, IDM_CT_OCT_DOWN, IDM_CT_OCT_UP, IDM_CT_PAN_R, IDM_CT_PAN_L,
 	IDM_CT_PAN_REVERSE, IDM_CT_TRANS_UP, IDM_CT_TRANS_DOWN, IDM_CT_VOL_PLUS, IDM_CT_VOL_MINUS,
 	IDM_CT_VOLWARIAI_UP, IDM_CT_VOLWARIAI_DOWN, IDM_ML_PAN_R, IDM_ML_PAN_L, IDM_ML_TRANS_UP,
-	IDM_ML_TRANS_DOWN, IDM_ML_VOL_PLUS, IDM_ML_VOL_MINUS, IDM_DR_VOL_PLUS, IDM_DR_VOL_MINUS
+	IDM_ML_TRANS_DOWN, IDM_ML_VOL_PLUS, IDM_ML_VOL_MINUS, IDM_DR_VOL_PLUS, IDM_DR_VOL_MINUS,
+	IDM_SONG_TRANSPOSE
 };
 
-static const int playbar_controls_select[9]{
+static const int playbar_controls_select[9] = {
 	ID_SELECTION_CLEAR, ID_SELECTION_DELETE,ID_SELECTION_INSERT,ID_SELECTION_VOLUME,ID_SELECTION_PANNING,
 	ID_SELECTION_TRANSPOSE, IDM_SELECT_RESET, IDM_SELECT_CUT, IDM_SELECT_COPY
 };
@@ -209,7 +210,7 @@ void UpdateToolbarStatus() {
 	// disable editor features while song is playing
 	bool enabled = timer_sw == 0;
 	if (lastUpdCheck != enabled) {
-		for (int i = 0; i < 67 - 6 - 6; ++i) {
+		for (int i = 0; i < sizeof(playbar_controls_menu) / sizeof(int); ++i) {
 			EnableMenuItem(hMenu, playbar_controls_menu[i], MF_BYCOMMAND | (enabled ? MF_ENABLED : MF_GRAYED));
 		}
 
@@ -232,7 +233,7 @@ void UpdateToolbarStatus() {
 	EnableMenuItem(hMenu, IDM_REDO, MF_BYCOMMAND | (enabled && org_data.RedoEnable ? MF_ENABLED : MF_GRAYED));
 	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_REDO, enabled && org_data.RedoEnable);
 
-	for (int i = 0; i < 9; ++i) {
+	for (int i = 0; i < sizeof(playbar_controls_select) / sizeof(int); ++i) {
 		EnableMenuItem(hMenu, playbar_controls_select[i], MF_BYCOMMAND | (enabled && tra >= 0 ? MF_ENABLED : MF_GRAYED));
 	}
 
@@ -2131,7 +2132,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_SELECT_CUT:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Cut the selection and put it on the Clipboard"); break;
 		case IDM_SELECT_COPY:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Copy the selection and put it on the Clipboard"); break;
 		case IDM_SELECT_PASTE:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Insert Clipboard contents"); break;
-		case IDM_SELECT_ADVPASTE:   SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"TODO"); break;
+		case IDM_SELECT_ADVPASTE:   SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Insert Clipboard contents with options"); break;
 		case IDM_SELECT_ALL:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select everything on the current channel"); break;
 		case IDM_SELECT_RESET:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Clear the current selection"); break;
 		case IDM_SELECT_ALL_ALL:    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select the entire document"); break;
@@ -2182,6 +2183,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_STOPNOWALL:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Stop all playing sounds"); break;
 
 		case IDM_DLGSETTING:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Configure the active document"); break;
+		case ID_SONG_COMMENTS:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"View and edit comments on this song"); break;
 		case IDM_SONG_TRANSPOSE:    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Transpose the entire song"); break;
 		case IDM_2BAI:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Expand song by 2x"); break;
 		case IDM_3BAI:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Expand song by 3x"); break;
