@@ -134,11 +134,7 @@ BOOL OrgData::SaveMusicData(void)
 		fwrite(name, sizeof(char), 0x20, fp);
 		fwrite(author, sizeof(char), 0x20, fp);
 
-#ifdef _DEBUG
-		snprintf(version, 0x21, "OrgMaker %s-dev", VER_STRING);
-#else
 		snprintf(version, 0x21, "OrgMaker %s", VER_STRING);
-#endif
 		fwrite(version, sizeof(char), 0x20, fp);
 
 		uint16_t len = comments.size();

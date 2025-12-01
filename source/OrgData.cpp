@@ -713,11 +713,7 @@ void OrgData::InitOrgData(void)
 	memset(author, '\0', 0x21);
 	memset(version, '\0', 0x21);
 
-#ifdef _DEBUG
-	snprintf(version, 0x21, "OrgMaker %s-dev", VER_STRING);
-#else
 	snprintf(version, 0x21, "OrgMaker %s", VER_STRING);
-#endif
 
 	comments.clear();
 }
