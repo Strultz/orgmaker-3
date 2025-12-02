@@ -137,10 +137,7 @@ BOOL OrgData::SaveMusicData(void)
 		snprintf(version, 0x21, "OrgMaker %s", VER_STRING);
 		fwrite(version, sizeof(char), 0x20, fp);
 
-		uint16_t len = comments.size();
-		fwrite(&len, sizeof(uint16_t), 1, fp);
-		fwrite(comments.data(), sizeof(char), len, fp);
-
+		fwrite(comments.data(), sizeof(char), comments.size(), fp);
 		fputc('\0', fp);
 	}
 
@@ -300,15 +297,12 @@ BOOL OrgData::LoadMusicData(void)
 		fread(author, sizeof(char), 0x20, fp);
 		fread(version, sizeof(char), 0x20, fp);
 
-		uint16_t len = 0;
-		fread(&len, sizeof(uint16_t), 1, fp);
-		comments.resize(len, '\0');
-		size_t read = fread(comments.data(), 1, len, fp);
-		if (read != len) {
-			comments.resize(read);
-		}
+		comments.clear();
 
-		//fseek(fp, 1, SEEK_CUR);
+		char ch;
+		while (fread(&ch, 1, 1, fp) == 1 && ch != '\0') {
+			comments += ch;
+		}
 	}
 
 	fclose(fp);
