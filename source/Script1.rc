@@ -1069,6 +1069,7 @@ BEGIN
     VK_NUMPAD9,     ID_AC_NUM9,             VIRTKEY, NOINVERT
     VK_SPACE,       ID_ACCEL40136,          VIRTKEY, NOINVERT
     "W",            ID_AC_W,                VIRTKEY, NOINVERT
+    "W",            ID_AC_CLOSE,            VIRTKEY, CONTROL, NOINVERT
     "W",            ID_AC_SW,               VIRTKEY, SHIFT, NOINVERT
     "Y",            ID_AC_Y,                VIRTKEY, NOINVERT
     "Y",            ID_AC_REDO,             VIRTKEY, CONTROL, NOINVERT

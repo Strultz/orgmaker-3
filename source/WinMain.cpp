@@ -2099,6 +2099,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGCOMMENTS), hwnd, DialogComments);
 			break;
 		}
+		case ID_AC_CLOSE:
+			SendMessage(hWnd, WM_CLOSE, 0, 0);
+			break;
 		}
 
 		break;
@@ -2255,7 +2258,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		//		if(MessageBox(hwnd,"Any unsaved content will be discarded. Are you sure you want to quit?","end confirmation",MB_OKCANCEL| MB_ICONASTERISK)==IDCANCEL)break;
 		//	}
 		//}
-		if(CancelDeleteCurrentData(CDCD_EXIT))break;
+		if(CancelDeleteCurrentData(CDCD_EXIT)) break;
 
 		SaveIniFile();
 		QuitMMTimer();
