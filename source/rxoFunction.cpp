@@ -160,13 +160,22 @@ void PutRecentFile(char *FileName)
 	CreateMenuRecent();
 }
 
+void RemoveRecentFile(int idx) {
+	if (idx < 0 || idx > 9) return;
+
+	for (int i = idx; i < 9; ++i) {
+		strcpy(RecentFileName[i], RecentFileName[i + 1]);
+	}
+	RecentFileName[9][0] = '\0';
+	CreateMenuRecent();
+}
+
 
 void LoadRecentFromIniFile(){
 	int i;
 	for(i=0;i<10;i++){
-		RecentFileName[i][0]='@';
-		RecentFileName[i][1]='\0';
-		GetPrivateProfileString( "Recent",FileAcc[i],"@",RecentFileName[i],256,app_path);
+		RecentFileName[i][0]='\0';
+		GetPrivateProfileString( "Recent",FileAcc[i],"",RecentFileName[i],256,app_path);
 	}
 	CreateMenuRecent();
 }
@@ -207,8 +216,7 @@ void ClearRecentFile()
 	if(a == IDYES){
 		int i;
 		for(i=0;i<10;i++){
-			RecentFileName[i][0]='@';
-			RecentFileName[i][1]='\0';
+			RecentFileName[i][0]='\0';
 		}
 		CreateMenuRecent();
 		//MessageBox(hWnd,"真っ白になったぜ。","通知",MB_OK);	// 2014.10.19 D
@@ -226,7 +234,7 @@ void CreateMenuRecent()
 {
 	int i;
 	for(i=0;i<10;i++){
-		if(RecentFileName[i][0]!='@'){
+		if(RecentFileName[i][0]!='\0'){
 			SetMenuRecent(i,RecentFileName[i],0);
 		}else{
 			//SetMenuRecent(i,"未使用",1);	// 2014.10.19 D

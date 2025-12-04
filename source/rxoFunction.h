@@ -56,6 +56,7 @@ extern void ChangeMetronomeMode(int iValue = -1);
 extern void ChangeScrollMode(int iValue = -1);
 
 void PutRecentFile(char *FileName);
+void RemoveRecentFile(int idx);
 void LoadRecentFromIniFile();
 void SaveRecentFilesToInifile();
 bool SetLoadRecentFile(int iNum);

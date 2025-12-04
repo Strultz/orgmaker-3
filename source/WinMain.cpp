@@ -1300,6 +1300,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				if (CancelDeleteCurrentData(CDCD_LOAD)) break;
 				if (!SetLoadRecentFile(i)) {
 					msgbox(hWnd, IDS_STRING64, IDS_ERROR_LOAD, MB_OK | MB_ICONWARNING);
+					RemoveRecentFile(i);
 					break;
 				}
 
