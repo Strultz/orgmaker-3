@@ -32,6 +32,9 @@ extern char TrackN[];
 extern HBITMAP waveBmp; // azy
 extern void SetModified(bool mod);
 
+extern HWND hDlgHelp;
+extern HWND hDlgComments;
+
 int volChangeLength = 10;
 bool volChangeUseNoteLength = true;
 bool volChangeSetNoteLength = false;
@@ -1205,6 +1208,7 @@ BOOL CALLBACK DialogComments(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 		SetDlgItemText(hdwnd, IDC_NAMETEXT, org_data.name);
 		SetDlgItemText(hdwnd, IDC_AUTHORTEXT, org_data.author);
 		SetDlgItemText(hdwnd, IDC_COMMENTSBOX, org_data.comments.c_str());
+		CheckDlgButton(hdwnd, IDC_COMMENTSOPEN, org_data.openComments);
 
 		SendDlgItemMessage(hdwnd, IDC_NAMETEXT, EM_SETLIMITTEXT, 0x20, 0);
 		SendDlgItemMessage(hdwnd, IDC_AUTHORTEXT, EM_SETLIMITTEXT, 0x20, 0);
@@ -1214,7 +1218,7 @@ BOOL CALLBACK DialogComments(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 		PostMessage(GetDlgItem(hdwnd, IDC_NAMETEXT), EM_SETSEL, -1, 0);
 		PostMessage(GetDlgItem(hdwnd, IDC_NAMETEXT), EM_SCROLLCARET, 0, 0);
 
-		EnableDialogWindow(FALSE);
+		//EnableDialogWindow(FALSE);
 		return 0;
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
@@ -1229,14 +1233,19 @@ BOOL CALLBACK DialogComments(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 			org_data.comments.resize(len + 1, '\0');
 			GetDlgItemTextA(hdwnd, IDC_COMMENTSBOX, org_data.comments.data(), len + 1);
 			org_data.comments.pop_back();
+			
+			org_data.openComments = IsDlgButtonChecked(hdwnd, IDC_COMMENTSOPEN);
 
 			// Fallthrough
 		}
 		case IDCANCEL:
-			EnableDialogWindow(TRUE);
-			EndDialog(hdwnd, 0);
+			//EnableDialogWindow(TRUE);
+			DestroyWindow(hdwnd);
 			return 1;
 		}
+	case WM_DESTROY:
+		hDlgComments = nullptr;
+		return 0;
 	}
 	return 0;
 }
@@ -2171,8 +2180,8 @@ BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			free(text);
 		}
 
-		SendMessage(GetDlgItem(hdwnd, IDC_HELPTEXT), EM_SETSEL, -1, 0);
-		SendMessage(GetDlgItem(hdwnd, IDC_HELPTEXT), EM_SCROLLCARET, 0, 0);
+		PostMessage(GetDlgItem(hdwnd, IDC_HELPTEXT), EM_SETSEL, -1, 0);
+		PostMessage(GetDlgItem(hdwnd, IDC_HELPTEXT), EM_SCROLLCARET, 0, 0);
 
 		return 1;
 	}
@@ -2195,12 +2204,14 @@ BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch(LOWORD(wParam)){
 		case IDCANCEL:
 			//EnableDialogWindow(TRUE); //D 2014.05.25
-			//EndDialog(hdwnd,0);
-			ShowWindow(hdwnd, SW_HIDE);
+			DestroyWindow(hdwnd);
+			//ShowWindow(hdwnd, SW_HIDE);
 			return 1;
 		}
 		return 1;
-	
+	case WM_DESTROY:
+		hDlgHelp = nullptr;
+		return 0;
 	}
 	return 0;
 }

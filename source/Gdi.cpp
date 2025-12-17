@@ -39,6 +39,7 @@ BOOL StartGDI(HWND hwnd) {
 	int nScreenWidth = GetSystemMetrics(SM_CXMAXTRACK);
     int nScreenHeight = GetSystemMetrics(SM_CYMAXTRACK);
 
+	// TODO: Use something better
 	if (DirectDrawCreate(NULL, &directDraw, NULL) != DD_OK)
 		return FALSE;
 

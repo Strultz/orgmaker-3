@@ -195,6 +195,7 @@
 #define IDC_PI1                         1009
 #define IDC_ADVMIX                      1009
 #define IDC_DEFVOL6                     1009
+#define IDC_COMMENTSOPEN                1009
 #define IDD_SETFREQ4                    1010
 #define IDC_PANPOT7                     1010
 #define IDC_PI2                         1010

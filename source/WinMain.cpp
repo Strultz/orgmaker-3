@@ -87,7 +87,8 @@ HINSTANCE hInst;//instance handle
 HWND hWnd;//main window handle
 //HWND hDlgTrack;
 //HWND hDlgEZCopy;
-HWND hDlgHelp = NULL;
+HWND hDlgHelp = nullptr;
+HWND hDlgComments = nullptr;
 BOOL actApp;
 
 bool gPlayMidNote = true;
@@ -645,7 +646,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		int screenWidth = GetSystemMetrics(SM_CXSCREEN);
 		int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-		wndSplash = CreateWindow(szSplashClass, "", WS_POPUP | WS_VISIBLE,
+		wndSplash = CreateWindowEx(WS_EX_TOOLWINDOW, szSplashClass, "", WS_POPUP | WS_VISIBLE,
 			(screenWidth - splashWidth) / 2, (screenHeight - splashHeight) / 2, splashWidth, splashHeight,
 			NULL, NULL, hInst, NULL);
 
@@ -890,19 +891,17 @@ BOOL SystemTask(void)
 {
 	MSG msg;
 
-	while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
-	{
+	while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)) {
 		if (!GetMessage(&msg, NULL, 0, 0))
 			return FALSE;
 
 		if (!TranslateAccelerator(hWnd, Ac, &msg)) {
-			if (!hwndToolbarPopup || !IsDialogMessage(hwndToolbarPopup, &msg)) {
-				if (!hwndTrackbarPopup || !IsDialogMessage(hwndTrackbarPopup, &msg)) {
-					if (!hDlgHelp || !IsDialogMessage(hDlgHelp, &msg)) {
-						TranslateMessage(&msg);
-						DispatchMessage(&msg);
-					}
-				}
+			if ((!hwndToolbarPopup || !IsDialogMessage(hwndToolbarPopup, &msg))
+				&& (!hwndTrackbarPopup || !IsDialogMessage(hwndTrackbarPopup, &msg))
+				&& (!hDlgHelp || !IsDialogMessage(hDlgHelp, &msg))
+				&& (!hDlgComments || !IsDialogMessage(hDlgComments, &msg))) {
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
 			}
 		}
 	}
@@ -949,6 +948,7 @@ LRESULT CALLBACK AreaWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 			TrackMouseEvent(&tme);
 			hasMouseCapture = true;
 		}
+		// Fallthrough
 	case WM_LBUTTONDOWN:
 	case WM_LBUTTONUP:
 	case WM_RBUTTONDOWN:
@@ -1842,7 +1842,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			if (!hDlgHelp) {
 				hDlgHelp = CreateDialog(hInst, "DLGHELP", hwnd, DialogHelp);
 			}
-			ShowWindow(hDlgHelp, SW_SHOWNOACTIVATE);
+			ShowWindow(hDlgHelp, SW_SHOW);
 			//StopPlayingSong();
 			//DialogBox(hInst,"DLGHELP",hwnd,DialogHelp);
 			break;
@@ -2096,8 +2096,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		}
 		case ID_SONG_COMMENTS: {
-			StopPlayingSong();
-			DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGCOMMENTS), hwnd, DialogComments);
+			if (!hDlgComments) {
+				hDlgComments = CreateDialog(hInst, MAKEINTRESOURCE(IDD_DLGCOMMENTS), hwnd, DialogComments);
+			}
+			ShowWindow(hDlgComments, SW_SHOW);
 			break;
 		}
 		case ID_AC_CLOSE:

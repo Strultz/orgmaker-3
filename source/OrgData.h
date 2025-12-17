@@ -167,6 +167,7 @@ typedef struct OrgData{
 		char author[0x21];
 		char version[0x21];
 		std::string comments;
+		bool openComments;
 }ORGDATA;
 extern ORGDATA org_data;
 

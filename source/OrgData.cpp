@@ -716,6 +716,8 @@ void OrgData::InitOrgData(void)
 	snprintf(version, 0x21, "OrgMaker %s", VER_STRING);
 
 	comments.clear();
+
+	openComments = false;
 }
 void OrgData::GetNoteUsed(long *use,long*left,char track)
 {
@@ -750,6 +752,7 @@ OrgData::OrgData()
 	memset(author, '\0', 0x21);
 	memset(version, '\0', 0x21);
 	comments = "";
+	openComments = false;
 	//noteon = new unsigned char[65536];
 }
 OrgData::~OrgData() //デストラクタ
