@@ -1845,9 +1845,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_DLGHELP://
 		case ID_AC_HELP:
 			//LoadFromResource(IDR_HELPHTML);
-			if (!hDlgHelp) {
-				hDlgHelp = CreateDialog(hInst, "DLGHELP", hwnd, DialogHelp);
+			if (hDlgHelp) {
+				DestroyWindow(hDlgHelp);
+				hDlgHelp = nullptr;
 			}
+			hDlgHelp = CreateDialog(hInst, "DLGHELP", hwnd, DialogHelp);
 			ShowWindow(hDlgHelp, SW_SHOW);
 			//StopPlayingSong();
 			//DialogBox(hInst,"DLGHELP",hwnd,DialogHelp);
@@ -2107,9 +2109,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		}
 		case ID_SONG_COMMENTS: {
-			if (!hDlgComments) {
-				hDlgComments = CreateDialog(hInst, MAKEINTRESOURCE(IDD_DLGCOMMENTS), hwnd, DialogComments);
+			if (hDlgComments) {
+				DestroyWindow(hDlgComments);
+				hDlgComments = nullptr;
 			}
+			hDlgComments = CreateDialog(hInst, MAKEINTRESOURCE(IDD_DLGCOMMENTS), hwnd, DialogComments);
 			ShowWindow(hDlgComments, SW_SHOW);
 			break;
 		}

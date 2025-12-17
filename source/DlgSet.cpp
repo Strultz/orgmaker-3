@@ -1241,10 +1241,9 @@ BOOL CALLBACK DialogComments(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 		case IDCANCEL:
 			//EnableDialogWindow(TRUE);
 			DestroyWindow(hdwnd);
+			hDlgComments = nullptr;
 			return 1;
 		}
-	case WM_DESTROY:
-		hDlgComments = nullptr;
 		return 0;
 	}
 	return 0;
@@ -2205,12 +2204,10 @@ BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case IDCANCEL:
 			//EnableDialogWindow(TRUE); //D 2014.05.25
 			DestroyWindow(hdwnd);
+			hDlgHelp = nullptr;
 			//ShowWindow(hdwnd, SW_HIDE);
 			return 1;
 		}
-		return 1;
-	case WM_DESTROY:
-		hDlgHelp = nullptr;
 		return 0;
 	}
 	return 0;
