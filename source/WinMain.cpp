@@ -1307,6 +1307,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				if (timer_sw != 0) // Stop playing song
 					StopPlayingSong();
 
+				if (hDlgComments) {
+					DestroyWindow(hDlgComments);
+					hDlgComments = nullptr;
+				}
+
 				ClearUndo(); // 2023.06.10 Someone forgot to put this here
 				org_data.InitOrgData();
 				org_data.LoadMusicData();
@@ -1810,6 +1815,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			//if (!hDlgTrack)DestroyWindow(hDlgTrack);
 			//if (hDlgEZCopy) DestroyWindow(hDlgEZCopy);
 			if (hDlgHelp) DestroyWindow(hDlgHelp);
+			if (hDlgComments) DestroyWindow(hDlgComments);
 
 			if (hwnd) DestroyWindow(hwnd);
 			PostQuitMessage(0);
@@ -1907,6 +1913,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 			if (timer_sw != 0) // Stop playing song
 				StopPlayingSong();
+
+			if (hDlgComments) {
+				DestroyWindow(hDlgComments);
+				hDlgComments = nullptr;
+			}
 
 			ClearUndo();
 			org_data.InitOrgData();
@@ -2237,6 +2248,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 		if (timer_sw != 0) // Stop playing song
 			StopPlayingSong();
+
+		if (hDlgComments) {
+			DestroyWindow(hDlgComments);
+			hDlgComments = nullptr;
+		}
 
 		ClearUndo();
 //		MessageBox(hWnd,music_file,"",MB_OK);
