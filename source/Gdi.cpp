@@ -4,6 +4,7 @@
 #include "DefOrg.h"
 #include "OrgData.h"
 #include "Gdi.h"
+#include "OrgWaveRenderer.h"
 
 #include <ddraw.h>
 
@@ -299,22 +300,23 @@ BOOL RefleshScreen(HWND hwnd, BOOL mainLoopUpdate) {
 		timePrev += (lek % 3 != 0) + 0x10;
 
 	static RECT dst;
-	static POINT pnt;
+	static POINT pntClient;
 
-	GetClientRect(hwnd, &dst);
-	pnt.x = dst.left;
-	pnt.y = dst.top;
+	GetClientRect(hwndArea, &dst);
+	pntClient.x = dst.left;
+	pntClient.y = dst.top;
 
-	ClientToScreen(hwnd, &pnt);
-	dst.left = pnt.x;
-	dst.top = pnt.y + rebarHeight;
+	POINT pntScreen = pntClient;
+	ClientToScreen(hwndArea, &pntScreen);
+	dst.left = pntScreen.x;
+	dst.top = pntScreen.y;
 	dst.right = dst.left + WWidth;
 	dst.bottom = dst.top + WHeight;
 
-	screenRect.left = 0;
-	screenRect.top = 0;
-	screenRect.right = WWidth;
-	screenRect.bottom = WHeight;
+	screenRect.left = pntClient.x;
+	screenRect.top = pntClient.y;
+	screenRect.right = pntClient.x + WWidth;
+	screenRect.bottom = pntClient.y + WHeight;
 
 	frontBuffer->Blt(&dst, backBuffer, &screenRect, DDBLT_WAIT, NULL);
 
@@ -522,44 +524,70 @@ void LoadSingleBitmap(HWND hdwnd, int item, int wdth, int hght, const char* name
 void GenerateWaveGraphic(char *wave100) {
 	if (waveBmp != NULL) DeleteObject(waveBmp);
 
-	HBITMAP waveImg = (HBITMAP)LoadImage(hInst, "WAVE100", IMAGE_BITMAP, 377, 491, LR_DEFAULTCOLOR); // BG
+	int width = 377;
+	int height = 491;
+
+	HBITMAP waveImg = (HBITMAP)LoadImage(hInst, "WAVE100", IMAGE_BITMAP, width, height, LR_DEFAULTCOLOR); // BG
 	if (waveImg == NULL) return;
 
 	HDC hdc = GetDC(hWnd);
-	waveBmp = CreateCompatibleBitmap(hdc, 377, 491);
+
+	void* pPixels = nullptr;
+	BITMAPINFO bmi = { 0 };
+	bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bmi.bmiHeader.biWidth = width;
+	bmi.bmiHeader.biHeight = -height;
+	bmi.bmiHeader.biPlanes = 1;
+	bmi.bmiHeader.biBitCount = 32;
+	bmi.bmiHeader.biCompression = BI_RGB;
+
+	waveBmp = CreateDIBSection(hdc, &bmi, DIB_RGB_COLORS, &pPixels, NULL, 0);
 	if (waveBmp == NULL) {
 		ReleaseDC(hWnd, hdc);
+		DeleteObject(waveImg);
 		return;
 	}
 
-	HDC toDC = CreateCompatibleDC(hdc);
-	HDC fromDC = CreateCompatibleDC(hdc);
-	HBITMAP toold = (HBITMAP)SelectObject(toDC, waveBmp);
-	HBITMAP fromold = (HBITMAP)SelectObject(fromDC, waveImg);
+	HDC hSrcDC = CreateCompatibleDC(hdc);
+	HDC hDstDC = CreateCompatibleDC(hdc);
 
-	SelectObject(toDC, GetStockObject(DC_PEN));
-	SetDCPenColor(toDC, RGB(0x00, 0xFF, 0x00));
+	HGDIOBJ hOldSrc = SelectObject(hSrcDC, waveImg);
+	HGDIOBJ hOldDst = SelectObject(hDstDC, waveBmp);
 
-	BitBlt(toDC, 0, 0, 377, 491, fromDC, 0, 0, SRCCOPY);
-	for (int i = 0; i < 100; ++i) {
-		int x = 8 + (i % 10) * 36 + ((i % 10) > 4 ? 4 : 0); // box position
-		int y = 16 + (i / 10) * 48 + ((i / 10) > 4 ? 4 : 0);
+	BitBlt(hDstDC, 0, 0, width, height, hSrcDC, 0, 0, SRCCOPY);
 
-		for (int j = 0; j < 256; ++j) {
-			int sample = wave100[i * 256 + j]; // Get the sample
-			if (j == 0)
-				MoveToEx(toDC, x + (j / 8), y + 16 + (-sample / 8), NULL);
-			else
-				LineTo(toDC, x + (j / 8), y + 16 + (-sample / 8)); // Draw line
-		}
-	}
-
-	SelectObject(toDC, toold);
-	SelectObject(fromDC, fromold);
-	DeleteDC(toDC);
-	DeleteDC(fromDC);
+	SelectObject(hSrcDC, hOldSrc);
+	SelectObject(hDstDC, hOldDst);
+	DeleteDC(hSrcDC);
+	DeleteDC(hDstDC);
 	ReleaseDC(hWnd, hdc);
 	DeleteObject(waveImg);
+
+	uint32_t* pixels = reinterpret_cast<uint32_t*>(pPixels);
+
+	for (int i = 0; i < 100; ++i) {
+		int xx = 8 + (i % 10) * 36 + ((i % 10) > 4 ? 4 : 0); // box position
+		int yy = 16 + (i / 10) * 48 + ((i / 10) > 4 ? 4 : 0);
+
+		OrgWaveRenderer::RenderParameters params;
+		params.width = 32;
+		params.height = 32;
+		params.antiAliasingFactor = 8;
+		params.backgroundColor = { 0, 0, 0 };
+		params.lineColor = { 0, 0xD8, 0 };
+		params.lineWidth = 1.2f;
+		params.baselineColor = { 0, 0x7D, 0 };
+		params.baselineWidth = 2.0f;
+
+		OrgWaveRenderer::Image img = OrgWaveRenderer::RenderWave(*reinterpret_cast<int8_t(*)[256]>(wave100 + i * 256), params);
+
+		for (int y = 0; y < img.height; y++) {
+			for (int x = 0; x < img.width; x++) {
+				auto& color = img.data[y * img.width + x];
+				pixels[(yy + y) * width + (xx + x)] = 0xFF000000 | (color.r << 16) | (color.g << 8) | color.b;
+			}
+		}
+	}
 }
 
 

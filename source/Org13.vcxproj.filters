@@ -81,6 +81,9 @@
     <ClCompile Include="Update.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="OrgWaveRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Script1.rc">
@@ -134,6 +137,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vendor\json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OrgWaveRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

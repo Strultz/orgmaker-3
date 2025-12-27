@@ -154,6 +154,7 @@
     <ClCompile Include="OrgFile.cpp" />
     <ClCompile Include="OrgFileMIDI.cpp" />
     <ClCompile Include="OrgPlay.cpp" />
+    <ClCompile Include="OrgWaveRenderer.cpp" />
     <ClCompile Include="rxoFunction.cpp" />
     <ClCompile Include="Scroll.cpp" />
     <ClCompile Include="Sound.cpp" />
@@ -172,6 +173,7 @@
     <ClInclude Include="Gdi.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="OrgData.h" />
+    <ClInclude Include="OrgWaveRenderer.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="rxoFunction.h" />
     <ClInclude Include="Scroll.h" />
