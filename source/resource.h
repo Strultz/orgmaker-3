@@ -518,6 +518,7 @@
 #define IDC_DEFPANSPIN16                1306
 #define IDC_BUTTON1                     1307
 #define IDC_DEFRESET                    1307
+#define IDC_RESETBUTTON                 1307
 #define IDC_ABOUTEDIT                   1308
 #define IDC_ABOUTTEXT                   1308
 #define IDC_BOLDLABEL                   1309

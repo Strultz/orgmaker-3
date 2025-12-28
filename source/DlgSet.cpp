@@ -403,6 +403,28 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 		return 1;
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
+		case IDC_RESETBUTTON: {
+			SetDlgItemText(hdwnd, IDD_SETWAIT, "125");
+			SendMessage(GetDlgItem(hdwnd, IDC_WAITSPIN), UDM_SETPOS, 0, 125);
+
+			EnableWindow(GetDlgItem(hdwnd, IDD_GRIDEDIT1), FALSE);
+			EnableWindow(GetDlgItem(hdwnd, IDD_GRIDEDIT2), FALSE);
+			SendDlgItemMessage(hdwnd, IDD_LB1, LB_SETCURSEL, 1, 0);
+
+			SetDlgItemText(hdwnd, IDD_REP_MEAS, "0");
+			SetDlgItemText(hdwnd, IDD_END_MEAS, "100");
+			SetDlgItemText(hdwnd, IDD_REP_BEAT, "0");
+			SetDlgItemText(hdwnd, IDD_END_BEAT, "0");
+
+			SendMessage(GetDlgItem(hdwnd, IDC_STARTMEASSPIN), UDM_SETPOS, 0, 0);
+			SendMessage(GetDlgItem(hdwnd, IDC_STARTSPIN), UDM_SETPOS, 0, 0);
+			SendMessage(GetDlgItem(hdwnd, IDC_ENDMEASSPIN), UDM_SETPOS, 0, 100);
+			SendMessage(GetDlgItem(hdwnd, IDC_ENDSPIN), UDM_SETPOS, 0, 0);
+
+			PropSheet_Changed(GetParent(hdwnd), hdwnd);
+			gPropChanged = true;
+			break;
+		}
 		case IDD_LB1:
 			if (HIWORD(wParam) == LBN_SELCHANGE) { //ﾘｽﾄﾎﾞｯｸｽでの選択変更
 				i = SendDlgItemMessage(hdwnd, IDD_LB1, LB_GETCURSEL, 0, 0);//インデックスを得る
@@ -823,6 +845,9 @@ BOOL CALLBACK DialogWaveSel(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 	return 0;
 }
 
+static const unsigned char defaultMelody[MAXMELODY] = { 0, 11, 22, 33, 44, 55, 66, 77 };
+static const unsigned char defaultPercussion[MAXDRAM] = { 0, 2, 5, 6, 4, 8, 0, 0 };
+
 BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	char bfr[256];
 	int i;
@@ -870,6 +895,22 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case BN_CLICKED:
 			switch (LOWORD(wParam)) {
+			case IDC_RESETBUTTON: {
+				for (i = 0; i < MAXMELODY; ++i) {
+					mi.tdata[i].wave_no = defaultMelody[i];
+					mi.tdata[i].freq = 1000;
+					mi.tdata[i].pipi = 0;
+
+					snprintf(bfr, 256, "Wave-%02d", defaultMelody[i]);
+					SetDlgItemText(hdwnd, btn_wave[i], bfr);
+					SetDlgItemInt(hdwnd, txt_freq[i], mi.tdata[i].freq, FALSE);
+					CheckDlgButton(hdwnd, check_pipi[i], mi.tdata[i].pipi);
+				}
+				PropSheet_Changed(GetParent(hdwnd), hdwnd);
+				gPropChanged = true;
+				i = -1;
+				break;
+			}
 			case IDC_WAVE1: i = 0; break;
 			case IDC_WAVE2: i = 1; break;
 			case IDC_WAVE3: i = 2; break;
@@ -999,6 +1040,19 @@ BOOL CALLBACK DialogPerc(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 1;
 	case WM_COMMAND:
 		switch (HIWORD(wParam)) {
+		case BN_CLICKED:
+			switch (LOWORD(wParam)) {
+			case IDC_RESETBUTTON: {
+				for (i = 0; i < MAXDRAM; ++i) {
+					mi.tdata[i + MAXMELODY].wave_no = defaultPercussion[i];
+					SendMessage(GetDlgItem(hdwnd, dd_drambox[i]), CB_SETCURSEL, List_no_to_Wave_no[mi.tdata[i + MAXMELODY].wave_no], 0);
+				}
+				PropSheet_Changed(GetParent(hdwnd), hdwnd);
+				gPropChanged = true;
+				break;
+			}
+			}
+			break;
 		case CBN_SELCHANGE:
 			switch (LOWORD(wParam)) {
 			case IDC_WAVEQ: i = 8; break;
