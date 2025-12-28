@@ -897,11 +897,11 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			switch (LOWORD(wParam)) {
 			case IDC_RESETBUTTON: {
 				for (i = 0; i < MAXMELODY; ++i) {
-					mi.tdata[i].wave_no = defaultMelody[i];
+					mi.tdata[i].wave_no = gAllWaveSel[i] = defaultMelody[i];
 					mi.tdata[i].freq = 1000;
 					mi.tdata[i].pipi = 0;
 
-					snprintf(bfr, 256, "Wave-%02d", defaultMelody[i]);
+					snprintf(bfr, 256, "Wave-%02d", gAllWaveSel[i]);
 					SetDlgItemText(hdwnd, btn_wave[i], bfr);
 					SetDlgItemInt(hdwnd, txt_freq[i], mi.tdata[i].freq, FALSE);
 					CheckDlgButton(hdwnd, check_pipi[i], mi.tdata[i].pipi);
