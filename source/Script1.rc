@@ -738,8 +738,9 @@ BEGIN
         MENUITEM "A&lways Select Current Channel\tCtrl+T", IDM_ALWAYS_CURRENT
         MENUITEM "&Drag Note to Extend\tCtrl+Alt+F9", IDM_DRAGMODE
         MENUITEM "Clic&k Note to Extend\tCtrl+Alt+F10", IDM_PRESSNOTE
+        MENUITEM "&Follow Playback", IDM_LOCKSCROLL
         MENUITEM SEPARATOR
-        MENUITEM "Sto&p All Sounds\t~",         IDM_STOPNOWALL
+        MENUITEM "Stop &All Sounds\t~",         IDM_STOPNOWALL
     END
     POPUP "&Song"
     BEGIN
@@ -772,6 +773,7 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "Allow &Keyboard During Playback", IDM_ENABLEPLAYING
             MENUITEM "Playback &Smooth Scrolling",  IDM_SMOOTHSCROLL
+            MENUITEM "Always Show &Playhead",       IDM_PLAYHEAD_ALWAYS
             MENUITEM "Extend &Note Heads",          IDM_NOTE_ENLARGE
             MENUITEM "Slide &Overlapping Notes",    IDM_SLIDEOVERLAPNOTES
             MENUITEM "Show &All Channels",          IDM_DRAWDOUBLE

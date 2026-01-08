@@ -13,6 +13,8 @@ extern int sACrnt;	//範囲選択は常にｶﾚﾝﾄﾄﾗｯｸ
 
 extern char timer_sw;
 extern int sSmoothScroll;
+extern bool sAlwaysShowPlayhead;
+extern bool lockScrollToSong;
 
 //◆◆表示部◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
 RECT note_rect[] = {
@@ -582,6 +584,16 @@ void OrgData::PutMusic(void)
 		
 	}
 
+	if (!lockScrollToSong || (sAlwaysShowPlayhead && !sSmoothScroll)) { // Disable it if sSmoothScroll is on because it's useless in that case
+		long playPos;
+		org_data.GetPlayPos(NULL, &playPos);
+
+		int x = KEYWIDTH + (playPos - hpos) * NoteWidth;
+
+		RECT rect = { x, -WYOffset, x + 1, WHeight + 288 - WHNM };
+		PutRect(&rect, 0xFFFFFF);
+	}
+
 	PutNumber();
 	PutRepeat();
 
@@ -652,38 +664,15 @@ void OrgData::PutMusic(void)
 		PutBitmap(0,WHeight+288-WHNM+72,&rc_ActiveVOL, BMPNOTE);
 	}
 
-	if (timer_sw) {
+	if (timer_sw && lockScrollToSong) {
 		long playPos;
 		org_data.GetPlayPos(NULL, &playPos);
-
-		//char str[12];
-		//char oldstr[12];
-
-
-		/*itoa(playPos / (info.dot * info.line), str, 10);
-		GetDlgItemText(hDlgPlayer, IDE_VIEWMEAS, oldstr, 10);
-		if (strcmp(str, oldstr) != 0) SetDlgItemText(hDlgPlayer, IDE_VIEWMEAS, str);
-
-		itoa(playPos % (info.dot * info.line), str, 10);
-		GetDlgItemText(hDlgPlayer, IDE_VIEWXPOS, oldstr, 10);
-		if (strcmp(str, oldstr) != 0) SetDlgItemText(hDlgPlayer, IDE_VIEWXPOS, str);*/
-
-		/*if (sSmoothScroll) {
-			/*DWORD dwNowTime;
-			dwNowTime = timeGetTime();
-			// Only draw if ms have passed, to prevent lags
-			if (dwNowTime - lastDrawTime >= drawCatch) { // 50 fps (cave story reference)
-				if (play_p != info.end_x) scr_data.SetHorzScroll(play_p);
-				else scr_data.SetHorzScroll(info.repeat_x);
-				lastDrawTime = timeGetTime();
-				drawCatch = lastDrawTime - dwNowTime;
-				if (drawCatch > 500) drawCatch = 500;
-			}*//*
-			/*if (playPos != info.end_x) scr_data.SetHorzScroll(playPos);
-			else scr_data.SetHorzScroll(info.repeat_x);*//*
-		}*/
-
 		scr_data.SetHorzScroll(sSmoothScroll ? playPos : ((playPos / (info.dot * info.line)) * (info.dot * info.line)));
+	}
+
+	if (!lockScrollToSong) {
+		RECT rect = { 0, -WYOffset, WWidth, 0 };
+		PutRect(&rect, 0x7F7F7F);
 	}
 	//gIsDrawing = false;
 }

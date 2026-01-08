@@ -299,6 +299,9 @@ BOOL RefleshScreen(HWND hwnd, BOOL mainLoopUpdate) {
 	else
 		timePrev += (lek % 3 != 0) + 0x10;
 
+	int width = WWidth + WXOffset;
+	int height = WHeight + WYOffset;
+
 	static RECT dst;
 	static POINT pntClient;
 
@@ -310,13 +313,13 @@ BOOL RefleshScreen(HWND hwnd, BOOL mainLoopUpdate) {
 	ClientToScreen(hwndArea, &pntScreen);
 	dst.left = pntScreen.x;
 	dst.top = pntScreen.y;
-	dst.right = dst.left + WWidth;
-	dst.bottom = dst.top + WHeight;
+	dst.right = dst.left + width;
+	dst.bottom = dst.top + height;
 
 	screenRect.left = pntClient.x;
 	screenRect.top = pntClient.y;
-	screenRect.right = pntClient.x + WWidth;
-	screenRect.bottom = pntClient.y + WHeight;
+	screenRect.right = pntClient.x + width;
+	screenRect.bottom = pntClient.y + height;
 
 	frontBuffer->Blt(&dst, backBuffer, &screenRect, DDBLT_WAIT, NULL);
 
@@ -333,19 +336,19 @@ void PutRect(RECT *rect, int color)
 	ddbltfx.dwFillColor = color;
 
 	static RECT rc;
-	rc.left = rect->left;
-	rc.top = rect->top;
-	rc.right = rect->right;
-	rc.bottom = rect->bottom;
+	rc.left = rect->left + WXOffset;
+	rc.top = rect->top + WYOffset;
+	rc.right = rect->right + WXOffset;
+	rc.bottom = rect->bottom + WYOffset;
 
 	if (rc.left < 0)
 		rc.left = 0;
 	if (rc.top < 0)
 		rc.top = 0;
-	if (rc.right > WWidth)
-		rc.right = WWidth;
-	if (rc.bottom > WHeight)
-		rc.bottom = WHeight;
+	if (rc.right > WWidth + WXOffset)
+		rc.right = WWidth + WXOffset;
+	if (rc.bottom > WHeight + WYOffset)
+		rc.bottom = WHeight + WYOffset;
 
 	backBuffer->Blt(&rc, 0, 0, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
 }
@@ -354,6 +357,9 @@ void PutBitmap(long x, long y, RECT *rect, int bmp_no)
 {
 	static RECT rcWork;
 	static RECT rcSet;
+
+	x += WXOffset;
+	y += WYOffset;
 
 	rcWork.left = rect->left;
 	rcWork.top = rect->top;
@@ -366,10 +372,10 @@ void PutBitmap(long x, long y, RECT *rect, int bmp_no)
 	if (rcWork.bottom - rcWork.top > bitmapMeta[bmp_no].height) {
 		rcWork.bottom = rcWork.top + bitmapMeta[bmp_no].height;
 	}
-	if (x + rect->right - rect->left > WWidth)
-		rcWork.right -= (x + rect->right - rect->left) - WWidth;
-	if (y + rect->bottom - rect->top > WHeight)
-		rcWork.bottom -= (y + rect->bottom - rect->top) - WHeight;
+	if (x + rect->right - rect->left > WWidth + WXOffset)
+		rcWork.right -= (x + rect->right - rect->left) - (WWidth + WXOffset);
+	if (y + rect->bottom - rect->top > WHeight + WYOffset)
+		rcWork.bottom -= (y + rect->bottom - rect->top) - (WHeight + WYOffset);
 	if (x < 0) {
 		rcWork.left -= x;
 		x = 0;

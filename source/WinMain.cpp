@@ -85,8 +85,6 @@ void SetModified(bool mod);
 //Declare global variables here
 HINSTANCE hInst;//instance handle
 HWND hWnd;//main window handle
-//HWND hDlgTrack;
-//HWND hDlgEZCopy;
 HWND hDlgHelp = nullptr;
 HWND hDlgComments = nullptr;
 BOOL actApp;
@@ -100,6 +98,7 @@ bool gFileUnsaved = true;
 
 long MAXHORZRANGE = 0x7FFFFFFF;
 
+int WXOffset = 0, WYOffset = 0;
 int WWidth = WINDOWWIDTH, WHeight = WINDOWHEIGHT;
 int realWidth = WINDOWWIDTH;
 int realHeight = WINDOWHEIGHT;
@@ -120,6 +119,7 @@ char TrackN[] = "12345678QWERTYUI";
 
 int sMetronome = 0;
 int sSmoothScroll = 0;
+bool sAlwaysShowPlayhead = true;
 
 extern int volChangeLength;
 extern bool volChangeUseNoteLength;
@@ -140,9 +140,9 @@ static bool floatingToolbars = false;
 extern void ChangeTrack(int iTrack);
 extern void ChangeTrackPlus(int iValue);
 extern char timer_sw; //Playing?
-//extern int EZCopyWindowState; //Easy copy status
-//extern RECT CmnDialogWnd;
-//extern int SaveWithInitVolFile;	//Song data and... save.
+
+bool lockScrollToSong = true;
+
 extern int Menu_Recent[];
 extern int iDragMode;
 extern int iDlgRepeat; //Iteration count obtained from the dialog
@@ -203,26 +203,33 @@ static const int iChgTrackBtn[16] = {
 	IDM_TRACKQ, IDM_TRACKW, IDM_TRACKE, IDM_TRACKR, IDM_TRACKT, IDM_TRACKY, IDM_TRACKU, IDM_TRACKI,
 };
 
-static bool lastUpdCheck = false;
+static int lastUpdCheck = 0;
 void UpdateToolbarStatus() {
 	HMENU hMenu;
 	hMenu = GetMenu(hWnd);
 
 	// disable editor features while song is playing
 	bool enabled = timer_sw == 0;
-	if (lastUpdCheck != enabled) {
+	if (lastUpdCheck != timer_sw) {
 		for (int i = 0; i < sizeof(playbar_controls_menu) / sizeof(int); ++i) {
 			EnableMenuItem(hMenu, playbar_controls_menu[i], MF_BYCOMMAND | (enabled ? MF_ENABLED : MF_GRAYED));
 		}
 
-		for (int i = 0; i < 4; ++i) {
-			SendMessage(hwndToolbar, TB_ENABLEBUTTON, playbar_controls_toolbar[i], enabled);
+		if (lockScrollToSong) {
+			for (int i = 0; i < 4; ++i) {
+				SendMessage(hwndToolbar, TB_ENABLEBUTTON, playbar_controls_toolbar[i], enabled);
+			}
+		}
+		else {
+			for (int i = 0; i < 4; ++i) {
+				SendMessage(hwndToolbar, TB_ENABLEBUTTON, playbar_controls_toolbar[i], true);
+			}
 		}
 
 		// change icon to pause while playing
 		SendMessage(hwndToolbar, TB_CHANGEBITMAP, IDM_PLAYPAUSE, enabled ? 12 : 13);
 
-		lastUpdCheck = enabled;
+		lastUpdCheck = timer_sw;
 	}
 
 	// special cases
@@ -256,6 +263,9 @@ void UpdateToolbarStatus() {
 		SendMessage(hwndTrackbar, TB_CHECKBUTTON, iChgTrackBtn[i], org_data.track == i);
 		SendMessage(hwndTrackbar, TB_CHANGEBITMAP, iChgTrackBtn[i], org_data.mute[i] ? i + 16 : i);
 	}
+
+	CheckMenuItem(hMenu, IDM_LOCKSCROLL, MF_BYCOMMAND | (lockScrollToSong ? MFS_CHECKED : MFS_UNCHECKED));
+	SendMessage(hwndToolbar, TB_CHECKBUTTON, IDM_LOCKSCROLL, lockScrollToSong);
 }
 int previewOctave = 3;
 
@@ -769,7 +779,13 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	gPlayMidNote = GetPrivateProfileInt(MAIN_WINDOW, "PlayMidNote", 1, app_path);
 
 	gNoteHighlights = GetPrivateProfileInt(MAIN_WINDOW, "NoteHighlights", 1, app_path);
-	
+
+	lockScrollToSong = GetPrivateProfileInt(MAIN_WINDOW, "LockScrollToSong", 1, app_path);
+	WYOffset = lockScrollToSong ? 0 : 16;
+
+	sAlwaysShowPlayhead = GetPrivateProfileInt(MAIN_WINDOW, "AlwaysShowPlayhead", 1, app_path);
+
+	CheckMenuItem(hMenu, IDM_PLAYHEAD_ALWAYS, MF_BYCOMMAND | (sAlwaysShowPlayhead ? MFS_CHECKED : MFS_UNCHECKED));
 	CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
 	CheckMenuItem(hMenu, IDM_FLOATTOOLBARS, MF_BYCOMMAND | (floatingToolbars ? MFS_CHECKED : MFS_UNCHECKED));
 	CheckMenuItem(hMenu, IDM_PLAY_NOTES_MID, MF_BYCOMMAND | (gPlayMidNote ? MFS_CHECKED : MFS_UNCHECKED));
@@ -936,8 +952,8 @@ LRESULT CALLBACK AreaWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 {
 	switch (message) {
 	case WM_SIZE:
-		WWidth = LOWORD(lParam);	//Client area size
-		WHeight = HIWORD(lParam);
+		WWidth = LOWORD(lParam) - WXOffset;	//Client area size
+		WHeight = HIWORD(lParam) - WYOffset;
 		return 0;
 	case WM_MOUSEMOVE:
 		if (!hasMouseCapture) {
@@ -1132,6 +1148,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
 			break;
 		}
+		break;
 	}
 	case OWM_TBCONTEXTMENU: {
 		for (i = 0; i < MAXTRACK; i++) {
@@ -1375,7 +1392,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				//DialogBox(hInst,"DLGVOLUME",hwnd,DialogVolume);
 				break;
 			case ID_AC_STPLAY:
-				StartPlayingSong();
+				StartPlayingSong(-1);
 				break;
 			//case IDM_DLGWAVE://Show settings dialog
 			//case ID_AC_WAVESELECT:
@@ -1390,7 +1407,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_2BAI:
 				SetUndo();
 				org_data.EnlargeAllNotes(2);
-				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//頭出し
+				scr_data.SetHorzScroll(0);
+				org_data.SetPlayPointer(0);
+				SetFocus(hWnd);//頭出し
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				UpdateStatusBar(false);
@@ -1398,7 +1417,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_3BAI:
 				SetUndo();
 				org_data.EnlargeAllNotes(3);
-				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//頭出し
+				scr_data.SetHorzScroll(0);
+				org_data.SetPlayPointer(0);
+				SetFocus(hWnd);//頭出し
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				UpdateStatusBar(false);
@@ -1406,7 +1427,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_2BUNNO1:
 				SetUndo();
 				org_data.ShortenAllNotes(2);
-				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//頭出し				
+				scr_data.SetHorzScroll(0);
+				org_data.SetPlayPointer(0);
+				SetFocus(hWnd);//頭出し				
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				UpdateStatusBar(false);
@@ -1414,7 +1437,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_3BUNNO1:
 				SetUndo();
 				org_data.ShortenAllNotes(3);
-				scr_data.SetHorzScroll(0);org_data.SetPlayPointer(0);SetFocus(hWnd);//頭出し				
+				scr_data.SetHorzScroll(0);
+				org_data.SetPlayPointer(0);
+				SetFocus(hWnd);//頭出し				
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				UpdateStatusBar(false);
@@ -1601,22 +1626,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				UpdateStatusBar(false);
 				break;
-			case IDC_LEFT:
-			case ID_AC_MEASBACK:
-				scr_data.HorzScrollProc(SB_PAGELEFT, 0);
-				//SendMessage(hDlgPlayer, WM_COMMAND, IDC_LEFT, NULL);
-				break;
-			case IDC_RIGHT:
-			case ID_AC_MEASNEXT:
-				scr_data.HorzScrollProc(SB_PAGERIGHT, 0);
-				//SendMessage(hDlgPlayer, WM_COMMAND, IDC_RIGHT, NULL);
-				break;
-			case IDC_LEFTSTEP:
-				scr_data.HorzScrollProc(SB_LINELEFT, 0);
-				break;
-			case IDC_RIGHTSTEP:
-				scr_data.HorzScrollProc(SB_LINERIGHT, 0);
-				break;
 			case ID_SELECTION_DELETE:
 			case ID_AC_SELECT_BACKDEL: //2014.04.13
 				SetUndo();
@@ -1738,7 +1747,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			if (timer_sw) {
 				StopPlayingSong();
 			} else {
-				StartPlayingSong();
+				StartPlayingSong(-1);
 			}
 			break;
 		case IDM_PREFERENCES:
@@ -1749,45 +1758,69 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			StopPlayingSong();
 			Rxo_StopAllSoundNow();
 			OpenSongProperties(hWnd);
-			//DialogBox(hInst,"DLGSETTING",hwnd,DialogSetting);
 			break;
 		case IDC_START:
 		case ID_AC_HOMEBACK: //home
-			StopPlayingSong();
+			if (lockScrollToSong) {
+				StopPlayingSong();
+				org_data.SetPlayPointer(0);
+			}
 			scr_data.SetHorzScroll(0);
-			org_data.SetPlayPointer(0);
-			//SendMessage(hDlgPlayer, WM_COMMAND, IDC_START, NULL);
 			break;
 		case IDC_END:
-		case ID_AC_TOEND: //home
-			StopPlayingSong();
+		case ID_AC_TOEND:
 			org_data.GetMusicInfo(&mi);
+			if (lockScrollToSong) {
+				StopPlayingSong();
+				org_data.SetPlayPointer(mi.end_x);
+			}
 			scr_data.SetHorzScroll(mi.end_x);
-			org_data.SetPlayPointer(mi.end_x);
-			//SendMessage(hDlgPlayer, WM_COMMAND, IDC_END, NULL);
+			break;
+		case IDM_PLAYHEAD_ALWAYS:
+			hMenu = GetMenu(hWnd);
+
+			sAlwaysShowPlayhead = !sAlwaysShowPlayhead;
+			CheckMenuItem(hMenu, IDM_PLAYHEAD_ALWAYS, MF_BYCOMMAND | (sAlwaysShowPlayhead ? MFS_CHECKED : MFS_UNCHECKED));
+			break;
+		case IDM_LOCKSCROLL:
+			hMenu = GetMenu(hWnd);
+
+			lockScrollToSong = !lockScrollToSong;
+
+			lastUpdCheck = -1;
+			UpdateToolbarStatus();
+
+			WYOffset = lockScrollToSong ? 0 : 16;
+			WHeight = lockScrollToSong ? WHeight + 16 : WHeight - 16;
+			break;
+		case IDC_LEFT:
+		case ID_AC_MEASBACK:
+			scr_data.HorzScrollProc(SB_PAGELEFT, 0);
+			break;
+		case IDC_RIGHT:
+		case ID_AC_MEASNEXT:
+			scr_data.HorzScrollProc(SB_PAGERIGHT, 0);
+			break;
+		case IDC_LEFTSTEP:
+			scr_data.HorzScrollProc(SB_LINELEFT, 0);
+			break;
+		case IDC_RIGHTSTEP:
+			scr_data.HorzScrollProc(SB_LINERIGHT, 0);
 			break;
 		case IDM_INIT:
 		case ID_AC_INIT:
 			StopPlayingSong();
-			//if(MessageBox(hwnd,"Any unsaved content will be discarded. Initialize?","Initialization confirmation",MB_OKCANCEL)==IDCANCEL)break; //2010.09.25 A
 			if (CancelDeleteCurrentData(CDCD_INIT))break;
 			ClearUndo();
 			memset(music_file, 0, MAX_PATH);
 			strcpy(music_file, MessageString[IDS_DEFAULT_ORG_FILENAME]);
-			//for(i = 0; i < 12; i++){
-			//	music_file[i] = name[i];
-			//}
 			org_data.InitOrgData();
 			org_data.SetPlayPointer(0);
 			scr_data.SetHorzScroll(0);
 			//reflected in the player
 			UpdateStatusBar(false);
-			//SetDlgItemText(hDlgPlayer, IDE_VIEWWAIT, "128");
-			//(hDlgPlayer, IDE_VIEWMEAS, "0");
-			//SetDlgItemText(hDlgPlayer, IDE_VIEWXPOS, "0");
 			SetModified(false);
 			gFileUnsaved = true;
-			//MessageBox(hwnd,"initialized","Message",MB_OK);
 			SelectReset();
 			//org_data.PutMusic();
 			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
@@ -1795,15 +1828,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 			break;
 		case IDM_EXIT:
-			//if(iChangeFinish!=0){	// A 2010.09.22
-			//	char cc[512],*chn;
-			//	GetWindowText(hWnd,cc,512);
-			//	chn = strstr(cc, HENKOU_NO_SHIRUSHI);
-			//	if(chn!=NULL){
-			//		//Confirm the end when there is a change. // A 2010.09.22
-			//		if(MessageBox(hwnd,"Any unsaved content will be discarded. Are you sure you want to quit?","End confirmation",MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)break;
-			//	}
-			//}
 			if (CancelDeleteCurrentData(CDCD_EXIT))break;
 			SaveIniFile();
 			QuitMMTimer();
@@ -1811,9 +1835,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			EndDirectSound();
 			org_data.ReleaseNote();
 			EndGDI();
-			//if (!hDlgPlayer)DestroyWindow(hDlgPlayer);
-			//if (!hDlgTrack)DestroyWindow(hDlgTrack);
-			//if (hDlgEZCopy) DestroyWindow(hDlgEZCopy);
 			if (hDlgHelp) DestroyWindow(hDlgHelp);
 			if (hDlgComments) DestroyWindow(hDlgComments);
 
@@ -1837,7 +1858,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			StopPlayingSong();
 			DialogBox(hInst, "DLGWAVEDBS", hwnd, DialogWaveDB);
 			break;
-		case ID_AC_STBACK:
+		case ID_AC_STBACK: // ?
 			StopPlayingSong();
 			scr_data.SetHorzScroll(0);
 			org_data.SetPlayPointer(0);
@@ -1862,16 +1883,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_SAVENEW://Save As
 		case ID_AC_MENUNEWSAVE:
 			OpenDoSave(hwnd, true);
-			/*res = GetFileNameSave(hwnd,MessageString[IDS_STRING62]); //"Save As"
-			if(res == MSGCANCEL)break;
-			if(res == MSGEXISFILE){
-				//if(MessageBox(hwnd,"Do you want to overwrite?","There is a file with the same name",MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 D
-				if(msgbox(hwnd,IDS_NOTIFY_OVERWRITE,IDS_INFO_SAME_FILE,MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 A
-					==IDNO)break;
-			}
-			org_data.SaveMusicData();
-			SetModified(false);//title name set
-			gFileUnsaved = false;*/
 			break;
 		case IDM_EXPORT_MIDI: //Export 2014.05.11
 		case ID_AC_MIDI:
@@ -2201,6 +2212,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_ALWAYS_CURRENT:    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Always select the current channel"); break;
 		case IDM_DRAGMODE:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Extend notes when dragging from their head"); break;
 		case IDM_PRESSNOTE:         SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Extend notes when clicking on their head"); break;
+		case IDM_LOCKSCROLL:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Lock horizontal scrolling to the playhead"); break;
 		case IDM_STOPNOWALL:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Stop all playing sounds"); break;
 
 		case IDM_DLGSETTING:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Configure the active document"); break;
@@ -2316,20 +2328,20 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			scr_data.KeyScroll(DIRECTION_DOWN);
 			break;
 		case VK_LEFT:
-			if (timer_sw == 0) scr_data.KeyScroll(DIRECTION_LEFT);
+			scr_data.KeyScroll(DIRECTION_LEFT);
 			break;
 		case VK_RIGHT:
-			if (timer_sw == 0) scr_data.KeyScroll(DIRECTION_RIGHT);
+			scr_data.KeyScroll(DIRECTION_RIGHT);
 			break;
 		case VK_F5:
 		//case VK_NUMPAD0:
-			if (timer_sw == 0) StartPlayingSong();
+			if (timer_sw == 0) StartPlayingSong(-1);
 			else StopPlayingSong();
 			break;
 		case VK_F6:
 			StopPlayingSong();
 			scr_data.SetHorzScroll(0);
-			StartPlayingSong();
+			StartPlayingSong(-1);
 			break;
 		//case VK_HOME:
 		//	SendMessage(hDlgPlayer , WM_COMMAND , IDC_START , NULL);
@@ -2656,6 +2668,8 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW,"Metronome",num_buf,app_path);
 	wsprintf(num_buf, "%d", sSmoothScroll);
 	WritePrivateProfileString(MAIN_WINDOW, "SmoothScroll", num_buf, app_path);
+	wsprintf(num_buf, "%d", sAlwaysShowPlayhead);
+	WritePrivateProfileString(MAIN_WINDOW, "AlwaysShowPlayhead", num_buf, app_path);
 	wsprintf(num_buf, "%d", volChangeLength);
 	WritePrivateProfileString(MAIN_WINDOW, "VolChangeLength", num_buf, app_path);
 	wsprintf(num_buf, "%d", volChangeUseNoteLength);
@@ -2670,6 +2684,8 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW, "PlayMidNote", num_buf, app_path);
 	wsprintf(num_buf, "%d", gNoteHighlights);
 	WritePrivateProfileString(MAIN_WINDOW, "NoteHighlights", num_buf, app_path);
+	wsprintf(num_buf, "%d", lockScrollToSong);
+	WritePrivateProfileString(MAIN_WINDOW, "LockScrollToSong", num_buf, app_path);
 	
 
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentThemePath", gSelectedTheme, app_path);

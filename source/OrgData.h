@@ -171,5 +171,5 @@ typedef struct OrgData{
 }ORGDATA;
 extern ORGDATA org_data;
 
-void StartPlayingSong(void);
+void StartPlayingSong(long pos);
 void StopPlayingSong(void);

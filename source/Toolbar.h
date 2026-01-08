@@ -1,7 +1,7 @@
 #pragma once
 #include <Windows.h>
 
-#define TOOLBAR_MAIN_BUTTON_COUNT 25
+#define TOOLBAR_MAIN_BUTTON_COUNT 26
 #define TOOLBAR_CHANNEL_BUTTON_COUNT 17
 
 void CreateToolbarClass(void);

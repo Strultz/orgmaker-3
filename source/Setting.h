@@ -27,7 +27,8 @@ extern HWND hWnd;//メインウィンドウハンドル
 extern HWND hwndArea;
 extern BOOL actApp;//ウインドウのアクティブ
 
-extern int  WWidth, WHeight;	//ウィンドウのサイズ
+extern int WXOffset, WYOffset;
+extern int WWidth, WHeight;	//ウィンドウのサイズ
 
 void UpdateToolbarStatus();
 void UpdateStatusBar(bool measonly);

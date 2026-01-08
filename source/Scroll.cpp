@@ -11,6 +11,7 @@
 #define MAIN_WINDOW "WINDOW"
 
 extern char timer_sw;
+extern bool lockScrollToSong;
 extern int NoteWidth;
 
 extern CHAR app_path[BUF_SIZE];
@@ -121,6 +122,10 @@ void ScrollData::HorzScrollProc(short mode, long scroll){
 	MUSICINFO mi;
 	org_data.GetMusicInfo(&mi);
 
+	if (lockScrollToSong && timer_sw != 0) {
+		return;
+	}
+
 	switch(mode){
 	case SB_LEFT:
 		hpos = 0;
@@ -162,9 +167,6 @@ void ScrollData::HorzScrollProc(short mode, long scroll){
 	}
 	//プレイヤーに反映
 	PrintHorzPosition();
-	if(timer_sw == 0){
-		org_data.SetPlayPointer(hpos);
-	}
 	scr_info.fMask = SIF_POS;//nPosを有効に
 	scr_info.nPos = hpos;
 	SetScrollInfo(hwndArea,SB_HORZ,&scr_info,1);
@@ -273,6 +275,10 @@ void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){
 	
 	if(zDelta<0){
 		if(fwKeys && MK_CONTROL){
+			if (lockScrollToSong && timer_sw != 0) {
+				return;
+			}
+
 			hpos += 4;
 			if (hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
 			if (hpos < 0)hpos = 0;
@@ -283,6 +289,10 @@ void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){
 		}
 	}else{
 		if(fwKeys && MK_CONTROL){
+			if (lockScrollToSong && timer_sw != 0) {
+				return;
+			}
+
 			hpos -= 4;
 			if (hpos < 0)hpos = 0;
 		}else{
@@ -315,9 +325,17 @@ void ScrollData::KeyScroll(int iDirection)
 		vpos++;
 		break;
 	case DIRECTION_LEFT:
+		if (lockScrollToSong && timer_sw != 0) {
+			return;
+		}
+
 		hpos--;
 		break;
 	case DIRECTION_RIGHT:
+		if (lockScrollToSong && timer_sw != 0) {
+			return;
+		}
+
 		hpos++;
 		break;
 	}

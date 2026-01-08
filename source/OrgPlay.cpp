@@ -13,6 +13,7 @@ extern int sSmoothScroll;
 extern int iKeyPushDown[256];
 extern unsigned char old_key[];
 extern bool gNoteHighlights;
+extern bool lockScrollToSong;
 
 char timer_sw = 0;
 long oplay_p;
@@ -120,13 +121,27 @@ void OrgData::GetPlayPos(long* playpos, long *oplaypos) {
 	if (oplaypos != NULL) *oplaypos = oplay_p;
 }
 
-void StartPlayingSong(void) {
+void StartPlayingSong(long pos) {
 	MUSICINFO mi;
-	long hp;
+
 	if (!timer_sw) {
 		Rxo_StopAllSoundNow();
-		scr_data.GetScrollPosition(&hp, NULL);
-		org_data.SetPlayPointer(hp);
+
+		if (pos == -1) {
+			long hp;
+			if (lockScrollToSong) {
+				scr_data.GetScrollPosition(&hp, NULL);
+				org_data.SetPlayPointer(hp);
+			}
+			else {
+				org_data.GetPlayPos(&hp, NULL);
+				org_data.SetPlayPointer(hp);
+			}
+		}
+		else {
+			org_data.SetPlayPointer(pos);
+		}
+		
 		InitMMTimer();
 		org_data.GetMusicInfo(&mi);
 		StartTimer(mi.wait);
@@ -204,12 +219,14 @@ void StopPlayingSong(void) {
 		Rxo_StopAllSoundNow();
 		timer_sw = 0;
 
-		MUSICINFO mi;
-		org_data.GetMusicInfo(&mi);
+		if (lockScrollToSong) {
+			MUSICINFO mi;
+			org_data.GetMusicInfo(&mi);
 
-		long playPos;
-		org_data.GetPlayPos(NULL, &playPos);
-		scr_data.SetHorzScroll(sSmoothScroll ? playPos : ((playPos / (mi.dot * mi.line)) * (mi.dot * mi.line)));
+			long playPos;
+			org_data.GetPlayPos(NULL, &playPos);
+			scr_data.SetHorzScroll(sSmoothScroll ? playPos : ((playPos / (mi.dot * mi.line)) * (mi.dot * mi.line)));
+		}
 
 		UpdateToolbarStatus();
 	}

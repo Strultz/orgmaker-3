@@ -870,13 +870,15 @@
 #define IDD_DLGCOMMENTS                 40377
 #define ID_SONG_COMMENTS                40378
 #define ID_AC_CLOSE                     40379
+#define IDM_LOCKSCROLL                  40380
+#define IDM_PLAYHEAD_ALWAYS             40381
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        267
-#define _APS_NEXT_COMMAND_VALUE         40380
+#define _APS_NEXT_COMMAND_VALUE         40382
 #define _APS_NEXT_CONTROL_VALUE         1313
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

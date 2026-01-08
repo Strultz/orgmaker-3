@@ -11,6 +11,8 @@
 
 //クリックされた時の処理
 extern char timer_sw;//再生スイッチ
+extern bool lockScrollToSong;
+
 extern void SetUndo();
 extern void ResetLastUndo(); //取りけし
 
@@ -336,7 +338,6 @@ void ClickProcL(WPARAM wParam, LPARAM lParam)
 	long scr_h,scr_v;
 	long Note_x;
 	unsigned char line,dot;
-	if(timer_sw)return;
 
 	scr_data.GetScrollPosition(&scr_h,&scr_v);
 	MUSICINFO mi;
@@ -352,7 +353,22 @@ void ClickProcL(WPARAM wParam, LPARAM lParam)
 	//マウスの座標を取得
 	mouse_data.GetMousePosition(&mouse_x,&mouse_y);
 
-	if (mouse_x < 0 || mouse_y < 0) return;
+	if (mouse_y < 0 && !lockScrollToSong) {
+		int x = (mouse_x - KEYWIDTH) / NoteWidth + scr_h;
+		bool playing = timer_sw;
+
+		if (playing) {
+			StopPlayingSong();
+			StartPlayingSong(x);
+		}
+		org_data.SetPlayPointer(x);
+	}
+
+	if (timer_sw) return;
+
+	if (mouse_x < 0 || mouse_y < 0) {
+		return;
+	}
 
 	//Shiftが押されていたらSelect(範囲選択)扱い
 	if(shift_down == 1 && mouse_y < WHeight+288-WHNM+144){

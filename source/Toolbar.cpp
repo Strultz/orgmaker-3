@@ -188,6 +188,7 @@ void CreateToolbars(HWND hwndRebar, HWND outHwnd[4]) {
         {17, IDM_LOUPE_PLUS, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Zoom In (F7)"},
         {18, IDM_LOUPE_MINUS, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Zoom Out (F8)"},
         {0, 0, 0, BTNS_SEP},
+        {22, IDM_LOCKSCROLL, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Follow Playback"},
         {9, IDC_START, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"To Song Start (Ctrl+Left)"},
         {10, IDC_LEFT, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Previous Measure (Shift+Left)"},
         {11, IDC_LEFTSTEP, TBSTATE_ENABLED,BTNS_BUTTON, {}, 0, (INT_PTR)"Backwards (Left)"},
