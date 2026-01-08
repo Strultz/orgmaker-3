@@ -363,6 +363,9 @@ void ClickProcL(WPARAM wParam, LPARAM lParam)
 			StopPlayingSong();
 			StartPlayingSong(x);
 		}
+		else {
+			org_data.SetPlayPointer(x);
+		}
 
 		UpdateStatusBar(true);
 		return;

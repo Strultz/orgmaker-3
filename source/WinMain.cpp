@@ -2278,7 +2278,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_SMOOTHSCROLL:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Scroll by steps while the song is playing"); break;
 		case IDM_PLAYHEAD_ALWAYS:   SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Show the current step as a line while the song is playing"); break;
 		case IDM_LOCKSCROLL:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Use a timeline bar at the top for moving the playhead"); break;
-		case IDM_FOLLOWSCROLL:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Follow the playbar while the song is playing"); break;
+		case IDM_FOLLOWSCROLL:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Follow the playhead while the song is playing"); break;
 		case IDM_NOTE_ENLARGE:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Enlarge note heads while zoomed out"); break;
 		case IDM_SLIDEOVERLAPNOTES: SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Shift overlapping notes on other channels"); break;
 		case IDM_DRAWDOUBLE:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Show ghost notes from melody or percussion channels"); break;
@@ -2387,6 +2387,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case VK_F6:
 			StopPlayingSong();
 			scr_data.SetHorzScroll(0);
+			org_data.SetPlayPointer(0);
 			StartPlayingSong(-1);
 			break;
 		//case VK_HOME:
