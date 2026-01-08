@@ -527,6 +527,17 @@ void OrgData::PutMusic(void)
 	brect = {0, 0, WWidth, WHeight};
 	PutRect(&brect, 0);
 
+	long playPos;
+	org_data.GetPlayPos(NULL, &playPos);
+
+	// Scroll with song playback
+	if (timer_sw && lockScrollToSong) {
+		scr_data.SetHorzScroll(sSmoothScroll ? playPos : ((playPos / (info.dot * info.line)) * (info.dot * info.line)));
+	}
+	else if (timer_sw) {
+		UpdateStatusBar(true);
+	}
+
 	scr_data.GetScrollPosition(&hpos,&vpos);
 	vpos2=vpos;
 	vpos = -(vpos%12)*12;
@@ -584,14 +595,11 @@ void OrgData::PutMusic(void)
 		
 	}
 
-	if (!lockScrollToSong || (sAlwaysShowPlayhead && !sSmoothScroll)) { // Disable it if sSmoothScroll is on because it's useless in that case
-		long playPos;
-		org_data.GetPlayPos(NULL, &playPos);
-
+	if (!lockScrollToSong || sAlwaysShowPlayhead) {
 		int x = KEYWIDTH + (playPos - hpos) * NoteWidth;
 
-		RECT rect = { x, -WYOffset, x + 1, WHeight + 288 - WHNM };
-		PutRect(&rect, 0xFFFFFF);
+		brect = { x, -WYOffset, x + 1, WHeight + 288 - WHNM };
+		PutRect(&brect, 0xFFFFFF);
 	}
 
 	PutNumber();
@@ -664,15 +672,35 @@ void OrgData::PutMusic(void)
 		PutBitmap(0,WHeight+288-WHNM+72,&rc_ActiveVOL, BMPNOTE);
 	}
 
-	if (timer_sw && lockScrollToSong) {
-		long playPos;
-		org_data.GetPlayPos(NULL, &playPos);
-		scr_data.SetHorzScroll(sSmoothScroll ? playPos : ((playPos / (info.dot * info.line)) * (info.dot * info.line)));
-	}
+	if (!lockScrollToSong || sAlwaysShowPlayhead) {
+		brect = { 0, -WYOffset, WWidth, 0 };
+		PutRect(&brect, 0x000000);
 
-	if (!lockScrollToSong) {
-		RECT rect = { 0, -WYOffset, WWidth, 0 };
-		PutRect(&rect, 0x7F7F7F);
+		for (i = 0; i < (WWidth / NoteWidth) + (info.line * info.dot) + 1; i++) { // 15
+			if (i % (info.line * info.dot) == 0){
+				brect = { 64, 0, 64 + NoteWidth, 16 };
+				PutBitmap(x + i * NoteWidth, -WYOffset, &brect, BMPPOS);
+			} else if (i % info.dot == 0) {
+				brect = { 64 + 16, 0, (64 + 16) + NoteWidth, 16 };
+				PutBitmap(x + i * NoteWidth, -WYOffset, &brect, BMPPOS);
+			} else {
+				if (NoteWidth >= 8) {
+					brect = { 64 + 32, 0, (64 + 32) + NoteWidth, 16 };
+					PutBitmap(x + i * NoteWidth, -WYOffset, &brect, BMPPOS);
+				} else {
+					brect = { 64 + 32 + 1, 0, (64 + 32 + 1) + NoteWidth, 16 };
+					PutBitmap(x + i * NoteWidth, -WYOffset, &brect, BMPPOS);
+				}
+			}
+		}
+
+		int x = KEYWIDTH + (playPos - hpos) * NoteWidth;
+
+		brect = { 112, 0, 121, 16 };
+		PutBitmap(x - 4, -WYOffset, &brect, BMPPOS);
+
+		brect = { 0, 0, KEYWIDTH, 16 };
+		PutBitmap(0, -WYOffset, &brect, BMPPOS);
 	}
 	//gIsDrawing = false;
 }

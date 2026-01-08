@@ -738,7 +738,7 @@ BEGIN
         MENUITEM "A&lways Select Current Channel\tCtrl+T", IDM_ALWAYS_CURRENT
         MENUITEM "&Drag Note to Extend\tCtrl+Alt+F9", IDM_DRAGMODE
         MENUITEM "Clic&k Note to Extend\tCtrl+Alt+F10", IDM_PRESSNOTE
-        MENUITEM "&Follow Playback", IDM_LOCKSCROLL
+        MENUITEM "Use Play&head Timeline",      IDM_LOCKSCROLL
         MENUITEM SEPARATOR
         MENUITEM "Stop &All Sounds\t~",         IDM_STOPNOWALL
     END
@@ -873,6 +873,8 @@ TOOLBAR_ICONS           BITMAP                  "Bitmap\\TOOLBAR_ICONS.bmp"
 TRACKBAR_ICONS          BITMAP                  "Bitmap\\TRACKBAR_ICONS.bmp"
 
 B_SPLASH                BITMAP                  "Bitmap\\org_splash.bmp"
+
+POS                     BITMAP                  "Bitmap\\Pos.bmp"
 
 
 /////////////////////////////////////////////////////////////////////////////

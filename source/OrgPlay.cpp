@@ -225,7 +225,12 @@ void StopPlayingSong(void) {
 
 			long playPos;
 			org_data.GetPlayPos(NULL, &playPos);
-			scr_data.SetHorzScroll(sSmoothScroll ? playPos : ((playPos / (mi.dot * mi.line)) * (mi.dot * mi.line)));
+
+			long hp = sSmoothScroll ? playPos : ((playPos / (mi.dot * mi.line)) * (mi.dot * mi.line));
+			scr_data.SetHorzScroll(hp);
+			org_data.SetPlayPointer(hp);
+
+			UpdateStatusBar(true);
 		}
 
 		UpdateToolbarStatus();

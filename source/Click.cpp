@@ -354,7 +354,7 @@ void ClickProcL(WPARAM wParam, LPARAM lParam)
 	mouse_data.GetMousePosition(&mouse_x,&mouse_y);
 
 	if (mouse_y < 0 && !lockScrollToSong) {
-		int x = (mouse_x - KEYWIDTH) / NoteWidth + scr_h;
+		int x = (mouse_x + (NoteWidth / 2) - KEYWIDTH) / NoteWidth + scr_h;
 		bool playing = timer_sw;
 
 		if (playing) {
@@ -362,6 +362,7 @@ void ClickProcL(WPARAM wParam, LPARAM lParam)
 			StartPlayingSong(x);
 		}
 		org_data.SetPlayPointer(x);
+		UpdateStatusBar(true);
 	}
 
 	if (timer_sw) return;

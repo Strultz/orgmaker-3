@@ -14,6 +14,7 @@
 #define BMPNOTE			1
 #define BMPNUMBER		2
 #define BMPPAN			3
+#define BMPPOS          4
 
 
 #define MSGCANCEL		1

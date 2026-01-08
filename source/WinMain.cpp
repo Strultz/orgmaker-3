@@ -103,6 +103,9 @@ int WWidth = WINDOWWIDTH, WHeight = WINDOWHEIGHT;
 int realWidth = WINDOWWIDTH;
 int realHeight = WINDOWHEIGHT;
 
+static int realAreaWidth = WINDOWWIDTH;
+static int realAreaHeight = WINDOWHEIGHT;
+
 static const char szClassName[] = "OrgMaker3";
 static const char szAreaClass[] = "OrgArea";
 static const char szSplashClass[] = "OrgSplash";
@@ -263,13 +266,17 @@ void UpdateToolbarStatus() {
 		SendMessage(hwndTrackbar, TB_CHECKBUTTON, iChgTrackBtn[i], org_data.track == i);
 		SendMessage(hwndTrackbar, TB_CHANGEBITMAP, iChgTrackBtn[i], org_data.mute[i] ? i + 16 : i);
 	}
-
-	CheckMenuItem(hMenu, IDM_LOCKSCROLL, MF_BYCOMMAND | (lockScrollToSong ? MFS_CHECKED : MFS_UNCHECKED));
-	SendMessage(hwndToolbar, TB_CHECKBUTTON, IDM_LOCKSCROLL, lockScrollToSong);
 }
+
 int previewOctave = 3;
 
+// :/
+extern long play_p;
+extern long oplay_p;
+
 void UpdateStatusBar(bool measonly) {
+	static long plCache = 0;
+
 	MUSICINFO mi;
 	char msg[256];
 	int meas = 0, step = 0;
@@ -277,8 +284,9 @@ void UpdateStatusBar(bool measonly) {
 
 	org_data.GetMusicInfo(&mi);
 
-	if (timer_sw == 0) {
+	if (timer_sw == 0 && lockScrollToSong) {
 		scr_data.GetScrollPosition(&pl, NULL);
+		oplay_p = play_p = pl;
 	} else {
 		org_data.GetPlayPos(NULL, &pl);
 	}
@@ -309,8 +317,12 @@ void UpdateStatusBar(bool measonly) {
 		SendMessage(hwndStatus, SB_SETTEXT, 4, (LPARAM)msg);
 	}
 
-	snprintf(msg, 256, "Meas %d:%d", meas, step);
-	SendMessage(hwndStatus, SB_SETTEXT, 5, (LPARAM)msg);
+	if (pl != plCache) {
+		snprintf(msg, 256, "Meas %d:%d", meas, step);
+		SendMessage(hwndStatus, SB_SETTEXT, 5, (LPARAM)msg);
+
+		plCache = pl;
+	}
 }
 
 void SaveIniFile();
@@ -428,6 +440,7 @@ void InitBitmaps() {
 	InitBitmap("NOTE", BMPNOTE);//Note
 	InitBitmap("NUMBER", BMPNUMBER);//number
 	InitBitmap("PAN", BMPPAN);//Pan and volume
+	InitBitmap("POS", BMPPOS);//Position
 
 	if (hwndToolbar) {
 		SetToolbarImageList(hwndToolbar, "TOOLBAR_ICONS", TOOLBAR_MAIN_BUTTON_COUNT);
@@ -781,11 +794,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	gNoteHighlights = GetPrivateProfileInt(MAIN_WINDOW, "NoteHighlights", 1, app_path);
 
 	lockScrollToSong = GetPrivateProfileInt(MAIN_WINDOW, "LockScrollToSong", 1, app_path);
-	WYOffset = lockScrollToSong ? 0 : 16;
-
 	sAlwaysShowPlayhead = GetPrivateProfileInt(MAIN_WINDOW, "AlwaysShowPlayhead", 1, app_path);
+	WYOffset = (lockScrollToSong && !sAlwaysShowPlayhead) ? 0 : 16;
 
 	CheckMenuItem(hMenu, IDM_PLAYHEAD_ALWAYS, MF_BYCOMMAND | (sAlwaysShowPlayhead ? MFS_CHECKED : MFS_UNCHECKED));
+	CheckMenuItem(hMenu, IDM_LOCKSCROLL, MF_BYCOMMAND | (!lockScrollToSong ? MFS_CHECKED : MFS_UNCHECKED));
 	CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
 	CheckMenuItem(hMenu, IDM_FLOATTOOLBARS, MF_BYCOMMAND | (floatingToolbars ? MFS_CHECKED : MFS_UNCHECKED));
 	CheckMenuItem(hMenu, IDM_PLAY_NOTES_MID, MF_BYCOMMAND | (gPlayMidNote ? MFS_CHECKED : MFS_UNCHECKED));
@@ -952,8 +965,10 @@ LRESULT CALLBACK AreaWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 {
 	switch (message) {
 	case WM_SIZE:
-		WWidth = LOWORD(lParam) - WXOffset;	//Client area size
-		WHeight = HIWORD(lParam) - WYOffset;
+		realAreaWidth = LOWORD(lParam);
+		realAreaHeight = HIWORD(lParam);
+		WWidth = realAreaWidth - WXOffset; //Client area size
+		WHeight = realAreaHeight - WYOffset;
 		return 0;
 	case WM_MOUSEMOVE:
 		if (!hasMouseCapture) {
@@ -1776,23 +1791,36 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			}
 			scr_data.SetHorzScroll(mi.end_x);
 			break;
-		case IDM_PLAYHEAD_ALWAYS:
+		case IDM_PLAYHEAD_ALWAYS: {
 			hMenu = GetMenu(hWnd);
 
 			sAlwaysShowPlayhead = !sAlwaysShowPlayhead;
+
+			bool curSet = (lockScrollToSong && !sAlwaysShowPlayhead);
+
+			WYOffset = curSet ? 0 : 16;
+			WHeight = realAreaHeight - WYOffset;
+
 			CheckMenuItem(hMenu, IDM_PLAYHEAD_ALWAYS, MF_BYCOMMAND | (sAlwaysShowPlayhead ? MFS_CHECKED : MFS_UNCHECKED));
+			UpdateStatusBar(true);
 			break;
-		case IDM_LOCKSCROLL:
+		}
+		case IDM_LOCKSCROLL: {
 			hMenu = GetMenu(hWnd);
 
 			lockScrollToSong = !lockScrollToSong;
 
+			bool curSet = (lockScrollToSong && !sAlwaysShowPlayhead);
+
+			WYOffset = curSet ? 0 : 16;
+			WHeight = realAreaHeight - WYOffset;
+
+			CheckMenuItem(hMenu, IDM_LOCKSCROLL, MF_BYCOMMAND | (!lockScrollToSong ? MFS_CHECKED : MFS_UNCHECKED));
 			lastUpdCheck = -1;
 			UpdateToolbarStatus();
-
-			WYOffset = lockScrollToSong ? 0 : 16;
-			WHeight = lockScrollToSong ? WHeight + 16 : WHeight - 16;
+			UpdateStatusBar(true);
 			break;
+		}
 		case IDC_LEFT:
 		case ID_AC_MEASBACK:
 			scr_data.HorzScrollProc(SB_PAGELEFT, 0);
