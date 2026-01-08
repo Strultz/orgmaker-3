@@ -15,6 +15,7 @@ extern char timer_sw;
 extern int sSmoothScroll;
 extern bool sAlwaysShowPlayhead;
 extern bool lockScrollToSong;
+extern bool sFollowScroll;
 
 //◆◆表示部◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
 RECT note_rect[] = {
@@ -535,6 +536,17 @@ void OrgData::PutMusic(void)
 		scr_data.SetHorzScroll(sSmoothScroll ? playPos : ((playPos / (info.dot * info.line)) * (info.dot * info.line)));
 	}
 	else if (timer_sw) {
+		if (sFollowScroll) {
+			scr_data.GetScrollPosition(&hpos, NULL);
+
+			int half = (WWidth - KEYWIDTH) / NoteWidth / 2;
+			int middle = playPos - half;
+
+			if (middle > hpos || playPos < hpos) {
+				if (middle < 0) middle = 0;
+				scr_data.SetHorzScroll(middle);
+			}
+		}
 		UpdateStatusBar(true);
 	}
 
@@ -595,7 +607,7 @@ void OrgData::PutMusic(void)
 		
 	}
 
-	if (!lockScrollToSong || sAlwaysShowPlayhead) {
+	if (!lockScrollToSong || (!sSmoothScroll && sAlwaysShowPlayhead)) {
 		int x = KEYWIDTH + (playPos - hpos) * NoteWidth;
 
 		brect = { x, -WYOffset, x + 1, WHeight + 288 - WHNM };
@@ -672,7 +684,7 @@ void OrgData::PutMusic(void)
 		PutBitmap(0,WHeight+288-WHNM+72,&rc_ActiveVOL, BMPNOTE);
 	}
 
-	if (!lockScrollToSong || sAlwaysShowPlayhead) {
+	if (!lockScrollToSong) {
 		brect = { 0, -WYOffset, WWidth, 0 };
 		PutRect(&brect, 0x000000);
 

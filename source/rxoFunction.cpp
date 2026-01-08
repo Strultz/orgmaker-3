@@ -53,6 +53,7 @@ extern int iDragMode;
 //extern int SaveWithInitVolFile;
 extern int sMetronome;
 extern int sSmoothScroll;
+extern bool lockScrollToSong;
 
 TCHAR *MessageStringBuffer = NULL;	// 2014.10.19 A
 TCHAR *MessageString[MESSAGE_STRING_MAX];
@@ -701,6 +702,8 @@ void ChangeScrollMode(int iValue)
 	else
 		CheckMenuItem(hMenu, IDM_SMOOTHSCROLL, (MF_BYCOMMAND | MFS_CHECKED));
 	ShowStatusMessage();
+
+	EnableMenuItem(hMenu, IDM_PLAYHEAD_ALWAYS, MF_BYCOMMAND | ((!sSmoothScroll && lockScrollToSong) ? MF_ENABLED : MF_GRAYED));
 }
 
 //2010.09.23 A

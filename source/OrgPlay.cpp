@@ -14,6 +14,7 @@ extern int iKeyPushDown[256];
 extern unsigned char old_key[];
 extern bool gNoteHighlights;
 extern bool lockScrollToSong;
+extern bool sFollowScroll;
 
 char timer_sw = 0;
 long oplay_p;
@@ -219,18 +220,30 @@ void StopPlayingSong(void) {
 		Rxo_StopAllSoundNow();
 		timer_sw = 0;
 
+		long playPos;
+		org_data.GetPlayPos(NULL, &playPos);
+
 		if (lockScrollToSong) {
 			MUSICINFO mi;
 			org_data.GetMusicInfo(&mi);
-
-			long playPos;
-			org_data.GetPlayPos(NULL, &playPos);
 
 			long hp = sSmoothScroll ? playPos : ((playPos / (mi.dot * mi.line)) * (mi.dot * mi.line));
 			scr_data.SetHorzScroll(hp);
 			org_data.SetPlayPointer(hp);
 
 			UpdateStatusBar(true);
+		}
+		else if (sFollowScroll) {
+			long hpos;
+			scr_data.GetScrollPosition(&hpos, NULL);
+
+			int half = (WWidth - KEYWIDTH) / NoteWidth / 2;
+			int middle = playPos - half;
+
+			if (middle > hpos || playPos < hpos) {
+				if (middle < 0) middle = 0;
+				scr_data.SetHorzScroll(middle);
+			}
 		}
 
 		UpdateToolbarStatus();

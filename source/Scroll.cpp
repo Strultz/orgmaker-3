@@ -12,6 +12,7 @@
 
 extern char timer_sw;
 extern bool lockScrollToSong;
+extern bool sFollowScroll;
 extern int NoteWidth;
 
 extern CHAR app_path[BUF_SIZE];
@@ -122,7 +123,7 @@ void ScrollData::HorzScrollProc(short mode, long scroll){
 	MUSICINFO mi;
 	org_data.GetMusicInfo(&mi);
 
-	if (lockScrollToSong && timer_sw != 0) {
+	if ((lockScrollToSong || sFollowScroll) && timer_sw != 0) {
 		return;
 	}
 
@@ -275,7 +276,7 @@ void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){
 	
 	if(zDelta<0){
 		if(fwKeys && MK_CONTROL){
-			if (lockScrollToSong && timer_sw != 0) {
+			if ((lockScrollToSong || sFollowScroll) && timer_sw != 0) {
 				return;
 			}
 
@@ -289,7 +290,7 @@ void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){
 		}
 	}else{
 		if(fwKeys && MK_CONTROL){
-			if (lockScrollToSong && timer_sw != 0) {
+			if ((lockScrollToSong || sFollowScroll) && timer_sw != 0) {
 				return;
 			}
 
@@ -325,14 +326,14 @@ void ScrollData::KeyScroll(int iDirection)
 		vpos++;
 		break;
 	case DIRECTION_LEFT:
-		if (lockScrollToSong && timer_sw != 0) {
+		if ((lockScrollToSong || sFollowScroll) && timer_sw != 0) {
 			return;
 		}
 
 		hpos--;
 		break;
 	case DIRECTION_RIGHT:
-		if (lockScrollToSong && timer_sw != 0) {
+		if ((lockScrollToSong || sFollowScroll) && timer_sw != 0) {
 			return;
 		}
 

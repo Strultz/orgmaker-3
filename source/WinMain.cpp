@@ -123,6 +123,7 @@ char TrackN[] = "12345678QWERTYUI";
 int sMetronome = 0;
 int sSmoothScroll = 0;
 bool sAlwaysShowPlayhead = true;
+bool sFollowScroll = true;
 
 extern int volChangeLength;
 extern bool volChangeUseNoteLength;
@@ -218,7 +219,7 @@ void UpdateToolbarStatus() {
 			EnableMenuItem(hMenu, playbar_controls_menu[i], MF_BYCOMMAND | (enabled ? MF_ENABLED : MF_GRAYED));
 		}
 
-		if (lockScrollToSong) {
+		if (lockScrollToSong || sFollowScroll) {
 			for (int i = 0; i < 4; ++i) {
 				SendMessage(hwndToolbar, TB_ENABLEBUTTON, playbar_controls_toolbar[i], enabled);
 			}
@@ -794,11 +795,22 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	gNoteHighlights = GetPrivateProfileInt(MAIN_WINDOW, "NoteHighlights", 1, app_path);
 
 	lockScrollToSong = GetPrivateProfileInt(MAIN_WINDOW, "LockScrollToSong", 1, app_path);
+	WYOffset = lockScrollToSong ? 0 : 16;
+
 	sAlwaysShowPlayhead = GetPrivateProfileInt(MAIN_WINDOW, "AlwaysShowPlayhead", 1, app_path);
-	WYOffset = (lockScrollToSong && !sAlwaysShowPlayhead) ? 0 : 16;
+
+	sFollowScroll = GetPrivateProfileInt(MAIN_WINDOW, "FollowScroll", 1, app_path);
+
+	EnableMenuItem(hMenu, IDM_SMOOTHSCROLL, MF_BYCOMMAND | (lockScrollToSong ? MF_ENABLED : MF_GRAYED));
+
+	CheckMenuItem(hMenu, IDM_FOLLOWSCROLL, MF_BYCOMMAND | (sFollowScroll ? MFS_CHECKED : MFS_UNCHECKED));
+	EnableMenuItem(hMenu, IDM_FOLLOWSCROLL, MF_BYCOMMAND | (!lockScrollToSong ? MF_ENABLED : MF_GRAYED));
 
 	CheckMenuItem(hMenu, IDM_PLAYHEAD_ALWAYS, MF_BYCOMMAND | (sAlwaysShowPlayhead ? MFS_CHECKED : MFS_UNCHECKED));
+	EnableMenuItem(hMenu, IDM_PLAYHEAD_ALWAYS, MF_BYCOMMAND | ((!sSmoothScroll && lockScrollToSong) ? MF_ENABLED : MF_GRAYED));
+
 	CheckMenuItem(hMenu, IDM_LOCKSCROLL, MF_BYCOMMAND | (!lockScrollToSong ? MFS_CHECKED : MFS_UNCHECKED));
+
 	CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
 	CheckMenuItem(hMenu, IDM_FLOATTOOLBARS, MF_BYCOMMAND | (floatingToolbars ? MFS_CHECKED : MFS_UNCHECKED));
 	CheckMenuItem(hMenu, IDM_PLAY_NOTES_MID, MF_BYCOMMAND | (gPlayMidNote ? MFS_CHECKED : MFS_UNCHECKED));
@@ -1793,29 +1805,33 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		case IDM_PLAYHEAD_ALWAYS: {
 			hMenu = GetMenu(hWnd);
-
 			sAlwaysShowPlayhead = !sAlwaysShowPlayhead;
-
-			bool curSet = (lockScrollToSong && !sAlwaysShowPlayhead);
-
-			WYOffset = curSet ? 0 : 16;
-			WHeight = realAreaHeight - WYOffset;
-
 			CheckMenuItem(hMenu, IDM_PLAYHEAD_ALWAYS, MF_BYCOMMAND | (sAlwaysShowPlayhead ? MFS_CHECKED : MFS_UNCHECKED));
-			UpdateStatusBar(true);
 			break;
 		}
 		case IDM_LOCKSCROLL: {
 			hMenu = GetMenu(hWnd);
 
 			lockScrollToSong = !lockScrollToSong;
-
-			bool curSet = (lockScrollToSong && !sAlwaysShowPlayhead);
-
-			WYOffset = curSet ? 0 : 16;
+			WYOffset = lockScrollToSong ? 0 : 16;
 			WHeight = realAreaHeight - WYOffset;
 
 			CheckMenuItem(hMenu, IDM_LOCKSCROLL, MF_BYCOMMAND | (!lockScrollToSong ? MFS_CHECKED : MFS_UNCHECKED));
+			lastUpdCheck = -1;
+			UpdateToolbarStatus();
+			UpdateStatusBar(true);
+
+			EnableMenuItem(hMenu, IDM_PLAYHEAD_ALWAYS, MF_BYCOMMAND | ((!sSmoothScroll && lockScrollToSong) ? MF_ENABLED : MF_GRAYED));
+			EnableMenuItem(hMenu, IDM_FOLLOWSCROLL, MF_BYCOMMAND | (!lockScrollToSong ? MF_ENABLED : MF_GRAYED));
+			EnableMenuItem(hMenu, IDM_SMOOTHSCROLL, MF_BYCOMMAND | (lockScrollToSong ? MF_ENABLED : MF_GRAYED));
+			break;
+		}
+		case IDM_FOLLOWSCROLL: {
+			hMenu = GetMenu(hWnd);
+
+			sFollowScroll = !sFollowScroll;
+
+			CheckMenuItem(hMenu, IDM_FOLLOWSCROLL, MF_BYCOMMAND | (sFollowScroll ? MFS_CHECKED : MFS_UNCHECKED));
 			lastUpdCheck = -1;
 			UpdateToolbarStatus();
 			UpdateStatusBar(true);
@@ -2240,7 +2256,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_ALWAYS_CURRENT:    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Always select the current channel"); break;
 		case IDM_DRAGMODE:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Extend notes when dragging from their head"); break;
 		case IDM_PRESSNOTE:         SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Extend notes when clicking on their head"); break;
-		case IDM_LOCKSCROLL:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Lock horizontal scrolling to the playhead"); break;
 		case IDM_STOPNOWALL:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Stop all playing sounds"); break;
 
 		case IDM_DLGSETTING:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Configure the active document"); break;
@@ -2261,6 +2276,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_AUTOCHECKUPDATES:  SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Automatically check for new versions on launch"); break;
 		case IDM_ENABLEPLAYING:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Allow keyboard playback while the song is playing"); break;
 		case IDM_SMOOTHSCROLL:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Scroll by steps while the song is playing"); break;
+		case IDM_PLAYHEAD_ALWAYS:   SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Show the current step as a line while the song is playing"); break;
+		case IDM_LOCKSCROLL:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Use a timeline bar at the top for moving the playhead"); break;
+		case IDM_FOLLOWSCROLL:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Follow the playbar while the song is playing"); break;
 		case IDM_NOTE_ENLARGE:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Enlarge note heads while zoomed out"); break;
 		case IDM_SLIDEOVERLAPNOTES: SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Shift overlapping notes on other channels"); break;
 		case IDM_DRAWDOUBLE:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Show ghost notes from melody or percussion channels"); break;
