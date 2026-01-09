@@ -2282,6 +2282,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_NOTE_ENLARGE:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Enlarge note heads while zoomed out"); break;
 		case IDM_SLIDEOVERLAPNOTES: SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Shift overlapping notes on other channels"); break;
 		case IDM_DRAWDOUBLE:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Show ghost notes from melody or percussion channels"); break;
+		case IDM_NOTE_HIGHLIGHT:    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Highlight active notes while the song is playing"); break;
+		case IDM_PLAY_NOTES_MID:    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Resume active notes when unpausing the song"); break;
 		case IDM_DLGDEFAULT:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Modify default volume/panning values"); break;
 		case IDM_METRONOME:         SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Plays a sound on every beat/measure"); break;
 		case IDM_DLGTHEMES:         SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select a custom visual style"); break;

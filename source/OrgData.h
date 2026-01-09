@@ -121,8 +121,8 @@ typedef struct OrgData{
 
 		void GetNoteUsed(long *use,long *left,char track);//音譜残量等
 		//以下は表示
-		void PutNotes(int TPCY, bool vol);
-		void PutNotes2(int TPCY, bool vol);
+		void PutNotes(int TPCY, bool vol, long play);
+		void PutNotes2(int TPCY, bool vol, long play);
 		void PutMusic(void);
 		void PutNumber(void);
 		void PutRepeat(void);

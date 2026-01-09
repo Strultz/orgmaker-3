@@ -16,6 +16,7 @@ extern int sSmoothScroll;
 extern bool sAlwaysShowPlayhead;
 extern bool lockScrollToSong;
 extern bool sFollowScroll;
+extern bool gNoteHighlights;
 
 //◆◆表示部◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
 RECT note_rect[] = {
@@ -265,7 +266,7 @@ void OrgData::PutRepeat(void)
 }
 
 //音符の表示
-void OrgData::PutNotes(int TPCY, bool vol)
+void OrgData::PutNotes(int TPCY, bool vol, long play)
 {
 	int i,j,k,t,addY;
 	int n; //2010.09.23 A
@@ -288,6 +289,8 @@ void OrgData::PutNotes(int TPCY, bool vol)
 	//必要なデータを取得
 	GetMusicInfo(&mi);line = mi.line;dot = mi.dot;
 	scr_data.GetScrollPosition(&scr_h,&scr_v);
+
+	bool vmode = gNoteHighlights && timer_sw != 0;
 
 	//for(i=0;i<128*92;i++)noteon[i] = 0;
 
@@ -324,7 +327,7 @@ void OrgData::PutNotes(int TPCY, bool vol)
 	if (!vol) {
 		for (n = 0; n < MAXMELODY; n++) {
 			k = getRecentTrack(n, 0);
-			if (k == track)continue;
+			if (k == track && !vmode)continue;
 			if ((p = info.tdata[k].note_list) == NULL)continue;//音符が無ければ中止
 			while (p != NULL && p->to != NULL) {//どこから表示するか
 				xpos = (p->x - scr_h) * NoteWidth + KEYWIDTH;
@@ -361,10 +364,18 @@ void OrgData::PutNotes(int TPCY, bool vol)
 					}
 
 					for (j = 0, i = p->length - 1; i > 0; i--, j++) {//尻尾
-						if (TPCY == 0) PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &note_tail_rect[k + 8], BMPNOTE);
-						else PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &rc_TCPY[2 + t], BMPNOTE);
+						if (TPCY == 0) {
+							if (vmode && !mute[k] && play >= p->x && play < p->x + p->length) {
+								PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &note_tail_rect[k], BMPNOTE);
+							} else PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &note_tail_rect[k + 8], BMPNOTE);
+						} else PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &rc_TCPY[2 + t], BMPNOTE);
 					}
-					if (TPCY == 0) PutBitmapHead(xpos, ypos + 2 + addY, &note_blue_rect[k], BMPNOTE, p->length);//音符(新)
+					if (TPCY == 0) {
+						if (vmode && !mute[k] && play >= p->x && play < p->x + p->length) {
+							iKeyPushDown[p->y] = 1;
+							PutBitmapHead(xpos, ypos + 2 + addY, &note_blue_rect[k + 16], BMPNOTE, p->length);//音符(新)
+						} else PutBitmapHead(xpos, ypos + 2 + addY, &note_blue_rect[k], BMPNOTE, p->length);//音符(新)
+					}
 					else PutBitmapHead(xpos, ypos + 2 + addY, &rc_TCPY[t], BMPNOTE, p->length);//音符(新)
 				}
 				p = p->to;
@@ -391,7 +402,7 @@ void OrgData::PutNotes(int TPCY, bool vol)
 				ypos = (95 - p->y - scr_v)*12;//下が0になる95が最大
 				xpos = (p->x - scr_h)*NoteWidth + KEYWIDTH;
 				if(xpos > WWidth)break;//表示領域を超えた。
-				if(!vol && ypos >= 0 && ypos < WHeight+286-WHNM){//表示範囲YPOS
+				if(!vol && ypos >= 0 && ypos < WHeight+286-WHNM && !vmode){//表示範囲YPOS
 					//tBitmap(xpos,ypos+2,&note_rect[0],BMPNOTE);//音符
 					for(j = 0,i = p->length-1; i > 0; i--,j++){//尻尾
 						//PutBitmap(xpos+j*16+16,ypos+3,&note_rect[2],BMPNOTE);
@@ -415,7 +426,7 @@ void OrgData::PutNotes(int TPCY, bool vol)
 	}
 }
 //音符(ドラム)の表示
-void OrgData::PutNotes2(int TPCY, bool vol)
+void OrgData::PutNotes2(int TPCY, bool vol, long play)
 {
 	int i,j,k,t,addY;
 	int n; //2010.09.23 A
@@ -428,11 +439,13 @@ void OrgData::PutNotes2(int TPCY, bool vol)
 	GetMusicInfo(&mi);line = mi.line;dot = mi.dot;
 	scr_data.GetScrollPosition(&scr_h,&scr_v);
 
+	bool vmode = gNoteHighlights && timer_sw != 0;
+
 	//編集しない音符を先に表示///////////
 	if (!vol) {
 		for (n = MAXMELODY; n < MAXTRACK; n++) {
 			k = getRecentTrack(n - MAXMELODY, 1);
-			if (k == track)continue;
+			if (k == track && !vmode)continue;
 			if ((p = info.tdata[k].note_list) == NULL) {
 				//			MessageBox(hWnd,"","",MB_OK);
 				continue;//音符が無ければ中止
@@ -460,11 +473,20 @@ void OrgData::PutNotes2(int TPCY, bool vol)
 						if((k-MAXMELODY)>=4)addY--;
 					}*/
 					for (j = 0, i = p->length - 1; i > 0; i--, j++) {//尻尾
-						if (TPCY == 0) PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &note_tail_rect[k], BMPNOTE);
+						if (TPCY == 0) {
+							if (vmode && !mute[k] && play >= p->x && play < p->x + p->length)
+								PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &note_tail_rect[k - 8], BMPNOTE);
+							else PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &note_tail_rect[k], BMPNOTE);
+						}
 						else PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &rc_TCPY[2 + t], BMPNOTE);
 					}
-					if (TPCY == 0) PutBitmapHead(xpos, ypos + 2 + addY, &note_blue_rect[k], BMPNOTE, p->length);//音符
-					else PutBitmapHead(xpos, ypos + 2 + addY, &rc_TCPY[0 + t], BMPNOTE, p->length);//音符
+					if (TPCY == 0) {
+						if (vmode && !mute[k] && play >= p->x && play < p->x + p->length) {
+							iKeyPushDown[p->y] = 1;
+							PutBitmapHead(xpos, ypos + 2 + addY, &note_blue_rect[k + 16], BMPNOTE, p->length);//音符(新)
+						} else PutBitmapHead(xpos, ypos + 2 + addY, &note_blue_rect[k], BMPNOTE, p->length);//音符(新)
+					}
+					else PutBitmapHead(xpos, ypos + 2 + addY, &rc_TCPY[t], BMPNOTE, p->length);//音符(新)
 				}
 				p = p->to;
 			}
@@ -490,7 +512,7 @@ void OrgData::PutNotes2(int TPCY, bool vol)
 				ypos = (95 - p->y - scr_v)*12;//下が0になる95が最大
 				xpos = (p->x - scr_h)*NoteWidth + KEYWIDTH;
 				if(xpos > WWidth)break;//表示領域を超えた。
-				if(!vol && ypos >= 0 && ypos < WHeight+286-WHNM){//表示範囲YPOS
+				if(!vol && ypos >= 0 && ypos < WHeight+286-WHNM && !vmode){//表示範囲YPOS
 					//PutBitmap(xpos,ypos+2,&note_rect[0],BMPNOTE);//音符
 					//PutBitmap2(xpos,ypos+2,&note_blue_rect[track+16],BMPNOTE);//音符	// 2014.05.27 D
 					for(j = 0,i = p->length-1; i > 0; i--,j++){//尻尾
@@ -530,6 +552,11 @@ void OrgData::PutMusic(void)
 
 	long playPos;
 	org_data.GetPlayPos(NULL, &playPos);
+
+	bool vmode = gNoteHighlights && timer_sw != 0;
+	if (vmode) {
+		memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
+	}
 
 	// Scroll with song playback
 	if (timer_sw && lockScrollToSong) {
@@ -593,16 +620,16 @@ void OrgData::PutMusic(void)
 	}
 
 	if(gDrawDouble==0){
-		if(track < MAXMELODY)PutNotes(0, false);
-		else PutNotes2(0, false);
+		if(track < MAXMELODY)PutNotes(0, false, playPos);
+		else PutNotes2(0, false, playPos);
 	}else{
 		if(track < MAXMELODY){
-			PutNotes2(1, false);	//半透明表示
-			PutNotes(0, false);		//実体表示
+			PutNotes2(1, false, playPos);	//半透明表示
+			PutNotes(0, false, playPos);		//実体表示
 		}
 		else{
-			PutNotes(1, false);	//半透明表示
-			PutNotes2(0, false);	//実体表示
+			PutNotes(1, false, playPos);	//半透明表示
+			PutNotes2(0, false, playPos);	//実体表示
 		}
 		
 	}
@@ -620,12 +647,16 @@ void OrgData::PutMusic(void)
 	for(j = 0; j < (WHeight / 144) + 1; j++) PutBitmap(0, j*144 + vpos, &msc_rect[0], BMPMUSIC);
 
 	//キーボード鍵盤（鍵盤部分）
+	for (j = 0; j < 96; j++) {
+		if (iKeyPushDown[j] != 0) {
+			for (i = 0; i < (WHeight / 144) + 1; i++) {
+				PutBitmap(0, (95 - (j % 12) - i * 12 - vpos2) * 12, &rc_PushKB3[j % 12], BMPMUSIC);//オクターブ違い鍵盤
+			}
+		}
+	}
 	for(j = 0; j < 96 ; j++){ // 2010.09.22 A
 		if(iKeyPushDown[j]!=0){
 			//A 2010.09.24
-			for(i = 0; i < (WHeight / 144) + 1; i++){
-				PutBitmap(0,  (95 - (j%12)- i*12 - vpos2)*12, &rc_PushKB3[j%12],BMPMUSIC);//オクターブ違い鍵盤
-			}
 			PutBitmap(0,  (95 - j - vpos2)*12, &rc_PushKB2[j%12],BMPMUSIC);//鍵盤
 		}
 	}
@@ -655,17 +686,17 @@ void OrgData::PutMusic(void)
 	//PutPanParts(x);//パンライン
 
 	if (gDrawDouble == 0) {
-		if (track < MAXMELODY)PutNotes(0, true);
-		else PutNotes2(0, true);
+		if (track < MAXMELODY)PutNotes(0, true, playPos);
+		else PutNotes2(0, true, playPos);
 	}
 	else {
 		if (track < MAXMELODY) {
-			PutNotes2(1, true);	//半透明表示
-			PutNotes(0, true);		//実体表示
+			PutNotes2(1, true, playPos);	//半透明表示
+			PutNotes(0, true, playPos);		//実体表示
 		}
 		else {
-			PutNotes(1, true);	//半透明表示
-			PutNotes2(0, true);	//実体表示
+			PutNotes(1, true, playPos);	//半透明表示
+			PutNotes2(0, true, playPos);	//実体表示
 		}
 
 	}

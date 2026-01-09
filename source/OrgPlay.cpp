@@ -12,7 +12,7 @@ extern HWND hwndToolbar;
 extern int sSmoothScroll;
 extern int iKeyPushDown[256];
 extern unsigned char old_key[];
-extern bool gNoteHighlights;
+//extern bool gNoteHighlights;
 extern bool lockScrollToSong;
 extern bool sFollowScroll;
 
@@ -39,10 +39,10 @@ void OrgData::PlayData(void)
 
 			if(mute[i] == 0) {
 				if(np[i]->y != KEYDUMMY) {
-					if (gNoteHighlights && this->track == i) {
+					/*if (gNoteHighlights && this->track == i) {
 						if (old_key[i] != 255) iKeyPushDown[old_key[i]] = 0;
 						iKeyPushDown[np[i]->y] = 1;
-					}
+					}*/
 					PlayOrganObject(np[i]->y,-1,i,info.tdata[i].freq, info.tdata[i].pipi);
 					now_leng[i] = np[i]->length;
 				}
@@ -52,7 +52,7 @@ void OrgData::PlayData(void)
 			np[i] = np[i]->to;//次の音符を指す
 		}
 		if(now_leng[i] == 0) {
-			if (gNoteHighlights && this->track == i && old_key[i] != 255) iKeyPushDown[old_key[i]] = 0;
+			//if (gNoteHighlights && this->track == i && old_key[i] != 255) iKeyPushDown[old_key[i]] = 0;
 			PlayOrganObject(NULL,2,i,info.tdata[i].freq, info.tdata[i].pipi);
 		}
 		if(now_leng[i] > 0) now_leng[i]--;
@@ -65,10 +65,10 @@ void OrgData::PlayData(void)
 		if(np[i] != NULL && play_p == np[i]->x) {//音が来た。
 			if(np[i]->y != KEYDUMMY) {//ならす
 				if (mute[i] == 0) {
-					if (gNoteHighlights && this->track == i) {
+					/*if (gNoteHighlights && this->track == i) {
 						if (old_key[i] != 255) iKeyPushDown[old_key[i]] = 0;
 						iKeyPushDown[np[i]->y] = 1;
-					}
+					}*/
 					PlayDramObject(np[i]->y, 1, i - MAXMELODY);
 				}
 			}
@@ -77,9 +77,9 @@ void OrgData::PlayData(void)
 			np[i] = np[i]->to;//次の音符を指す
 		}
 
-		if (gNoteHighlights && this->track == i && !IsDramPlaying(i - MAXMELODY) && old_key[i] != 255) {
+		/*if (gNoteHighlights && this->track == i && !IsDramPlaying(i - MAXMELODY) && old_key[i] != 255) {
 			iKeyPushDown[old_key[i]] = 0;
-		}
+		}*/
 	}
 	//プレイヤーに表示
 	//自動スクロール
