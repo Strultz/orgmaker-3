@@ -2380,15 +2380,14 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			scr_data.KeyScroll(DIRECTION_RIGHT);
 			break;
 		case VK_F5:
+		case VK_SPACE:
 		//case VK_NUMPAD0:
 			if (timer_sw == 0) StartPlayingSong(-1);
 			else StopPlayingSong();
 			break;
 		case VK_F6:
 			StopPlayingSong();
-			scr_data.SetHorzScroll(0);
-			org_data.SetPlayPointer(0);
-			StartPlayingSong(-1);
+			StartPlayingSong(0);
 			break;
 		//case VK_HOME:
 		//	SendMessage(hDlgPlayer , WM_COMMAND , IDC_START , NULL);
