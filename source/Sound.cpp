@@ -810,12 +810,10 @@ void ChangeOrganFrequency(unsigned char key,char track, DWORD a)
 	//double tmpDouble;
 	for(int j = 0; j < 8; j++)
 		for(int i = 0; i < 2; i++){
-			//dmmult = (0.98f + ((double)a / 50000.0f));
-			//tmpDouble = (((double)oct_wave[j].wave_size * freq_tbl[key]) * (double)oct_wave[j].oct_par) / (8.00f * (2.0f - dmmult));
-			
+			//double mul = pow(2.0, ((int)a - 1000) / 12000.0);
 			if (lpORGANBUFFER[track][j][i] != NULL)
 				S_SetSoundFrequency(lpORGANBUFFER[track][j][i], //1000‚ð+ƒ¿‚ÌƒfƒtƒHƒ‹ƒg’l‚Æ‚·‚é
-					(DWORD)((oct_wave[j].wave_size * freq_tbl[key]) * oct_wave[j].oct_par) / 8 + (a - 1000)
+					(DWORD)((oct_wave[j].wave_size * freq_tbl[key]) * oct_wave[j].oct_par) / 8 + (a - 1000) // (8 / mul)
 //					((oct_wave[j].wave_size*freq_tbl[key])*oct_wave[j].oct_par)/8 + (a-1000)
 				);
 		}

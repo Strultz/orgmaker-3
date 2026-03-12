@@ -16,6 +16,8 @@ extern unsigned char old_key[];
 extern bool lockScrollToSong;
 extern bool sFollowScroll;
 
+bool followPlayhead = true;
+
 char timer_sw = 0;
 long oplay_p;
 long play_p;//現在再生位置（キャンバス）
@@ -233,7 +235,7 @@ void StopPlayingSong(void) {
 
 			UpdateStatusBar(true);
 		}
-		else if (sFollowScroll) {
+		else if (followPlayhead) {
 			long hpos;
 			scr_data.GetScrollPosition(&hpos, NULL);
 

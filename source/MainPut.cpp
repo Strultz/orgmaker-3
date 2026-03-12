@@ -17,6 +17,7 @@ extern bool sAlwaysShowPlayhead;
 extern bool lockScrollToSong;
 extern bool sFollowScroll;
 extern bool gNoteHighlights;
+extern bool followPlayhead;
 
 //◆◆表示部◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
 RECT note_rect[] = {
@@ -563,7 +564,7 @@ void OrgData::PutMusic(void)
 		scr_data.SetHorzScroll(sSmoothScroll ? playPos : ((playPos / (info.dot * info.line)) * (info.dot * info.line)));
 	}
 	else if (timer_sw) {
-		if (sFollowScroll) {
+		if (followPlayhead) {
 			scr_data.GetScrollPosition(&hpos, NULL);
 
 			int half = (WWidth - KEYWIDTH) / NoteWidth / 2;
@@ -613,6 +614,7 @@ void OrgData::PutMusic(void)
 	}*/
 
 	//キーボード鍵盤（譜面背景を光らす部分）
+	// TODO this doesn't work while playing because we fill iKeyPushDown in PutNotes...
 	for(j = 0; j < 96; j++){ // 2010.09.22 A
 		if(iKeyPushDown[j]!=0){
 			PutBitmap(0,  (95 - j - vpos2)*12, &rc_PushKB[j%12],BMPMUSIC);//鍵盤
@@ -647,7 +649,7 @@ void OrgData::PutMusic(void)
 	for(j = 0; j < (WHeight / 144) + 1; j++) PutBitmap(0, j*144 + vpos, &msc_rect[0], BMPMUSIC);
 
 	//キーボード鍵盤（鍵盤部分）
-	for (j = 0; j < 96; j++) {
+	for (j = 0; !vmode && j < 96; j++) {
 		if (iKeyPushDown[j] != 0) {
 			for (i = 0; i < (WHeight / 144) + 1; i++) {
 				PutBitmap(0, (95 - (j % 12) - i * 12 - vpos2) * 12, &rc_PushKB3[j % 12], BMPMUSIC);//オクターブ違い鍵盤

@@ -774,7 +774,7 @@ BEGIN
             MENUITEM "Playback &Smooth Scrolling",  IDM_SMOOTHSCROLL
             MENUITEM "Sho&w Playback Step",         IDM_PLAYHEAD_ALWAYS
             MENUITEM "Use Play&head Timeline",      IDM_LOCKSCROLL
-            MENUITEM "&Follow Play&head",           IDM_FOLLOWSCROLL
+            MENUITEM "Always &Follow Playhead",     IDM_FOLLOWSCROLL
             MENUITEM "Extend &Note Heads",          IDM_NOTE_ENLARGE
             MENUITEM "Slide &Overlapping Notes",    IDM_SLIDEOVERLAPNOTES
             MENUITEM "Show &All Channels",          IDM_DRAWDOUBLE

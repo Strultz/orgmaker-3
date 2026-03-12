@@ -873,13 +873,14 @@
 #define IDM_LOCKSCROLL                  40380
 #define IDM_PLAYHEAD_ALWAYS             40381
 #define IDM_FOLLOWSCROLL                40382
+#define IDC_TOGGLEFOLLOW                40383
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        267
-#define _APS_NEXT_COMMAND_VALUE         40383
+#define _APS_NEXT_COMMAND_VALUE         40384
 #define _APS_NEXT_CONTROL_VALUE         1313
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

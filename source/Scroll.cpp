@@ -13,6 +13,7 @@
 extern char timer_sw;
 extern bool lockScrollToSong;
 extern bool sFollowScroll;
+extern bool followPlayhead;
 extern int NoteWidth;
 
 extern CHAR app_path[BUF_SIZE];
@@ -114,6 +115,7 @@ void ScrollData::PrintHorzPosition(void)
 	itoa(hpos % (mi.dot * mi.line),str,10);
 	SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,str);*/
 
+	UpdateToolbarStatus();
 	UpdateStatusBar(true);
 
 }
@@ -123,8 +125,11 @@ void ScrollData::HorzScrollProc(short mode, long scroll){
 	MUSICINFO mi;
 	org_data.GetMusicInfo(&mi);
 
-	if ((lockScrollToSong || sFollowScroll) && timer_sw != 0) {
-		return;
+	if (timer_sw != 0) {
+		if (lockScrollToSong || sFollowScroll) {
+			return;
+		}
+		followPlayhead = false;
 	}
 
 	switch(mode){
@@ -276,8 +281,11 @@ void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){
 	
 	if(zDelta<0){
 		if(fwKeys && MK_CONTROL){
-			if ((lockScrollToSong || sFollowScroll) && timer_sw != 0) {
-				return;
+			if (timer_sw != 0) {
+				if (lockScrollToSong || sFollowScroll) {
+					return;
+				}
+				followPlayhead = false;
 			}
 
 			hpos += 4;
@@ -290,8 +298,11 @@ void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){
 		}
 	}else{
 		if(fwKeys && MK_CONTROL){
-			if ((lockScrollToSong || sFollowScroll) && timer_sw != 0) {
-				return;
+			if (timer_sw != 0) {
+				if (lockScrollToSong || sFollowScroll) {
+					return;
+				}
+				followPlayhead = false;
 			}
 
 			hpos -= 4;
@@ -326,15 +337,21 @@ void ScrollData::KeyScroll(int iDirection)
 		vpos++;
 		break;
 	case DIRECTION_LEFT:
-		if ((lockScrollToSong || sFollowScroll) && timer_sw != 0) {
-			return;
+		if (timer_sw != 0) {
+			if (lockScrollToSong || sFollowScroll) {
+				return;
+			}
+			followPlayhead = false;
 		}
 
 		hpos--;
 		break;
 	case DIRECTION_RIGHT:
-		if ((lockScrollToSong || sFollowScroll) && timer_sw != 0) {
-			return;
+		if (timer_sw != 0) {
+			if (lockScrollToSong || sFollowScroll) {
+				return;
+			}
+			followPlayhead = false;
 		}
 
 		hpos++;

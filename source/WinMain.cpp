@@ -123,7 +123,7 @@ char TrackN[] = "12345678QWERTYUI";
 int sMetronome = 0;
 int sSmoothScroll = 0;
 bool sAlwaysShowPlayhead = true;
-bool sFollowScroll = true;
+bool sFollowScroll = false;
 
 extern int volChangeLength;
 extern bool volChangeUseNoteLength;
@@ -132,6 +132,8 @@ extern bool volChangeSetNoteLength;
 extern bool gLMBDown;
 extern bool gRMBDown;
 extern bool gMMBDown;
+
+extern bool followPlayhead;
 
 static bool hasMouseCapture = false;
 
@@ -219,15 +221,19 @@ void UpdateToolbarStatus() {
 			EnableMenuItem(hMenu, playbar_controls_menu[i], MF_BYCOMMAND | (enabled ? MF_ENABLED : MF_GRAYED));
 		}
 
-		if (lockScrollToSong || sFollowScroll) {
+		if (lockScrollToSong) {
 			for (int i = 0; i < 4; ++i) {
 				SendMessage(hwndToolbar, TB_ENABLEBUTTON, playbar_controls_toolbar[i], enabled);
 			}
+			SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDC_START, true);
+			SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDC_END, true);
 		}
 		else {
 			for (int i = 0; i < 4; ++i) {
-				SendMessage(hwndToolbar, TB_ENABLEBUTTON, playbar_controls_toolbar[i], true);
+				SendMessage(hwndToolbar, TB_ENABLEBUTTON, playbar_controls_toolbar[i], enabled || !sFollowScroll);
 			}
+			SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDC_START, enabled || !sFollowScroll);
+			SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDC_END, enabled || !sFollowScroll);
 		}
 
 		// change icon to pause while playing
@@ -262,6 +268,11 @@ void UpdateToolbarStatus() {
 	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_LOUPE_MINUS, NoteWidth > 4);
 	EnableMenuItem(GetMenu(hWnd), IDM_LOUPE_PLUS, NoteWidth < 16 ? MF_ENABLED : MF_GRAYED);
 	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDM_LOUPE_PLUS, NoteWidth < 16);
+
+	EnableMenuItem(GetMenu(hWnd), IDM_LOUPE_PLUS, NoteWidth < 16 ? MF_ENABLED : MF_GRAYED);
+
+	SendMessage(hwndToolbar, TB_CHECKBUTTON, IDC_TOGGLEFOLLOW, followPlayhead);
+	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDC_TOGGLEFOLLOW, !lockScrollToSong && !sFollowScroll);
 
 	for (int i = 0; i < MAXTRACK; ++i) {
 		SendMessage(hwndTrackbar, TB_CHECKBUTTON, iChgTrackBtn[i], org_data.track == i);
@@ -799,7 +810,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	sAlwaysShowPlayhead = GetPrivateProfileInt(MAIN_WINDOW, "AlwaysShowPlayhead", 1, app_path);
 
-	sFollowScroll = GetPrivateProfileInt(MAIN_WINDOW, "FollowScroll", 1, app_path);
+	sFollowScroll = GetPrivateProfileInt(MAIN_WINDOW, "FollowScroll", 0, app_path);
 
 	EnableMenuItem(hMenu, IDM_SMOOTHSCROLL, MF_BYCOMMAND | (lockScrollToSong ? MF_ENABLED : MF_GRAYED));
 
@@ -936,11 +947,15 @@ BOOL SystemTask(void)
 		if (!GetMessage(&msg, NULL, 0, 0))
 			return FALSE;
 
+		// These will handle keyboard input when focused
+		if ((hDlgComments && IsDialogMessage(hDlgComments, &msg))
+			|| (hDlgHelp && IsDialogMessage(hDlgHelp, &msg))) {
+			continue;
+		}
+
 		if (!TranslateAccelerator(hWnd, Ac, &msg)) {
 			if ((!hwndToolbarPopup || !IsDialogMessage(hwndToolbarPopup, &msg))
-				&& (!hwndTrackbarPopup || !IsDialogMessage(hwndTrackbarPopup, &msg))
-				&& (!hDlgHelp || !IsDialogMessage(hDlgHelp, &msg))
-				&& (!hDlgComments || !IsDialogMessage(hDlgComments, &msg))) {
+				&& (!hwndTrackbarPopup || !IsDialogMessage(hwndTrackbarPopup, &msg))) {
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
@@ -1792,7 +1807,14 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				StopPlayingSong();
 				org_data.SetPlayPointer(0);
 			}
+			if (timer_sw != 0) {
+				if (lockScrollToSong || sFollowScroll) {
+					break;
+				}
+				followPlayhead = false;
+			}
 			scr_data.SetHorzScroll(0);
+			UpdateToolbarStatus();
 			break;
 		case IDC_END:
 		case ID_AC_TOEND:
@@ -1801,7 +1823,14 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				StopPlayingSong();
 				org_data.SetPlayPointer(mi.end_x);
 			}
+			if (timer_sw != 0) {
+				if (lockScrollToSong || sFollowScroll) {
+					break;
+				}
+				followPlayhead = false;
+			}
 			scr_data.SetHorzScroll(mi.end_x);
+			UpdateToolbarStatus();
 			break;
 		case IDM_PLAYHEAD_ALWAYS: {
 			hMenu = GetMenu(hWnd);
@@ -1830,11 +1859,17 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			hMenu = GetMenu(hWnd);
 
 			sFollowScroll = !sFollowScroll;
+			followPlayhead = true;
 
 			CheckMenuItem(hMenu, IDM_FOLLOWSCROLL, MF_BYCOMMAND | (sFollowScroll ? MFS_CHECKED : MFS_UNCHECKED));
 			lastUpdCheck = -1;
 			UpdateToolbarStatus();
 			UpdateStatusBar(true);
+			break;
+		}
+		case IDC_TOGGLEFOLLOW: {
+			followPlayhead = !followPlayhead;
+			UpdateToolbarStatus();
 			break;
 		}
 		case IDC_LEFT:
@@ -2734,7 +2769,8 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW, "NoteHighlights", num_buf, app_path);
 	wsprintf(num_buf, "%d", lockScrollToSong);
 	WritePrivateProfileString(MAIN_WINDOW, "LockScrollToSong", num_buf, app_path);
-	
+	wsprintf(num_buf, "%d", sFollowScroll);
+	WritePrivateProfileString(MAIN_WINDOW, "FollowScroll", num_buf, app_path);
 
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentThemePath", gSelectedTheme, app_path);
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentWavePath", gSelectedWave, app_path);
