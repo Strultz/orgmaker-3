@@ -916,14 +916,23 @@ BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 void ClipboardPaste(int no, int flags);
 
+static int copyNum = 1;
+static bool mixPaste = false;
+static bool copyNotes = true;
+static bool copyVol = true;
+static bool copyPan = true;
+
+void AdvancedPaste() {
+	int copyFlags = 0;
+	copyFlags |= (mixPaste ? PF_MIX_PASTE : 0);
+	copyFlags |= (copyNotes ? PF_PASTE_NOTE : 0);
+	copyFlags |= (copyVol ? PF_PASTE_VOL : 0);
+	copyFlags |= (copyPan ? PF_PASTE_PAN : 0);
+
+	ClipboardPaste(copyNum, copyFlags);
+}
 
 BOOL CALLBACK DialogAdvPaste(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
-	static int copyNum = 1;
-	static bool mixPaste = false;
-	static bool copyNotes = true;
-	static bool copyVol = true;
-	static bool copyPan = true;
-
 	LPNMHDR lpnm;
 
 	switch (message) {

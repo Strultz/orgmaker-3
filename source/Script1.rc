@@ -779,6 +779,7 @@ BEGIN
             MENUITEM "Slide &Overlapping Notes",    IDM_SLIDEOVERLAPNOTES
             MENUITEM "Show &All Channels",          IDM_DRAWDOUBLE
             MENUITEM "&Highlight Playing Notes",    IDM_NOTE_HIGHLIGHT
+            MENUITEM "Always Use &Paste Special Settings", IDM_USESPECIALPASTE
             MENUITEM SEPARATOR
             MENUITEM "&Resume Notes After Head",    IDM_PLAY_NOTES_MID
             MENUITEM "&Metronome",                  IDM_METRONOME

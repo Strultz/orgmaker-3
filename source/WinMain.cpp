@@ -81,6 +81,7 @@ BOOL CALLBACK DialogSongTra(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 BOOL CALLBACK DialogComments(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void SetModified(bool mod);
+void AdvancedPaste();
 
 //Declare global variables here
 HINSTANCE hInst;//instance handle
@@ -124,6 +125,7 @@ int sMetronome = 0;
 int sSmoothScroll = 0;
 bool sAlwaysShowPlayhead = true;
 bool sFollowScroll = false;
+bool sUseSpecialPaste = false;
 
 extern int volChangeLength;
 extern bool volChangeUseNoteLength;
@@ -812,6 +814,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	sFollowScroll = GetPrivateProfileInt(MAIN_WINDOW, "FollowScroll", 0, app_path);
 
+	sUseSpecialPaste = GetPrivateProfileInt(MAIN_WINDOW, "UseSpecialPaste", 0, app_path);
+
 	EnableMenuItem(hMenu, IDM_SMOOTHSCROLL, MF_BYCOMMAND | (lockScrollToSong ? MF_ENABLED : MF_GRAYED));
 
 	CheckMenuItem(hMenu, IDM_FOLLOWSCROLL, MF_BYCOMMAND | (sFollowScroll ? MFS_CHECKED : MFS_UNCHECKED));
@@ -826,6 +830,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	CheckMenuItem(hMenu, IDM_FLOATTOOLBARS, MF_BYCOMMAND | (floatingToolbars ? MFS_CHECKED : MFS_UNCHECKED));
 	CheckMenuItem(hMenu, IDM_PLAY_NOTES_MID, MF_BYCOMMAND | (gPlayMidNote ? MFS_CHECKED : MFS_UNCHECKED));
 	CheckMenuItem(hMenu, IDM_NOTE_HIGHLIGHT, MF_BYCOMMAND | (gNoteHighlights ? MFS_CHECKED : MFS_UNCHECKED));
+
+	CheckMenuItem(hMenu, IDM_USESPECIALPASTE, MF_BYCOMMAND | (sUseSpecialPaste ? MFS_CHECKED : MFS_UNCHECKED));
 
 	for (i = 0; i < MAXTRACK; ++i) {
 		snprintf(strtmp, 128, "Channel%dDefaultVol", i);
@@ -1730,9 +1736,14 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				}
 				break;
 			}
-			case ID_AC_NUM7:
 			case ID_AC_PASTE:
 			case IDM_SELECT_PASTE:
+				if (sUseSpecialPaste) {
+					AdvancedPaste();
+					break;
+				}
+				// fallthrough
+			case ID_AC_NUM7:
 				ClipboardPaste(1, PF_PASTE_ALL);
 				break;
 			case ID_AC_NUM8:
@@ -2061,6 +2072,12 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_SMOOTHSCROLL:
 			ChangeScrollMode();
 			break;
+		case IDM_USESPECIALPASTE:
+			hMenu = GetMenu(hWnd);
+			sUseSpecialPaste = !sUseSpecialPaste;
+			CheckMenuItem(hMenu, IDM_USESPECIALPASTE, (MF_BYCOMMAND | (sUseSpecialPaste ? MFS_CHECKED : MFS_UNCHECKED)));
+			ShowStatusMessage();
+			break;
 		case IDM_ALWAYS_CURRENT:
 		case ID_AC_ALWAYS_CURRENT:
 			ChangeSelAlwaysCurrent();
@@ -2318,6 +2335,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_SLIDEOVERLAPNOTES: SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Shift overlapping notes on other channels"); break;
 		case IDM_DRAWDOUBLE:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Show ghost notes from melody or percussion channels"); break;
 		case IDM_NOTE_HIGHLIGHT:    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Highlight active notes while the song is playing"); break;
+		case IDM_USESPECIALPASTE:   SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Use the Paste Special settings when pasting normally"); break;
 		case IDM_PLAY_NOTES_MID:    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Resume active notes when unpausing the song"); break;
 		case IDM_DLGDEFAULT:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Modify default volume/panning values"); break;
 		case IDM_METRONOME:         SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Plays a sound on every beat/measure"); break;
@@ -2771,7 +2789,9 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW, "LockScrollToSong", num_buf, app_path);
 	wsprintf(num_buf, "%d", sFollowScroll);
 	WritePrivateProfileString(MAIN_WINDOW, "FollowScroll", num_buf, app_path);
-
+	wsprintf(num_buf, "%d", sUseSpecialPaste);
+	WritePrivateProfileString(MAIN_WINDOW, "UseSpecialPaste", num_buf, app_path);
+	
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentThemePath", gSelectedTheme, app_path);
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentWavePath", gSelectedWave, app_path);
 
