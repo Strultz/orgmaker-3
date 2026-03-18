@@ -960,15 +960,7 @@ BOOL CALLBACK DialogAdvPaste(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 			copyNotes = IsDlgButtonChecked(hdwnd, IDC_ADVNOTES);
 			copyVol = IsDlgButtonChecked(hdwnd, IDC_ADVVOL);
 			copyPan = IsDlgButtonChecked(hdwnd, IDC_ADVPAN);
-
-			int copyFlags = 0;
-			copyFlags |= (mixPaste  ? PF_MIX_PASTE  : 0);
-			copyFlags |= (copyNotes ? PF_PASTE_NOTE : 0);
-			copyFlags |= (copyVol   ? PF_PASTE_VOL  : 0);
-			copyFlags |= (copyPan   ? PF_PASTE_PAN  : 0);
-
-			ClipboardPaste(copyNum, copyFlags);
-
+			AdvancedPaste();
 			EndDialog(hdwnd, 0);
 			return 0;
 		}

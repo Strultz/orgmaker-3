@@ -175,6 +175,8 @@ void MouseDrag(WPARAM wParam, LPARAM lParam)
 
 	unsigned char newn;
 
+	bool shift = GetKeyState(VK_SHIFT) < 0;
+
 	if(DragStartx<=-99999){
 		if(wParam & MK_LBUTTON){
 			if (keyDrag > -99999) {
@@ -263,14 +265,14 @@ void MouseDrag(WPARAM wParam, LPARAM lParam)
 					long xxx, xxxplusvalue, xxxredraw = 0;
 					xxxplusvalue = (mouse_x >= Last_VOL_Drag_mouse_x) ? 1 : -1;
 					for(xxx = Last_VOL_Drag_mouse_x; xxx != mouse_x; xxx += xxxplusvalue){ //マウスポインタがすばやくてとんだ間も補完しつつ消す
-						if(org_data.CutVolume(xxx,(unsigned char)mouse_y)==TRUE){ 
+						if(org_data.CutVolume(xxx,(unsigned char)mouse_y, !shift)==TRUE){ 
 							//org_data.PutMusic();//楽譜の再描画
 							xxxredraw++; //RedrawWindow(hWnd,&rectVOL,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 						}
 					}
 					Last_VOL_Drag_mouse_x = mouse_x; //2014.05.02 A
 					Last_VOL_Drag_mouse_y = mouse_y;
-					if(org_data.CutVolume(mouse_x,(unsigned char)mouse_y)==TRUE){	// 2010.08.14 C
+					if(org_data.CutVolume(mouse_x,(unsigned char)mouse_y, !shift)==TRUE){	// 2010.08.14 C
 						//org_data.PutMusic();//楽譜の再描画
 						xxxredraw++; //RedrawWindow(hWnd,&rectVOL,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 					}
@@ -540,6 +542,8 @@ void ClickProcR(WPARAM wParam, LPARAM lParam)
 		mouse_y = WHeight+288-WHNM+144 + 8;
 	}
 
+	bool shift = GetKeyState(VK_SHIFT) < 0;
+
 	SetUndo();
 
 	if(mouse_x < 64)return;
@@ -572,7 +576,7 @@ void ClickProcR(WPARAM wParam, LPARAM lParam)
 		mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h;
 //		mouse_y = (351+5+WDWHEIGHTPLUS - mouse_y)/5;//96*12は楽譜の縦サイズ(Pixel)
 		mouse_y = (WHeight+351+5-WHNM - mouse_y)/5;//96*12は楽譜の縦サイズ(Pixel)
-		if(org_data.CutPan(mouse_x,(unsigned char)mouse_y)==FALSE)ResetLastUndo();
+		if(org_data.CutPan(mouse_x,(unsigned char)mouse_y, !shift)==FALSE)ResetLastUndo();
 		//org_data.PutMusic();//楽譜の再描画
 		//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 		ClearDrag();
@@ -581,7 +585,7 @@ void ClickProcR(WPARAM wParam, LPARAM lParam)
 		mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h;
 //		mouse_y = (428+WDWHEIGHTPLUS - mouse_y)*4;//96*12は楽譜の縦サイズ(Pixel)
 		mouse_y = (WHeight+428-WHNM - mouse_y)*4;//96*12は楽譜の縦サイズ(Pixel)
-		if(org_data.CutVolume(mouse_x,(unsigned char)mouse_y)==FALSE)ResetLastUndo(); //2014.05.03 D //このままドラッグされるとアンドゥできない
+		if(org_data.CutVolume(mouse_x,(unsigned char)mouse_y, !shift)==FALSE)ResetLastUndo(); //2014.05.03 D //このままドラッグされるとアンドゥできない
 		//org_data.PutMusic();//楽譜の再描画
 		ClearDrag();
 		//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);

@@ -229,6 +229,8 @@ BOOL OrgData::SetNote(long x,unsigned char y, int DragMode)
 		}else{
 			PlayOrganKey(y,track,info.tdata[track].freq,100);//■
 			p->y = y;//Ｙ変更
+			if (p->volume == VOLDUMMY) p->volume = def_volume[track];
+			if (p->pan == PANDUMMY) p->pan = def_pan[track];
 			//カットすべき音符を検索
 			cut_p = p->from;
 			while(cut_p != NULL && cut_p->y == KEYDUMMY)cut_p = cut_p->from;
@@ -468,7 +470,7 @@ BOOL OrgData::SetPan2(long x,unsigned char y)
 	return TRUE;
 }
 //音符のカット(右クリックの処理)
-BOOL OrgData::CutPan(long x,unsigned char y)
+BOOL OrgData::CutPan(long x,unsigned char y, bool delNote)
 {
 	NOTELIST *p;//リストを指すポインター
 	//頭から検索
@@ -478,11 +480,19 @@ BOOL OrgData::CutPan(long x,unsigned char y)
 	if(p == NULL)return FALSE;
 	//パラメータ変更
 	if(p->x == x){
-		p->length = 0;
-		if(p->from == NULL)info.tdata[track].note_list = p->to;
-		else p->from->to = p->to;
-		if(p->to == NULL);
-		else p->to->from = p->from;
+		if (delNote) {
+			p->length = 0;
+			if (p->from == NULL)info.tdata[track].note_list = p->to;
+			else p->from->to = p->to;
+			if (p->to == NULL);
+			else p->to->from = p->from;
+		}
+		else {
+			p->pan = PANDUMMY;
+		}
+	}
+	else {
+		return FALSE;
 	}
 	return TRUE;
 }
@@ -651,7 +661,7 @@ BOOL OrgData::SetVolume2(long x,unsigned char y,long fade)
 	return TRUE;
 }
 //音符のカット(右クリックの処理)
-BOOL OrgData::CutVolume(long x,unsigned char y)
+BOOL OrgData::CutVolume(long x,unsigned char y, bool delNote)
 {
 	NOTELIST *p;//リストを指すポインター
 	//頭から検索
@@ -661,11 +671,16 @@ BOOL OrgData::CutVolume(long x,unsigned char y)
 	if(p == NULL)return FALSE;
 	//パラメータ変更
 	if(p->x == x){
-		p->length = 0;
-		if(p->from == NULL)info.tdata[track].note_list = p->to;
-		else p->from->to = p->to;
-		if(p->to == NULL);
-		else p->to->from = p->from;
+		if (delNote) {
+			p->length = 0;
+			if (p->from == NULL)info.tdata[track].note_list = p->to;
+			else p->from->to = p->to;
+			if (p->to == NULL);
+			else p->to->from = p->from;
+		}
+		else {
+			p->volume = VOLDUMMY;
+		}
 	}else{
 		return FALSE;	// 2010.08.14 A
 	}
