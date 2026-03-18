@@ -294,6 +294,7 @@ void MouseDrag(WPARAM wParam, LPARAM lParam)
 	if(wParam & MK_LBUTTON){
 		//左ボタンドラッグ
 		Note_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h; //ノートのx座標
+		if (Note_x < 0) Note_x = 0;
 		if(Note_x>StartNotex){
 			if(sGrid || alt_down == 1){
 				nc_Select.x1_1=MinimumGrid(StartNotex);
