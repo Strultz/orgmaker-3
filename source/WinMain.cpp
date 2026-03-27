@@ -807,7 +807,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	gNoteHighlights = GetPrivateProfileInt(MAIN_WINDOW, "NoteHighlights", 1, app_path);
 
-	lockScrollToSong = GetPrivateProfileInt(MAIN_WINDOW, "LockScrollToSong", 1, app_path);
+	lockScrollToSong = GetPrivateProfileInt(MAIN_WINDOW, "LockScrollToSong", 0, app_path);
 	WYOffset = lockScrollToSong ? 0 : 16;
 
 	sAlwaysShowPlayhead = GetPrivateProfileInt(MAIN_WINDOW, "AlwaysShowPlayhead", 1, app_path);
@@ -824,7 +824,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	CheckMenuItem(hMenu, IDM_PLAYHEAD_ALWAYS, MF_BYCOMMAND | (sAlwaysShowPlayhead ? MFS_CHECKED : MFS_UNCHECKED));
 	EnableMenuItem(hMenu, IDM_PLAYHEAD_ALWAYS, MF_BYCOMMAND | ((!sSmoothScroll && lockScrollToSong) ? MF_ENABLED : MF_GRAYED));
 
-	CheckMenuItem(hMenu, IDM_LOCKSCROLL, MF_BYCOMMAND | (!lockScrollToSong ? MFS_CHECKED : MFS_UNCHECKED));
+	CheckMenuItem(hMenu, IDM_LOCKSCROLL, MF_BYCOMMAND | (lockScrollToSong ? MFS_CHECKED : MFS_UNCHECKED));
 
 	CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
 	CheckMenuItem(hMenu, IDM_FLOATTOOLBARS, MF_BYCOMMAND | (floatingToolbars ? MFS_CHECKED : MFS_UNCHECKED));
@@ -1856,7 +1856,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			WYOffset = lockScrollToSong ? 0 : 16;
 			WHeight = realAreaHeight - WYOffset;
 
-			CheckMenuItem(hMenu, IDM_LOCKSCROLL, MF_BYCOMMAND | (!lockScrollToSong ? MFS_CHECKED : MFS_UNCHECKED));
+			CheckMenuItem(hMenu, IDM_LOCKSCROLL, MF_BYCOMMAND | (lockScrollToSong ? MFS_CHECKED : MFS_UNCHECKED));
 			lastUpdCheck = -1;
 			UpdateToolbarStatus();
 			UpdateStatusBar(true);
@@ -2323,13 +2323,12 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_LOUPE_PLUS:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Zoom the piano roll in"); break;
 		case IDM_LOUPE_MINUS:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Zoom the piano roll out"); break;
 		case IDM_FLOATTOOLBARS:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Pop out toolbars into their own window"); break;
-		//case IDM_PREFERENCES:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open OrgMaker preferences"); break;
 		case IDM_CHANGEFINISH:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Confirm unsaved changes on exit"); break;
 		case IDM_AUTOCHECKUPDATES:  SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Automatically check for new versions on launch"); break;
 		case IDM_ENABLEPLAYING:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Allow keyboard playback while the song is playing"); break;
 		case IDM_SMOOTHSCROLL:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Scroll by steps while the song is playing"); break;
 		case IDM_PLAYHEAD_ALWAYS:   SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Show the current step as a line while the song is playing"); break;
-		case IDM_LOCKSCROLL:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Use a timeline bar at the top for moving the playhead"); break;
+		case IDM_LOCKSCROLL:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Hide the timeline bar and use scrolling as the playhead"); break;
 		case IDM_FOLLOWSCROLL:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Follow the playhead while the song is playing"); break;
 		case IDM_NOTE_ENLARGE:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Enlarge note heads while zoomed out"); break;
 		case IDM_SLIDEOVERLAPNOTES: SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Shift overlapping notes on other channels"); break;
@@ -2341,6 +2340,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_METRONOME:         SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Plays a sound on every beat/measure"); break;
 		case IDM_DLGTHEMES:         SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select a custom visual style"); break;
 		case IDM_DLGWAVEDBS:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select a custom sound bank"); break;
+		//case IDM_PREFERENCES:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open OrgMaker preferences"); break;
 
 		case IDM_DLGHELP:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open the Help menu"); break;
 		case IDM_GITHUB:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open the GitHub page for OrgMaker 3"); break;

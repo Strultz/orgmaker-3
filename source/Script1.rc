@@ -773,7 +773,7 @@ BEGIN
             MENUITEM "Allow &Keyboard During Playback", IDM_ENABLEPLAYING
             MENUITEM "Playback &Smooth Scrolling",  IDM_SMOOTHSCROLL
             MENUITEM "Sho&w Playback Step",         IDM_PLAYHEAD_ALWAYS
-            MENUITEM "Use Play&head Timeline",      IDM_LOCKSCROLL
+            MENUITEM "Use &Classic Playback Controls", IDM_LOCKSCROLL
             MENUITEM "Always &Follow Playhead",     IDM_FOLLOWSCROLL
             MENUITEM "Extend &Note Heads",          IDM_NOTE_ENLARGE
             MENUITEM "Slide &Overlapping Notes",    IDM_SLIDEOVERLAPNOTES
