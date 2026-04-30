@@ -222,6 +222,7 @@
     <Image Include="Bitmap\org_stop.bmp" />
     <Image Include="Bitmap\Pan.bmp" />
     <Image Include="Bitmap\Play.bmp" />
+    <Image Include="Bitmap\Pos.bmp" />
     <Image Include="Bitmap\Right.bmp" />
     <Image Include="Bitmap\Solo.bmp" />
     <Image Include="Bitmap\Stop.bmp" />

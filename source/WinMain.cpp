@@ -197,9 +197,10 @@ static const int playbar_controls_menu[68 - 6 - 6] = {
 	IDM_SONG_TRANSPOSE
 };
 
-static const int playbar_controls_select[9] = {
+static const int playbar_controls_select[10] = {
 	ID_SELECTION_CLEAR, ID_SELECTION_DELETE,ID_SELECTION_INSERT,ID_SELECTION_VOLUME,ID_SELECTION_PANNING,
-	ID_SELECTION_TRANSPOSE, IDM_SELECT_RESET, IDM_SELECT_CUT, IDM_SELECT_COPY
+	ID_SELECTION_TRANSPOSE, IDM_SELECT_RESET, IDM_SELECT_CUT, IDM_SELECT_COPY,
+	IDM_SONG_REPEATSELECT
 };
 
 static const int playbar_controls_toolbar[4] = {
@@ -1765,6 +1766,14 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_SONG_TRANSPOSE:
 				DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGSONGTRA), hwnd, DialogSongTra);
 				break;
+			case IDM_SONG_REPEATSELECT:
+				if (tra >= 0) {
+					org_data.GetMusicInfo(&mi);
+					mi.repeat_x = nc_Select.x1_1;
+					mi.end_x = nc_Select.x1_2 + 1;
+					org_data.SetMusicInfo(&mi, SETREPEAT);
+				}
+				break;
 			}
 		}else{
 			//only while playing
@@ -2312,6 +2321,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 		case IDM_DLGSETTING:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Configure the active document"); break;
 		case ID_SONG_COMMENTS:      SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"View and edit comments on this song"); break;
+		case IDM_SONG_REPEATSELECT: SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Set the repeat range of this song to the current selection"); break;
 		case IDM_SONG_TRANSPOSE:    SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Transpose the entire song"); break;
 		case IDM_2BAI:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Expand song by 2x"); break;
 		case IDM_3BAI:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Expand song by 3x"); break;

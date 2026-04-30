@@ -580,6 +580,15 @@ BEGIN
     CONTROL         "",IDC_EXPRPROGRESS,"msctls_progress32",WS_BORDER,8,20,184,14
 END
 
+IDD_PREFS DIALOGEX 0, 0, 319, 178
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_VSCROLL
+CAPTION "Preferences"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,198,157,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,250,157,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -754,6 +763,7 @@ BEGIN
             MENUITEM "Reduce to 1/2x",              IDM_2BUNNO1
             MENUITEM "Reduce to 1/3x",              IDM_3BUNNO1
         END
+        MENUITEM "&Repeat Selection", IDM_SONG_REPEATSELECT
         MENUITEM SEPARATOR
         MENUITEM "Estimate Song &Length...",    IDM_SONGLEN
         MENUITEM "&Event Usage...",             IDM_DLGUSED
@@ -1211,6 +1221,11 @@ BEGIN
     0
 END
 
+IDD_PREFS AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1325,6 +1340,14 @@ BEGIN
         RIGHTMARGIN, 194
         TOPMARGIN, 7
         BOTTOMMARGIN, 53
+    END
+
+    IDD_PREFS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 300
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 171
     END
 END
 #endif    // APSTUDIO_INVOKED

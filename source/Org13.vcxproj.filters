@@ -270,6 +270,9 @@
     <Image Include="Bitmap\org_splash.bmp">
       <Filter>Resource Files\Bitmap</Filter>
     </Image>
+    <Image Include="Bitmap\Pos.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Media Include="Wave\Bass01.wav">

@@ -146,6 +146,8 @@
 #define IDR_MENU1                       263
 #define IDR_CHBTNMENU                   263
 #define IDD_EXPORTPROG                  264
+#define IDD_DIALOG2                     267
+#define IDD_PREFS                       267
 #define IDD_LB1                         1001
 #define IDM_DIALOG1                     1002
 #define IDM_DLGGRID                     1002
@@ -875,13 +877,14 @@
 #define IDM_FOLLOWSCROLL                40382
 #define IDC_TOGGLEFOLLOW                40383
 #define IDM_USESPECIALPASTE             40384
+#define IDM_SONG_REPEATSELECT           40385
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        267
-#define _APS_NEXT_COMMAND_VALUE         40385
+#define _APS_NEXT_RESOURCE_VALUE        269
+#define _APS_NEXT_COMMAND_VALUE         40386
 #define _APS_NEXT_CONTROL_VALUE         1313
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
