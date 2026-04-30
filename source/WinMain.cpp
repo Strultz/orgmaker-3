@@ -1768,6 +1768,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				break;
 			case IDM_SONG_REPEATSELECT:
 				if (tra >= 0) {
+					SetUndo();
 					org_data.GetMusicInfo(&mi);
 					mi.repeat_x = nc_Select.x1_1;
 					mi.end_x = nc_Select.x1_2 + 1;
