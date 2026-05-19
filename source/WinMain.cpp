@@ -1824,32 +1824,32 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		case IDC_START:
 		case ID_AC_HOMEBACK: //home
-			if (lockScrollToSong) {
+			/*if (lockScrollToSong)*/ {
 				StopPlayingSong();
 				org_data.SetPlayPointer(0);
 			}
-			if (timer_sw != 0) {
+			/*if (timer_sw != 0) {
 				if (lockScrollToSong || sFollowScroll) {
 					break;
 				}
 				followPlayhead = false;
-			}
+			}*/
 			scr_data.SetHorzScroll(0);
 			UpdateToolbarStatus();
 			break;
 		case IDC_END:
 		case ID_AC_TOEND:
 			org_data.GetMusicInfo(&mi);
-			if (lockScrollToSong) {
+			/*if (lockScrollToSong)*/ {
 				StopPlayingSong();
 				org_data.SetPlayPointer(mi.end_x);
 			}
-			if (timer_sw != 0) {
+			/*if (timer_sw != 0) {
 				if (lockScrollToSong || sFollowScroll) {
 					break;
 				}
 				followPlayhead = false;
-			}
+			}*/
 			scr_data.SetHorzScroll(mi.end_x);
 			UpdateToolbarStatus();
 			break;
