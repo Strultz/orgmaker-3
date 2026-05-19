@@ -134,7 +134,7 @@ typedef struct OrgData{
 		void GetPlayPos(long *playpos, long *oplaypos = NULL);
 		//以下はファイル関係
 		unsigned short GetNoteNumber(char track, long x1, long x2);
-		BOOL OrgData::SaveMusicData(void);
+		BOOL OrgData::SaveMusicData(bool noMeta = false);
 		BOOL OrgData::LoadMusicData(void);
 		int FileCheckBeforeLoad(char *checkfile); //ファイルがロード可能であれば0異常であれば1を返す。ﾃﾞｰﾀロードはされない。 2014.05.22
 		//以下は編集関係

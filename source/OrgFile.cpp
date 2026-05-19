@@ -63,7 +63,7 @@ unsigned short OrgData::GetNoteNumber(char track, long x1, long x2)
 	}
 }
 //曲データを保存
-BOOL OrgData::SaveMusicData(void)
+BOOL OrgData::SaveMusicData(bool noMeta)
 {
 	ORGANYADATA org_data;
 	NOTELIST *np;
@@ -127,8 +127,7 @@ BOOL OrgData::SaveMusicData(void)
 		}
 	}
 
-	bool compatible = false;
-	if (!compatible) {
+	if (!noMeta) {
 		fwrite("OM3MD2", sizeof(char), 6, fp);
 
 		fwrite(name, sizeof(char), 0x20, fp);

@@ -2237,6 +2237,23 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case ID_AC_CLOSE:
 			SendMessage(hWnd, WM_CLOSE, 0, 0);
 			break;
+		case IDM_SAVE_NOEXTRAS: {
+			//MessageBox(hWnd, "Legacy export will save a .org file without any non-standard metadata", "OrgMaker 3", MB_OK | MB_ICONWARNING);
+			
+			char oldName[MAX_PATH];
+			// weirdness ensues
+			memcpy(oldName, music_file, MAX_PATH);
+
+			char res = GetFileNameSave(hwnd, MessageString[IDS_STRING62]); //"Save As"
+			if (res == MSGCANCEL) break;
+			if (res == MSGEXISFILE) {
+				if (msgbox(hwnd, IDS_NOTIFY_OVERWRITE, IDS_INFO_SAME_FILE, MB_YESNO | MB_ICONEXCLAMATION) == IDNO) break;
+			}
+			org_data.SaveMusicData(true);
+			// put it back.
+			memcpy(music_file, oldName, MAX_PATH);
+			break;
+		}
 		}
 
 		break;
@@ -2263,6 +2280,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_SAVENEW:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Save the active document with a new name"); break;
 		case IDM_EXPORT_MIDI:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Export the active document to a MIDI file"); break;
 		case IDM_EXPORT_WAV:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Export the active document to a WAV file"); break;
+		case IDM_SAVE_NOEXTRAS:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Export an ORG file without any non-standard metadata"); break;
 		case IDM_EXIT:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Exit OrgMaker 3"); break;
 
 		case IDM_UNDO:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Undo the last action"); break;

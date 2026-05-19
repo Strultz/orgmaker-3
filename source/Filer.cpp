@@ -49,7 +49,8 @@ char GetFileNameSave(HWND hwnd,char *title)
 	ofn.lpstrFile   = music_file;
 	ofn.nMaxFile    = MAX_PATH;
 	ofn.lpstrTitle  = title;
-	ofn.Flags       = OFN_NOREADONLYRETURN | OFN_OVERWRITEPROMPT | OFN_CREATEPROMPT | OFN_HIDEREADONLY;
+	ofn.Flags       = OFN_NOREADONLYRETURN | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY
+					| OFN_EXPLORER | OFN_ENABLESIZING;
 	ofn.lpstrDefExt = "org";
 
 	//ファイル名取得を試みる。
@@ -191,7 +192,7 @@ char GetFileNameMIDI(HWND hwnd,char *title, char *filename)
 	ofn.lpstrTitle  = title;
     ofn.Flags       = OFN_EXPLORER |
                       OFN_OVERWRITEPROMPT |
-                      OFN_CREATEPROMPT |
+				      OFN_PATHMUSTEXIST |
                       OFN_HIDEREADONLY |
                       OFN_ENABLESIZING |
                       OFN_ENABLEHOOK |     //フックプロシージャを使う
@@ -274,7 +275,7 @@ char GetFileNameLoad(HWND hwnd,char *title/*, int OpenType*/)
 	ofn.lpstrFile   = mfile;
 	ofn.nMaxFile    = MAX_PATH;
 	ofn.lpstrTitle  = title;
-	ofn.Flags       = OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+	ofn.Flags       = OFN_HIDEREADONLY | OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_ENABLESIZING;
 	/*if(OpenType==1){
 		ofn.Flags       = OFN_CREATEPROMPT | OFN_HIDEREADONLY |OFN_EXPLORER | 
 						OFN_ENABLESIZING | OFN_ENABLEHOOK |     //フックプロシージャを使う
@@ -319,7 +320,8 @@ char GetFileNameExportWav(HWND hwnd, char* title, char* filename)
 	ofn.lpstrFile = filename;
 	ofn.nMaxFile = MAX_PATH;
 	ofn.lpstrTitle = title;
-	ofn.Flags = OFN_NOREADONLYRETURN | OFN_OVERWRITEPROMPT | OFN_CREATEPROMPT | OFN_HIDEREADONLY;
+	ofn.Flags = OFN_NOREADONLYRETURN | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY
+				| OFN_EXPLORER | OFN_ENABLESIZING;
 	ofn.lpstrDefExt = "wav";
 
 	//ファイル名取得を試みる。

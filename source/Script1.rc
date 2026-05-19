@@ -621,6 +621,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Export &WAV File (*.wav)...\tCtrl+Alt+W", IDM_EXPORT_WAV
         MENUITEM "Export &MIDI File (*.mid)...\tCtrl+Alt+M", IDM_EXPORT_MIDI
+        MENUITEM "&Legacy Export...", IDM_SAVE_NOEXTRAS
         MENUITEM SEPARATOR
         MENUITEM "&Exit\tAlt+F4",               IDM_EXIT
     END
