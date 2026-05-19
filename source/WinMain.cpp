@@ -228,16 +228,18 @@ void UpdateToolbarStatus() {
 			for (int i = 0; i < 4; ++i) {
 				SendMessage(hwndToolbar, TB_ENABLEBUTTON, playbar_controls_toolbar[i], enabled);
 			}
-			SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDC_START, true);
-			SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDC_END, true);
+			//SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDC_START, true);
+			//SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDC_END, true);
 		}
 		else {
 			for (int i = 0; i < 4; ++i) {
 				SendMessage(hwndToolbar, TB_ENABLEBUTTON, playbar_controls_toolbar[i], enabled || !sFollowScroll);
 			}
-			SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDC_START, enabled || !sFollowScroll);
-			SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDC_END, enabled || !sFollowScroll);
+			//SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDC_START, enabled || !sFollowScroll);
+			//SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDC_END, enabled || !sFollowScroll);
 		}
+		SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDC_START, true);
+		SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDC_END, true);
 
 		// change icon to pause while playing
 		SendMessage(hwndToolbar, TB_CHANGEBITMAP, IDM_PLAYPAUSE, enabled ? 12 : 13);
