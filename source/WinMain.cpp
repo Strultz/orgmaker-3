@@ -97,6 +97,8 @@ bool gIsDrawing = false;
 bool gFileModified = false;
 bool gFileUnsaved = true;
 
+bool gKeepClickedPos = false;
+
 // TODO add these to UI
 bool gUseOldVol = false;
 bool gUseProperFreq = false;
@@ -110,6 +112,8 @@ int realHeight = WINDOWHEIGHT;
 
 static int realAreaWidth = WINDOWWIDTH;
 static int realAreaHeight = WINDOWHEIGHT;
+
+long gClickedPos = 0;
 
 static const char szClassName[] = "OrgMaker3";
 static const char szAreaClass[] = "OrgArea";
@@ -1470,46 +1474,74 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				DialogBox(hInst,"DLGSWAP",hwnd,DialogSwap);
 				break;
 			
-			case IDM_2BAI:
+			case IDM_2BAI: {
 				SetUndo();
 				org_data.EnlargeAllNotes(2);
-				scr_data.SetHorzScroll(0);
-				org_data.SetPlayPointer(0);
+
+				long h;
+				scr_data.GetScrollPosition(&h, nullptr);
+				scr_data.SetHorzScroll(h * 2);
+
+				gClickedPos *= 2;
+				org_data.SetPlayPointer(gClickedPos);
+
 				SetFocus(hWnd);//頭出し
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				UpdateStatusBar(false);
 				break;
-			case IDM_3BAI:
+			}
+			case IDM_3BAI: {
 				SetUndo();
 				org_data.EnlargeAllNotes(3);
-				scr_data.SetHorzScroll(0);
-				org_data.SetPlayPointer(0);
+
+				long h;
+				scr_data.GetScrollPosition(&h, nullptr);
+				scr_data.SetHorzScroll(h * 3);
+
+				gClickedPos *= 3;
+				org_data.SetPlayPointer(gClickedPos);
+
 				SetFocus(hWnd);//頭出し
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				UpdateStatusBar(false);
 				break;
-			case IDM_2BUNNO1:
+			}
+			case IDM_2BUNNO1: {
 				SetUndo();
 				org_data.ShortenAllNotes(2);
-				scr_data.SetHorzScroll(0);
-				org_data.SetPlayPointer(0);
+
+				long h;
+				scr_data.GetScrollPosition(&h, nullptr);
+				scr_data.SetHorzScroll(h / 2);
+
+				gClickedPos /= 2;
+				org_data.SetPlayPointer(gClickedPos);
+
 				SetFocus(hWnd);//頭出し				
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				UpdateStatusBar(false);
 				break;
-			case IDM_3BUNNO1:
+			}
+			case IDM_3BUNNO1: {
 				SetUndo();
 				org_data.ShortenAllNotes(3);
-				scr_data.SetHorzScroll(0);
-				org_data.SetPlayPointer(0);
+
+				long h;
+				scr_data.GetScrollPosition(&h, nullptr);
+				scr_data.SetHorzScroll(h / 3);
+
+				gClickedPos /= 3;
+				org_data.SetPlayPointer(gClickedPos);
+
 				SetFocus(hWnd);//頭出し				
 				//org_data.PutMusic();
 				//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				UpdateStatusBar(false);
 				break;
+			}
 			case IDM_CT_L1: //Linear debility IDM_CT_L1 to 9 must be consecutive numbers!
 			case IDM_CT_L2: //Convex weakness
 			case IDM_CT_L3: //Convex weakness 2
@@ -1844,6 +1876,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			/*if (lockScrollToSong)*/ {
 				StopPlayingSong();
 				org_data.SetPlayPointer(0);
+				gClickedPos = 0;
 			}
 			/*if (timer_sw != 0) {
 				if (lockScrollToSong || sFollowScroll) {
@@ -1860,6 +1893,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			/*if (lockScrollToSong)*/ {
 				StopPlayingSong();
 				org_data.SetPlayPointer(mi.end_x);
+				gClickedPos = mi.end_x;
 			}
 			/*if (timer_sw != 0) {
 				if (lockScrollToSong || sFollowScroll) {
@@ -1933,6 +1967,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			strcpy(music_file, MessageString[IDS_DEFAULT_ORG_FILENAME]);
 			org_data.InitOrgData();
 			org_data.SetPlayPointer(0);
+			gClickedPos = 0;
 			scr_data.SetHorzScroll(0);
 			//reflected in the player
 			UpdateStatusBar(false);
@@ -1979,6 +2014,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			StopPlayingSong();
 			scr_data.SetHorzScroll(0);
 			org_data.SetPlayPointer(0);
+			gClickedPos = 0;
 			break;
 		case IDM_DLGHELP://
 		case ID_AC_HELP:
@@ -2484,12 +2520,13 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case VK_F5:
 		case VK_SPACE:
 		//case VK_NUMPAD0:
-			if (timer_sw == 0) StartPlayingSong(-1);
+			if (timer_sw == 0) StartPlayingSong(gClickedPos);
 			else StopPlayingSong();
 			break;
 		case VK_F6:
 			StopPlayingSong();
-			StartPlayingSong(0);
+			gClickedPos = 0;
+			StartPlayingSong(gClickedPos);
 			break;
 		//case VK_HOME:
 		//	SendMessage(hDlgPlayer , WM_COMMAND , IDC_START , NULL);

@@ -7,15 +7,19 @@
 #include "Timer.h"
 #include "CommCtrl.h"
 
+extern long gClickedPos;
+
+extern bool gKeepClickedPos;
 extern bool gUseOldVol;
 extern bool gPlayMidNote;
-extern HWND hwndToolbar;
 extern int sSmoothScroll;
-extern int iKeyPushDown[256];
-extern unsigned char old_key[];
 //extern bool gNoteHighlights;
 extern bool lockScrollToSong;
 extern bool sFollowScroll;
+
+extern HWND hwndToolbar;
+extern int iKeyPushDown[256];
+extern unsigned char old_key[];
 
 bool followPlayhead = true;
 
@@ -135,12 +139,11 @@ void StartPlayingSong(long pos) {
 			long hp;
 			if (lockScrollToSong) {
 				scr_data.GetScrollPosition(&hp, NULL);
-				org_data.SetPlayPointer(hp);
 			}
 			else {
 				org_data.GetPlayPos(&hp, NULL);
-				org_data.SetPlayPointer(hp);
 			}
+			org_data.SetPlayPointer(hp);
 		}
 		else {
 			org_data.SetPlayPointer(pos);
@@ -235,8 +238,18 @@ void StopPlayingSong(void) {
 			org_data.SetPlayPointer(hp);
 
 			UpdateStatusBar(true);
+			UpdateToolbarStatus();
+			return;
 		}
-		else if (followPlayhead) {
+
+		if (gKeepClickedPos) {
+			org_data.SetPlayPointer(gClickedPos);
+			playPos = gClickedPos;
+		} else {
+			gClickedPos = playPos;
+		}
+
+		if (followPlayhead) {
 			long hpos;
 			scr_data.GetScrollPosition(&hpos, NULL);
 

@@ -13,6 +13,8 @@
 extern char timer_sw;//再生スイッチ
 extern bool lockScrollToSong;
 
+extern long gClickedPos;
+
 extern void SetUndo();
 extern void ResetLastUndo(); //取りけし
 
@@ -369,6 +371,8 @@ void ClickProcL(WPARAM wParam, LPARAM lParam)
 		else {
 			org_data.SetPlayPointer(x);
 		}
+
+		gClickedPos = x;
 
 		UpdateStatusBar(true);
 		return;

@@ -453,6 +453,8 @@ S_Sound *lpDRAMBUFFER[MAXDRAM] = {NULL};
 extern int s_solo;
 extern int iKeyPushDown[256];
 
+extern long gClickedPos;
+
 extern bool gUseProperFreq;
 extern bool gUseOldVol;
 extern bool gPlayMidNote;
@@ -1400,6 +1402,7 @@ void SetupExportBuffer(unsigned long sample_rate, size_t frames_total, size_t fa
 	output_frequency = sample_rate;
 	vol_ticks = (long)((float)output_frequency * 0.004F);
 
+	org_data.GetPlayPos(&gClickedPos, NULL);
 	org_data.SetPlayPointer(0);
 
 	ma_mutex_lock(&organya_mutex);
@@ -1427,6 +1430,8 @@ void EndExportBuffer(void)
 	lastMetro = 0;
 
 	ma_mutex_unlock(&organya_mutex);
+
+	org_data.SetPlayPointer(gClickedPos);
 
 	output_frequency = device.sampleRate;
 	vol_ticks = (long)((float)output_frequency * 0.004F);

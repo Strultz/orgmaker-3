@@ -9,6 +9,8 @@
 #include "Scroll.h"
 #include "rxoFunction.h"
 
+extern long gClickedPos;
+
 //曲のPATHはここに置いておく
 char music_file[MAX_PATH]; //NewData.org
 
@@ -327,6 +329,7 @@ BOOL OrgData::LoadMusicData(void)
 	//プレイヤーに表示
 	char str[32];
 	SetPlayPointer(0);//頭出し
+	gClickedPos = 0;
 	scr_data.SetHorzScroll(0);
 	itoa(info.wait,str,10);
 	/*SetDlgItemText(hDlgPlayer, IDE_VIEWWAIT, str);
@@ -436,6 +439,7 @@ void OrgData::SortNotes()
 	//プレイヤーに表示
 	char str[32];
 	SetPlayPointer(0);//頭出し
+	gClickedPos = 0;
 	scr_data.SetHorzScroll(0);
 	itoa(info.wait,str,10);
 	/*SetDlgItemText(hDlgPlayer, IDE_VIEWWAIT, str);
