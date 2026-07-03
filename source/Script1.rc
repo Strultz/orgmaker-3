@@ -676,7 +676,7 @@ BEGIN
             MENUITEM "(&9) (none)",                 IDM_CT_S18, GRAYED
             MENUITEM SEPARATOR
             MENUITEM "Clear Volume Events\tCtrl+0", IDM_CT_S20
-            MENUITEM "Setup Decay Length...",       IDM_DCLEN
+            MENUITEM "Setup Decay Length...\tCtrl+P", IDM_DCLEN
         END
         POPUP "Note &Volume (Existing Notes Only)"
         BEGIN
@@ -793,8 +793,8 @@ BEGIN
             MENUITEM "&Metronome",                  IDM_METRONOME
             MENUITEM SEPARATOR
             MENUITEM "&Default Volume/Panning...",  IDM_DLGDEFAULT
-            MENUITEM "&Themes...",                  IDM_DLGTHEMES
-            MENUITEM "Sound&banks...",              IDM_DLGWAVEDBS
+            MENUITEM "&Themes...\tCtrl+Alt+T",      IDM_DLGTHEMES
+            MENUITEM "Sound&banks...\tCtrl+Alt+S",  IDM_DLGWAVEDBS
         END
     END
     POPUP "&Help"
@@ -1096,6 +1096,9 @@ BEGIN
     "C",            ID_AC_COPY,             VIRTKEY, CONTROL, NOINVERT
     "V",            ID_AC_PASTE,            VIRTKEY, CONTROL, NOINVERT
     "V",            ID_AC_ADVPASTE,         VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "P",            IDM_DCLEN,              VIRTKEY, CONTROL, NOINVERT
+    "T",            IDM_DLGTHEMES,          VIRTKEY, CONTROL, ALT, NOINVERT
+    "S",            IDM_DLGWAVEDBS,         VIRTKEY, CONTROL, ALT, NOINVERT
 END
 
 
