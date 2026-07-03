@@ -542,6 +542,7 @@ BOOL InitDirectSound(HWND hwnd)
 	config.dataCallback = S_Callback;
 	config.pUserData = NULL;
 	config.periodSizeInMilliseconds = 10;
+	config.noClip = true;
 	//config.performanceProfile = ma_performance_profile_conservative;
 
 	if (ma_device_init(NULL, &config, &device) == MA_SUCCESS)
