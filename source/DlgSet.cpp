@@ -984,6 +984,8 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				for (i = 0; i < MAXMELODY; ++i) {
 					MakeOrganyaWave(i, mi.tdata[i].wave_no, mi.tdata[i].pipi);
 				}
+
+				SetMutedTrack();
 			}
 			return error;
 		}
@@ -992,6 +994,8 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			for (i = 0; i < MAXMELODY; ++i) {
 				MakeOrganyaWave(i, mi.tdata[i].wave_no, mi.tdata[i].pipi);
 			}
+
+			SetMutedTrack();
 			break;
 		}
 		case UDN_DELTAPOS: {
@@ -1118,6 +1122,8 @@ BOOL CALLBACK DialogPerc(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				for (i = 0; i < MAXDRAM; ++i) {
 					InitDramObject(mi.tdata[i + MAXMELODY].wave_no, i);
 				}
+
+				SetMutedTrack();
 			}
 			return error;
 		}
@@ -1126,6 +1132,8 @@ BOOL CALLBACK DialogPerc(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			for (i = 0; i < MAXDRAM; ++i) {
 				InitDramObject(mi.tdata[i + MAXMELODY].wave_no, i);
 			}
+
+			SetMutedTrack();
 			break;
 		}
 		}
@@ -1487,6 +1495,8 @@ BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 				i = mi.tdata[j].wave_no;
 				InitDramObject(i, j - MAXMELODY);
 			}
+
+			SetMutedTrack();
 
 			EnableDialogWindow(TRUE);
 			EndDialog(hdwnd, 0);

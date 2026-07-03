@@ -39,7 +39,7 @@ void OrgData::PlayData(void)
 			if (s_solo != -1 && s_solo != i)
 				continue;
 
-			if(mute[i] == 0) {
+			if(mute[i] == 0 || gPlayMidNote) {
 				if(np[i]->y != KEYDUMMY) {
 					/*if (gNoteHighlights && this->track == i) {
 						if (old_key[i] != 255) iKeyPushDown[old_key[i]] = 0;
@@ -66,7 +66,7 @@ void OrgData::PlayData(void)
 
 		if(np[i] != NULL && play_p == np[i]->x) {//音が来た。
 			if(np[i]->y != KEYDUMMY) {//ならす
-				if (mute[i] == 0) {
+				if (mute[i] == 0 || gPlayMidNote) {
 					/*if (gNoteHighlights && this->track == i) {
 						if (old_key[i] != 255) iKeyPushDown[old_key[i]] = 0;
 						iKeyPushDown[np[i]->y] = 1;
@@ -161,7 +161,7 @@ void StartPlayingSong(long pos) {
 				// Pizzicato channels still have weird behavior that this doesn't account for,
 				// but I'm not gonna fix it because I don't feel like it
 				NOTELIST* note = mi.tdata[i].pipi ? org_data.FindLastOrgNoteKey(i, play_p) : org_data.FindOrgNoteLength(i, play_p);
-				if (note != NULL && note->x < play_p && org_data.mute[i] == 0) {
+				if (note != NULL && note->x < play_p && (org_data.mute[i] == 0 || gPlayMidNote)) {
 					unsigned char y = note->y;
 
 					now_leng[i] = (note->x + note->length) - play_p;
@@ -191,7 +191,7 @@ void StartPlayingSong(long pos) {
 				unsigned char pan = PANDUMMY;
 
 				NOTELIST* note = org_data.FindLastOrgNoteKey(i, play_p);
-				if (note != NULL && note->x < play_p && org_data.mute[i] == 0) {
+				if (note != NULL && note->x < play_p && (org_data.mute[i] == 0 || gPlayMidNote)) {
 					int played_len = (play_p - note->x) * mi.wait;
 
 					ResumeDramObject(note->y, i - MAXMELODY, played_len);

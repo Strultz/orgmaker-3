@@ -849,6 +849,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	toolbarSavedX[1] = GetPrivateProfileInt(TOOLBAR_POS, "ToolbarChannelX", 100, app_path);
 	toolbarSavedY[1] = GetPrivateProfileInt(TOOLBAR_POS, "ToolbarChannelY", 160, app_path);
 
+	SetMutedTrack();
+
 	DragAcceptFiles(hWnd,TRUE);//Now allow dragging
 	//Generate player dialog (modalless)
 
@@ -1289,12 +1291,14 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					for (j = 0; j < (i < 8 ? MAXMELODY : MAXDRAM); ++j) {
 						org_data.mute[j + (i < 8 ? 0 : 8)] = d;
 					}
+					SetMutedTrack();
 					UpdateToolbarStatus();
 				} else if (GetKeyState(VK_CONTROL) & 0x8000) { // Solo
 					bool un = IsSolo(i);
 					for (j = 0; j < MAXTRACK; ++j) {
 						org_data.mute[j] = (!un && i != j);
 					}
+					SetMutedTrack();
 					UpdateToolbarStatus();
 				} else if (org_data.track == i || GetKeyState(VK_SHIFT) & 0x8000) { // Mute
 					MuteTrack(i);
@@ -1310,6 +1314,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				for (j = 0; j < MAXTRACK; ++j) {
 					org_data.mute[j] = (!un && i != j);
 				}
+				SetMutedTrack();
 				UpdateToolbarStatus();
 			}
 		}
@@ -1318,36 +1323,42 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			for (j = 0; j < MAXTRACK; ++j) {
 				org_data.mute[j] = true;
 			}
+			SetMutedTrack();
 			UpdateToolbarStatus();
 			break;
 		case IDC_UNMUTE_ALL:
 			for (j = 0; j < MAXTRACK; ++j) {
 				org_data.mute[j] = false;
 			}
+			SetMutedTrack();
 			UpdateToolbarStatus();
 			break;
 		case IDC_MUTE_MELO:
 			for (j = 0; j < MAXMELODY; ++j) {
 				org_data.mute[j] = true;
 			}
+			SetMutedTrack();
 			UpdateToolbarStatus();
 			break;
 		case IDC_UNMUTE_MELO:
 			for (j = 0; j < MAXMELODY; ++j) {
 				org_data.mute[j] = false;
 			}
+			SetMutedTrack();
 			UpdateToolbarStatus();
 			break;
 		case IDC_MUTE_PERC:
 			for (j = MAXMELODY; j < MAXTRACK; ++j) {
 				org_data.mute[j] = true;
 			}
+			SetMutedTrack();
 			UpdateToolbarStatus();
 			break;
 		case IDC_UNMUTE_PERC:
 			for (j = MAXMELODY; j < MAXTRACK; ++j) {
 				org_data.mute[j] = false;
 			}
+			SetMutedTrack();
 			UpdateToolbarStatus();
 			break;
 		}
@@ -2205,6 +2216,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			hMenu = GetMenu(hWnd);
 			gPlayMidNote = !gPlayMidNote;
 			CheckMenuItem(hMenu, IDM_PLAY_NOTES_MID, MF_BYCOMMAND | (gPlayMidNote ? MFS_CHECKED : MFS_UNCHECKED));
+			SetMutedTrack();
 			break;
 		case IDM_NOTE_HIGHLIGHT:
 			hMenu = GetMenu(hWnd);

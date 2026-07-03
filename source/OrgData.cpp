@@ -40,6 +40,8 @@ BOOL OrgData::NoteAlloc(void)
 	for(j = 0; j < MAXDRAM; j++)
 		InitDramObject(0,j);
 
+	SetMutedTrack();
+
 	track = 0;//////////今はここに書いておく
 	return TRUE;
 }
@@ -724,6 +726,8 @@ void OrgData::InitOrgData(void)
 		InitDramObject(info.tdata[i].wave_no,i-MAXMELODY);
 	}
 
+	SetMutedTrack();
+
 	memset(name, '\0', 0x21);
 	memset(author, '\0', 0x21);
 	memset(version, '\0', 0x21);
@@ -843,6 +847,8 @@ int OrgData::ReplaceFromUndoData()
 	for (j = MAXMELODY; j < MAXTRACK; j++) {
 		InitDramObject(mi.tdata[j].wave_no, j - MAXMELODY);
 	}
+
+	SetMutedTrack();
 	return r;
 }
 
@@ -874,6 +880,8 @@ int OrgData::ReplaceFromRedoData()
 	for (j = MAXMELODY; j < MAXTRACK; j++) {
 		InitDramObject(mi.tdata[j].wave_no, j - MAXMELODY);
 	}
+
+	SetMutedTrack();
 	return r;
 
 }

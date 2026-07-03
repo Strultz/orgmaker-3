@@ -34,6 +34,7 @@ static struct S_Sound
 	bool playing;
 	bool played_before;
 	bool looping;
+	bool mute;
 
 	float volume;
 	float pan_l;
@@ -147,6 +148,7 @@ static S_Sound* S_CreateSound(unsigned int frequency, const unsigned char* sampl
 	sound->frames = length;
 	sound->playing = false;
 	sound->played_before = false;
+	sound->mute = false;
 	sound->position = 0;
 	sound->ring = 0;
 	sound->sub_position = 0;
@@ -271,6 +273,30 @@ static bool S_IsPlaying(S_Sound* sound) {
 	return playing;
 }
 
+static void S_MuteSound(S_Sound* sound, bool mute) {
+	if (sound == NULL)
+		return;
+
+	ma_mutex_lock(&mutex);
+
+	sound->mute = mute;
+
+	ma_mutex_unlock(&mutex);
+}
+
+static bool S_IsMuted(S_Sound* sound) {
+	if (sound == NULL)
+		return false;
+
+	ma_mutex_lock(&mutex);
+
+	bool mute = sound->mute;
+
+	ma_mutex_unlock(&mutex);
+
+	return mute;
+}
+
 // This is for exporting
 static void S_ResetSounds() {
 	ma_mutex_lock(&mutex);
@@ -278,6 +304,7 @@ static void S_ResetSounds() {
 	for (S_Sound* sound = sound_list_head; sound != NULL; sound = sound->next) {
 		memset(sound->samples, 0, 4);
 		sound->playing = false;
+		sound->mute = false;
 		sound->looping = false;
 		sound->played_before = false;
 		sound->silence_count = 0;
@@ -333,8 +360,10 @@ static void S_MixSounds(float* stream, size_t frames_total) {
 				const float interpolated_sample = ((c3 * subsample + c2) * subsample + c1) * subsample + c0;
 
 				// Mix, and apply volume
-				*stream_pointer++ += interpolated_sample * sound->volume_l;
-				*stream_pointer++ += interpolated_sample * sound->volume_r;
+				if (!sound->mute) {
+					*stream_pointer++ += interpolated_sample * sound->volume_l;
+					*stream_pointer++ += interpolated_sample * sound->volume_r;
+				}
 
 				// Increment sample
 				const long last_position = sound->position;
@@ -423,6 +452,8 @@ S_Sound *lpDRAMBUFFER[MAXDRAM] = {NULL};
 
 extern int s_solo;
 extern int iKeyPushDown[256];
+
+extern bool gPlayMidNote;
 
 static void S_Callback(ma_device* device, void* output_stream, const void* input_stream, ma_uint32 frames_total)
 {
@@ -1331,6 +1362,18 @@ void Rxo_StopAllSoundNow(void)
 		old_key[i]=255; //2014.05.02 A ‚±‚ê‚Å“ª‚ª•Ï‚È‰¹‚É‚È‚ç‚È‚­‚·‚éB
 }
 
+void SetMutedTrack(void) {
+	for (int i = 0; i < MAXMELODY; i++) {
+		for (int j = 0; j < 8; j++) {
+			S_MuteSound(lpORGANBUFFER[i][j][0], org_data.mute[i] && gPlayMidNote);
+			S_MuteSound(lpORGANBUFFER[i][j][1], org_data.mute[i] && gPlayMidNote);
+		}
+	}
+	for (int i = 0; i < MAXDRAM; i++) {
+		S_MuteSound(lpDRAMBUFFER[i], org_data.mute[MAXMELODY + i] && gPlayMidNote);
+	}
+}
+
 extern int sMetronome;
 static int lastMetro = 0;
 static size_t totalFrames = 0;
@@ -1342,13 +1385,13 @@ void SetupExportBuffer(unsigned long sample_rate, size_t frames_total, size_t fa
 	MUSICINFO mi;
 	org_data.GetMusicInfo(&mi);
 
-	output_frequency = sample_rate;
-	vol_ticks = (long)((float)output_frequency * 0.004F);
+	Rxo_StopAllSoundNow();
+	S_ResetSounds();
 
 	exporting = true;
 
-	Rxo_StopAllSoundNow();
-	S_ResetSounds();
+	output_frequency = sample_rate;
+	vol_ticks = (long)((float)output_frequency * 0.004F);
 
 	org_data.SetPlayPointer(0);
 
@@ -1386,6 +1429,8 @@ void EndExportBuffer(void)
 	doneFrames = 0;
 
 	exporting = false;
+
+	SetMutedTrack();
 }
 
 void ExportOrganyaBuffer(float* output_stream, size_t do_frames) {

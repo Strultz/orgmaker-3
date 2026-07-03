@@ -322,6 +322,8 @@ BOOL OrgData::LoadMusicData(void)
 		i = info.tdata[j].wave_no;
 		InitDramObject(i,j-MAXMELODY);
 	}
+
+	SetMutedTrack();
 	//プレイヤーに表示
 	char str[32];
 	SetPlayPointer(0);//頭出し

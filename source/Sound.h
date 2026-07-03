@@ -56,6 +56,8 @@ void ResumeDramObject(unsigned char key, char track, int played_ms);
 void Rxo_ShowDirectSoundObject(HWND hwnd);
 void Rxo_StopAllSoundNow(void);
 
+void SetMutedTrack(void);
+
 void Rxo_PlayKey(unsigned char key,char track,DWORD freq, int Phase);
 void Rxo_StopKey(unsigned char key,char track, int Phase);
 

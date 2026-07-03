@@ -344,6 +344,7 @@ int ReverseTrackCode(char *strTrack)
 void MuteTrack(int Track)
 {
 	org_data.mute[Track] = (org_data.mute[Track] == 0);
+	SetMutedTrack();
 	UpdateToolbarStatus();
 }
 
