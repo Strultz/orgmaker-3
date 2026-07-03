@@ -453,6 +453,8 @@ S_Sound *lpDRAMBUFFER[MAXDRAM] = {NULL};
 extern int s_solo;
 extern int iKeyPushDown[256];
 
+extern bool gUseProperFreq;
+extern bool gUseOldVol;
 extern bool gPlayMidNote;
 
 static void S_Callback(ma_device* device, void* output_stream, const void* input_stream, ma_uint32 frames_total)
@@ -835,18 +837,22 @@ BOOL MakeSoundObject8(char *wavep,char track, char pipi )
 }
 //2.1.0‚Å ®”Œ^‚©‚ç¬”“_Œ^‚É•ÏX‚µ‚Ä‚Ý‚½B20140401
 short freq_tbl[12] = { 262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494 };
-//double freq_tbl[12] = {261.62556530060, 277.18263097687, 293.66476791741, 311.12698372208, 329.62755691287, 349.22823143300, 369.99442271163, 391.99543598175, 415.30469757995, 440.00000000000, 466.16376151809, 493.88330125612};
+double freq_tbl_prec[12] = {261.62556530060, 277.18263097687, 293.66476791741, 311.12698372208, 329.62755691287, 349.22823143300, 369.99442271163, 391.99543598175, 415.30469757995, 440.00000000000, 466.16376151809, 493.88330125612};
 void ChangeOrganFrequency(unsigned char key,char track, DWORD a)
 {
 	//double tmpDouble;
-	for(int j = 0; j < 8; j++)
-		for(int i = 0; i < 2; i++){
+	for (int j = 0; j < 8; j++)
+		for (int i = 0; i < 2; i++){
 			//double mul = pow(2.0, ((int)a - 1000) / 12000.0);
-			if (lpORGANBUFFER[track][j][i] != NULL)
-				S_SetSoundFrequency(lpORGANBUFFER[track][j][i], //1000‚ð+ƒ¿‚ÌƒfƒtƒHƒ‹ƒg’l‚Æ‚·‚é
-					(DWORD)((oct_wave[j].wave_size * freq_tbl[key]) * oct_wave[j].oct_par) / 8 + (a - 1000) // (8 / mul)
-//					((oct_wave[j].wave_size*freq_tbl[key])*oct_wave[j].oct_par)/8 + (a-1000)
-				);
+			if (lpORGANBUFFER[track][j][i] != NULL) {
+				DWORD val;
+				if (gUseProperFreq) {
+					val = (DWORD)((oct_wave[j].wave_size * freq_tbl_prec[key]) * oct_wave[j].oct_par) / 8.00 + (a - 1000);
+				} else {
+					val = (DWORD)((oct_wave[j].wave_size * freq_tbl[key]) * oct_wave[j].oct_par) / 8 + (a - 1000);
+				}
+				S_SetSoundFrequency(lpORGANBUFFER[track][j][i], val);
+			}
 		}
 }
 short pan_tbl[13] = {0,43,86,129,172,215,256,297,340,383,426,469,512}; 
@@ -1277,7 +1283,7 @@ void PlayOrganKey(unsigned char key,char track,DWORD freq,int Nagasa)
 	if (track < MAXMELODY && lpORGANBUFFER[track][key/12][0] != NULL){
 		DWORD wait = timeGetTime();
 		ChangeOrganFrequency(key%12,track,freq);//Žü”g”‚ðÝ’è‚µ‚Ä
-		S_SetSoundVolume(lpORGANBUFFER[track][key / 12][0], ((200 * 100 / 0x7F) - 255) * 8);
+		S_SetSoundVolume(lpORGANBUFFER[track][key / 12][0], ((200 * (gUseOldVol ? 0x7F : 100) / 0x7F) - 255) * 8);
 		S_SetSoundPan(lpORGANBUFFER[track][key / 12][0], 0);
 		S_PlaySoundFor(lpORGANBUFFER[track][key / 12][0], Nagasa);
 //		lpORGANBUFFER[track][key/12][0]->Play(0, 0, 0); //C 2010.09.23 ‘¦Žž’âŽ~‚·‚éB
@@ -1285,7 +1291,7 @@ void PlayOrganKey(unsigned char key,char track,DWORD freq,int Nagasa)
 		S_StopSound(lpDRAMBUFFER[track - MAXMELODY]);
 		S_RewindSound(lpDRAMBUFFER[track - MAXMELODY]);
 		ChangeDramFrequency(key, track - MAXMELODY);//Žü”g”‚ðÝ’è‚µ‚Ä
-		S_SetSoundVolume(lpDRAMBUFFER[track - MAXMELODY], ((200 * 100 / 0x7F) - 255) * 8);
+		S_SetSoundVolume(lpDRAMBUFFER[track - MAXMELODY], ((200 * (gUseOldVol ? 0x7F : 100) / 0x7F) - 255) * 8);
 		S_SetSoundPan(lpDRAMBUFFER[track - MAXMELODY], 0);
 		S_PlaySound(lpDRAMBUFFER[track - MAXMELODY], false);
 	}
@@ -1298,14 +1304,14 @@ void Rxo_PlayKey(unsigned char key,char track,DWORD freq, int Phase)
 	if (key >= 96) return;
 	if (track < MAXMELODY && lpORGANBUFFER[track][key/12][Phase] != NULL) {
 		ChangeOrganFrequency(key%12,track,freq);
-		S_SetSoundVolume(lpORGANBUFFER[track][key/12][Phase], ((200 * 100 / 0x7F) - 255) * 8);
+		S_SetSoundVolume(lpORGANBUFFER[track][key/12][Phase], ((200 * (gUseOldVol ? 0x7F : 100) / 0x7F) - 255) * 8);
 		S_SetSoundPan(lpORGANBUFFER[track][key/12][Phase], 0);
 		S_PlaySound(lpORGANBUFFER[track][key/12][Phase], true);
 	} else if (lpDRAMBUFFER[track - MAXMELODY] != NULL) {
 		S_StopSound(lpDRAMBUFFER[track - MAXMELODY]);
 		S_RewindSound(lpDRAMBUFFER[track - MAXMELODY]);
 		ChangeDramFrequency(key, track - MAXMELODY);//Žü”g”‚ðÝ’è‚µ‚Ä
-		S_SetSoundVolume(lpDRAMBUFFER[track - MAXMELODY], ((200 * 100 / 0x7F) - 255) * 8);
+		S_SetSoundVolume(lpDRAMBUFFER[track - MAXMELODY], ((200 * (gUseOldVol ? 0x7F : 100) / 0x7F) - 255) * 8);
 		S_SetSoundPan(lpDRAMBUFFER[track - MAXMELODY], 0);
 		S_PlaySound(lpDRAMBUFFER[track - MAXMELODY], false);
 	}

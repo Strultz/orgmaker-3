@@ -97,6 +97,10 @@ bool gIsDrawing = false;
 bool gFileModified = false;
 bool gFileUnsaved = true;
 
+// TODO add these to UI
+bool gUseOldVol = false;
+bool gUseProperFreq = false;
+
 long MAXHORZRANGE = 0x7FFFFFFF;
 
 int WXOffset = 0, WYOffset = 0;

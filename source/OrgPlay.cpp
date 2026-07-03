@@ -7,6 +7,7 @@
 #include "Timer.h"
 #include "CommCtrl.h"
 
+extern bool gUseOldVol;
 extern bool gPlayMidNote;
 extern HWND hwndToolbar;
 extern int sSmoothScroll;
@@ -50,7 +51,7 @@ void OrgData::PlayData(void)
 				}
 			}
 			if(np[i]->pan != PANDUMMY) ChangeOrganPan(np[i]->y,np[i]->pan,i);
-			if(np[i]->volume != VOLDUMMY) ChangeOrganVolume(np[i]->y,np[i]->volume * 100 / 0x7F,i);
+			if(np[i]->volume != VOLDUMMY) ChangeOrganVolume(np[i]->y,np[i]->volume * (gUseOldVol ? 0x7F : 100) / 0x7F,i);
 			np[i] = np[i]->to;//次の音符を指す
 		}
 		if(now_leng[i] == 0) {
@@ -180,7 +181,7 @@ void StartPlayingSong(long pos) {
 					}
 
 					if (pan != PANDUMMY) ChangeOrganPan(y, pan, i);
-					if (vol != VOLDUMMY) ChangeOrganVolume(y, vol * 100 / 0x7F, i);
+					if (vol != VOLDUMMY) ChangeOrganVolume(y, vol * (gUseOldVol ? 0x7F : 100) / 0x7F, i);
 				}
 			}
 			for (int i = MAXMELODY; i < MAXTRACK; i++) {
@@ -207,7 +208,7 @@ void StartPlayingSong(long pos) {
 					}
 
 					if (pan != PANDUMMY) ChangeDramPan(pan, i - MAXMELODY);
-					if (vol != VOLDUMMY) ChangeDramVolume(vol * 100 / 0x7F, i - MAXMELODY);
+					if (vol != VOLDUMMY) ChangeDramVolume(vol * (gUseOldVol ? 0x7F : 100) / 0x7F, i - MAXMELODY);
 				}
 			}
 		}
