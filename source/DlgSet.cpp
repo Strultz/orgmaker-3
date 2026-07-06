@@ -23,6 +23,8 @@
 #define MAXWAVE		100
 #define maxx(a, b) ((a) > (b) ? (a) : (b))
 
+extern void SetModified(bool mod);
+
 extern HWND hDlgTrack;
 extern HWND hDlgPlayer;
 extern HWND hDlgEZCopy;
@@ -957,6 +959,53 @@ BOOL CALLBACK DialogNoteUsed(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 			EndDialog(hdwnd,0);
 			return 1;
 		}
+	}
+	return 0;
+}
+
+BOOL CALLBACK DialogComments(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	switch (message) {
+	case WM_INITDIALOG:
+		SetDlgItemText(hdwnd, IDC_NAMETEXT, org_data.name);
+		SetDlgItemText(hdwnd, IDC_AUTHORTEXT, org_data.author);
+		SetDlgItemText(hdwnd, IDC_COMMENTSBOX, org_data.comments.c_str());
+		CheckDlgButton(hdwnd, IDC_COMMENTSOPEN, org_data.openComments);
+
+		SendDlgItemMessage(hdwnd, IDC_NAMETEXT, EM_SETLIMITTEXT, 0x20, 0);
+		SendDlgItemMessage(hdwnd, IDC_AUTHORTEXT, EM_SETLIMITTEXT, 0x20, 0);
+		SendDlgItemMessage(hdwnd, IDC_COMMENTSBOX, EM_SETLIMITTEXT, 0xFFFF, 0);
+
+		SetFocus(GetDlgItem(hdwnd, IDC_NAMETEXT));
+		PostMessage(GetDlgItem(hdwnd, IDC_NAMETEXT), EM_SETSEL, -1, 0);
+		PostMessage(GetDlgItem(hdwnd, IDC_NAMETEXT), EM_SCROLLCARET, 0, 0);
+
+		//EnableDialogWindow(FALSE);
+		return 0;
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK: {
+			//SetUndo(); // TODO this doesnt work
+			SetModified(true);
+
+			GetDlgItemTextA(hdwnd, IDC_NAMETEXT, org_data.name, 0x21);
+			GetDlgItemTextA(hdwnd, IDC_AUTHORTEXT, org_data.author, 0x21);
+
+			int len = GetWindowTextLength(GetDlgItem(hdwnd, IDC_COMMENTSBOX));
+			org_data.comments.resize(len + 1, '\0');
+			GetDlgItemTextA(hdwnd, IDC_COMMENTSBOX, org_data.comments.data(), len + 1);
+			org_data.comments.pop_back();
+
+			org_data.openComments = IsDlgButtonChecked(hdwnd, IDC_COMMENTSOPEN);
+
+			// Fallthrough
+		}
+		case IDCANCEL:
+			//EnableDialogWindow(TRUE);
+			DestroyWindow(hdwnd);
+			hDlgComments = nullptr;
+			return 1;
+		}
+		return 0;
 	}
 	return 0;
 }

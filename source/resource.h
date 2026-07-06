@@ -702,13 +702,19 @@
 #define IDM_DLGWAVEDBS                  40299
 #define IDM_DCLEN						40300
 #define IDM_GITHUB                      40301
+#define IDD_DLGCOMMENTS					40302
+#define IDC_NAMETEXT					40303
+#define IDC_AUTHORTEXT					40304
+#define IDC_COMMENTSBOX					40305
+#define IDC_COMMENTSOPEN				40306
+#define ID_SONG_COMMENTS				40307
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        239
-#define _APS_NEXT_COMMAND_VALUE         40302
+#define _APS_NEXT_COMMAND_VALUE         40308
 #define _APS_NEXT_CONTROL_VALUE         1228
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

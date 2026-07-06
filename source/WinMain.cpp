@@ -59,6 +59,7 @@ BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogDecayLength(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK DialogComments(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void SetModified(bool mod);
 void CheckLoupeMenu(void);
@@ -70,6 +71,7 @@ HWND hDlgPlayer;
 HWND hDlgTrack;
 HWND hDlgEZCopy;
 HWND hDlgHelp = NULL;
+HWND hDlgComments = nullptr;
 BOOL actApp;
 
 bool gIsDrawing = false;
@@ -595,6 +597,12 @@ BOOL SystemTask(void)
 		if (!GetMessage(&msg, NULL, 0, 0))
 			return FALSE;
 
+		// These will handle keyboard input when focused
+		if ((hDlgComments && IsDialogMessage(hDlgComments, &msg))
+			|| (hDlgHelp && IsDialogMessage(hDlgHelp, &msg))) {
+			continue;
+		}
+
 		if (!TranslateAccelerator(hWnd, Ac, &msg)) {
 			if (!IsDialogMessage(hDlgPlayer, &msg)) {
 				if (!IsDialogMessage(hDlgTrack, &msg)) {
@@ -666,6 +674,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 				if (timer_sw != 0) // Stop playing song
 					SendMessage(hDlgPlayer, WM_COMMAND, IDC_STOP, NULL);
+
+				if (hDlgComments) {
+					DestroyWindow(hDlgComments);
+					hDlgComments = nullptr;
+				}
 
 				ClearUndo(); // 2023.06.10 Someone forgot to put this here
 				org_data.InitOrgData();
@@ -814,6 +827,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				
 				if (timer_sw != 0) // Stop playing song
 					SendMessage(hDlgPlayer, WM_COMMAND, IDC_STOP, NULL);
+
+				if (hDlgComments) {
+					DestroyWindow(hDlgComments);
+					hDlgComments = nullptr;
+				}
 				
 				ClearUndo();
 				org_data.InitOrgData();
@@ -852,10 +870,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				EndDirectSound();
 				org_data.ReleaseNote();
 				EndGDI();
-				if(!hDlgPlayer)DestroyWindow(hDlgPlayer);
-				if(!hDlgTrack)DestroyWindow(hDlgTrack);
-				if(!hDlgEZCopy)DestroyWindow(hDlgEZCopy);
-				if(!hDlgHelp)DestroyWindow(hDlgHelp);
+				if(hDlgPlayer)DestroyWindow(hDlgPlayer);
+				if(hDlgTrack)DestroyWindow(hDlgTrack);
+				if(hDlgEZCopy)DestroyWindow(hDlgEZCopy);
+				if(hDlgHelp)DestroyWindow(hDlgHelp);
+				if(hDlgComments) DestroyWindow(hDlgComments);
 				
 				if(!hwnd)DestroyWindow(hwnd);
 				PostQuitMessage(0);
@@ -1310,6 +1329,15 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
         case IDM_GITHUB:
 			ShellExecute(NULL, "open", "https://github.com/Strultz/orgmaker-3", NULL, NULL, SW_SHOWNORMAL);
 			break;
+		case ID_SONG_COMMENTS: {
+			if (hDlgComments) {
+				DestroyWindow(hDlgComments);
+				hDlgComments = nullptr;
+			}
+			hDlgComments = CreateDialog(hInst, MAKEINTRESOURCE(IDD_DLGCOMMENTS), hwnd, DialogComments);
+			ShowWindow(hDlgComments, SW_SHOW);
+			break;
+		}
 		}
 
 		break;
@@ -1375,6 +1403,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 		if (timer_sw != 0) // Stop playing song
 			SendMessage(hDlgPlayer, WM_COMMAND, IDC_STOP, NULL);
+
+		if (hDlgComments) {
+			DestroyWindow(hDlgComments);
+			hDlgComments = nullptr;
+		}
 
 		ClearUndo();
 //		MessageBox(hWnd,music_file,"",MB_OK);
@@ -1653,41 +1686,25 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 //Show filename in title bar
 void SetTitlebarText()
 {
-	int i, j;
-	char k;
-	char set_name[MAX_PATH + 20];//display space in title
-	char file_name[MAX_PATH];//Manipulate names (exclude directories)
+	char set_name[MAX_PATH + 30]; // display space in title
 
-	i = 0;
-	while (music_file[i] != NULL) i++;//first up to the end
-	while (i != 0 && music_file[i - 1] != '\\') i--; //Last circle mark
+	char* slash = strrchr(music_file, '/');
+	char* backslash = strrchr(music_file, '\\');
 
-	//create file name
-	j = 0;
-	while (music_file[i] != NULL) {
-		file_name[j] = music_file[i];
-		i++;
-		j++;
+	char* name = music_file;
+	if (slash == NULL && backslash != NULL) {
+		name = &backslash[1];
 	}
-	file_name[j] = NULL;
+	else if (slash != NULL && backslash == NULL) {
+		name = &slash[1];
+	}
+	else if (slash != NULL && backslash != NULL) {
+		name = slash < backslash ? &backslash[1] : &slash[1];
+	}
 
-	k = 0;
-	if (gFileModified) { // Lazy
-		set_name[0] = '*';
-		k = 1;
-	}
-	//put file name
-	for (i = 0; i < MAX_PATH; i++) {
-		if (file_name[i] == NULL)break;
-		set_name[i + k] = file_name[i];
-	}
-	//Insert app title
-	for (j = 0; j < 20; j++) {
-		set_name[i + k] = lpszName[j];
-		if (set_name[i + k] == NULL) break;
-		i++;
-	}
-	SetWindowText(hWnd, &set_name[0]);
+	snprintf(set_name, MAX_PATH + 30, "%s%s - %s %s", gFileModified ? "*" : "", name, lpszName, VER_STRING);
+
+	SetWindowText(hWnd, set_name);
 }
 
 void SetModified(bool mod) {

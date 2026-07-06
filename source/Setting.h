@@ -24,4 +24,6 @@ extern HINSTANCE hInst;//インスタンスハンドル
 extern HWND hWnd;//メインウィンドウハンドル
 extern BOOL actApp;//ウインドウのアクティブ
 
+extern HWND hDlgComments;
+
 extern int  WWidth, WHeight;	//ウィンドウのサイズ

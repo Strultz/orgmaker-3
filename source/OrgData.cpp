@@ -705,6 +705,16 @@ void OrgData::InitOrgData(void)
 	for(i = MAXMELODY; i < MAXTRACK; i++){
 		InitDramObject(info.tdata[i].wave_no,i-MAXMELODY);
 	}
+
+	memset(name, '\0', 0x21);
+	memset(author, '\0', 0x21);
+	memset(version, '\0', 0x21);
+
+	snprintf(version, 0x21, "OrgMaker %s", VER_STRING);
+
+	comments.clear();
+
+	openComments = false;
 }
 void OrgData::GetNoteUsed(long *use,long*left,char track)
 {
@@ -734,6 +744,12 @@ OrgData::OrgData()
 	MaximumUndoCursor = 0;
 	RedoEnable = false;
 	UndoEnable = false;
+
+	memset(name, '\0', 0x21);
+	memset(author, '\0', 0x21);
+	memset(version, '\0', 0x21);
+	comments = "";
+	openComments = false;
 	//noteon = new unsigned char[65536];
 }
 OrgData::~OrgData() //デストラクタ

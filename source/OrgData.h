@@ -1,3 +1,8 @@
+#pragma once
+
+#include <cstdint>
+#include <string>
+
 //編集用構造体///////////////
 typedef struct{//●コピー構造体
 	char track1;//このトラックの
@@ -116,7 +121,7 @@ typedef struct OrgData{
 		void GetPlayPos(long *playpos, long *oplaypos = NULL);
 		//以下はファイル関係
 		unsigned short GetNoteNumber(char track,NOTECOPY *nc);
-		BOOL OrgData::SaveMusicData(void);
+		BOOL OrgData::SaveMusicData(bool noMeta = false);
 		BOOL OrgData::LoadMusicData(void);
 		int FileCheckBeforeLoad(char *checkfile); //ファイルがロード可能であれば0異常であれば1を返す。ﾃﾞｰﾀロードはされない。 2014.05.22
 		//以下は編集関係
@@ -133,6 +138,13 @@ typedef struct OrgData{
 
 		unsigned short GetWait(void);
 
-	bool CopyNoteDataToCB(NOTECOPY *nc, int iTrack, int iFullTrack);
+		bool CopyNoteDataToCB(NOTECOPY *nc, int iTrack, int iFullTrack);
+
+		// OM3MD
+		char name[0x21];
+		char author[0x21];
+		char version[0x21];
+		std::string comments;
+		bool openComments;
 }ORGDATA;
 extern ORGDATA org_data;

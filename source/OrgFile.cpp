@@ -66,7 +66,7 @@ unsigned short OrgData::GetNoteNumber(char track,NOTECOPY *nc)
 	}
 }
 //曲データを保存
-BOOL OrgData::SaveMusicData(void)
+BOOL OrgData::SaveMusicData(bool noMeta)
 {
 	ORGANYADATA org_data;
 	NOTELIST *np;
@@ -128,7 +128,23 @@ BOOL OrgData::SaveMusicData(void)
 			fwrite(&np->pan,    sizeof(unsigned char), 1, fp);
 			np = np->to;
 		}
-	}	
+	}
+
+	if (!noMeta) {
+		fwrite("OM3MD2", sizeof(char), 6, fp);
+
+		fwrite(name, sizeof(char), 0x20, fp);
+		fwrite(author, sizeof(char), 0x20, fp);
+
+		snprintf(version, 0x21, "OrgMaker %s", VER_STRING);
+		fwrite(version, sizeof(char), 0x20, fp);
+
+		fwrite(comments.data(), sizeof(char), comments.size(), fp);
+		fputc('\0', fp);
+
+		fputc(openComments ? '\1' : '\0', fp);
+	}
+
 	fclose(fp);
 	PutRecentFile(music_file);
 //	MessageBox(hWnd,"保存しました","Message (Save)",MB_OK);
@@ -279,6 +295,29 @@ BOOL OrgData::LoadMusicData(void)
 			np++;
 		}
 	}
+
+	size_t read = fread(&pass_check[0], sizeof(char), 6, fp);
+	if (read == 6 && !memcmp(pass_check, "OM3MD", 5)) {
+		int ver = pass_check[5] - '0';
+		if (ver >= 1 && ver <= 2) {
+			fread(name, sizeof(char), 0x20, fp);
+			fread(author, sizeof(char), 0x20, fp);
+			fread(version, sizeof(char), 0x20, fp);
+
+			comments.clear();
+
+			char ch;
+			while (fread(&ch, 1, 1, fp) == 1 && ch != '\0') {
+				comments += ch;
+			}
+
+			if (ver >= 2) {
+				fread(&ch, 1, 1, fp);
+				openComments = (ch == '\1');
+			}
+		}
+	}
+
 	fclose(fp);
 	//データを有効に
 	for(j = 0; j < MAXMELODY; j++)
