@@ -20,6 +20,8 @@
 
 #include <windows.h>
 #include <winuser.h>
+#include <string>
+#include <thread>
 
 #include "Setting.h"
 #include "DefOrg.h"
@@ -34,6 +36,7 @@
 #include "Filer.h"
 #include "rxoFunction.h"
 
+#include "Update.h"
 #include "Sound.h"
 #include "Timer.h"
 
@@ -75,6 +78,8 @@ HWND hDlgHelp = NULL;
 HWND hDlgComments = nullptr;
 BOOL actApp;
 
+bool gPlayMidNote = true;
+
 bool gIsDrawing = false;
 bool gFileModified = false;
 bool gFileUnsaved = true;
@@ -100,6 +105,8 @@ int sSmoothScroll = 0;
 extern int volChangeLength;
 extern bool volChangeUseNoteLength;
 extern bool volChangeSetNoteLength;
+
+static bool autoCheckUpdate = true;
 
 extern void LoadTrackBitmaps(HWND hdwnd);
 extern void LoadPlayerBitmaps(HWND hdwnd);
@@ -463,6 +470,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	volChangeLength = GetPrivateProfileInt(MAIN_WINDOW, "VolChangeLength", 10, app_path);
 	volChangeUseNoteLength = GetPrivateProfileInt(MAIN_WINDOW, "VolChangeUseNoteLength", 1, app_path);
 	volChangeSetNoteLength = GetPrivateProfileInt(MAIN_WINDOW, "VolChangeSetNoteLength", 0, app_path);
+
+	autoCheckUpdate = GetPrivateProfileInt(MAIN_WINDOW, "AutoCheckUpdates", 1, app_path);
+	gPlayMidNote = GetPrivateProfileInt(MAIN_WINDOW, "PlayMidNote", 1, app_path);
+
+	CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
 	
 	//org_data.PutMusic();//View sheet music
 
@@ -558,6 +570,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	QuitMMTimer(); //A 2010.09.21
 
 	if (RefleshScreen(hWnd, TRUE)) {
+		if (autoCheckUpdate) {
+			std::thread t(CheckUpdate, false);
+			t.detach();
+		}
+
 		while (TRUE) {
 			org_data.PutMusic();
 			if (!RefleshScreen(hWnd, TRUE)) {
@@ -647,6 +664,36 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 	char str[128];
 	
 	switch(message){
+	case OWM_UPDATESTATUS: {
+		switch (wParam) {
+		case 0: {
+			char* ver = (char*)lParam;
+
+			char msg[256];
+			snprintf(msg, 256, "Version %s is now available. Would you like to download it?", ver);
+			int h = MessageBox(hWnd, msg, "OrgMaker Update", MB_ICONINFORMATION | MB_OKCANCEL);
+			if (h == IDOK) {
+				snprintf(msg, 256, "https://github.com/Strultz/orgmaker-3/releases/tag/%s", ver);
+				ShellExecute(NULL, "open", msg, NULL, NULL, SW_SHOWNORMAL);
+			}
+			break;
+		}
+		case 2:
+			MessageBox(hWnd, "Recieved invalid response from server. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
+			break;
+		case 3:
+			MessageBox(hWnd, "No new updates are available.", "OrgMaker Update", MB_ICONINFORMATION | MB_OK);
+			break;
+		case 4:
+			MessageBox(hWnd, "Update checking is disabled in debug builds.", "OrgMaker Update", MB_ICONWARNING | MB_OK);
+			break;
+		default:
+		case 1:
+			MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
+			break;
+		}
+		break;
+	}
 	case WM_TIMER:
 	{
 		if (wParam == (UINT_PTR)RefleshScreen)
@@ -1380,6 +1427,22 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
         case IDM_GITHUB:
 			ShellExecute(NULL, "open", "https://github.com/Strultz/orgmaker-3", NULL, NULL, SW_SHOWNORMAL);
 			break;
+		case IDM_CHECKUPD: {
+			std::thread t(CheckUpdate, true);
+			t.detach();
+			break;
+		}
+		case IDM_AUTOCHECKUPDATES:
+			hMenu = GetMenu(hWnd);
+			autoCheckUpdate = !autoCheckUpdate;
+			CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
+			break;
+		/*case IDM_PLAY_NOTES_MID:
+			hMenu = GetMenu(hWnd);
+			gPlayMidNote = !gPlayMidNote;
+			CheckMenuItem(hMenu, IDM_PLAY_NOTES_MID, MF_BYCOMMAND | (gPlayMidNote ? MFS_CHECKED : MFS_UNCHECKED));
+			SetMutedTrack();
+			break;*/
 		case ID_SONG_COMMENTS: {
 			if (hDlgComments) {
 				DestroyWindow(hDlgComments);
@@ -1828,6 +1891,10 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW, "VolChangeUseNoteLength", num_buf, app_path);
 	wsprintf(num_buf, "%d", volChangeSetNoteLength);
 	WritePrivateProfileString(MAIN_WINDOW, "VolChangeSetNoteLength", num_buf, app_path);
+	wsprintf(num_buf, "%d", autoCheckUpdate);
+	WritePrivateProfileString(MAIN_WINDOW, "AutoCheckUpdates", num_buf, app_path);
+	wsprintf(num_buf, "%d", gPlayMidNote);
+	WritePrivateProfileString(MAIN_WINDOW, "PlayMidNote", num_buf, app_path);
 
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentThemePath", gSelectedTheme, app_path);
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentWavePath", gSelectedWave, app_path);

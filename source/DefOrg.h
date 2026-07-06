@@ -43,6 +43,8 @@
 #define MODEMULTIPLY 10 //2014.04.30 A
 #define MODEDECAY   64  //2014.05.01 A
 
+#define OWM_UPDATESTATUS (WM_USER + 1)
+
 
 //#define NUMDRAMITEM		39	//ÇPÇQÅ{ÇTÅ{ÇXÅ{ÇP(îL)Å{ÇPÇP	    // 2011.10.17 D
 #define NUMDRAMITEM		42	//ÇPÇQÅ{ÇTÅ{ÇXÅ{ÇP(îL)Å{ÇPÇPÅ{ÇR	// 2011.10.17 A

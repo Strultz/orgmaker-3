@@ -1216,30 +1216,79 @@ BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 	return 0;
 }
 
+static HFONT hFont = NULL;
 BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-//	char str[10] = {NULL};
-	switch(message){
-	case WM_INITDIALOG://ダイアログが呼ばれた
+	RECT rc;
+
+	switch (message) {
+	case WM_INITDIALOG: {
+		LOGFONT lf = { 0 };
+		SystemParametersInfo(SPI_GETICONTITLELOGFONT, sizeof(LOGFONT), &lf, 0);
+		lf.lfWeight = FW_BOLD;
+		hFont = CreateFontIndirect(&lf);
+
+		HWND hText = GetDlgItem(hdwnd, IDC_BOLDLABEL);
+		SendMessage(hText, WM_SETFONT, (WPARAM)hFont, TRUE);
+
+		RECT rc;
+		GetWindowRect(hdwnd, &rc);
+
+		DWORD style = (DWORD)GetWindowLong(hdwnd, GWL_STYLE);
+		DWORD exStyle = (DWORD)GetWindowLong(hdwnd, GWL_EXSTYLE);
+
+		RECT rcNew = { 0, 0, 375, 0 };
+		AdjustWindowRectEx(&rcNew, style, FALSE, exStyle);
+
+		SetWindowPos(hdwnd, NULL, 0, 0, rcNew.right - rcNew.left, rc.bottom - rc.top, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
+
+		HRSRC hrscr = FindResource(NULL, "TEXTABOUT", "TEXT");// ???????
+		if (hrscr)
+		{
+			DWORD len = SizeofResource(NULL, hrscr);
+
+			char* text = (char*)malloc(len + 1);
+			if (text == NULL) {
+				// Ooops!
+				return 0;
+			}
+
+			char* cc = (char*)LockResource(LoadResource(NULL, hrscr));// ????????????
+			memcpy(text, cc, len);
+			text[len] = '\0';
+
+			SetDlgItemText(hdwnd, IDC_ABOUTTEXT, text);
+			free(text);
+		}
+
+		SetFocus(GetDlgItem(hdwnd, IDC_ABOUTTEXT));
+		PostMessage(GetDlgItem(hdwnd, IDC_ABOUTTEXT), EM_SETSEL, -1, 0);
+		PostMessage(GetDlgItem(hdwnd, IDC_ABOUTTEXT), EM_SCROLLCARET, 0, 0);
 
 		EnableDialogWindow(FALSE);
-		return 1;
+		return 0;
+	}
+	case WM_DESTROY: {
+		if (hFont)
+			DeleteObject(hFont);
+		break;
+	}
 	case WM_COMMAND:
-		switch(LOWORD(wParam)){
+		switch (LOWORD(wParam)) {
+		case IDCANCEL:
 		case IDOK:
 			EnableDialogWindow(TRUE);
-			EndDialog(hdwnd,0);
-			return 1;
-		case ID_ICON_ORG:
+			EndDialog(hdwnd, 0);
 			return 1;
 		}
 
 
 		return 1;
-	
+
 	}
 	return 0;
 }
+
 
 static unsigned long sample_rate = 0;
 static unsigned long loop_count = 0;

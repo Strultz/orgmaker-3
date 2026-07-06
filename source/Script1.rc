@@ -382,7 +382,7 @@ END
 
 DLGUSED DIALOG 0, 0, 175, 139
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
-CAPTION "Memory Usage"
+CAPTION "Event Usage"
 FONT 9, "MS PGothic"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,60,120,56,14
@@ -442,18 +442,16 @@ BEGIN
     LTEXT           "Tr",IDC_STATIC,92,4,10,10
 END
 
-DLGMEMO DIALOGEX 0, 0, 119, 135
-STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
+DLGMEMO DIALOGEX 0, 0, 250, 232
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About OrgMaker 3"
-FONT 9, "MS PGothic", 0, 0, 0x1
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,39,113,40,18
-    CTEXT           "OrgMaker 3.0.10",IDC_STATIC,20,32,80,8
-    LTEXT           "2026 / 07 / 06",IDC_STATIC,37,43,44,8
-    CTEXT           "OrgMaker 1 by Studio Pixel",IDC_STATIC,2,57,114,16,SS_CENTERIMAGE | SS_SUNKEN
-    ICON            "ICON",ID_ICON_ORG,49,3,20,20,SS_NOTIFY,WS_EX_DLGMODALFRAME
-    CTEXT           "OrgMaker 2 by Rxo Inverse",IDC_STATIC,2,75,114,16,SS_CENTERIMAGE | SS_SUNKEN
-    CTEXT           "OrgMaker 3 by Strultz",IDC_STATIC,2,93,114,16,SS_CENTERIMAGE | SS_SUNKEN
+DEFPUSHBUTTON   "OK", IDOK, 203, 212, 40, 12
+LTEXT           "OrgMaker 3.0.10", IDC_BOLDLABEL, 8, 78, 112, 10
+LTEXT           "2026 / 07 / 06", IDC_STATIC, 8, 88, 112, 8
+CONTROL         "B_SPLASH", ID_ICON_ORG, "Static", SS_BITMAP, 0, 0, 375, 120
+EDITTEXT        IDC_ABOUTTEXT, 8, 100, 234, 104, ES_MULTILINE | ES_READONLY | WS_VSCROLL
 END
 
 DLGCOPY2 DIALOGEX 0, 0, 175, 145
@@ -1076,6 +1074,7 @@ BEGIN
         MENUITEM "Window Dialog",               IDM_DUMMY, INACTIVE
         MENUITEM "  Toggle &Edit Toolbar\tF9",  IDM_EZCOPYVISIBLE
         MENUITEM "  Confirm &Unsaved Changes",  IDM_CHANGEFINISH
+        MENUITEM "  Auto&matically Check for Updates", IDM_AUTOCHECKUPDATES
         MENUITEM SEPARATOR
         MENUITEM "Operations",                  IDM_DUMMY, INACTIVE
         MENUITEM "  &Snap Selection to Beat Grid\tCtrl+G", IDM_GRIDMODE
@@ -1103,7 +1102,8 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Open &GitHub Page",           IDM_GITHUB
         MENUITEM SEPARATOR
-        MENUITEM "&About OrgMaker 3",              IDM_DLGMEMO
+        MENUITEM "&Check for Updates",          IDM_CHECKUPD
+        MENUITEM "&About OrgMaker 3",           IDM_DLGMEMO
     END
 END
 
@@ -1176,6 +1176,8 @@ B_TRACK_I               BITMAP                  "Bitmap\\button_track_I.bmp"
 B_LOUPE_PLUS            BITMAP                  "Bitmap\\Loupe_PLUS.bmp"
 
 B_LOUPE_MINUS           BITMAP                  "Bitmap\\Loupe_MINUS.bmp"
+
+B_SPLASH                BITMAP                  "Bitmap\\org_splash.bmp"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1489,7 +1491,9 @@ END
 // TEXT
 //
 
-TEXTHELP                TEXT                    "help.txt"
+TEXTHELP                TEXT                    "Text\\help.txt"
+
+TEXTABOUT               TEXT                    "Text\\about.txt"
 
 
 /////////////////////////////////////////////////////////////////////////////

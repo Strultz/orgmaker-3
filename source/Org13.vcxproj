@@ -98,7 +98,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>ddraw.lib;dsound.lib;winmm.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Wininet.lib;ddraw.lib;dsound.lib;winmm.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
@@ -137,7 +137,7 @@
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>ddraw.lib;ddraw.lib;winmm.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Wininet.lib;ddraw.lib;ddraw.lib;winmm.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -160,6 +160,7 @@
     <ClCompile Include="rxoFunction.cpp" />
     <ClCompile Include="Scroll.cpp" />
     <ClCompile Include="Sound.cpp" />
+    <ClCompile Include="Update.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="WinTimer.cpp" />
   </ItemGroup>
@@ -171,7 +172,6 @@
     <ClInclude Include="DefOrg.h" />
     <ClInclude Include="Filer.h" />
     <ClInclude Include="Gdi.h" />
-    <ClInclude Include="miniaudio.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="OrgData.h" />
     <ClInclude Include="OrgWaveRenderer.h" />
@@ -181,6 +181,9 @@
     <ClInclude Include="Setting.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="Update.h" />
+    <ClInclude Include="vendor\json.hpp" />
+    <ClInclude Include="vendor\miniaudio.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Bitmap\button_track_1.bmp" />
@@ -233,7 +236,8 @@
     <Media Include="Wave\Metro02.wav" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="help.txt" />
+    <Text Include="Text\about.txt" />
+    <Text Include="Text\help.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
