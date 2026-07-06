@@ -987,7 +987,7 @@ BEGIN
         MENUITEM "  (&9) (none)", IDM_CT_S18, GRAYED
         MENUITEM SEPARATOR
         MENUITEM "Clear Volume Events\tCtrl+0", IDM_CT_S20
-        MENUITEM "Setup Decay Length...", IDM_DCLEN
+        MENUITEM "Setup Decay Length...\tCtrl+P", IDM_DCLEN
     END
     MENUITEM "|",                           IDM_DUMMY_TATE_SEPARATOR, GRAYED
     POPUP "&Operations"
@@ -1058,8 +1058,8 @@ BEGIN
         END
         MENUITEM "  &Auto Load/Save .pvi File", IDM_AUTOLOADPVI
         MENUITEM "  &Metronome",                IDM_METRONOME
-        MENUITEM "  &Themes...",                IDM_DLGTHEMES
-        MENUITEM "  Sound&banks...",            IDM_DLGWAVEDBS
+        MENUITEM "  &Themes...\tCtrl+Alt+T",                IDM_DLGTHEMES
+        MENUITEM "  Sound&banks...\tCtrl+Alt+S",            IDM_DLGWAVEDBS
     END
     POPUP "&Help"
     BEGIN
@@ -1444,6 +1444,9 @@ BEGIN
     "Y",            ID_AC_REDO,             VIRTKEY, CONTROL, NOINVERT
     "Y",            ID_AC_SY,               VIRTKEY, SHIFT, NOINVERT
     "Z",            ID_AC_UNDO,             VIRTKEY, CONTROL, NOINVERT
+    "P",            IDM_DCLEN,              VIRTKEY, CONTROL, NOINVERT
+    "T",            IDM_DLGTHEMES,          VIRTKEY, CONTROL, ALT, NOINVERT
+    "S",            IDM_DLGWAVEDBS,         VIRTKEY, CONTROL, ALT, NOINVERT
 END
 
 
