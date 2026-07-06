@@ -304,6 +304,7 @@ static void S_ResetSounds() {
 		sound->volume_l = sound->target_volume_l;
 		sound->volume_r = sound->target_volume_r;
 		sound->vol_ticks = 0;
+		sound->stop_in = 0;
 	}
 
 	ma_mutex_unlock(&mutex);

@@ -963,7 +963,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				if(hDlgHelp)DestroyWindow(hDlgHelp);
 				if(hDlgComments) DestroyWindow(hDlgComments);
 				
-				if(!hwnd)DestroyWindow(hwnd);
+				if(hwnd)DestroyWindow(hwnd);
 				PostQuitMessage(0);
 				break;
 			case IDM_2BAI:
@@ -1472,6 +1472,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			memset(iKeyPhase, -1, sizeof(iKeyPhase));
 			memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
 			break;
+		case ID_ACCEL40136:
+			if (timer_sw != 0) SendMessage(hDlgPlayer, WM_COMMAND, IDC_STOP, NULL);
+			else SendMessage(hDlgPlayer, WM_COMMAND, IDC_PLAY, NULL);
+			break;
 		}
 
 		break;
@@ -1582,10 +1586,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		org_data.ReleaseNote();
 		DeleteWaveData100(); //Added 20140401 Normally, it seems to be called in the order of WM_CLOSE E> WM_DESTROY E> WM_QUIT.
 		EndGDI();
-		if(!hDlgPlayer)DestroyWindow(hDlgPlayer);
-		if(!hDlgTrack)DestroyWindow(hDlgTrack);
-		if(!hDlgEZCopy)DestroyWindow(hDlgEZCopy);
-		if(!hwnd)DestroyWindow(hwnd);
+		if(hDlgPlayer)DestroyWindow(hDlgPlayer);
+		if(hDlgTrack)DestroyWindow(hDlgTrack);
+		if(hDlgEZCopy)DestroyWindow(hDlgEZCopy);
+		if(hwnd)DestroyWindow(hwnd);
 		PostQuitMessage(0);
 		FreeMessageStringBuffer();	// 2014.10.19 
 		break;
