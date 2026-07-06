@@ -91,6 +91,8 @@ extern char music_file[];//file name
 extern int sGrid;	//Range selection in grid units
 extern int sACrnt;	//Range selection always on current track
 
+extern NOTECOPY nc_Select;
+
 int sMetronome = 0;
 int sSmoothScroll = 0;
 
@@ -411,7 +413,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	InitSoundObject("METRO01", 1);
 	InitSoundObject("METRO02", 2);
-    InitSoundObject("CAT", 3);
 	
 	hDlgPlayer = CreateDialog(hInst,"PLAYER",hWnd,DialogPlayer);
 	hDlgTrack = CreateDialog(hInst,"TRACK",hWnd,DialogTrack);
@@ -1316,6 +1317,15 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case ID_AC_DELETEKEY: //Add 2014/04/12
 				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_DELETEBUTTON , NULL);
 				break;
+			case IDM_SONG_REPEATSELECT:
+				if (tra >= 0) {
+					SetUndo();
+					org_data.GetMusicInfo(&mi);
+					mi.repeat_x = nc_Select.x1_1;
+					mi.end_x = nc_Select.x1_2 + 1;
+					org_data.SetMusicInfo(&mi, SETREPEAT);
+				}
+				break;
 			}
 		}else{
 			//only while playing
@@ -1373,6 +1383,21 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			}
 			hDlgComments = CreateDialog(hInst, MAKEINTRESOURCE(IDD_DLGCOMMENTS), hwnd, DialogComments);
 			ShowWindow(hDlgComments, SW_SHOW);
+			break;
+		}
+		case IDM_SONGLEN: {
+			org_data.GetMusicInfo(&mi);
+			long lengthMs = mi.end_x * mi.wait;
+			long minutes = lengthMs / 1000 / 60;
+			if (minutes >= 60) {
+				snprintf(str, 128, "Estimated song length: %dh %dm %ds",
+					minutes / 60, minutes % 60, (lengthMs / 1000) % 60);
+			}
+			else {
+				snprintf(str, 128, "Estimated song length: %dm %ds",
+					minutes, (lengthMs / 1000) % 60);
+			}
+			MessageBox(hWnd, str, "OrgMaker 3", MB_OK | MB_ICONINFORMATION);
 			break;
 		}
 		}

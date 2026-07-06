@@ -1,4 +1,4 @@
-OrgMaker 3   Ver3.0.9   Simple Help
+OrgMaker 3   Ver3.0.10   Simple Help
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
   Basic usage is the same as "OrgMaker 1" developed by Mr. Pixel.
@@ -235,11 +235,30 @@ OrgMaker 3   Ver3.0.9   Simple Help
 
 
 [] Pan and Volume headers light up when you click on them.
-    They only light up in version 3.0.8. It has no significance.
+    They only light up in version 3.0.10. It has no significance.
     Clicking Select toggles the "Always Select Current Track" function.
 
 
 # Revision History 
+
+  3.0.10 2026/07/06  Added comments
+                       You can now write the song name, author name, and other
+                       additional text attached to your files.
+                       This extra metadata is entirely backwards compatible.
+                       Older versions will simply ignore this data.
+                     Improved rendering of custom waveforms
+                       They are now much smoother looking, matching the original
+                       visuals.
+                     Improved BPM conversion mechanism
+                       The arrow buttons are gone, and the conversion is entirely
+                       automatic now.
+                     Improved audio accuracy
+                       The audio output should now be much closer to the original
+                       code's output.
+                     Fixed visual issues
+                       The graphics should no longer stutter when opening menus
+                       or placing new notes.
+                     Other fixes and minor changes
 
   3.0.9  2024/10/16  Added soundbanks, which are like MIDI soundfonts but for
                        Organya

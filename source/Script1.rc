@@ -937,7 +937,9 @@ BEGIN
         MENUITEM "&Default Pan/Volume...\tF3",  IDM_DLGDEFAULT
         MENUITEM "Comments...",                 ID_SONG_COMMENTS
         MENUITEM SEPARATOR
-        MENUITEM "&Memory Usage...",            IDM_DLGUSED
+        MENUITEM "&Repeat Selection",           IDM_SONG_REPEATSELECT
+        MENUITEM "Estimate Song &Length...",    IDM_SONGLEN
+        MENUITEM "&Event Usage...",             IDM_DLGUSED
     END
     POPUP "&Edit"
     BEGIN
@@ -1267,8 +1269,6 @@ SNARE08                 WAVE                    "Wave\\Snare08.wav" */
 METRO01                 WAVE                    "Wave\\Metro01.wav"
 
 METRO02                 WAVE                    "Wave\\Metro02.wav"
-
-CAT                     WAVE                    "Wave\\Cat.wav"
 
 
 /////////////////////////////////////////////////////////////////////////////
