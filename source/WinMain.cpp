@@ -555,10 +555,12 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	}
 	QuitMMTimer(); //A 2010.09.21
 
-	while (TRUE) {
-		org_data.PutMusic();
-		if (!RefleshScreen(hWnd)) {
-			break;
+	if (RefleshScreen(hWnd, TRUE)) {
+		while (TRUE) {
+			org_data.PutMusic();
+			if (!RefleshScreen(hWnd, TRUE)) {
+				break;
+			}
 		}
 	}
 
@@ -621,6 +623,8 @@ BOOL SystemTask(void)
 }
 
 //main procedure
+static int gLoopIn = 0;
+
 LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
 //	char str[64];
@@ -641,6 +645,39 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 	char str[128];
 	
 	switch(message){
+	case WM_TIMER:
+	{
+		if (wParam == (UINT_PTR)RefleshScreen)
+		{
+			RefleshScreen(hwnd, FALSE);
+		}
+		break;
+	}
+	case WM_ENTERMENULOOP:
+	case WM_ENTERSIZEMOVE:
+	{
+		if (gLoopIn == 0)
+		{
+			SetTimer(hwnd, (UINT_PTR)RefleshScreen, USER_TIMER_MINIMUM, NULL);
+		}
+		++gLoopIn;
+		break;
+	}
+	case WM_EXITMENULOOP:
+	case WM_EXITSIZEMOVE:
+	{
+		if (gLoopIn == 0)
+		{
+			break;
+		}
+
+		--gLoopIn;
+		if (gLoopIn == 0)
+		{
+			KillTimer(hwnd, (UINT_PTR)RefleshScreen);
+		}
+		break;
+	}
 	case WM_COMMAND:
 		for(i=0;i<16;i++){
 			if(LOWORD(wParam) == iChgTrackKey[i]){
