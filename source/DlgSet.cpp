@@ -1182,7 +1182,6 @@ BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			EndDialog(hdwnd,0);
 			return 1;
 		case ID_ICON_ORG:
-			PlaySoundObject(3, 1);
 			return 1;
 		}
 

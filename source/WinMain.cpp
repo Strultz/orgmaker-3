@@ -745,7 +745,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				DialogBox(hInst,"DLGSWAP",hwnd,DialogSwap);
 				break;
 			case IDM_DLGMEMO://
-				PlaySoundObject(3, 1);
 				DialogBox(hInst,"DLGMEMO",hwnd,DialogMemo);
 				break;
 			case IDM_DLGTHEMES:
@@ -1443,6 +1442,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case VK_RIGHT:
 			if (timer_sw == 0) scr_data.KeyScroll(DIRECTION_RIGHT);
 			break;
+		case VK_F6:
+			SendMessage(hDlgPlayer , WM_COMMAND , IDC_START , NULL);
+			// Fallthrough
 		case VK_F5:
 		case VK_NUMPAD0:
 			if(timer_sw == 0)SendMessage(hDlgPlayer , WM_COMMAND , IDC_PLAY , NULL);

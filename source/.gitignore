@@ -1,3 +1,6 @@
 Debug/
 Release/
 .vs/
+Script1.aps
+
+*.vcxproj.user
