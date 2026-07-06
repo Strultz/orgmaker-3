@@ -173,11 +173,6 @@ void CheckUpdate(bool act) {
 				canUpdateCheck = true;
 				return;
 			}
-			else {
-				if (act) PostMessage(hWnd, OWM_UPDATESTATUS, 3, 0);
-				canUpdateCheck = true;
-				return;
-			}
 		}
 
 		if (act) PostMessage(hWnd, OWM_UPDATESTATUS, 2, 0);
