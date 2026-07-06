@@ -180,6 +180,7 @@ BOOL CALLBACK DialogTrack(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 		str[1]='\0';
 		SetDlgItemText(hdwnd,IDE_VIEWTRACK,str);
 		for(i = 0; i < MAXTRACK; i++)org_data.mute[i] = 0;
+		SetMutedTrack();
 		LoadTrackBitmaps(hdwnd);
 
 		return 1;
@@ -215,6 +216,7 @@ BOOL CALLBACK DialogTrack(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 					org_data.mute[i] = 1;
 				else org_data.mute[i] = 0;
 			}
+			SetMutedTrack();
 			//SetFocus(hWnd);
 		}
 		switch(LOWORD(wParam)){
@@ -252,6 +254,7 @@ BOOL CALLBACK DialogTrack(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 					}
 				}
 			}
+			SetMutedTrack();
 			SetFocus(hWnd);		// 2010.11.30 A
 			break;
 		case IDC_BTN_LOUPE1: //PLUS 2014.05.27
@@ -287,6 +290,7 @@ BOOL CALLBACK DialogTrack(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 					
 				}
 			}
+			SetMutedTrack();
 			SetFocus(hWnd);		// 2010.11.30 A
 			break;
 		//A2008/05/13
@@ -314,6 +318,7 @@ BOOL CALLBACK DialogTrack(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 					}	
 				}
 			}
+			SetMutedTrack();
 			SetFocus(hWnd);		// 2010.11.30 A
 			break;
 		case IDC_BTN_DRUM:	//ƒhƒ‰ƒ€‚Ì‚Ý‚ðON-OFF
@@ -340,6 +345,7 @@ BOOL CALLBACK DialogTrack(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 					}	
 				}
 			}
+			SetMutedTrack();
 			SetFocus(hWnd);		// 2010.11.30 A
 			break;
 		case IDC_TR_WAIT:

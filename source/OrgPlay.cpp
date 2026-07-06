@@ -4,7 +4,12 @@
 #include "Sound.h"
 #include "resource.h"
 #include "Scroll.h"
+#include "Timer.h"
 
+extern bool gPlayMidNote;
+extern int sSmoothScroll;
+
+extern char timer_sw;
 long oplay_p;
 long play_p;//現在再生位置（キャンバス）
 NOTELIST *np[MAXTRACK];//現在再生準備の音符
@@ -25,7 +30,7 @@ void OrgData::PlayData(void)
 			if (s_solo != -1 && s_solo != i)
 				continue;
 
-			if(mute[i] == 0){
+			if(mute[i] == 0 || gPlayMidNote) {
 				if(np[i]->y != KEYDUMMY){
 					PlayOrganObject(np[i]->y,-1,i,info.tdata[i].freq, info.tdata[i].pipi);
 					now_leng[i] = np[i]->length;
@@ -47,7 +52,9 @@ void OrgData::PlayData(void)
 
 		if(np[i] != NULL &&play_p == np[i]->x ){//音が来た。
 			if(np[i]->y != KEYDUMMY){//ならす
-				if(mute[i] == 0)PlayDramObject(np[i]->y,1,i-MAXMELODY);
+				if (mute[i] == 0 || gPlayMidNote) {
+					PlayDramObject(np[i]->y, 1, i - MAXMELODY);
+				}
 			}
 			if(np[i]->pan != PANDUMMY)ChangeDramPan(np[i]->pan,i-MAXMELODY);
 			if(np[i]->volume != VOLDUMMY)ChangeDramVolume(np[i]->volume * 100 / 0x7F,i-MAXMELODY);
@@ -93,4 +100,107 @@ void OrgData::SetPlayPointer(long x)
 void OrgData::GetPlayPos(long* playpos, long *oplaypos) {
 	if (playpos != NULL) *playpos = play_p;
 	if (oplaypos != NULL) *oplaypos = oplay_p;
+}
+
+void StartPlayingSong(long pos) {
+	MUSICINFO mi;
+
+	if (!timer_sw) {
+		Rxo_StopAllSoundNow();
+
+		if (pos == -1) {
+			long hp;
+			scr_data.GetScrollPosition(&hp, NULL);
+			org_data.SetPlayPointer(hp);
+		}
+		else {
+			org_data.SetPlayPointer(pos);
+		}
+
+		InitMMTimer();
+		org_data.GetMusicInfo(&mi);
+		StartTimer(mi.wait);
+
+		// Set up mid note track stuff
+		if (gPlayMidNote) {
+			for (int i = 0; i < MAXMELODY; i++) {
+				if (s_solo != -1 && s_solo != i)
+					continue;
+
+				unsigned char vol = VOLDUMMY;
+				unsigned char pan = PANDUMMY;
+
+				// Pizzicato channels still have weird behavior that this doesn't account for,
+				// but I'm not gonna fix it because I don't feel like it
+				NOTELIST* note = mi.tdata[i].pipi ? org_data.FindLastOrgNoteKey(i, play_p) : org_data.FindOrgNoteLength(i, play_p);
+				if (note != NULL && note->x < play_p && (org_data.mute[i] == 0 || gPlayMidNote)) {
+					unsigned char y = note->y;
+
+					now_leng[i] = (note->x + note->length) - play_p;
+					int played_len = (play_p - note->x) * mi.wait;
+
+					ResumeOrganObject(y, i, mi.tdata[i].freq, mi.tdata[i].pipi, played_len);
+
+					while (note != NULL && note->x < play_p) {
+						if (note->volume != VOLDUMMY)
+							vol = note->volume;
+
+						if (note->pan != PANDUMMY)
+							pan = note->pan;
+
+						note = note->to;
+					}
+
+					if (pan != PANDUMMY) ChangeOrganPan(y, pan, i);
+					if (vol != VOLDUMMY) ChangeOrganVolume(y, vol * 100 / 0x7F, i);
+				}
+			}
+			for (int i = MAXMELODY; i < MAXTRACK; i++) {
+				if (s_solo != -1 && s_solo != i)
+					continue;
+
+				unsigned char vol = VOLDUMMY;
+				unsigned char pan = PANDUMMY;
+
+				NOTELIST* note = org_data.FindLastOrgNoteKey(i, play_p);
+				if (note != NULL && note->x < play_p && (org_data.mute[i] == 0 || gPlayMidNote)) {
+					int played_len = (play_p - note->x) * mi.wait;
+
+					ResumeDramObject(note->y, i - MAXMELODY, played_len);
+
+					while (note != NULL && note->x < play_p) {
+						if (note->volume != VOLDUMMY)
+							vol = note->volume;
+
+						if (note->pan != PANDUMMY)
+							pan = note->pan;
+
+						note = note->to;
+					}
+
+					if (pan != PANDUMMY) ChangeDramPan(pan, i - MAXMELODY);
+					if (vol != VOLDUMMY) ChangeDramVolume(vol * 100 / 0x7F, i - MAXMELODY);
+				}
+			}
+		}
+
+		timer_sw = 1;
+	}
+}
+void StopPlayingSong(void) {
+	if (timer_sw) {
+		QuitMMTimer();
+		Rxo_StopAllSoundNow();
+		timer_sw = 0;
+
+		long playPos;
+		org_data.GetPlayPos(NULL, &playPos);
+
+		MUSICINFO mi;
+		org_data.GetMusicInfo(&mi);
+
+		long hp = sSmoothScroll ? playPos : ((playPos / (mi.dot * mi.line)) * (mi.dot * mi.line));
+		scr_data.SetHorzScroll(hp);
+		org_data.SetPlayPointer(hp);
+	}
 }

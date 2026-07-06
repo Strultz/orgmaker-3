@@ -138,6 +138,12 @@ typedef struct OrgData{
 
 		unsigned short GetWait(void);
 
+		NOTELIST* FindOrgNote(char track, int x);
+		NOTELIST* FindOrgNoteLength(char track, int x);
+		NOTELIST* FindLastOrgNoteKey(char track, int x);
+		NOTELIST* CreateOrgNote(char track, int x);
+		void DeleteOrgNote(char track, NOTELIST* note);
+
 		void TransposeTrack(char track, int by);
 
 		bool CopyNoteDataToCB(NOTECOPY *nc, int iTrack, int iFullTrack);
@@ -150,3 +156,6 @@ typedef struct OrgData{
 		bool openComments;
 }ORGDATA;
 extern ORGDATA org_data;
+
+void StartPlayingSong(long pos);
+void StopPlayingSong(void);

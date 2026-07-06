@@ -297,6 +297,90 @@ BOOL OrgData::ChangeTransData(PARCHANGE *pc)
 	return TRUE;
 }
 
+// I'm tired of this
+NOTELIST* OrgData::FindOrgNote(char track, int x) {
+	if (track < 0 || track > 15) return NULL;
+	NOTELIST* rnp = info.tdata[track].note_list;
+	while (rnp != NULL && rnp->x < x) {
+		rnp = rnp->to;
+	}
+	if (rnp == NULL) return NULL;
+	if (rnp->x == x) return rnp;
+	return NULL;
+}
+
+NOTELIST* OrgData::CreateOrgNote(char track, int x) {
+	if (track < 0 || track > 15) return NULL;
+	NOTELIST* nfrom = info.tdata[track].note_list;
+	if (nfrom != NULL) {
+		while (nfrom->x < x && nfrom->to != NULL) {
+			nfrom = nfrom->to;
+		}
+		if (nfrom->x == x) return NULL; // note exists here
+	}
+	NOTELIST* mnp = SearchNote(info.tdata[track].note_p);
+	if (mnp == NULL) return NULL;
+	if (nfrom == NULL) {
+		info.tdata[track].note_list = mnp;
+		mnp->from = NULL;
+		mnp->to = NULL;
+		mnp->x = x;
+		mnp->y = KEYDUMMY;
+		mnp->volume = VOLDUMMY;
+		mnp->pan = PANDUMMY;
+		mnp->length = 1;
+		return mnp;
+	}
+	else if (nfrom->x > x) {
+		mnp->from = nfrom->from;
+		mnp->to = nfrom;
+		mnp->x = x;
+		mnp->y = KEYDUMMY;
+		mnp->volume = VOLDUMMY;
+		mnp->pan = PANDUMMY;
+		mnp->length = 1;
+		if (nfrom->from == NULL) {
+			info.tdata[track].note_list = mnp;
+		}
+		else {
+			nfrom->from->to = mnp;
+		}
+		nfrom->from = mnp;
+		return mnp;
+	}
+	else if (nfrom->to == NULL) {
+		mnp->from = nfrom;
+		nfrom->to = mnp;
+		mnp->to = NULL;
+		mnp->x = x;
+		mnp->y = KEYDUMMY;
+		mnp->volume = VOLDUMMY;
+		mnp->pan = PANDUMMY;
+		mnp->length = 1;
+		return mnp;
+	}
+	return NULL;
+}
+
+void OrgData::DeleteOrgNote(char track, NOTELIST* note) {
+	if (track < 0 || track > 15) return;
+	if (note == NULL) return;
+	if (note->from == NULL) {
+		if (note != info.tdata[track].note_list) {
+			return;
+		}
+		info.tdata[track].note_list = note->to;
+	}
+	else {
+		note->from->to = note->to;
+	}
+	if (note->to != NULL) {
+		note->to->from = note->from;
+	}
+	//free(note);
+	note->length = 0;
+}
+
 void OrgData::TransposeTrack(char track, int by) {
 	if (track < 0 || track > 15) return;
 
@@ -309,6 +393,50 @@ void OrgData::TransposeTrack(char track, int by) {
 		}
 		p = p->to;
 	}
+}
+
+NOTELIST* OrgData::FindLastOrgNoteKey(char track, int x) {
+	if (track < 0 || track > 15) return NULL;
+
+	NOTELIST* rnp = info.tdata[track].note_list;
+
+	if (rnp == NULL) return NULL;
+
+	while (rnp->to != NULL && rnp->to->x < x) {
+		rnp = rnp->to;
+	}
+
+	while (rnp != NULL && rnp->y == KEYDUMMY) {
+		rnp = rnp->from;
+	}
+
+	if (rnp == NULL) return NULL;
+
+	if (x >= rnp->x) return rnp;
+
+	return NULL;
+}
+
+NOTELIST* OrgData::FindOrgNoteLength(char track, int x) {
+	if (track < 0 || track > 15) return NULL;
+
+	NOTELIST* rnp = info.tdata[track].note_list;
+
+	if (rnp == NULL) return NULL;
+
+	while (rnp->to != NULL && rnp->to->x < x) {
+		rnp = rnp->to;
+	}
+
+	while (rnp != NULL && rnp->y == KEYDUMMY) {
+		rnp = rnp->from;
+	}
+
+	if (rnp == NULL) return NULL;
+
+	if (x >= rnp->x && x < rnp->x + rnp->length) return rnp;
+
+	return NULL;
 }
 
 //ÉîÉHÉäÉÖÅ[ÉÄÇÕ254Ç™MAX

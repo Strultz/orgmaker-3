@@ -97,7 +97,6 @@ BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 		switch(LOWORD(wParam)){
 		case IDC_PLAY:
 			if(timer_sw == 0){
-				
 				//メニューを無効にする。
 				hmenu = GetMenu(hWnd);
 				hsubmenu = GetSubMenu(hmenu,0);
@@ -119,15 +118,11 @@ BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 						org_data.mute[i] = 0;
 					}
 				}
+				SetMutedTrack();
 				//プレイポインターの設定
-				scr_data.GetScrollPosition(&hp,&vp);
-				org_data.SetPlayPointer(hp);
-				timer_sw = 1;
-				InitMMTimer();
-				//テンポを取得
-				MUSICINFO mi;
-				org_data.GetMusicInfo(&mi);
-				StartTimer(mi.wait);
+
+				StartPlayingSong(-1);
+
 				SetFocus(hWnd);
 			}
 			return 1;
@@ -147,18 +142,7 @@ BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 				EnableMenuItem(hmenu,7,MF_BYPOSITION|MF_ENABLED);
 				EnableMenuItem(hmenu,8,MF_BYPOSITION|MF_ENABLED);
 				//DragAcceptFiles(hWnd,TRUE);//ドラッグ許可
-				org_data.GetMusicInfo(&mi);
-				QuitMMTimer(); // Quit timer first
-				Rxo_StopAllSoundNow();	// 2010.11.30 C
-				/*
-				for(int i = 0; i < MAXMELODY; i++)
-					PlayOrganObject(NULL,2 ,i,NULL);
-					*/
-				timer_sw = 0;
-
-				long p;
-				org_data.GetPlayPos(&p);
-				org_data.SetPlayPointer(p);
+				StopPlayingSong();
 			}
 			SetFocus(hWnd);
 //			return 1;

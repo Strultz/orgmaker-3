@@ -1092,6 +1092,7 @@ BEGIN
             MENUITEM "&Clear Recent Files",         IDM_RECENT_CLEAR
         END
         MENUITEM "  &Auto Load/Save .pvi File", IDM_AUTOLOADPVI
+        MENUITEM "  &Resume Notes After Head",  IDM_PLAY_NOTES_MID
         MENUITEM "  &Metronome",                IDM_METRONOME
         MENUITEM "  &Themes...\tCtrl+Alt+T",                IDM_DLGTHEMES
         MENUITEM "  Sound&banks...\tCtrl+Alt+S",            IDM_DLGWAVEDBS

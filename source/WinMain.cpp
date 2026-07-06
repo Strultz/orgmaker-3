@@ -475,6 +475,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	gPlayMidNote = GetPrivateProfileInt(MAIN_WINDOW, "PlayMidNote", 1, app_path);
 
 	CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
+	CheckMenuItem(hMenu, IDM_PLAY_NOTES_MID, MF_BYCOMMAND | (gPlayMidNote ? MFS_CHECKED : MFS_UNCHECKED));
 	
 	//org_data.PutMusic();//View sheet music
 
@@ -1437,12 +1438,12 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			autoCheckUpdate = !autoCheckUpdate;
 			CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
 			break;
-		/*case IDM_PLAY_NOTES_MID:
+		case IDM_PLAY_NOTES_MID:
 			hMenu = GetMenu(hWnd);
 			gPlayMidNote = !gPlayMidNote;
 			CheckMenuItem(hMenu, IDM_PLAY_NOTES_MID, MF_BYCOMMAND | (gPlayMidNote ? MFS_CHECKED : MFS_UNCHECKED));
 			SetMutedTrack();
-			break;*/
+			break;
 		case ID_SONG_COMMENTS: {
 			if (hDlgComments) {
 				DestroyWindow(hDlgComments);

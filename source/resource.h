@@ -718,13 +718,14 @@
 #define IDC_ABOUTTEXT					40315
 #define IDM_CHECKUPD					40316
 #define IDM_AUTOCHECKUPDATES		    40317
+#define IDM_PLAY_NOTES_MID				40318
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        239
-#define _APS_NEXT_COMMAND_VALUE         40318
+#define _APS_NEXT_COMMAND_VALUE         40319
 #define _APS_NEXT_CONTROL_VALUE         1228
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

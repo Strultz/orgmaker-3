@@ -33,6 +33,7 @@ static struct S_Sound
 	bool playing;
 	bool played_before;
 	bool looping;
+	bool mute;
     
 	float volume;
 	float pan_l;
@@ -146,10 +147,12 @@ static S_Sound* S_CreateSound(unsigned int frequency, const unsigned char* sampl
 	sound->frames = length;
 	sound->playing = false;
 	sound->played_before = false;
+	sound->mute = false;
 	sound->position = 0;
     sound->ring = 0;
     sound->sub_position = 0;
     sound->silence_count = 0;
+	sound->stop_in = 0;
 
 	S_SetSoundFrequency(sound, frequency);
 	S_SetSoundVolume(sound, 0);
@@ -256,6 +259,30 @@ static void S_RewindSound(S_Sound* sound) {
 	ma_mutex_unlock(&mutex);
 }
 
+static void S_MuteSound(S_Sound* sound, bool mute) {
+	if (sound == NULL)
+		return;
+
+	ma_mutex_lock(&mutex);
+
+	sound->mute = mute;
+
+	ma_mutex_unlock(&mutex);
+}
+
+static bool S_IsMuted(S_Sound* sound) {
+	if (sound == NULL)
+		return false;
+
+	ma_mutex_lock(&mutex);
+
+	bool mute = sound->mute;
+
+	ma_mutex_unlock(&mutex);
+
+	return mute;
+}
+
 // This is for exporting
 static void S_ResetSounds() {
 	ma_mutex_lock(&mutex);
@@ -264,6 +291,7 @@ static void S_ResetSounds() {
 		sound->playing = false;
 		sound->looping = false;
 		sound->played_before = false;
+		sound->mute = false;
 		sound->silence_count = 0;
 		sound->ring = 0;
 		sound->position = 0;
@@ -316,8 +344,10 @@ static void S_MixSounds(float* stream, size_t frames_total) {
 				const float interpolated_sample = ((c3 * subsample + c2) * subsample + c1) * subsample + c0;
 
 				// Mix, and apply volume
-				*stream_pointer++ += interpolated_sample * sound->volume_l;
-				*stream_pointer++ += interpolated_sample * sound->volume_r;
+				if (!sound->mute) {
+					*stream_pointer++ += interpolated_sample * sound->volume_l;
+					*stream_pointer++ += interpolated_sample * sound->volume_r;
+				}
 
 				// Increment sample
 				const long last_position = sound->position;
@@ -405,6 +435,7 @@ S_Sound *lpDRAMBUFFER[8] = {NULL};
 //DWORD						OutBufSize;				//!< ƒXƒgƒŠ[ƒ€ƒoƒbƒtƒ@EƒTƒCƒY.
 
 extern int s_solo;
+extern bool gPlayMidNote;
 
 static void S_Callback(ma_device* device, void* output_stream, const void* input_stream, ma_uint32 frames_total)
 {
@@ -816,6 +847,38 @@ void ChangeOrganVolume(int no, long volume,char track)//300‚ªMAX‚Å300‚ª
 	if(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]] != NULL && old_key[track] != 255)
 		S_SetSoundVolume(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], (volume-255)*8);
 }
+
+void ResumeOrganObject(unsigned char key, char track, DWORD freq, bool pipi, int played_ms) {
+	S_Sound* sound = lpORGANBUFFER[track][key / 12][key_twin[track]];
+	if (sound != NULL) {
+		ChangeOrganFrequency(key % 12, track, freq);
+
+		ma_mutex_lock(&mutex);
+
+		sound->playing = true;
+		sound->silence_count = 0;
+
+		float fpos = sound->advance_delta * ((float)(played_ms * output_frequency) / 1000);
+		sound->position = (int)fpos;
+		sound->sub_position = fpos - sound->position;
+
+		sound->looping = !pipi /* || gCompatFlags & COMPAT_CS_PIPI */;
+		sound->stop_in = 0;
+
+		if (!sound->looping && sound->position >= sound->frames) {
+			sound->playing = false;
+		}
+		else if (sound->looping) {
+			sound->position = sound->position % sound->frames;
+		}
+
+		ma_mutex_unlock(&mutex);
+
+		old_key[track] = key;
+		key_on[track] = 1;
+	}
+}
+
 // ƒTƒEƒ“ƒh‚ÌÄ¶ 
 void PlayOrganObject(unsigned char key, int mode,char track,DWORD freq, bool pipi)
 {
@@ -1140,6 +1203,35 @@ void ChangeDramVolume(long volume,char track)//
 	if (lpDRAMBUFFER[track] != NULL)
 		S_SetSoundVolume(lpDRAMBUFFER[track], (volume-255)*8);
 }
+
+void ResumeDramObject(unsigned char key, char track, int played_ms) {
+	S_Sound* sound = lpDRAMBUFFER[track];
+	if (sound != NULL) {
+		ChangeDramFrequency(key, track);
+
+		ma_mutex_lock(&mutex);
+
+		sound->playing = true;
+		sound->silence_count = 0;
+
+		float fpos = sound->advance_delta * ((float)(played_ms * output_frequency) / 1000);
+		sound->position = (int)fpos;
+		sound->sub_position = fpos - sound->position;
+
+		sound->looping = false;
+		sound->stop_in = 0;
+
+		if (!sound->looping && sound->position >= sound->frames) {
+			sound->playing = false;
+		}
+		else if (sound->looping) {
+			sound->position = sound->position % sound->frames;
+		}
+
+		ma_mutex_unlock(&mutex);
+	}
+}
+
 // ƒTƒEƒ“ƒh‚ÌÄ¶ 
 void PlayDramObject(unsigned char key, int mode,char track)
 {
@@ -1251,83 +1343,122 @@ void Rxo_StopAllSoundNow(void)
 		old_key[i]=255; //2014.05.02 A ‚±‚ê‚Å“ª‚ª•Ï‚È‰¹‚É‚È‚ç‚È‚­‚·‚éB
 }
 
-extern int sMetronome;
+void SetMutedTrack(void) {
+	for (int i = 0; i < MAXMELODY; i++) {
+		for (int j = 0; j < 8; j++) {
+			S_MuteSound(lpORGANBUFFER[i][j][0], org_data.mute[i] && gPlayMidNote);
+			S_MuteSound(lpORGANBUFFER[i][j][1], org_data.mute[i] && gPlayMidNote);
+		}
+	}
+	for (int i = 0; i < MAXDRAM; i++) {
+		S_MuteSound(lpDRAMBUFFER[i], org_data.mute[MAXMELODY + i] && gPlayMidNote);
+	}
+}
 
-void ExportOrganyaBuffer(unsigned long sample_rate, float* output_stream, size_t frames_total, size_t fade_frames) {
+extern int sMetronome;
+static int lastMetro = 0;
+static size_t totalFrames = 0;
+static size_t fadeFrames = 0;
+static size_t doneFrames = 0;
+
+static void SetupExportBuffer(unsigned long sample_rate, size_t frames_total, size_t fade_frames)
+{
 	MUSICINFO mi;
 	org_data.GetMusicInfo(&mi);
+
+	Rxo_StopAllSoundNow();
+	S_ResetSounds();
+
+	exporting = true;
 
 	output_frequency = sample_rate;
 	vol_ticks = (long)((float)output_frequency * 0.004F);
 
-	exporting = true;
-
-	Rxo_StopAllSoundNow();
-    S_ResetSounds();
-    
 	org_data.SetPlayPointer(0);
 
 	ma_mutex_lock(&organya_mutex);
 
-	int lastMetro = sMetronome;
+	lastMetro = sMetronome;
 	sMetronome = 0;
 
 	organya_timer = mi.wait;
 	organya_countdown = 0;
 
-	float* stream = output_stream;
-	size_t frames_done = 0;
-	while (frames_done != frames_total) {
-		float mix_buffer[0x400 * 2];
-		size_t subframes = MIN(0x400, frames_total - frames_done);
-		memset(mix_buffer, 0, subframes * sizeof(float) * 2);
-		if (organya_timer == 0) {
-			ma_mutex_lock(&mutex);
-			S_MixSounds(mix_buffer, subframes);
-			ma_mutex_unlock(&mutex);
-		}
-		else {
-			unsigned int subframes_done = 0;
-			while (subframes_done != subframes) {
-				if (organya_countdown == 0) {
-					organya_countdown = (organya_timer * output_frequency) / 1000;
-					org_data.PlayData();
-				}
-				const unsigned int frames_to_do = MIN(organya_countdown, subframes - subframes_done);
-				ma_mutex_lock(&mutex);
-				S_MixSounds(mix_buffer + subframes_done * 2, frames_to_do);
-				ma_mutex_unlock(&mutex);
-				subframes_done += frames_to_do;
-				organya_countdown -= frames_to_do;
-			}
-		}
+	totalFrames = frames_total;
+	fadeFrames = fade_frames;
+	doneFrames = 0;
+}
 
-		float fd = 1.0F;
-		for (size_t i = 0; i < subframes * 2; ++i) {
-			if (fade_frames > 0 && frames_done + i / 2 > frames_total - fade_frames) {
-				if (i % 2 == 0)
-					fd = ((float)(fade_frames - ((frames_done + i / 2) - (frames_total - fade_frames))) / (float)fade_frames);
-				mix_buffer[i] = mix_buffer[i] * fd;
-			}
-
-			*stream++ = mix_buffer[i];
-		}
-		frames_done += subframes;
-	}
-
+static void EndExportBuffer(void)
+{
 	Rxo_StopAllSoundNow();
+	S_ResetSounds();
 
 	organya_countdown = 0;
 	organya_timer = 0;
 
 	sMetronome = lastMetro;
+	lastMetro = 0;
 
 	ma_mutex_unlock(&organya_mutex);
 
 	output_frequency = device.sampleRate;
 	vol_ticks = (long)((float)output_frequency * 0.004F);
 
+	totalFrames = 0;
+	fadeFrames = 0;
+	doneFrames = 0;
+
 	exporting = false;
+
+	SetMutedTrack();
+}
+
+static void ExportBuffer(float* output_stream, size_t do_frames) {
+	if (!exporting) return;
+
+	memset(output_stream, 0, do_frames * sizeof(float) * 2);
+
+	size_t frames_done = 0;
+	while (frames_done != do_frames) {
+		if (organya_timer == 0) {
+			ma_mutex_lock(&mutex);
+			S_MixSounds(output_stream, do_frames);
+			ma_mutex_unlock(&mutex);
+		}
+		else {
+			if (organya_countdown == 0) {
+				organya_countdown = (organya_timer * output_frequency) / 1000;
+				org_data.PlayData();
+			}
+			const unsigned int frames_to_do = MIN(organya_countdown, do_frames - frames_done);
+			ma_mutex_lock(&mutex);
+			S_MixSounds(output_stream + frames_done * 2, frames_to_do);
+			ma_mutex_unlock(&mutex);
+			frames_done += frames_to_do;
+			organya_countdown -= frames_to_do;
+		}
+	}
+
+	doneFrames += do_frames;
+	size_t fadeTimeFrames = totalFrames - fadeFrames;
+
+	if (fadeFrames > 0) {
+		for (size_t i = 0; i < do_frames; ++i)
+		{
+			if (doneFrames + i > fadeTimeFrames) {
+				float fd = doneFrames + i > totalFrames ? 0.0f : ((float)(fadeFrames - ((doneFrames + i) - fadeTimeFrames)) / (float)fadeFrames);
+				output_stream[i * 2 + 0] = output_stream[i * 2 + 0] * fd;
+				output_stream[i * 2 + 1] = output_stream[i * 2 + 1] * fd;
+			}
+		}
+	}
+}
+
+void ExportOrganyaBuffer(unsigned long sample_rate, float* output_stream, size_t frames_total, size_t fade_frames) {
+	SetupExportBuffer(sample_rate, frames_total, fade_frames);
+	ExportBuffer(output_stream, frames_total);
+	EndExportBuffer();
 }
 
 void SetExportChannel(int track) {
