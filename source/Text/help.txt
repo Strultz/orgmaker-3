@@ -243,21 +243,34 @@ OrgMaker 3   Ver3.0.10   Simple Help
 
   3.0.10 2026/07/06  Added comments
                        You can now write the song name, author name, and other
-                       additional text attached to your files.
-                       This extra metadata is entirely backwards compatible.
-                       Older versions will simply ignore this data.
+                       additional text attached to your files. This extra metadata
+                       is backwards compatible, and older versions will simply
+                       ignore this data.
+                     New menu options
+                       Transpose Song: Transpose the entire song at once
+                       Repeat Selection: Set the loop region to the current selection
+                       Estimate Song Length: View how long the song is in real time
+                     Improved track muting
+                       The track will be muted immediately instead of waiting for
+                       the next note. Additionally starting playback from the middle
+                       of a note will no longer skip it. This feature can be disabled
+                       if you prefer the old behavior.
+                     Improved BPM conversion
+                       The arrow buttons are gone, and the conversion is entirely
+                       automatic now.
                      Improved rendering of custom waveforms
                        They are now much smoother looking, matching the original
                        visuals.
-                     Improved BPM conversion mechanism
-                       The arrow buttons are gone, and the conversion is entirely
-                       automatic now.
                      Improved audio accuracy
-                       The audio output should now be much closer to the original
-                       code's output.
+                       The audio output should now match the original code more
+                       closely.
                      Fixed visual issues
-                       The graphics should no longer stutter when opening menus
-                       or placing new notes.
+                       The program should no longer stutter or freeze when opening
+                       menus or placing new notes.
+                     Check for updates
+                       Now you have the ability to be notified when a new version
+                       is released. This feature can be disabled if you do not want
+                       to upgrade.
                      Other fixes and minor changes
 
   3.0.9  2024/10/16  Added soundbanks, which are like MIDI soundfonts but for
