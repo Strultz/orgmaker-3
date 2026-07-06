@@ -59,6 +59,7 @@ BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogDecayLength(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK DialogSongTra(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogComments(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void SetModified(bool mod);
@@ -1316,6 +1317,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				break;
 			case ID_AC_DELETEKEY: //Add 2014/04/12
 				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_DELETEBUTTON , NULL);
+				break;
+			case IDM_SONG_TRANSPOSE:
+				DialogBox(hInst, MAKEINTRESOURCE(IDD_DLGSONGTRA), hwnd, DialogSongTra);
 				break;
 			case IDM_SONG_REPEATSELECT:
 				if (tra >= 0) {

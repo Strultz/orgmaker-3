@@ -296,6 +296,21 @@ BOOL OrgData::ChangeTransData(PARCHANGE *pc)
 	}
 	return TRUE;
 }
+
+void OrgData::TransposeTrack(char track, int by) {
+	if (track < 0 || track > 15) return;
+
+	NOTELIST* p = info.tdata[track].note_list;
+	while (p != nullptr) {
+		if (p->y != KEYDUMMY) {
+			if (p->y + by < 0) p->y = 0;
+			else if (p->y + by > 95) p->y = 95;
+			else p->y += by;
+		}
+		p = p->to;
+	}
+}
+
 //ƒ”ƒHƒŠƒ…[ƒ€‚Í254‚ªMAX
 BOOL OrgData::ChangeVolumeData(PARCHANGE *pc, char mode)
 {

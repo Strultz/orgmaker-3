@@ -138,6 +138,8 @@ typedef struct OrgData{
 
 		unsigned short GetWait(void);
 
+		void TransposeTrack(char track, int by);
+
 		bool CopyNoteDataToCB(NOTECOPY *nc, int iTrack, int iFullTrack);
 
 		// OM3MD

@@ -624,3 +624,54 @@ BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return 0;
 }
+
+BOOL CALLBACK DialogSongTra(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	char str[128] = { NULL };
+	//	long a,b,c,d;
+	RECT rect = { 64,0,WWidth,WHeight };//更新する領域
+	switch (message) {
+	case WM_INITDIALOG://ダイアログが呼ばれた
+		SendDlgItemMessage(hdwnd, IDR_ADD, BM_SETCHECK, 1, 0);
+		SetDlgItemText(hdwnd, IDE_PAR, "1");
+
+		CheckDlgButton(hdwnd, IDC_TRINCMEL, true);
+		CheckDlgButton(hdwnd, IDC_TRINCPERC, true);
+
+		EnableWindow(hDlgPlayer, FALSE);
+		return 1;
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDCANCEL:
+			EndDialog(hdwnd, 0);
+			EnableWindow(hDlgPlayer, TRUE);
+			return 1;
+		case IDOK:
+			int traTimes = GetDlgItemInt(hdwnd, IDE_PAR, NULL, FALSE);
+			bool traUp = false;
+			if (SendDlgItemMessage(hdwnd, IDR_ADD, BM_GETCHECK, 0, 0)) {
+				traUp = true;
+			}
+
+			bool traIncludeMelody = IsDlgButtonChecked(hdwnd, IDC_TRINCMEL);
+			bool traIncludePercussion = IsDlgButtonChecked(hdwnd, IDC_TRINCPERC);
+
+			SetUndo();
+
+			if (traIncludeMelody) {
+				for (int i = 0; i < MAXMELODY; ++i) {
+					org_data.TransposeTrack(i, traUp ? traTimes : -traTimes);
+				}
+			}
+			if (traIncludePercussion) {
+				for (int i = MAXMELODY; i < MAXTRACK; ++i) {
+					org_data.TransposeTrack(i, traUp ? traTimes : -traTimes);
+				}
+			}
+
+			EndDialog(hdwnd, 0);
+			return 1;
+		}
+	}
+	return 0;
+}

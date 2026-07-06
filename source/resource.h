@@ -710,13 +710,17 @@
 #define ID_SONG_COMMENTS				40307
 #define IDM_SONG_REPEATSELECT           40308
 #define IDM_SONGLEN				        40309
+#define IDM_SONG_TRANSPOSE              40310
+#define IDD_DLGSONGTRA                  40311
+#define IDC_TRINCMEL                    40312
+#define IDC_TRINCPERC                   40313
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        239
-#define _APS_NEXT_COMMAND_VALUE         40310
+#define _APS_NEXT_COMMAND_VALUE         40314
 #define _APS_NEXT_CONTROL_VALUE         1228
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
