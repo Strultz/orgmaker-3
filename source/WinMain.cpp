@@ -168,7 +168,7 @@ char gSelectedWave[MAX_PATH];
 
 static HACCEL Ac;
 
-bool OpenDoSave(HWND hwnd, bool savenew) {
+bool OpenDoSave(HWND hwnd, bool savenew, bool noMeta) {
 	char res;
 	if (savenew || gFileUnsaved) {
 		res = GetFileNameSave(hwnd, MessageString[IDS_STRING62]); //"Save As"
@@ -179,7 +179,7 @@ bool OpenDoSave(HWND hwnd, bool savenew) {
 				== IDNO) return false;
 		}
 	}
-	org_data.SaveMusicData();
+	org_data.SaveMusicData(noMeta);
 	SetModified(false);
 	gFileUnsaved = false;
 	return true;
@@ -205,7 +205,7 @@ int CancelDeleteCurrentData(int iMessagePattern = 1){
 			wsprintf(strMesssage, MessageString[IDS_NOTIFY_UNSAVED], music_file);
 			res = MessageBox(hWnd, strMesssage, MessageString[IDS_NOTIFY_TITLE_UNSAVED], MB_YESNOCANCEL | MB_ICONWARNING);
 			if (res == IDCANCEL) return 1;
-			if (res == IDYES) return OpenDoSave(hWnd, false) ? 0 : 1;
+			if (res == IDYES) return OpenDoSave(hWnd, false, false) ? 0 : 1;
 		}
 	} 
 	return 0;
@@ -864,11 +864,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				break;
 			case IDM_SAVEOVER:
 			case ID_AC_MENUOVERSAVE:
-				OpenDoSave(hwnd, false);
-				break;							  
+				OpenDoSave(hwnd, false, false);
+				break;
 			case IDM_SAVENEW://Save As
 			case ID_AC_MENUNEWSAVE:
-				OpenDoSave(hwnd, true);
+				OpenDoSave(hwnd, true, false);
 				/*res = GetFileNameSave(hwnd,MessageString[IDS_STRING62]); //"Save As"
 				if(res == MSGCANCEL)break;
 				if(res == MSGEXISFILE){
@@ -1256,9 +1256,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_RECENT_CLEAR:
 				ClearRecentFile();
 				break;
-			case IDM_STOPNOWALL:
-				Rxo_StopAllSoundNow();
-				break;
 			case ID_AC_DRAGMODE:
 			case IDM_DRAGMODE:
 				ChangeDragMode();
@@ -1378,6 +1375,49 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					org_data.SetMusicInfo(&mi, SETREPEAT);
 				}
 				break;
+			case IDM_GITHUB:
+				ShellExecute(NULL, "open", "https://github.com/Strultz/orgmaker-3", NULL, NULL, SW_SHOWNORMAL);
+				break;
+			case IDM_CHECKUPD: {
+				std::thread t(CheckUpdate, true);
+				t.detach();
+				break;
+			}
+			case IDM_AUTOCHECKUPDATES:
+				hMenu = GetMenu(hWnd);
+				autoCheckUpdate = !autoCheckUpdate;
+				CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
+				break;
+			case IDM_PLAY_NOTES_MID:
+				hMenu = GetMenu(hWnd);
+				gPlayMidNote = !gPlayMidNote;
+				CheckMenuItem(hMenu, IDM_PLAY_NOTES_MID, MF_BYCOMMAND | (gPlayMidNote ? MFS_CHECKED : MFS_UNCHECKED));
+				SetMutedTrack();
+				break;
+			case ID_SONG_COMMENTS: {
+				if (hDlgComments) {
+					DestroyWindow(hDlgComments);
+					hDlgComments = nullptr;
+				}
+				hDlgComments = CreateDialog(hInst, MAKEINTRESOURCE(IDD_DLGCOMMENTS), hwnd, DialogComments);
+				ShowWindow(hDlgComments, SW_SHOW);
+				break;
+			}
+			case IDM_SONGLEN: {
+				org_data.GetMusicInfo(&mi);
+				long lengthMs = mi.end_x * mi.wait;
+				long minutes = lengthMs / 1000 / 60;
+				if (minutes >= 60) {
+					snprintf(str, 128, "Estimated song length: %dh %dm %ds",
+						minutes / 60, minutes % 60, (lengthMs / 1000) % 60);
+				}
+				else {
+					snprintf(str, 128, "Estimated song length: %dm %ds",
+						minutes, (lengthMs / 1000) % 60);
+				}
+				MessageBox(hWnd, str, "OrgMaker 3", MB_OK | MB_ICONINFORMATION);
+				break;
+			}
 			}
 		}else{
 			//only while playing
@@ -1425,49 +1465,13 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			}
 			CheckLoupeMenu();
 			break;
-        case IDM_GITHUB:
-			ShellExecute(NULL, "open", "https://github.com/Strultz/orgmaker-3", NULL, NULL, SW_SHOWNORMAL);
+		case IDM_STOPNOWALL:
+		case ID_AC_KILLSOUND:
+			SendMessage(hDlgPlayer, WM_COMMAND, IDC_STOP, NULL);
+			Rxo_StopAllSoundNow();
+			memset(iKeyPhase, -1, sizeof(iKeyPhase));
+			memset(iKeyPushDown, 0, sizeof(iKeyPushDown));
 			break;
-		case IDM_CHECKUPD: {
-			std::thread t(CheckUpdate, true);
-			t.detach();
-			break;
-		}
-		case IDM_AUTOCHECKUPDATES:
-			hMenu = GetMenu(hWnd);
-			autoCheckUpdate = !autoCheckUpdate;
-			CheckMenuItem(hMenu, IDM_AUTOCHECKUPDATES, MF_BYCOMMAND | (autoCheckUpdate ? MFS_CHECKED : MFS_UNCHECKED));
-			break;
-		case IDM_PLAY_NOTES_MID:
-			hMenu = GetMenu(hWnd);
-			gPlayMidNote = !gPlayMidNote;
-			CheckMenuItem(hMenu, IDM_PLAY_NOTES_MID, MF_BYCOMMAND | (gPlayMidNote ? MFS_CHECKED : MFS_UNCHECKED));
-			SetMutedTrack();
-			break;
-		case ID_SONG_COMMENTS: {
-			if (hDlgComments) {
-				DestroyWindow(hDlgComments);
-				hDlgComments = nullptr;
-			}
-			hDlgComments = CreateDialog(hInst, MAKEINTRESOURCE(IDD_DLGCOMMENTS), hwnd, DialogComments);
-			ShowWindow(hDlgComments, SW_SHOW);
-			break;
-		}
-		case IDM_SONGLEN: {
-			org_data.GetMusicInfo(&mi);
-			long lengthMs = mi.end_x * mi.wait;
-			long minutes = lengthMs / 1000 / 60;
-			if (minutes >= 60) {
-				snprintf(str, 128, "Estimated song length: %dh %dm %ds",
-					minutes / 60, minutes % 60, (lengthMs / 1000) % 60);
-			}
-			else {
-				snprintf(str, 128, "Estimated song length: %dm %ds",
-					minutes, (lengthMs / 1000) % 60);
-			}
-			MessageBox(hWnd, str, "OrgMaker 3", MB_OK | MB_ICONINFORMATION);
-			break;
-		}
 		}
 
 		break;

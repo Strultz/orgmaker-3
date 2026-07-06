@@ -1087,7 +1087,7 @@ BEGIN
         POPUP "  &Memory"
         BEGIN
             MENUITEM "Rebuild Note &Memory",        IDM_SORTMUSICNOTE
-            MENUITEM "&Stop All Notes",             IDM_STOPNOWALL
+            MENUITEM "&Stop All Sounds\t~",         IDM_STOPNOWALL
             MENUITEM SEPARATOR
             MENUITEM "&Clear Recent Files",         IDM_RECENT_CLEAR
         END
@@ -1484,6 +1484,7 @@ BEGIN
     "P",            IDM_DCLEN,              VIRTKEY, CONTROL, NOINVERT
     "T",            IDM_DLGTHEMES,          VIRTKEY, CONTROL, ALT, NOINVERT
     "S",            IDM_DLGWAVEDBS,         VIRTKEY, CONTROL, ALT, NOINVERT
+    VK_OEM_3,       ID_AC_KILLSOUND,         VIRTKEY, NOINVERT
 END
 
 
