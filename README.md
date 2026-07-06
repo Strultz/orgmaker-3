@@ -1,70 +1,28 @@
-# &#x1F3BC; *OrgMaker 3*
+> [!WARNING]
+> **Development for version 3.0.x has ended.**
+> 
+> This branch will not receive any further updates.
 
-**Fork of A music sequencer for retro video games**  
+<img src="/.github/img/banner.png" alt="OrgMaker 3">
 
-This does not use a MIDI device.  
-This original library was created by [Studio Pixel](http://studiopixel.sakura.ne.jp/) in 1999, and was used in [Cave Story](https://www.cavestory.org/).
+OrgMaker 3 is an updated fork of OrgMaker, a simple piano roll music sequencer. It was the software used to create the music for [Cave Story](https://www.cavestory.org/game-info/about-cave-story.php).
 
-<img src='/previmg.png' width=60% height=60%>
+<img src="/.github/img/screenshot.png" width="100%" alt="Screenshot of OrgMaker 3">
 
-## &#x1F352; Introduction
+## History
 
-For the '[STARGAZER](http://www5b.biglobe.ne.jp/~kiss-me/aji/star/)' development, I inherited this library from [Studio Pixel](http://studiopixel.sakura.ne.jp/) in 2003.  
-However, due to a change in my private life, it became inactive for a long time. On the other hand, the world expansion of Cave Story has increased the number of people requesting Organya.
+In 1999, Daisuke Amaya, better known online as [Studio Pixel](https://studiopixel.jp), created the Organya music engine for use in Cave Story, although it was also used in a few other games. Pixel created the original version of OrgMaker (which was also named Organya in Japan) to produce music in this format.
 
------
+In 2003, Pixel gave the source code of OrgMaker to [Rxo Inverse](http://www5b.biglobe.ne.jp/~kiss-me/aji/index.html) for use in the game [STARGAZER](http://www5b.biglobe.ne.jp/~kiss-me/aji/star/). Rxo would continue updating the program, now as OrgMaker 2, until the end of 2014. It was eventually [open-sourced](https://github.com/shbow/organya) in 2018.
 
-Mastermind.
+## Features
 
-In 1999, Studio Pixel produced the song composition software Organya for "Cave Story".
+Organya allows for use of up to 8 melody channels, and 8 percussion channels. Melodic instruments are selected from 100 waveforms, and percussive instruments are selected from 42 samples. Melody channels also support finetuning, and a 'pizzicato' mode, which makes notes produce a short blip instead of sustaining.
 
->Basically an internal development tool, and not very general, occasionally people who say "I like the shabby sound for some reason" and even "I want to compose with that sound" call this tool perfect.
+## Download
 
-With the world knowing the development of "Cave Story", which increased the demand of Organya, and the same for the opinion for how to manage the source code, I have made the repository public.
+Check the Releases for the latest version: [![Releases](https://img.shields.io/github/downloads/Strultz/orgmaker-3/total?style=plastic&logo=github)](https://github.com/Strultz/orgmaker-3/releases)
 
------
+## Compiling
 
-
-## &#x1F352; Features
-* 8 Melody Tracks + 8 Drum Trucks (Each track can play one sound)  
-* Melody track can be selected from 100 waveforms.  
-* Drum track can be selected from 42 sounds.  
-* Melody track can adjust the frequency to make the chorus effect.  
-* You can loop music indefinitely in a measure.  
-* Export to standard MIDI file (GM format).  
-
-
-# &#x1F34E; Requirements
-## &#x1F352; for Utilization
-* Windows 7 and up (Vista may work but is untested)
-* [DirectX](https://www.google.com/search?q=DirectX+download) 8, 9, 10, 11, maybe more...  
-* [Microsoft Visual C++ 6.0 Runtime Components](https://www.google.com/search?q=visual+c%2B%2B+6+runtime+library+download)  
-
-## &#x1F352; for Development
-* Microsoft Visual Studio 2022
-
-
-# &#x1F34E; Usage
-
-If you only use OrgMaker, check out the [releases](https://github.com/Strultz/orgmaker-3/releases).
-
-# &#x1F34E; Contributing
-This project was developed in Japanese. The help file is also written in Japanese as well.
-I translated it to English anyway
-
-# &#x1F34E; Author
-## &#x1F352; OrgMaker 3
-
-[Strultz](http://www.strultz.com/)
-## &#x1F352; Twei
-
-[Rxo Inverse](http://www5b.biglobe.ne.jp/~kiss-me/aji/) (首謀)  
-
-## &#x1F352; Original
-[Studio Pixel](http://studiopixel.sakura.ne.jp/) (開発室Pixel)
-
-# &#x1F34E; License
-BSD  
-
-
-
+You'll need Visual Studio 2022 with the `Desktop development with C++` workload. You should also select the `C++ MFC for latest v143 build tools` component. After installing, open `source/Org3.sln` and build the project.
