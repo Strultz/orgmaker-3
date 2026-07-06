@@ -268,9 +268,8 @@ OrgMaker 3   Ver3.0.10   Simple Help
                        The program should no longer stutter or freeze when opening
                        menus or placing new notes.
                      Check for updates
-                       Now you have the ability to be notified when a new version
-                       is released. This feature can be disabled if you do not want
-                       to upgrade.
+                       Now you will get notified when a new version is released.
+                       This feature can be disabled if you do not want to upgrade.
                      Other fixes and minor changes
 
   3.0.9  2024/10/16  Added soundbanks, which are like MIDI soundfonts but for
