@@ -762,7 +762,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	InitSoundObject("METRO01", 1);
 	InitSoundObject("METRO02", 2);
-	InitSoundObject("CAT", 3);
 	
 	//hDlgPlayer = CreateDialog(hInst,"PLAYER",hWnd,DialogPlayer);
 	//hDlgTrack = CreateDialog(hInst,"TRACK",hWnd,DialogTrack);
