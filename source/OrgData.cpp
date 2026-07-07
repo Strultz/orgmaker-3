@@ -24,7 +24,8 @@ BOOL OrgData::NoteAlloc(void)
 		info.tdata[j].wave_no = 0;
 		info.tdata[j].note_list = NULL;//コンストラクタにやらせたい
 		info.tdata[j].note_p = new NOTELIST[ALLOCNOTE];
-		if(info.tdata[j].note_p == NULL)return FALSE;
+		if(info.tdata[j].note_p == NULL)
+			return FALSE;
 		//	info.alloc_note = alloc;
 		for(i = 0; i < ALLOCNOTE; i++){
 			(info.tdata[j].note_p + i)->from = NULL;

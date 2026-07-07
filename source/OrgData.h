@@ -67,8 +67,6 @@ typedef struct {
 typedef struct OrgData{
 	OrgData();//コンストラクタ
 	~OrgData();//デストラクタ
-	private:
-		MUSICINFO info;
 	public:
 		//unsigned char *noteon;
 		BOOL SetNote_afterSetLength(long x);
@@ -168,6 +166,14 @@ typedef struct OrgData{
 		char version[0x21];
 		std::string comments;
 		bool openComments;
+	private:
+		MUSICINFO info;
+
+		bool ReadMetadata(FILE* fp);
+		bool ReadSegment(FILE* fp);
+
+		void WriteMetadata(FILE* fp);
+		void WriteSegment(FILE* fp);
 }ORGDATA;
 extern ORGDATA org_data;
 

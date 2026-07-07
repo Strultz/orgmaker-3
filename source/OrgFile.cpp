@@ -38,6 +38,45 @@ typedef struct{
 }ORGANYADATA;
 
 
+void OrgData::WriteMetadata(FILE* fp) {
+	fwrite("OM3MD2", sizeof(char), 6, fp);
+
+	fwrite(name, sizeof(char), 0x20, fp);
+	fwrite(author, sizeof(char), 0x20, fp);
+
+	snprintf(version, 0x21, "OrgMaker %s", VER_STRING);
+	fwrite(version, sizeof(char), 0x20, fp);
+
+	fwrite(comments.data(), sizeof(char), comments.size(), fp);
+	fputc('\0', fp);
+
+	fputc(openComments ? '\1' : '\0', fp);
+}
+
+void OrgData::WriteSegment(FILE* fp) {
+	bool saveDefVal = false;
+	for (int i = 0; i < MAXTRACK; i++) {
+		if (def_volume[i] != 200) {
+			saveDefVal = true;
+			break;
+		}
+		if (def_pan[i] != 6) {
+			saveDefVal = true;
+			break;
+		}
+	}
+
+	if (saveDefVal) {
+		uint32_t len = MAXTRACK * 2;
+		fwrite("DEFS", sizeof(char), 4, fp);
+		fwrite(&len, sizeof(uint32_t), 1, fp);
+
+		fwrite(def_volume, sizeof(unsigned char), MAXTRACK, fp);
+		fwrite(def_pan, sizeof(unsigned char), MAXTRACK, fp);
+	}
+}
+
+
 //そのトラックに使われている音符の数を検出
 unsigned short OrgData::GetNoteNumber(char track, long x1, long x2)
 {
@@ -130,18 +169,8 @@ BOOL OrgData::SaveMusicData(bool noMeta)
 	}
 
 	if (!noMeta) {
-		fwrite("OM3MD2", sizeof(char), 6, fp);
-
-		fwrite(name, sizeof(char), 0x20, fp);
-		fwrite(author, sizeof(char), 0x20, fp);
-
-		snprintf(version, 0x21, "OrgMaker %s", VER_STRING);
-		fwrite(version, sizeof(char), 0x20, fp);
-
-		fwrite(comments.data(), sizeof(char), comments.size(), fp);
-		fputc('\0', fp);
-
-		fputc(openComments ? '\1' : '\0', fp);
+		WriteMetadata(fp);
+		WriteSegment(fp);
 	}
 
 	fclose(fp);
@@ -163,16 +192,16 @@ int OrgData::FileCheckBeforeLoad(char *checkfile)
 	FILE *fp;
 	char pass_check[6];
 	char ver = 0;
-	if((fp=fopen(checkfile,"rb"))==NULL){
+	if ((fp = fopen(checkfile,"rb")) == NULL) {
 		//MessageBox(hWnd,"ファイルにアクセスできません","Error (Load)",MB_OK);
 		return 1;
 	}
 
 	fread(&pass_check[0], sizeof(char), 6, fp);
-	if( !memcmp( pass_check, "Org-01", 6))ver = 1;
-	if( !memcmp( pass_check, "Org-02", 6))ver = 2;
-	if( !memcmp( pass_check, "Org-03", 6))ver = 3;
-	if( !ver ){
+	if (!memcmp(pass_check, "Org-01", 6)) ver = 1;
+	if (!memcmp(pass_check, "Org-02", 6)) ver = 2;
+	if (!memcmp(pass_check, "Org-03", 6)) ver = 3;
+	if (!ver) {
 		fclose(fp);
 		//MessageBox(hWnd,"このファイルは使えません","Error (Load)",MB_OK);
 		return 1;
@@ -181,6 +210,56 @@ int OrgData::FileCheckBeforeLoad(char *checkfile)
 
 	return 0;
 }
+
+bool OrgData::ReadMetadata(FILE* fp) {
+	char pass_check[6];
+	size_t read = fread(&pass_check[0], sizeof(char), 6, fp);
+	if (read == 6 && !memcmp(pass_check, "OM3MD", 5)) {
+		int ver = pass_check[5] - '0';
+		if (ver >= 1 && ver <= 2) {
+			fread(name, sizeof(char), 0x20, fp);
+			fread(author, sizeof(char), 0x20, fp);
+			fread(version, sizeof(char), 0x20, fp);
+
+			comments.clear();
+
+			char ch;
+			while (fread(&ch, 1, 1, fp) == 1 && ch != '\0') {
+				comments += ch;
+			}
+
+			if (ver >= 2) {
+				fread(&ch, 1, 1, fp);
+				openComments = (ch == '\1');
+			}
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool OrgData::ReadSegment(FILE *fp) {
+	char pass_check[4];
+	uint32_t len;
+	size_t read = fread(&pass_check[0], sizeof(char), 4, fp);
+	read += fread(&len, sizeof(uint32_t), 1, fp);
+
+	if (read == 5 && !memcmp(pass_check, "DEFS", 4)) {
+		if (len != MAXTRACK * 2) {
+			return false;
+		}
+
+		fread(def_volume, sizeof(unsigned char), MAXTRACK, fp);
+		fread(def_pan, sizeof(unsigned char), MAXTRACK, fp);
+
+		return true;
+    }
+
+    return false;
+}
+
 BOOL OrgData::LoadMusicData(void)
 {
 	ORGANYADATA org_data;
@@ -201,7 +280,7 @@ BOOL OrgData::LoadMusicData(void)
 	fread(&pass_check[0], sizeof(char), 6, fp);
 	if(!memcmp(pass_check, "Org-01", 6)) ver = 1;
 	if(!memcmp(pass_check, "Org-02", 6)) ver = 2;
-	if(!memcmp(pass_check, "Org-03", 6)) ver = 3; // are you JOKING why was this 2
+	if(!memcmp(pass_check, "Org-03", 6)) ver = 3;
 	if(!ver) {
 		fclose(fp);
 		//MessageBox(hWnd,"このファイルは使えません","Error (Load)",MB_OK);	// 2014.10.19 D
@@ -294,27 +373,11 @@ BOOL OrgData::LoadMusicData(void)
 		}
 	}
 
-	size_t read = fread(&pass_check[0], sizeof(char), 6, fp);
-	if (read == 6 && !memcmp(pass_check, "OM3MD", 5)) {
-		int ver = pass_check[5] - '0';
-		if (ver >= 1 && ver <= 2) {
-			fread(name, sizeof(char), 0x20, fp);
-			fread(author, sizeof(char), 0x20, fp);
-			fread(version, sizeof(char), 0x20, fp);
+	// Read OM3MD segment first (name, author, comments, etc)
+	ReadMetadata(fp);
 
-			comments.clear();
-
-			char ch;
-			while (fread(&ch, 1, 1, fp) == 1 && ch != '\0') {
-				comments += ch;
-			}
-
-			if (ver >= 2) {
-				fread(&ch, 1, 1, fp);
-				openComments = (ch == '\1');
-			}
-		}
-	}
+    // Read custom segments
+    while (ReadSegment(fp));
 
 	fclose(fp);
 	//データを有効に

@@ -843,13 +843,13 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	CheckMenuItem(hMenu, IDM_USESPECIALPASTE, MF_BYCOMMAND | (sUseSpecialPaste ? MFS_CHECKED : MFS_UNCHECKED));
 
-	for (i = 0; i < MAXTRACK; ++i) {
+	/*for (i = 0; i < MAXTRACK; ++i) {
 		snprintf(strtmp, 128, "Channel%dDefaultVol", i);
 		org_data.def_volume[i] = GetPrivateProfileInt(MAIN_WINDOW, strtmp, 200, app_path);
 
 		snprintf(strtmp, 128, "Channel%dDefaultPan", i);
 		org_data.def_pan[i] = GetPrivateProfileInt(MAIN_WINDOW, strtmp, 6, app_path);
-	}
+	}*/
 
 	toolbarSavedX[0] = GetPrivateProfileInt(TOOLBAR_POS, "ToolbarMainX", 100, app_path);
 	toolbarSavedY[0] = GetPrivateProfileInt(TOOLBAR_POS, "ToolbarMainY", 100, app_path);
@@ -2878,7 +2878,7 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentThemePath", gSelectedTheme, app_path);
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentWavePath", gSelectedWave, app_path);
 
-	char strtmp[128];
+	/*char strtmp[128];
 	for (i = 0; i < MAXTRACK; ++i) {
 		snprintf(strtmp, 128, "Channel%dDefaultVol", i);
 		wsprintf(num_buf, "%d", org_data.def_volume[i]);
@@ -2887,7 +2887,7 @@ void SaveIniFile()
 		snprintf(strtmp, 128, "Channel%dDefaultPan", i);
 		wsprintf(num_buf, "%d", org_data.def_pan[i]);
 		WritePrivateProfileString(MAIN_WINDOW, strtmp, num_buf, app_path);
-	}
+	}*/
 
 	/*GetWindowRect(hDlgTrack, (LPRECT)&WinRect);
 	wsprintf(num_buf,"%d",WinRect.left);
