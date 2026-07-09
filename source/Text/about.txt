@@ -20,8 +20,8 @@ https://github.com/nlohmann/json
 
 
 Copyright (c) 2023-2026 Strultz
-Copyright (c) 2004-2018 Rxo Inverse
-Copyright (c) 1999-2004 Studio Pixel
+Copyright (c) 2005-2018 Rxo Inverse
+Copyright (c) 1999-2005 Studio Pixel
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
