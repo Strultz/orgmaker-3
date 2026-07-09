@@ -1,3 +1,8 @@
+> [!NOTE]
+> This branch was part of an experiment to add twice as many channels to OrgMaker 3.
+>
+> Since this was completed, this branch will not be updated further.
+
 <img src="/.github/img/banner.png" alt="OrgMaker 3">
 
 OrgMaker 3 is an updated fork of OrgMaker, a simple piano roll music sequencer. It was the software used to create the music for [Cave Story](https://www.cavestory.org/game-info/about-cave-story.php).
