@@ -79,18 +79,6 @@ typedef struct OrgData{
 		void ClearUndoData();
 		int SetUndoData();
 		int ResetLastUndo(void); //最後のアンドゥはなかったことに！（空クリックだったとか）
-		MUSICINFO ud_tdata[32]; //とりあえず、アンドゥは32回
-		NOTELIST  ud_note[32][MAXTRACK][ALLOCNOTE];
-		bool UndoEnable;
-		bool RedoEnable;
-		int CurrentUndoCursor; //この番号に書き込む
-		int MinimumUndoCursor; //この番号までならさかのぼれる
-		int MaximumUndoCursor; //この番号までならやり直せる（リドゥ可能）
-
-		char track;
-		char mute[MAXTRACK];
-		unsigned char def_pan[MAXTRACK];
-		unsigned char def_volume[MAXTRACK];
 		void InitOrgData(void);
 		void GetMusicInfo(MUSICINFO *mi, int mode = 0);//曲情報を取得
 		//曲情報を設定。flagは設定アイテムを指定
@@ -160,6 +148,19 @@ typedef struct OrgData{
 		void TransposeTrack(char track, int by);
 		bool CopyNoteDataToCB(NOTECOPY* nc, int iTrack, int iFullTrack);
 
+		MUSICINFO ud_tdata[32]; //とりあえず、アンドゥは32回
+		NOTELIST  ud_note[32][MAXTRACK][ALLOCNOTE];
+		bool UndoEnable;
+		bool RedoEnable;
+		int CurrentUndoCursor; //この番号に書き込む
+		int MinimumUndoCursor; //この番号までならさかのぼれる
+		int MaximumUndoCursor; //この番号までならやり直せる（リドゥ可能）
+
+		char track;
+		char mute[MAXTRACK];
+		unsigned char def_pan[MAXTRACK];
+		unsigned char def_volume[MAXTRACK];
+
 		// OM3MD
 		char name[0x21];
 		char author[0x21];
@@ -170,7 +171,7 @@ typedef struct OrgData{
 		MUSICINFO info;
 
 		bool ReadMetadata(FILE* fp);
-		bool ReadSegment(FILE* fp);
+		bool ReadSegment(FILE* fp, bool orgx);
 
 		void WriteMetadata(FILE* fp);
 		void WriteSegment(FILE* fp);

@@ -712,7 +712,7 @@ void OrgData::InitOrgData(void)
 
 	// 以下 2014.05.07 追加
 	for(i=0; i<MAXMELODY; i++){
-		info.tdata[i].wave_no = (i*11)%100;
+		info.tdata[i].wave_no = (i%8*11);
 		MakeOrganyaWave(i, info.tdata[i].wave_no, info.tdata[i].pipi);
 	}
 	info.tdata[MAXDRAM+0].wave_no = 0;
@@ -723,6 +723,14 @@ void OrgData::InitOrgData(void)
 	info.tdata[MAXDRAM+5].wave_no = 8;
 	info.tdata[MAXDRAM+6].wave_no = 0;
 	info.tdata[MAXDRAM+7].wave_no = 0;
+	info.tdata[MAXDRAM+8].wave_no = 0;
+	info.tdata[MAXDRAM+9].wave_no = 2;
+	info.tdata[MAXDRAM+10].wave_no = 5;
+	info.tdata[MAXDRAM+11].wave_no = 6;
+	info.tdata[MAXDRAM+12].wave_no = 4;
+	info.tdata[MAXDRAM+13].wave_no = 8;
+	info.tdata[MAXDRAM+14].wave_no = 0;
+	info.tdata[MAXDRAM+15].wave_no = 0;
 	for(i = MAXMELODY; i < MAXTRACK; i++){
 		InitDramObject(info.tdata[i].wave_no,i-MAXMELODY);
 	}
@@ -733,7 +741,7 @@ void OrgData::InitOrgData(void)
 	memset(author, '\0', 0x21);
 	memset(version, '\0', 0x21);
 
-	snprintf(version, 0x21, "OrgMaker %s", VER_STRING);
+	snprintf(version, 0x21, "OrgXMaker %s", VER_STRING);
 
 	comments.clear();
 

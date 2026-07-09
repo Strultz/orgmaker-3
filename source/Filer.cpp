@@ -51,7 +51,7 @@ char GetFileNameSave(HWND hwnd,char *title)
 	ofn.lpstrTitle  = title;
 	ofn.Flags       = OFN_NOREADONLYRETURN | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY
 					| OFN_EXPLORER | OFN_ENABLESIZING;
-	ofn.lpstrDefExt = "org";
+	ofn.lpstrDefExt = "orgx";
 
 	//ファイル名取得を試みる。
 	if(GetSaveFileName(&ofn));//InvalidateRect(hwnd,NULL,TRUE);
@@ -177,7 +177,9 @@ char GetFileNameMIDI(HWND hwnd,char *title, char *filename)
 	memset(&ofn,0,sizeof(OPENFILENAME));
 	strcpy(filename, music_file);
 	char *p;
-	if( (p = strstr(filename, ".org")) != NULL ){
+	if( (p = strstr(filename, ".orgx")) != NULL ){
+		strcpy(p, ".mid");
+	} else if( (p = strstr(filename, ".org")) != NULL ){
 		strcpy(p, ".mid");
 	}
 
@@ -284,7 +286,7 @@ char GetFileNameLoad(HWND hwnd,char *title/*, int OpenType*/)
 		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_DIALOGOPEN);
 
 	}*/
-	ofn.lpstrDefExt = "org";
+	ofn.lpstrDefExt = "orgx";
 	
 	count_of_INIT_DONE = 0;
 	//ファイル名取得を試みる。
@@ -308,7 +310,9 @@ char GetFileNameExportWav(HWND hwnd, char* title, char* filename)
 	memset(&ofn, 0, sizeof(OPENFILENAME));
 	strcpy(filename, music_file);
 	char* p;
-	if ((p = strstr(filename, ".org")) != NULL) {
+	if ((p = strstr(filename, ".orgx")) != NULL) {
+		strcpy(p, ".wav");
+	} else if ((p = strstr(filename, ".org")) != NULL) {
 		strcpy(p, ".wav");
 	}
 

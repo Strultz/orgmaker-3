@@ -2,7 +2,7 @@
 #include <Windows.h>
 
 #define TOOLBAR_MAIN_BUTTON_COUNT 26
-#define TOOLBAR_CHANNEL_BUTTON_COUNT 17
+#define TOOLBAR_CHANNEL_BUTTON_COUNT 33
 
 void CreateToolbarClass(void);
 HWND CreateRebar(HWND hwnd);

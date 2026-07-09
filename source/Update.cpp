@@ -89,7 +89,7 @@ void CheckUpdate(bool act) {
 	DWORD dwBytesRead;
 	char buffer[1024];
 
-	hSession = InternetOpen("OrgMaker/3.x", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+	hSession = InternetOpen("OrgXMaker/3.x", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
 	if (hSession == NULL) {
 		canUpdateCheck = true;
 		return;

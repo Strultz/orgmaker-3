@@ -37,7 +37,7 @@ long PutStartX = -99999;	//音符のドラッグ開始点
 
 int keyDrag = -99999;
 
-extern char TrackN[];
+//extern char TrackN[];
 extern int sGrid;	//範囲選択はグリッド単位で
 extern int MinimumGrid(int x);
 extern int MaximumGrid(int x);

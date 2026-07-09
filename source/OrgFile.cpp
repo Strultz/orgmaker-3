@@ -34,8 +34,16 @@ typedef struct{
 	unsigned char dot;
 	long repeat_x;//リピート
 	long end_x;//曲の終わり(リピートに戻る)
+	ORGANYATRACK tdata[16];
+}ORGANYADATAO;
+typedef struct {
+	unsigned short wait;
+	unsigned char line;
+	unsigned char dot;
+	long repeat_x;//リピート
+	long end_x;//曲の終わり(リピートに戻る)
 	ORGANYATRACK tdata[MAXTRACK];
-}ORGANYADATA;
+}ORGANYADATAX;
 
 
 void OrgData::WriteMetadata(FILE* fp) {
@@ -44,7 +52,7 @@ void OrgData::WriteMetadata(FILE* fp) {
 	fwrite(name, sizeof(char), 0x20, fp);
 	fwrite(author, sizeof(char), 0x20, fp);
 
-	snprintf(version, 0x21, "OrgMaker %s", VER_STRING);
+	snprintf(version, 0x21, "OrgXMaker %s", VER_STRING);
 	fwrite(version, sizeof(char), 0x20, fp);
 
 	fwrite(comments.data(), sizeof(char), comments.size(), fp);
@@ -106,7 +114,7 @@ unsigned short OrgData::GetNoteNumber(char track, long x1, long x2)
 //曲データを保存
 BOOL OrgData::SaveMusicData(bool noMeta)
 {
-	ORGANYADATA org_data;
+	ORGANYADATAX org_data;
 	NOTELIST *np;
 	int i,j;
 	//記録用曲情報の生成
@@ -134,10 +142,10 @@ BOOL OrgData::SaveMusicData(bool noMeta)
 	for(i=MAXMELODY;i<MAXTRACK;i++){ // iT JUST KEEPS GETTING WORSE !! WHY WAS IT < 15
 		if(org_data.tdata[i].wave_no>=12)j=3;	//ドラムの新しい音を使っていればVer.3
 	}
-	if (j == 2)fwrite("Org-02", sizeof(char), 6, fp);
-	else fwrite("Org-03", sizeof(char), 6, fp);
+	if (j == 2)fwrite("OrgX02", sizeof(char), 6, fp);
+	else fwrite("OrgX03", sizeof(char), 6, fp);
 	//曲情報の書き込み
-	fwrite(&org_data, sizeof(ORGANYADATA), 1, fp);
+	fwrite(&org_data, sizeof(ORGANYADATAX), 1, fp);
 	//音符の保存
 	for(j = 0; j < MAXTRACK; j++){
 		if(info.tdata[j].note_list == NULL)continue;
@@ -201,6 +209,9 @@ int OrgData::FileCheckBeforeLoad(char *checkfile)
 	if (!memcmp(pass_check, "Org-01", 6)) ver = 1;
 	if (!memcmp(pass_check, "Org-02", 6)) ver = 2;
 	if (!memcmp(pass_check, "Org-03", 6)) ver = 3;
+	if (!memcmp(pass_check, "OrgX01", 6)) { ver = 1; }
+	if (!memcmp(pass_check, "OrgX02", 6)) { ver = 2; }
+	if (!memcmp(pass_check, "OrgX03", 6)) { ver = 3; }
 	if (!ver) {
 		fclose(fp);
 		//MessageBox(hWnd,"このファイルは使えません","Error (Load)",MB_OK);
@@ -240,19 +251,27 @@ bool OrgData::ReadMetadata(FILE* fp) {
 	return false;
 }
 
-bool OrgData::ReadSegment(FILE *fp) {
+bool OrgData::ReadSegment(FILE *fp, bool orgx) {
 	char pass_check[4];
 	uint32_t len;
 	size_t read = fread(&pass_check[0], sizeof(char), 4, fp);
 	read += fread(&len, sizeof(uint32_t), 1, fp);
 
 	if (read == 5 && !memcmp(pass_check, "DEFS", 4)) {
-		if (len != MAXTRACK * 2) {
+		if (len != (orgx ? MAXTRACK * 2 : 32)) {
 			return false;
 		}
 
-		fread(def_volume, sizeof(unsigned char), MAXTRACK, fp);
-		fread(def_pan, sizeof(unsigned char), MAXTRACK, fp);
+		if (orgx) {
+			fread(def_volume, sizeof(unsigned char), MAXTRACK, fp);
+			fread(def_pan, sizeof(unsigned char), MAXTRACK, fp);
+		}
+		else {
+			fread(&def_volume[0], sizeof(unsigned char), 8, fp);
+			fread(&def_volume[MAXMELODY], sizeof(unsigned char), 8, fp);
+			fread(&def_pan[0], sizeof(unsigned char), 8, fp);
+			fread(&def_pan[MAXMELODY], sizeof(unsigned char), 8, fp);
+		}
 
 		return true;
     }
@@ -262,12 +281,13 @@ bool OrgData::ReadSegment(FILE *fp) {
 
 BOOL OrgData::LoadMusicData(void)
 {
-	ORGANYADATA org_data;
+	ORGANYADATAX org_data;
 	NOTELIST *np;
 	int i,j;
 	char pass_check[6];
 	char ver = 0;
 	bool cflag = false;
+	bool orgx = false;
 
 	//｣｣｣｣｣｣｣｣｣｣｣｣｣｣｣ロード
 	FILE *fp;
@@ -278,9 +298,12 @@ BOOL OrgData::LoadMusicData(void)
 	}
 	//パスワードチェック
 	fread(&pass_check[0], sizeof(char), 6, fp);
-	if(!memcmp(pass_check, "Org-01", 6)) ver = 1;
-	if(!memcmp(pass_check, "Org-02", 6)) ver = 2;
-	if(!memcmp(pass_check, "Org-03", 6)) ver = 3;
+	if (!memcmp(pass_check, "Org-01", 6)) ver = 1;
+	if (!memcmp(pass_check, "Org-02", 6)) ver = 2;
+	if (!memcmp(pass_check, "Org-03", 6)) ver = 3;
+	if (!memcmp(pass_check, "OrgX01", 6)) { ver = 1; orgx = true; }
+	if (!memcmp(pass_check, "OrgX02", 6)) { ver = 2; orgx = true; }
+	if (!memcmp(pass_check, "OrgX03", 6)) { ver = 3; orgx = true; }
 	if(!ver) {
 		fclose(fp);
 		//MessageBox(hWnd,"このファイルは使えません","Error (Load)",MB_OK);	// 2014.10.19 D
@@ -295,7 +318,8 @@ BOOL OrgData::LoadMusicData(void)
 //		}
 //	}
 	//曲情報の読み込み
-	fread(&org_data, sizeof(ORGANYADATA), 1, fp);
+	fread(&org_data, orgx ? sizeof(ORGANYADATAX) : sizeof(ORGANYADATAO), 1, fp);
+	long tCnt = orgx ? MAXTRACK : 16;
 
 	//曲の情報を設定
 	info.wait = org_data.wait;
@@ -303,21 +327,24 @@ BOOL OrgData::LoadMusicData(void)
 	info.dot = org_data.dot;
 	info.repeat_x = org_data.repeat_x;
 	info.end_x = org_data.end_x;
-	for(i = 0; i < MAXTRACK; i++){
-		info.tdata[i].freq = org_data.tdata[i].freq;
+	int jpx = 0;
+	for (jpx = 0; jpx < tCnt; jpx++) {
+		i = orgx ? jpx : (jpx < 8 ? jpx : jpx + 8);
+		info.tdata[i].freq = org_data.tdata[jpx].freq;
 		if( ver == 1 )info.tdata[i].pipi = 0;
-		else info.tdata[i].pipi = org_data.tdata[i].pipi;
-		info.tdata[i].wave_no = org_data.tdata[i].wave_no;
+		else info.tdata[i].pipi = org_data.tdata[jpx].pipi;
+		info.tdata[i].wave_no = org_data.tdata[jpx].wave_no;
 	}
 
 	//音符のロード
-	for(j = 0; j < MAXTRACK; j++){
+	for(jpx = 0; jpx < tCnt; jpx++){
+		j = orgx ? jpx : (jpx < 8 ? jpx : jpx + 8);
 		//最初の音符はfromがNULLとなる
-		if(org_data.tdata[j].note_num == 0){
+		if(org_data.tdata[jpx].note_num == 0){
 			info.tdata[j].note_list = NULL;
 			continue;
 		}
-		if (org_data.tdata[j].note_num > ALLOCNOTE) {
+		if (org_data.tdata[jpx].note_num > ALLOCNOTE) {
 			if (!cflag) {
 				MessageBox(NULL, "Some tracks were truncated due to having too many events.", "Notice", MB_OK | MB_ICONASTERISK);
 				cflag = true;
@@ -329,7 +356,7 @@ BOOL OrgData::LoadMusicData(void)
 		np->from = NULL;
 		np->to = (np + 1);
 		np++;
-		for(i = 1; i < org_data.tdata[j].note_num && i < ALLOCNOTE; i++){
+		for(i = 1; i < org_data.tdata[jpx].note_num && i < ALLOCNOTE; i++){
 			np->from = (np - 1);
 			np->to = (np + 1);
 			np++;
@@ -340,33 +367,33 @@ BOOL OrgData::LoadMusicData(void)
 
 		//内容を代入
 		np = info.tdata[j].note_p;//Ｘ座標
-		for(i = 0; i < org_data.tdata[j].note_num; i++){
+		for(i = 0; i < org_data.tdata[jpx].note_num; i++){
 			if (i >= ALLOCNOTE) { fseek(fp, sizeof(long), SEEK_CUR); continue; }
 			fread(&np->x,      sizeof(long), 1, fp);
 			np++;
 		}
 		np = info.tdata[j].note_p;//Ｙ座標
-		for(i = 0; i < org_data.tdata[j].note_num; i++){
+		for(i = 0; i < org_data.tdata[jpx].note_num; i++){
 			if (i >= ALLOCNOTE) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
 			fread(&np->y,      sizeof(unsigned char), 1, fp);
 			if (np->y >= 96) np->y = KEYDUMMY; // another fix
 			np++;
 		}
 		np = info.tdata[j].note_p;//長さ
-		for(i = 0; i < org_data.tdata[j].note_num; i++){
+		for(i = 0; i < org_data.tdata[jpx].note_num; i++){
 			if (i >= ALLOCNOTE) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
 			fread(&np->length, sizeof(unsigned char), 1, fp);
 			if (np->length == 0) np->length = 1; // org corruption fix
 			np++;
 		}
 		np = info.tdata[j].note_p;//ボリューム
-		for(i = 0; i < org_data.tdata[j].note_num; i++){
+		for(i = 0; i < org_data.tdata[jpx].note_num; i++){
 			if (i >= ALLOCNOTE) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
 			fread(&np->volume, sizeof(unsigned char), 1, fp);
 			np++;
 		}
 		np = info.tdata[j].note_p;//パン
-		for(i = 0; i < org_data.tdata[j].note_num; i++){
+		for(i = 0; i < org_data.tdata[jpx].note_num; i++){
 			if (i >= ALLOCNOTE) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
 			fread(&np->pan,    sizeof(unsigned char), 1, fp);
 			np++;
@@ -377,7 +404,7 @@ BOOL OrgData::LoadMusicData(void)
 	ReadMetadata(fp);
 
     // Read custom segments
-    while (ReadSegment(fp));
+    while (ReadSegment(fp, orgx));
 
 	fclose(fp);
 	//データを有効に
@@ -418,7 +445,7 @@ BOOL OrgData::LoadMusicData(void)
 void OrgData::SortNotes()
 {
 	NOTELIST *pntl,*pNtls,*np;
-	ORGANYADATA org_data;
+	ORGANYADATAX org_data;
 	int i,j;
 
 	org_data.wait = info.wait;

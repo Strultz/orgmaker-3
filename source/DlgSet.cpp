@@ -18,7 +18,7 @@
 
 #define PI 3.14159265358979323846
 
-#define NUMGRID		8
+#define NUMGRID		16
 #define NUMGRIDA		11
 #define MAXWAVE		100
 #define maxx(a, b) ((a) > (b) ? (a) : (b))
@@ -27,7 +27,7 @@
 extern char gSelectedTheme[MAX_PATH];
 extern char gSelectedWave[MAX_PATH];
 
-extern char TrackN[];
+//extern char TrackN[];
 
 extern HBITMAP waveBmp; // azy
 extern void SetModified(bool mod);
@@ -61,22 +61,32 @@ GRID grid[NUMGRIDA] = {
 int btn_wave[NUMGRID] = {
 	IDC_WAVE1, IDC_WAVE2, IDC_WAVE3, IDC_WAVE4,
 	IDC_WAVE5, IDC_WAVE6, IDC_WAVE7, IDC_WAVE8,
+	IDC_WAVE1X, IDC_WAVE2X, IDC_WAVE3X, IDC_WAVE4X,
+	IDC_WAVE5X, IDC_WAVE6X, IDC_WAVE7X, IDC_WAVE8X,
 };
 int txt_freq[NUMGRID] = {
 	IDC_FREQ1, IDC_FREQ2, IDC_FREQ3, IDC_FREQ4,
 	IDC_FREQ5, IDC_FREQ6, IDC_FREQ7, IDC_FREQ8,
+	IDC_FREQ1X, IDC_FREQ2X, IDC_FREQ3X, IDC_FREQ4X,
+	IDC_FREQ5X, IDC_FREQ6X, IDC_FREQ7X, IDC_FREQ8X,
 };
 int spin_freq[NUMGRID] = {
 	IDC_SPIN1, IDC_SPIN2, IDC_SPIN3, IDC_SPIN4,
 	IDC_SPIN5, IDC_SPIN6, IDC_SPIN7, IDC_SPIN8,
+	IDC_SPIN1X, IDC_SPIN2X, IDC_SPIN3X, IDC_SPIN4X,
+	IDC_SPIN5X, IDC_SPIN6X, IDC_SPIN7X, IDC_SPIN8X,
 };
 int check_pipi[NUMGRID] = {
 	IDC_PI1, IDC_PI2, IDC_PI3, IDC_PI4,
 	IDC_PI5, IDC_PI6, IDC_PI7, IDC_PI8,
+	IDC_PI1X, IDC_PI2X, IDC_PI3X, IDC_PI4X,
+	IDC_PI5X, IDC_PI6X, IDC_PI7X, IDC_PI8X,
 };
 int dd_drambox[NUMGRID] = {
 	IDC_WAVEQ, IDC_WAVEW, IDC_WAVEE, IDC_WAVER,
 	IDC_WAVET, IDC_WAVEY, IDC_WAVEU, IDC_WAVEI,
+	IDC_WAVEQX, IDC_WAVEWX, IDC_WAVEEX, IDC_WAVERX,
+	IDC_WAVETX, IDC_WAVEYX, IDC_WAVEUX, IDC_WAVEIX,
 };
 
 int txt_Pan[]={
@@ -845,8 +855,8 @@ BOOL CALLBACK DialogWaveSel(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 	return 0;
 }
 
-static const unsigned char defaultMelody[MAXMELODY] = { 0, 11, 22, 33, 44, 55, 66, 77 };
-static const unsigned char defaultPercussion[MAXDRAM] = { 0, 2, 5, 6, 4, 8, 0, 0 };
+static const unsigned char defaultMelody[MAXMELODY] = { 0, 11, 22, 33, 44, 55, 66, 77, 0, 11, 22, 33, 44, 55, 66, 77 };
+static const unsigned char defaultPercussion[MAXDRAM] = { 0, 2, 5, 6, 4, 8, 0, 0, 0, 2, 5, 6, 4, 8, 0, 0 };
 
 BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	char bfr[256];
@@ -884,6 +894,14 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case IDC_FREQ6:
 			case IDC_FREQ7:
 			case IDC_FREQ8:
+			case IDC_FREQ1X:
+			case IDC_FREQ2X:
+			case IDC_FREQ3X:
+			case IDC_FREQ4X:
+			case IDC_FREQ5X:
+			case IDC_FREQ6X:
+			case IDC_FREQ7X:
+			case IDC_FREQ8X:
 				if (HIWORD(wParam) == EN_UPDATE) {
 					PropSheet_Changed(GetParent(hdwnd), hdwnd);
 					gPropChanged = true;
@@ -919,6 +937,14 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case IDC_WAVE6: i = 5; break;
 			case IDC_WAVE7: i = 6; break;
 			case IDC_WAVE8: i = 7; break;
+			case IDC_WAVE1X: i = 8; break;
+			case IDC_WAVE2X: i = 9; break;
+			case IDC_WAVE3X: i = 10; break;
+			case IDC_WAVE4X: i = 11; break;
+			case IDC_WAVE5X: i = 12; break;
+			case IDC_WAVE6X: i = 13; break;
+			case IDC_WAVE7X: i = 14; break;
+			case IDC_WAVE8X: i = 15; break;
 			case IDC_PI1:
 			case IDC_PI2:
 			case IDC_PI3:
@@ -927,6 +953,14 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case IDC_PI6:
 			case IDC_PI7:
 			case IDC_PI8:
+			case IDC_PI1X:
+			case IDC_PI2X:
+			case IDC_PI3X:
+			case IDC_PI4X:
+			case IDC_PI5X:
+			case IDC_PI6X:
+			case IDC_PI7X:
+			case IDC_PI8X:
 				PropSheet_Changed(GetParent(hdwnd), hdwnd);
 				gPropChanged = true;
 			default: i = -1; break;
@@ -1059,14 +1093,22 @@ BOOL CALLBACK DialogPerc(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case CBN_SELCHANGE:
 			switch (LOWORD(wParam)) {
-			case IDC_WAVEQ: i = 8; break;
-			case IDC_WAVEW: i = 9; break;
-			case IDC_WAVEE: i = 10; break;
-			case IDC_WAVER: i = 11; break;
-			case IDC_WAVET: i = 12; break;
-			case IDC_WAVEY: i = 13; break;
-			case IDC_WAVEU: i = 14; break;
-			case IDC_WAVEI: i = 15; break;
+			case IDC_WAVEQ: i = 16; break;
+			case IDC_WAVEW: i = 17; break;
+			case IDC_WAVEE: i = 18; break;
+			case IDC_WAVER: i = 19; break;
+			case IDC_WAVET: i = 20; break;
+			case IDC_WAVEY: i = 21; break;
+			case IDC_WAVEU: i = 22; break;
+			case IDC_WAVEI: i = 23; break;
+			case IDC_WAVEQX: i = 24; break;
+			case IDC_WAVEWX: i = 25; break;
+			case IDC_WAVEEX: i = 26; break;
+			case IDC_WAVERX: i = 27; break;
+			case IDC_WAVETX: i = 28; break;
+			case IDC_WAVEYX: i = 29; break;
+			case IDC_WAVEUX: i = 30; break;
+			case IDC_WAVEIX: i = 31; break;
 			default: i = -1; break;
 			}
 
@@ -1206,7 +1248,14 @@ int usebox[MAXTRACK] = {
 	IDE_USE5,
 	IDE_USE6,
 	IDE_USE7,
-
+	IDE_USE0X,
+	IDE_USE1X,
+	IDE_USE2X,
+	IDE_USE3X,
+	IDE_USE4X,
+	IDE_USE5X,
+	IDE_USE6X,
+	IDE_USE7X,
 	IDE_USE8,
 	IDE_USE9,
 	IDE_USE10,
@@ -1215,6 +1264,14 @@ int usebox[MAXTRACK] = {
 	IDE_USE13,
 	IDE_USE14,
 	IDE_USE15,
+	IDE_USE8X,
+	IDE_USE9X,
+	IDE_USE10X,
+	IDE_USE11X,
+	IDE_USE12X,
+	IDE_USE13X,
+	IDE_USE14X,
+	IDE_USE15X,
 };
 int leftbox[MAXTRACK] = {
 	IDE_LEFT0,
@@ -1225,7 +1282,14 @@ int leftbox[MAXTRACK] = {
 	IDE_LEFT5,
 	IDE_LEFT6,
 	IDE_LEFT7,
-
+	IDE_LEFT0X,
+	IDE_LEFT1X,
+	IDE_LEFT2X,
+	IDE_LEFT3X,
+	IDE_LEFT4X,
+	IDE_LEFT5X,
+	IDE_LEFT6X,
+	IDE_LEFT7X,
 	IDE_LEFT8,
 	IDE_LEFT9,
 	IDE_LEFT10,
@@ -1234,6 +1298,14 @@ int leftbox[MAXTRACK] = {
 	IDE_LEFT13,
 	IDE_LEFT14,
 	IDE_LEFT15,
+	IDE_LEFT8X,
+	IDE_LEFT9X,
+	IDE_LEFT10X,
+	IDE_LEFT11X,
+	IDE_LEFT12X,
+	IDE_LEFT13X,
+	IDE_LEFT14X,
+	IDE_LEFT15X,
 };
 BOOL CALLBACK DialogNoteUsed(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -1317,7 +1389,7 @@ BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 	case WM_INITDIALOG://ダイアログが呼ばれた
 	{
 		int cursel = 0;
-		SendDlgItemMessage(hdwnd, IDD_THEMES, LB_ADDSTRING, 0, (LPARAM)"OrgMaker 3 (default)");
+		SendDlgItemMessage(hdwnd, IDD_THEMES, LB_ADDSTRING, 0, (LPARAM)"OrgXMaker 3 (default)");
 
 		WIN32_FIND_DATA fdFile;
 		HANDLE hFind = NULL;
@@ -1835,7 +1907,7 @@ BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lP
 					char chPath[MAX_PATH] = { NULL };
 
 					snprintf(chPath, MAX_PATH, "%s", strPath);
-					snprintf(tstr, 15, " - Track %c.wav", TrackN[i]);
+					snprintf(tstr, 15, " - Track %s.wav", TrackCode[i]);
 
 					pC = strrchr(chPath, '.');
 					if (pC != NULL) pC[0] = '\0';

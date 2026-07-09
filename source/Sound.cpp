@@ -455,7 +455,7 @@ extern int iKeyPushDown[256];
 
 extern long gClickedPos;
 
-extern bool gUseProperFreq;
+extern bool gUseRealFreq;
 extern bool gUseOldVol;
 extern bool gPlayMidNote;
 
@@ -849,7 +849,7 @@ void ChangeOrganFrequency(unsigned char key,char track, DWORD a)
 			//double mul = pow(2.0, ((int)a - 1000) / 12000.0);
 			if (lpORGANBUFFER[track][j][i] != NULL) {
 				DWORD val;
-				if (gUseProperFreq) {
+				if (gUseRealFreq) {
 					val = (DWORD)((oct_wave[j].wave_size * freq_tbl_prec[key]) * oct_wave[j].oct_par) / 8.00 + (a - 1000);
 				} else {
 					val = (DWORD)((oct_wave[j].wave_size * freq_tbl[key]) * oct_wave[j].oct_par) / 8 + (a - 1000);

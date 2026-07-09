@@ -101,7 +101,7 @@ bool gKeepClickedPos = false;
 
 // TODO add these to UI
 bool gUseOldVol = false;
-bool gUseProperFreq = false;
+bool gUseRealFreq = false;
 
 long MAXHORZRANGE = 0x7FFFFFFF;
 
@@ -115,7 +115,7 @@ static int realAreaHeight = WINDOWHEIGHT;
 
 long gClickedPos = 0;
 
-static const char szClassName[] = "OrgMaker3";
+static const char szClassName[] = "OrgXMaker3";
 static const char szAreaClass[] = "OrgArea";
 static const char szSplashClass[] = "OrgSplash";
 
@@ -127,7 +127,9 @@ MOUSEDATA mouse_data;//mouse data
 extern char music_file[];//file name
 int sGrid = 0;
 int sACrnt = 0;
-char TrackN[] = "12345678QWERTYUI";
+
+char* TrackCode[] = { "1","2","3","4","5","6","7","8","1X","2X","3X","4X","5X","6X","7X","8X",
+"Q","W","E","R","T","Y","U","I","QX","WX","EX","RX","TX","YX","UX","IX" };
 
 int sMetronome = 0;
 int sSmoothScroll = 0;
@@ -215,9 +217,11 @@ static const int playbar_controls_toolbar[4] = {
 	IDC_LEFT, IDC_RIGHT, IDC_LEFTSTEP, IDC_RIGHTSTEP
 };
 
-static const int iChgTrackBtn[16] = {
+static const int iChgTrackBtn[MAXTRACK] = {
 	IDM_TRACK1, IDM_TRACK2, IDM_TRACK3, IDM_TRACK4, IDM_TRACK5, IDM_TRACK6, IDM_TRACK7, IDM_TRACK8,
+	IDM_TRACK1X, IDM_TRACK2X, IDM_TRACK3X, IDM_TRACK4X, IDM_TRACK5X, IDM_TRACK6X, IDM_TRACK7X, IDM_TRACK8X,
 	IDM_TRACKQ, IDM_TRACKW, IDM_TRACKE, IDM_TRACKR, IDM_TRACKT, IDM_TRACKY, IDM_TRACKU, IDM_TRACKI,
+	IDM_TRACKQX, IDM_TRACKWX, IDM_TRACKEX, IDM_TRACKRX, IDM_TRACKTX, IDM_TRACKYX, IDM_TRACKUX, IDM_TRACKIX,
 };
 
 static int lastUpdCheck = 0;
@@ -287,9 +291,15 @@ void UpdateToolbarStatus() {
 	SendMessage(hwndToolbar, TB_CHECKBUTTON, IDC_TOGGLEFOLLOW, followPlayhead);
 	SendMessage(hwndToolbar, TB_ENABLEBUTTON, IDC_TOGGLEFOLLOW, !lockScrollToSong && !sFollowScroll);
 
-	for (int i = 0; i < MAXTRACK; ++i) {
-		SendMessage(hwndTrackbar, TB_CHECKBUTTON, iChgTrackBtn[i], org_data.track == i);
-		SendMessage(hwndTrackbar, TB_CHANGEBITMAP, iChgTrackBtn[i], org_data.mute[i] ? i + 16 : i);
+	for (int t = 0; t < MAXMELODY; ++t) {
+		int i = t % 8;
+		SendMessage(hwndTrackbar, TB_CHECKBUTTON, iChgTrackBtn[t], org_data.track == t);
+		SendMessage(hwndTrackbar, TB_CHANGEBITMAP, iChgTrackBtn[t], org_data.mute[t] ? i + 16 : i);
+	}
+	for (int t = MAXMELODY; t < MAXTRACK; ++t) {
+		int i = (t - MAXMELODY) % 8 + 8;
+		SendMessage(hwndTrackbar, TB_CHECKBUTTON, iChgTrackBtn[t], org_data.track == t);
+		SendMessage(hwndTrackbar, TB_CHANGEBITMAP, iChgTrackBtn[t], org_data.mute[t] ? i + 16 : i);
 	}
 }
 
@@ -360,19 +370,25 @@ int gHeightWindow;
 
 int gDrawDouble;	//draw both trackgroups
 
-int iChgTrackKey[16] = {
+int iChgTrackKey[MAXTRACK] = {
 	ID_AC_1,	ID_AC_2,	ID_AC_3,	ID_AC_4,	ID_AC_5,	ID_AC_6,	ID_AC_7,	ID_AC_8,
+	ID_AC_1X,	ID_AC_2X,	ID_AC_3X,	ID_AC_4X,	ID_AC_5X,	ID_AC_6X,	ID_AC_7X,	ID_AC_8X,
 	ID_AC_Q,	ID_AC_W,	ID_AC_E,	ID_AC_R,	ID_AC_T,	ID_AC_Y,	ID_AC_U,	ID_AC_I,
+	ID_AC_QX,	ID_AC_WX,	ID_AC_EX,	ID_AC_RX,	ID_AC_TX,	ID_AC_YX,	ID_AC_UX,	ID_AC_IX,
 };
 
-int iMuteKey[16]={
-	ID_AC_S1, ID_AC_S2, ID_AC_S3, ID_AC_S4, ID_AC_S5, ID_AC_S6, ID_AC_S7, ID_AC_S8,
-	ID_AC_SQ, ID_AC_SW, ID_AC_SE, ID_AC_SR, ID_AC_ST, ID_AC_SY, ID_AC_SU, ID_AC_SI, 
+int iMuteKey[MAXTRACK] = {
+	ID_AC_S1,  ID_AC_S2,  ID_AC_S3,  ID_AC_S4,  ID_AC_S5,  ID_AC_S6,  ID_AC_S7,  ID_AC_S8,
+	ID_AC_S1X, ID_AC_S2X, ID_AC_S3X, ID_AC_S4X, ID_AC_S5X, ID_AC_S6X, ID_AC_S7X, ID_AC_S8X,
+	ID_AC_SQ,  ID_AC_SW,  ID_AC_SE,  ID_AC_SR,  ID_AC_ST,  ID_AC_SY,  ID_AC_SU,  ID_AC_SI,
+	ID_AC_SQX, ID_AC_SWX, ID_AC_SEX, ID_AC_SRX, ID_AC_STX, ID_AC_SYX, ID_AC_SUX, ID_AC_SIX,
 };
 
-int iSoloKey[16] = {
-	ID_AC_L1, ID_AC_L2, ID_AC_L3, ID_AC_L4, ID_AC_L5, ID_AC_L6, ID_AC_L7, ID_AC_L8,
-	ID_AC_LQ, ID_AC_LW, ID_AC_LE, ID_AC_LR, ID_AC_LT, ID_AC_LY, ID_AC_LU, ID_AC_LI,
+int iSoloKey[MAXTRACK] = {
+	ID_AC_L1,  ID_AC_L2,  ID_AC_L3,  ID_AC_L4,  ID_AC_L5,  ID_AC_L6,  ID_AC_L7,  ID_AC_L8,
+	ID_AC_L1X, ID_AC_L2X, ID_AC_L3X, ID_AC_L4X, ID_AC_L5X, ID_AC_L6X, ID_AC_L7X, ID_AC_L8X,
+	ID_AC_LQ,  ID_AC_LW,  ID_AC_LE,  ID_AC_LR,  ID_AC_LT,  ID_AC_LY,  ID_AC_LU,  ID_AC_LI,
+	ID_AC_LQX, ID_AC_LWX, ID_AC_LEX, ID_AC_LRX, ID_AC_LTX, ID_AC_LYX, ID_AC_LUX, ID_AC_LIX,
 };
 
 TCHAR strSize[128]; //for Debug	// 2010.08.14 A
@@ -537,7 +553,7 @@ static LRESULT CALLBACK SplashWndProc(HWND hwnd, UINT message, WPARAM wParam, LP
 
 // Oops!
 LONG WINAPI OrgCrashHandler(EXCEPTION_POINTERS* ep) {
-	MessageBox(NULL, "A fatal error has occurred. The program will now exit.", "OrgMaker Crash", MB_OK | MB_ICONERROR);
+	MessageBox(NULL, "A fatal error has occurred. The program will now exit.", "OrgXMaker Crash", MB_OK | MB_ICONERROR);
 
 	return EXCEPTION_EXECUTE_HANDLER;
 }
@@ -569,19 +585,19 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	iCast['S']= 1;
 	iCast['X']= 2;
 	iCast['D'] = 3;
-	iCast['C']= 4; //C … C sound
-	iCast['V']= 5; //     D
+	iCast['C']= 4;
+	iCast['V']= 5;
 	iCast['G']= 6;
-	iCast['B']= 7; //     E
+	iCast['B']= 7;
 	iCast['H'] = 8;
-	iCast['N']= 9; //     F
+	iCast['N']= 9;
 	iCast['J']= 10;
-	iCast['M']= 11; //     G
-	iCast[VK_OEM_COMMA]=12; //,    A
+	iCast['M']= 11;
+	iCast[VK_OEM_COMMA]=12;
 	iCast['L']= 13;
-	iCast[VK_OEM_PERIOD]=14; //.    B
-	iCast[VK_OEM_1]=15; //／   C
-	iCast[VK_OEM_2]=16; //:
+	iCast[VK_OEM_PERIOD]=14;
+	iCast[VK_OEM_1]=15;
+	iCast[VK_OEM_2]=16;
     
 	LoadString(GetModuleHandle(NULL), IDS_TITLE, lpszName, sizeof(lpszName) / sizeof(lpszName[0]));
 
@@ -669,7 +685,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	// main window
 	hWnd = CreateWindow(szClassName,
-			"OrgMaker 3",
+			"OrgXMaker 3",
 			ul,
 			WinRect.left, WinRect.top, realWidth, realHeight,
             NULL, NULL, hInst, NULL);
@@ -734,7 +750,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 //Image initialization //////////
 	if (!StartGDI(hwndArea)) { //GDI ready
-		MessageBox(hWnd, "Graphics engine failed to initalize.", "OrgMaker Error", MB_ICONERROR | MB_OK);
+		MessageBox(hWnd, "Graphics engine failed to initalize.", "OrgXMaker Error", MB_ICONERROR | MB_OK);
 		QuitMMTimer();
 		if (hwndRebar) DestroyWindow(hwndRebar);
 		DestroyWindow(hwndStatus);
@@ -747,7 +763,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	InitCursor();
 //Sound initialization ///////
 	if (!InitDirectSound(hWnd)) {
-		MessageBox(hWnd, "Sound engine failed to initalize.", "OrgMaker Error", MB_ICONERROR | MB_OK);
+		MessageBox(hWnd, "Sound engine failed to initalize.", "OrgXMaker Error", MB_ICONERROR | MB_OK);
 		QuitMMTimer();
 		EndGDI();
 		if (hwndRebar) DestroyWindow(hwndRebar);
@@ -1187,7 +1203,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 			char msg[256];
 			snprintf(msg, 256, "Version %s is now available. Would you like to download it?", ver);
-			int h = MessageBox(hWnd, msg, "OrgMaker Update", MB_ICONINFORMATION | MB_OKCANCEL);
+			int h = MessageBox(hWnd, msg, "OrgXMaker Update", MB_ICONINFORMATION | MB_OKCANCEL);
 			if (h == IDOK) {
 				snprintf(msg, 256, "https://github.com/Strultz/orgmaker-3/releases/tag/%s", ver);
 				ShellExecute(NULL, "open", msg, NULL, NULL, SW_SHOWNORMAL);
@@ -1195,17 +1211,17 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		}
 		case 2:
-			MessageBox(hWnd, "Recieved invalid response from server. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
+			MessageBox(hWnd, "Recieved invalid response from server. Please try again later.", "OrgXMaker Update", MB_ICONERROR | MB_OK);
 			break;
 		case 3:
-			MessageBox(hWnd, "No new updates are available.", "OrgMaker Update", MB_ICONINFORMATION | MB_OK);
+			MessageBox(hWnd, "No new updates are available.", "OrgXMaker Update", MB_ICONINFORMATION | MB_OK);
 			break;
 		case 4:
-			MessageBox(hWnd, "Update checking is disabled in debug builds.", "OrgMaker Update", MB_ICONWARNING | MB_OK);
+			MessageBox(hWnd, "Update checking is disabled in debug builds.", "OrgXMaker Update", MB_ICONWARNING | MB_OK);
 			break;
 		default:
 		case 1:
-			MessageBox(hWnd, "Request failed. Please try again later.", "OrgMaker Update", MB_ICONERROR | MB_OK);
+			MessageBox(hWnd, "Request failed. Please try again later.", "OrgXMaker Update", MB_ICONERROR | MB_OK);
 			break;
 		}
 		break;
@@ -1215,10 +1231,18 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			if (wParam == iChgTrackBtn[i]) {
 				hMenu = CreatePopupMenu();
 
-				snprintf(str, 128, "Select\t%c", TrackN[i]);
+				if ((i >= 8 && i < 16) || (i >= 24 && i < 32)) {
+					snprintf(str, 128, "Select\tAlt+%s", TrackCode[i - 8]);
+				} else {
+					snprintf(str, 128, "Select\t%s", TrackCode[i]);
+				}
 				AppendMenu(hMenu, MF_STRING, iChgTrackKey[i], str);
 
-				snprintf(str, 128, "%sute\tShift+%c", org_data.mute[i] ? "Unm" : "M", TrackN[i]);
+				if ((i >= 8 && i < 16) || (i >= 24 && i < 32)) {
+					snprintf(str, 128, "%sute\tAlt+Shift+%s", org_data.mute[i] ? "Unm" : "M", TrackCode[i - 8]);
+				} else {
+					snprintf(str, 128, "%sute\tShift+%s", org_data.mute[i] ? "Unm" : "M", TrackCode[i]);
+				}
 				AppendMenu(hMenu, MF_STRING, iMuteKey[i], str);
 
 				if (!IsSolo(i)) {
@@ -2038,6 +2062,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		case IDM_EXPORT_MIDI: //Export 2014.05.11
 		case ID_AC_MIDI:
+			break;
+			/*
 			StopPlayingSong();
 
 			res = GetFileNameMIDI(hwnd, MessageString[IDS_STRING63], strMIDIFile);//"Export in standard MIDI format"
@@ -2050,7 +2076,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			org_data.ExportMIDIData(strMIDIFile, iDlgRepeat);
 			//SetTitlebarText();//title name set
 			//ResetTitlebarChange();
-			break;
+			break;*/
 		case IDM_EXPORT_WAV:
 		case ID_AC_WAV:
 			StopPlayingSong();
@@ -2275,7 +2301,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				snprintf(str, 128, "Estimated song length: %dm %ds",
 					minutes, (lengthMs / 1000) % 60);
 			}
-			MessageBox(hWnd, str, "OrgMaker 3", MB_OK | MB_ICONINFORMATION);
+			MessageBox(hWnd, str, "OrgXMaker 3", MB_OK | MB_ICONINFORMATION);
 			break;
 		}
 		case ID_SONG_COMMENTS: {
@@ -2291,7 +2317,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			SendMessage(hWnd, WM_CLOSE, 0, 0);
 			break;
 		case IDM_SAVE_NOEXTRAS: {
-			//MessageBox(hWnd, "Legacy export will save a .org file without any non-standard metadata", "OrgMaker 3", MB_OK | MB_ICONWARNING);
+			//MessageBox(hWnd, "Legacy export will save a .org file without any non-standard metadata", "OrgXMaker 3", MB_OK | MB_ICONWARNING);
 			
 			char oldName[MAX_PATH];
 			// weirdness ensues
@@ -2334,7 +2360,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_EXPORT_MIDI:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Export the active document to a MIDI file"); break;
 		case IDM_EXPORT_WAV:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Export the active document to a WAV file"); break;
 		case IDM_SAVE_NOEXTRAS:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Export an ORG file without any non-standard metadata"); break;
-		case IDM_EXIT:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Exit OrgMaker 3"); break;
+		case IDM_EXIT:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Exit OrgXMaker 3"); break;
 
 		case IDM_UNDO:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Undo the last action"); break;
 		case IDM_REDO:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Redo the previously undone action"); break;
@@ -2422,12 +2448,12 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_METRONOME:         SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Plays a sound on every beat/measure"); break;
 		case IDM_DLGTHEMES:         SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select a custom visual style"); break;
 		case IDM_DLGWAVEDBS:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select a custom sound bank"); break;
-		//case IDM_PREFERENCES:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open OrgMaker preferences"); break;
+		//case IDM_PREFERENCES:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open OrgXMaker preferences"); break;
 
 		case IDM_DLGHELP:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open the Help menu"); break;
-		case IDM_GITHUB:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open the GitHub page for OrgMaker 3"); break;
-		case IDM_CHECKUPD:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Check for a new version of OrgMaker 3"); break;
-		case IDM_DLGMEMO:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"About OrgMaker 3"); break;
+		case IDM_GITHUB:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open the GitHub page for OrgXMaker 3"); break;
+		case IDM_CHECKUPD:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Check for a new version of OrgXMaker 3"); break;
+		case IDM_DLGMEMO:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"About OrgXMaker 3"); break;
 		}
 		break;
 	case WM_DROPFILES://file drop

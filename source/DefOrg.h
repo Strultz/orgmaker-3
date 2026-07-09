@@ -19,8 +19,8 @@
 #endif
 
 #define MAXNOTELENGTH	255//音符の最大長
-#define MAXMELODY		8
-#define MAXDRAM			8
+#define MAXMELODY		16
+#define MAXDRAM			16
 #define MAXTRACK		(MAXMELODY + MAXDRAM)
 
 #define KEYDUMMY		255//キーの変更は加えない音符
