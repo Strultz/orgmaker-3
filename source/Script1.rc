@@ -1317,7 +1317,7 @@ BEGIN
             VALUE "CompanyName", "No extra taste."
             VALUE "FileDescription", "OrgMaker 3"
             VALUE "FileVersion", "3.0.10"
-            VALUE "LegalCopyright", "Copyright (C) 2023-2026 Strultz, Copyright (C) 2005-2018 Rxo Inverse, Copyright (C) 1999-2005 Studio Pixel"
+            VALUE "LegalCopyright", "Copyright (C) 1999-2005 Studio Pixel, 2005-2018 Rxo Inverse, 2023-2026 Strultz"
             VALUE "OriginalFilename", "OrgMaker.exe"
             VALUE "ProductName", "OrgMaker"
             VALUE "ProductVersion", "3.0.10"
