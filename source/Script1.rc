@@ -447,7 +447,7 @@ END
 
 DLGMEMO DIALOGEX 0, 0, 250, 232
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "About OrgXMaker 3"
+CAPTION "About OrgXMaker"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,203,212,40,12
@@ -1010,7 +1010,7 @@ BEGIN
         MENUITEM "Open &GitHub Page",           IDM_GITHUB
         MENUITEM SEPARATOR
         MENUITEM "&Check for Updates",          IDM_CHECKUPD, GRAYED
-        MENUITEM "&About OrgXMaker 3",           IDM_DLGMEMO
+        MENUITEM "&About OrgXMaker",           IDM_DLGMEMO
     END
 END
 
@@ -1141,11 +1141,11 @@ BEGIN
         BEGIN
             VALUE "Comments", "Please ignore the rough parts."
             VALUE "CompanyName", "Strultz"
-            VALUE "FileDescription", "OrgXMaker 3"
+            VALUE "FileDescription", "OrgXMaker"
             VALUE "FileVersion", "1.0.0"
             VALUE "LegalCopyright", "Copyright (C) 1999-2005 Studio Pixel, 2005-2018 Rxo Inverse, 2023-2026 Strultz"
-            VALUE "OriginalFilename", "OrgXMaker3.exe"
-            VALUE "ProductName", "OrgXMaker 3"
+            VALUE "OriginalFilename", "OrgXMaker.exe"
+            VALUE "ProductName", "OrgXMaker"
             VALUE "ProductVersion", "1.0.0"
         END
     END
@@ -1790,7 +1790,7 @@ STRINGTABLE
 BEGIN
     IDS_STRING112           "1!2!3!4!5!6!7!8!Q!W!E!R!T!Y!U!I!!"
     IDS_STRING113           "[1]![2]![3]![4]![5]![6]![7]![8]![Q]![W]![E]![R]![T]![Y]![U]![I]!!"
-    IDS_STRING114           "Created with OrgXMaker 3"
+    IDS_STRING114           "Created with OrgXMaker"
     IDS_STRING115           " from beginning to end"
     IDS_STRING116           "All channels from beginning to end"
     IDS_STRING117           "Wave-%02d*"

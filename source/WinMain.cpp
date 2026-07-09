@@ -115,7 +115,7 @@ static int realAreaHeight = WINDOWHEIGHT;
 
 long gClickedPos = 0;
 
-static const char szClassName[] = "OrgXMaker3";
+static const char szClassName[] = "OrgXMaker";
 static const char szAreaClass[] = "OrgArea";
 static const char szSplashClass[] = "OrgSplash";
 
@@ -685,7 +685,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	// main window
 	hWnd = CreateWindow(szClassName,
-			"OrgXMaker 3",
+			"OrgXMaker",
 			ul,
 			WinRect.left, WinRect.top, realWidth, realHeight,
             NULL, NULL, hInst, NULL);
@@ -2301,7 +2301,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				snprintf(str, 128, "Estimated song length: %dm %ds",
 					minutes, (lengthMs / 1000) % 60);
 			}
-			MessageBox(hWnd, str, "OrgXMaker 3", MB_OK | MB_ICONINFORMATION);
+			MessageBox(hWnd, str, "OrgXMaker", MB_OK | MB_ICONINFORMATION);
 			break;
 		}
 		case ID_SONG_COMMENTS: {
@@ -2317,7 +2317,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			SendMessage(hWnd, WM_CLOSE, 0, 0);
 			break;
 		case IDM_SAVE_NOEXTRAS: {
-			//MessageBox(hWnd, "Legacy export will save a .org file without any non-standard metadata", "OrgXMaker 3", MB_OK | MB_ICONWARNING);
+			//MessageBox(hWnd, "Legacy export will save a .org file without any non-standard metadata", "OrgXMaker", MB_OK | MB_ICONWARNING);
 			
 			char oldName[MAX_PATH];
 			// weirdness ensues
@@ -2360,7 +2360,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_EXPORT_MIDI:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Export the active document to a MIDI file"); break;
 		case IDM_EXPORT_WAV:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Export the active document to a WAV file"); break;
 		case IDM_SAVE_NOEXTRAS:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Export an ORG file without any non-standard metadata"); break;
-		case IDM_EXIT:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Exit OrgXMaker 3"); break;
+		case IDM_EXIT:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Exit OrgXMaker"); break;
 
 		case IDM_UNDO:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Undo the last action"); break;
 		case IDM_REDO:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Redo the previously undone action"); break;
@@ -2451,9 +2451,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		//case IDM_PREFERENCES:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open OrgXMaker preferences"); break;
 
 		case IDM_DLGHELP:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open the Help menu"); break;
-		case IDM_GITHUB:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open the GitHub page for OrgXMaker 3"); break;
-		case IDM_CHECKUPD:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Check for a new version of OrgXMaker 3"); break;
-		case IDM_DLGMEMO:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"About OrgXMaker 3"); break;
+		case IDM_GITHUB:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open the GitHub page for OrgXMaker"); break;
+		case IDM_CHECKUPD:          SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Check for a new version of OrgXMaker"); break;
+		case IDM_DLGMEMO:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"About OrgXMaker"); break;
 		}
 		break;
 	case WM_DROPFILES://file drop
