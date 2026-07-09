@@ -374,8 +374,8 @@ void OrgData::PutNotes(int TPCY, bool vol, long play)
 					if (TPCY == 0) {
 						if (vmode && !mute[k] && play >= p->x && play < p->x + p->length) {
 							iKeyPushDown[p->y] = 1;
-							PutBitmapHead(xpos, ypos + 2 + addY, &note_blue_rect[k % 8 + 16], BMPNOTE, p->length);//音符(新)
-						} else PutBitmapHead(xpos, ypos + 2 + addY, &note_blue_rect[k % 8], BMPNOTE, p->length);//音符(新)
+							PutBitmapHead(xpos, ypos + 2 + addY, &note_blue_rect[k + 16], BMPNOTE, p->length);//音符(新)
+						} else PutBitmapHead(xpos, ypos + 2 + addY, &note_blue_rect[k], BMPNOTE, p->length);//音符(新)
 					}
 					else PutBitmapHead(xpos, ypos + 2 + addY, &rc_TCPY[t], BMPNOTE, p->length);//音符(新)
 				}
@@ -407,9 +407,9 @@ void OrgData::PutNotes(int TPCY, bool vol, long play)
 					//tBitmap(xpos,ypos+2,&note_rect[0],BMPNOTE);//音符
 					for(j = 0,i = p->length-1; i > 0; i--,j++){//尻尾
 						//PutBitmap(xpos+j*16+16,ypos+3,&note_rect[2],BMPNOTE);
-						PutBitmap2(xpos+j*NoteWidth+NoteWidth,ypos+3,&note_tail_rect[track % 8],BMPNOTE);
+						PutBitmap2(xpos+j*NoteWidth+NoteWidth,ypos+3,&note_tail_rect[track],BMPNOTE);
 					}
-					PutBitmapHead(xpos,ypos+2,&note_blue_rect[track % 8 +16],BMPNOTE,p->length);//音符(新)
+					PutBitmapHead(xpos,ypos+2,&note_blue_rect[track +16],BMPNOTE,p->length);//音符(新)
 				}
 				if (vol) {
 					if (p->pan != PANDUMMY) {
@@ -484,8 +484,8 @@ void OrgData::PutNotes2(int TPCY, bool vol, long play)
 					if (TPCY == 0) {
 						if (vmode && !mute[k] && play >= p->x && play < p->x + p->length) {
 							iKeyPushDown[p->y] = 1;
-							PutBitmapHead(xpos, ypos + 2 + addY, &note_blue_rect[k % 8 + 16], BMPNOTE, p->length);//音符(新)
-						} else PutBitmapHead(xpos, ypos + 2 + addY, &note_blue_rect[k % 8], BMPNOTE, p->length);//音符(新)
+							PutBitmapHead(xpos, ypos + 2 + addY, &note_blue_rect[k + 16], BMPNOTE, p->length);//音符(新)
+						} else PutBitmapHead(xpos, ypos + 2 + addY, &note_blue_rect[k], BMPNOTE, p->length);//音符(新)
 					}
 					else PutBitmapHead(xpos, ypos + 2 + addY, &rc_TCPY[t], BMPNOTE, p->length);//音符(新)
 				}
@@ -517,9 +517,9 @@ void OrgData::PutNotes2(int TPCY, bool vol, long play)
 					//PutBitmap(xpos,ypos+2,&note_rect[0],BMPNOTE);//音符
 					//PutBitmap2(xpos,ypos+2,&note_blue_rect[track+16],BMPNOTE);//音符	// 2014.05.27 D
 					for(j = 0,i = p->length-1; i > 0; i--,j++){//尻尾
-						PutBitmap2(xpos+j*NoteWidth+NoteWidth,ypos+3,&note_tail_rect[track % 8 -8],BMPNOTE);
+						PutBitmap2(xpos+j*NoteWidth+NoteWidth,ypos+3,&note_tail_rect[track -8],BMPNOTE);
 					}
-					PutBitmapHead(xpos,ypos+2,&note_blue_rect[track % 8 +16],BMPNOTE,p->length);//音符	// 2014.05.27 A
+					PutBitmapHead(xpos,ypos+2,&note_blue_rect[track +16],BMPNOTE,p->length);//音符	// 2014.05.27 A
 				}
 				if (vol) {
 					if (p->pan != PANDUMMY) {
