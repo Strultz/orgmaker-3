@@ -957,8 +957,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	if (RefleshScreen(hWnd, TRUE)) {
 		if (autoCheckUpdate) {
-			std::thread t(CheckUpdate, false);
-			t.detach();
+			//std::thread t(CheckUpdate, false);
+			//t.detach();
 		}
 
 		while (TRUE) {
