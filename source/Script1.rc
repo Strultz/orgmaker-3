@@ -451,7 +451,7 @@ CAPTION "About OrgXMaker 3"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,203,212,40,12
-    LTEXT           "OrgXMaker 3.1.0-dev",IDC_BOLDLABEL,8,78,112,10
+    LTEXT           "OrgXMaker 1.0.0",IDC_BOLDLABEL,8,78,112,10
     LTEXT           "2026 / 07 / 09",IDC_STATIC,8,88,112,8
     CONTROL         "B_SPLASH",ID_ICON_ORG,"Static",SS_BITMAP,0,0,375,120
     EDITTEXT        IDC_ABOUTTEXT,8,100,234,104,ES_MULTILINE | ES_READONLY | WS_VSCROLL
@@ -1009,7 +1009,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Open &GitHub Page",           IDM_GITHUB
         MENUITEM SEPARATOR
-        MENUITEM "&Check for Updates",          IDM_CHECKUPD
+        MENUITEM "&Check for Updates",          IDM_CHECKUPD, GRAYED
         MENUITEM "&About OrgXMaker 3",           IDM_DLGMEMO
     END
 END
@@ -1123,8 +1123,8 @@ METRO02                 WAVE                    "Wave\\Metro02.wav"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,1,0,0
- PRODUCTVERSION 3,1,0,0
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -1142,11 +1142,11 @@ BEGIN
             VALUE "Comments", "Please ignore the rough parts."
             VALUE "CompanyName", "Strultz"
             VALUE "FileDescription", "OrgXMaker 3"
-            VALUE "FileVersion", "3.1.0-dev"
+            VALUE "FileVersion", "1.0.0"
             VALUE "LegalCopyright", "Copyright (C) 1999-2005 Studio Pixel, 2005-2018 Rxo Inverse, 2023-2026 Strultz"
             VALUE "OriginalFilename", "OrgXMaker3.exe"
             VALUE "ProductName", "OrgXMaker 3"
-            VALUE "ProductVersion", "3.1.0-dev"
+            VALUE "ProductVersion", "1.0.0"
         END
     END
     BLOCK "VarFileInfo"

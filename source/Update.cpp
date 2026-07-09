@@ -74,7 +74,7 @@ static bool IsNewerVersion(const Version& current, const Version& latest) {
 }
 
 void CheckUpdate(bool act) {
-#ifdef _DEBUG
+#if 1
 	if (!canUpdateCheck) return;
 	canUpdateCheck = false;
 	if (act) PostMessage(hWnd, OWM_UPDATESTATUS, 4, 0);

@@ -1217,7 +1217,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			MessageBox(hWnd, "No new updates are available.", "OrgXMaker Update", MB_ICONINFORMATION | MB_OK);
 			break;
 		case 4:
-			MessageBox(hWnd, "Update checking is disabled in debug builds.", "OrgXMaker Update", MB_ICONWARNING | MB_OK);
+			MessageBox(hWnd, "Update checking is disabled.", "OrgXMaker Update", MB_ICONWARNING | MB_OK);
 			break;
 		default:
 		case 1:
@@ -2262,8 +2262,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			ShellExecute(NULL, "open", "https://github.com/Strultz/orgmaker-3", NULL, NULL, SW_SHOWNORMAL);
 			break;
 		case IDM_CHECKUPD: {
-			std::thread t(CheckUpdate, true);
-			t.detach();
+			//std::thread t(CheckUpdate, true);
+			//t.detach();
 			break;
 		}
 		case IDM_AUTOCHECKUPDATES:

@@ -2,10 +2,10 @@
 #define VER_VS(x) #x
 #define VER_S(x) VER_VS(x)
 
-#define VER_MAJOR 3
-#define VER_MINOR 1
+#define VER_MAJOR 1
+#define VER_MINOR 0
 #define VER_PATCH 0
-#define VER_PRE   2 // set as -1 if not prerelease
+#define VER_PRE   -1 // set as -1 if not prerelease
 
 #if defined(_DEBUG)
 #define VER_STRING VER_S(VER_MAJOR) "." VER_S(VER_MINOR) "." VER_S(VER_PATCH) "-dev"
