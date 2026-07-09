@@ -934,10 +934,10 @@ BEGIN
         BLOCK "040904E4"
         BEGIN
             VALUE "Comments", "Please ignore the rough parts."
-            VALUE "CompanyName", "No extra taste."
+            VALUE "CompanyName", "Strultz"
             VALUE "FileDescription", "OrgMaker 3"
             VALUE "FileVersion", "3.1.0-dev"
-            VALUE "LegalCopyright", "Copyright (C) 2005-2025 Pixel and Rxo Inverse"
+            VALUE "LegalCopyright", "Copyright (C) 1999-2005 Studio Pixel, 2005-2018 Rxo Inverse, 2023-2026 Strultz"
             VALUE "OriginalFilename", "OrgMaker3.exe"
             VALUE "ProductName", "OrgMaker 3"
             VALUE "ProductVersion", "3.1.0-dev"
