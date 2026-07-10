@@ -1313,213 +1313,6 @@ BOOL CALLBACK DialogComments(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 	return 0;
 }
 
-BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
-	int i, j;
-	switch (message) {
-	case WM_INITDIALOG://ダイアログが呼ばれた
-	{
-		int cursel = 0;
-		SendDlgItemMessage(hdwnd, IDD_THEMES, LB_ADDSTRING, 0, (LPARAM)"OrgMaker 3 (default)");
-
-		WIN32_FIND_DATA fdFile;
-		HANDLE hFind = NULL;
-		
-		char sDir[MAX_PATH];
-		GetApplicationPath(sDir);
-		strcat(sDir, "themes");
-
-		char sPath[MAX_PATH];
-		sprintf(sPath, "%s\\*.*", sDir);
-
-		i = 0;
-		if ((hFind = FindFirstFile(sPath, &fdFile)) != INVALID_HANDLE_VALUE)
-		{
-			do
-			{
-				if (strcmp(fdFile.cFileName, ".") != 0
-					&& strcmp(fdFile.cFileName, "..") != 0)
-				{
-					sprintf(sPath, "%s\\%s", sDir, fdFile.cFileName);
-
-					if (fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) // It should be a theme folder
-					{
-						SendDlgItemMessage(hdwnd, IDD_THEMES, LB_ADDSTRING, 0, (LPARAM)fdFile.cFileName);
-						++i;
-						if (strlen(gSelectedTheme) > 0 && strcmp(sPath, gSelectedTheme) == 0) {
-							cursel = i;
-						}
-					}
-				}
-			} while (FindNextFile(hFind, &fdFile));
-
-			FindClose(hFind);
-		}
-
-		SendDlgItemMessage(hdwnd, IDD_THEMES, LB_SETCURSEL, (WPARAM)cursel, 0);
-
-		EnableDialogWindow(FALSE);
-		return 1;
-	}
-	case WM_COMMAND:
-	{
-		switch (LOWORD(wParam)) {
-		case IDOK:
-			gSelectedTheme[0] = 0;
-
-			char sDir[MAX_PATH];
-			GetApplicationPath(sDir);
-
-			i = SendDlgItemMessage(hdwnd, IDD_THEMES, LB_GETCURSEL, 0, 0);
-			if (i != 0) {
-				j = SendDlgItemMessage(hdwnd, IDD_THEMES, LB_GETTEXTLEN, i, 0);
-				if (j != LB_ERR) {
-					char* nam = (char*)malloc(j + 1);
-					if (nam != NULL) {
-						memset(nam, '\0', sizeof(nam));
-						SendDlgItemMessage(hdwnd, IDD_THEMES, LB_GETTEXT, i, (LPARAM)nam);
-						strcat(sDir, "themes\\");
-						strcat(sDir, nam);
-						free(nam);
-					}
-				}
-
-				DWORD dwAttrib = GetFileAttributes(sDir);
-				if (dwAttrib != INVALID_FILE_ATTRIBUTES && dwAttrib & FILE_ATTRIBUTE_DIRECTORY)
-					strcpy(gSelectedTheme, sDir);
-			}
-
-			ReloadBitmaps();
-
-			EnableDialogWindow(TRUE);
-			EndDialog(hdwnd, 0);
-			return 1;
-		case IDCANCEL:
-			EnableDialogWindow(TRUE);
-			EndDialog(hdwnd, 0);
-			return 1;
-		case IDC_OPNTHMFLD:
-			char themePath[MAX_PATH];
-			GetApplicationPath(themePath);
-			strcat(themePath, "themes");
-			ShellExecute(NULL, "open", themePath, NULL, NULL, SW_SHOWDEFAULT);
-			break;
-		}
-		return 1;
-	}
-	}
-	return 0;
-}
-
-BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
-	MUSICINFO mi;
-	int i, j;
-	switch (message) {
-	case WM_INITDIALOG://ダイアログが呼ばれた
-	{
-		int cursel = 0;
-		SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_ADDSTRING, 0, (LPARAM)"Organya (default)");
-
-		WIN32_FIND_DATA fdFile;
-		HANDLE hFind = NULL;
-
-		char sDir[MAX_PATH];
-		GetApplicationPath(sDir);
-		strcat(sDir, "soundbanks");
-
-		char sPath[MAX_PATH];
-		sprintf(sPath, "%s\\*.wdb", sDir);
-
-		i = 0;
-		if ((hFind = FindFirstFile(sPath, &fdFile)) != INVALID_HANDLE_VALUE)
-		{
-			do
-			{
-				if (strcmp(fdFile.cFileName, ".") != 0
-					&& strcmp(fdFile.cFileName, "..") != 0)
-				{
-					sprintf(sPath, "%s\\%s", sDir, fdFile.cFileName);
-
-					if (!(fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) // It should be a .wdb file
-					{
-						SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_ADDSTRING, 0, (LPARAM)fdFile.cFileName);
-						++i;
-						if (strlen(gSelectedWave) > 0 && strcmp(sPath, gSelectedWave) == 0) {
-							cursel = i;
-						}
-					}
-				}
-			} while (FindNextFile(hFind, &fdFile));
-
-			FindClose(hFind);
-		}
-
-		SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_SETCURSEL, (WPARAM)cursel, 0);
-
-		EnableDialogWindow(FALSE);
-		return 1;
-	}
-	case WM_COMMAND:
-	{
-		switch (LOWORD(wParam)) {
-		case IDOK:
-			gSelectedWave[0] = 0;
-
-			char sDir[MAX_PATH];
-			GetApplicationPath(sDir);
-
-			i = SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_GETCURSEL, 0, 0);
-			if (i != 0) {
-				j = SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_GETTEXTLEN, i, 0);
-				if (j != LB_ERR) {
-					char* nam = (char*)malloc(j + 1);
-					if (nam != NULL) {
-						memset(nam, '\0', sizeof(nam));
-						SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_GETTEXT, i, (LPARAM)nam);
-						strcat(sDir, "soundbanks\\");
-						strcat(sDir, nam);
-						free(nam);
-					}
-				}
-
-				DWORD dwAttrib = GetFileAttributes(sDir);
-				if (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY))
-					strcpy(gSelectedWave, sDir);
-			}
-
-			LoadWaveData100(gSelectedWave);
-			GenerateWaveGraphic(wave_data);
-
-			org_data.GetMusicInfo(&mi);
-
-			for (j = 0; j < MAXMELODY; j++)
-				MakeOrganyaWave(j, mi.tdata[j].wave_no, mi.tdata[j].pipi);
-			for (j = MAXMELODY; j < MAXTRACK; j++) {
-				i = mi.tdata[j].wave_no;
-				InitDramObject(i, j - MAXMELODY);
-			}
-
-			SetMutedTrack();
-
-			EnableDialogWindow(TRUE);
-			EndDialog(hdwnd, 0);
-			return 1;
-		case IDCANCEL:
-			EnableDialogWindow(TRUE);
-			EndDialog(hdwnd, 0);
-			return 1;
-		case IDC_OPNTHMFLD:
-			char wavePath[MAX_PATH];
-			GetApplicationPath(wavePath);
-			strcat(wavePath, "soundbanks");
-			ShellExecute(NULL, "open", wavePath, NULL, NULL, SW_SHOWDEFAULT);
-			break;
-		}
-		return 1;
-	}
-	}
-	return 0;
-}
-
 static HFONT hFont = NULL;
 BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -2394,11 +2187,61 @@ BOOL CALLBACK DialogPrefsThemes(HWND hdwnd, UINT message, WPARAM wParam, LPARAM 
 	LPNMHDR lpnm;
 
 	switch (message) {
-	case WM_INITDIALOG:
+	case WM_INITDIALOG: {
+		int cursel = 0;
+		SendDlgItemMessage(hdwnd, IDD_THEMES, LB_ADDSTRING, 0, (LPARAM)"OrgMaker 3 (default)");
+
+		WIN32_FIND_DATA fdFile;
+		HANDLE hFind = NULL;
+
+		char sDir[MAX_PATH];
+		GetApplicationPath(sDir);
+		strcat(sDir, "themes");
+
+		char sPath[MAX_PATH];
+		sprintf(sPath, "%s\\*.*", sDir);
+
+		i = 0;
+		if ((hFind = FindFirstFile(sPath, &fdFile)) != INVALID_HANDLE_VALUE)
+		{
+			do
+			{
+				if (strcmp(fdFile.cFileName, ".") != 0
+					&& strcmp(fdFile.cFileName, "..") != 0)
+				{
+					sprintf(sPath, "%s\\%s", sDir, fdFile.cFileName);
+
+					if (fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) // It should be a theme folder
+					{
+						SendDlgItemMessage(hdwnd, IDD_THEMES, LB_ADDSTRING, 0, (LPARAM)fdFile.cFileName);
+						++i;
+						if (strlen(gSelectedTheme) > 0 && strcmp(sPath, gSelectedTheme) == 0) {
+							cursel = i;
+						}
+					}
+				}
+			} while (FindNextFile(hFind, &fdFile));
+
+			FindClose(hFind);
+		}
+
+		SendDlgItemMessage(hdwnd, IDD_THEMES, LB_SETCURSEL, (WPARAM)cursel, 0);
+
+		EnableDialogWindow(FALSE);
 		return 1;
+	}
 	case WM_COMMAND:
 		switch (HIWORD(wParam)) {
 		case BN_CLICKED:
+			switch (LOWORD(wParam)) {
+			case IDC_OPNTHMFLD: {
+				char themePath[MAX_PATH];
+				GetApplicationPath(themePath);
+				strcat(themePath, "\\themes");
+				ShellExecute(NULL, "open", themePath, NULL, NULL, SW_SHOWDEFAULT);
+				break;
+			}
+			}
 			break;
 		case CBN_SELCHANGE:
 			PropSheet_Changed(GetParent(hdwnd), hdwnd);
@@ -2414,6 +2257,31 @@ BOOL CALLBACK DialogPrefsThemes(HWND hdwnd, UINT message, WPARAM wParam, LPARAM 
 		}
 		case PSN_APPLY: {
 			bool error = false;
+			gSelectedTheme[0] = 0;
+
+			char sDir[MAX_PATH];
+			GetApplicationPath(sDir);
+
+			i = SendDlgItemMessage(hdwnd, IDD_THEMES, LB_GETCURSEL, 0, 0);
+			if (i != 0) {
+				j = SendDlgItemMessage(hdwnd, IDD_THEMES, LB_GETTEXTLEN, i, 0);
+				if (j != LB_ERR) {
+					char* nam = (char*)malloc(j + 1);
+					if (nam != NULL) {
+						memset(nam, '\0', sizeof(nam));
+						SendDlgItemMessage(hdwnd, IDD_THEMES, LB_GETTEXT, i, (LPARAM)nam);
+						strcat(sDir, "themes\\");
+						strcat(sDir, nam);
+						free(nam);
+					}
+				}
+
+				DWORD dwAttrib = GetFileAttributes(sDir);
+				if (dwAttrib != INVALID_FILE_ATTRIBUTES && dwAttrib & FILE_ATTRIBUTE_DIRECTORY)
+					strcpy(gSelectedTheme, sDir);
+			}
+
+			ReloadBitmaps();
 			return error;
 		}
 		case PSN_QUERYCANCEL: {
@@ -2430,11 +2298,61 @@ BOOL CALLBACK DialogPrefsSoundbanks(HWND hdwnd, UINT message, WPARAM wParam, LPA
 	LPNMHDR lpnm;
 
 	switch (message) {
-	case WM_INITDIALOG:
+	case WM_INITDIALOG: {
+		int cursel = 0;
+		SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_ADDSTRING, 0, (LPARAM)"Organya (default)");
+
+		WIN32_FIND_DATA fdFile;
+		HANDLE hFind = NULL;
+
+		char sDir[MAX_PATH];
+		GetApplicationPath(sDir);
+		strcat(sDir, "soundbanks");
+
+		char sPath[MAX_PATH];
+		sprintf(sPath, "%s\\*.wdb", sDir);
+
+		i = 0;
+		if ((hFind = FindFirstFile(sPath, &fdFile)) != INVALID_HANDLE_VALUE)
+		{
+			do
+			{
+				if (strcmp(fdFile.cFileName, ".") != 0
+					&& strcmp(fdFile.cFileName, "..") != 0)
+				{
+					sprintf(sPath, "%s\\%s", sDir, fdFile.cFileName);
+
+					if (!(fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) // It should be a .wdb file
+					{
+						SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_ADDSTRING, 0, (LPARAM)fdFile.cFileName);
+						++i;
+						if (strlen(gSelectedWave) > 0 && strcmp(sPath, gSelectedWave) == 0) {
+							cursel = i;
+						}
+					}
+				}
+			} while (FindNextFile(hFind, &fdFile));
+
+			FindClose(hFind);
+		}
+
+		SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_SETCURSEL, (WPARAM)cursel, 0);
+
+		EnableDialogWindow(FALSE);
 		return 1;
+	}
 	case WM_COMMAND:
 		switch (HIWORD(wParam)) {
 		case BN_CLICKED:
+			switch (LOWORD(wParam)) {
+			case IDC_OPNTHMFLD: {
+				char themePath[MAX_PATH];
+				GetApplicationPath(themePath);
+				strcat(themePath, "\\soundbanks");
+				ShellExecute(NULL, "open", themePath, NULL, NULL, SW_SHOWDEFAULT);
+				break;
+			}
+			}
 			break;
 		case CBN_SELCHANGE:
 			PropSheet_Changed(GetParent(hdwnd), hdwnd);
@@ -2450,6 +2368,43 @@ BOOL CALLBACK DialogPrefsSoundbanks(HWND hdwnd, UINT message, WPARAM wParam, LPA
 		}
 		case PSN_APPLY: {
 			bool error = false;
+			gSelectedWave[0] = 0;
+
+			char sDir[MAX_PATH];
+			GetApplicationPath(sDir);
+
+			i = SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_GETCURSEL, 0, 0);
+			if (i != 0) {
+				j = SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_GETTEXTLEN, i, 0);
+				if (j != LB_ERR) {
+					char* nam = (char*)malloc(j + 1);
+					if (nam != NULL) {
+						memset(nam, '\0', sizeof(nam));
+						SendDlgItemMessage(hdwnd, IDD_WAVEDBS, LB_GETTEXT, i, (LPARAM)nam);
+						strcat(sDir, "soundbanks\\");
+						strcat(sDir, nam);
+						free(nam);
+					}
+				}
+
+				DWORD dwAttrib = GetFileAttributes(sDir);
+				if (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY))
+					strcpy(gSelectedWave, sDir);
+			}
+
+			LoadWaveData100(gSelectedWave);
+			GenerateWaveGraphic(wave_data);
+
+			org_data.GetMusicInfo(&mi);
+
+			for (j = 0; j < MAXMELODY; j++)
+				MakeOrganyaWave(j, mi.tdata[j].wave_no, mi.tdata[j].pipi);
+			for (j = MAXMELODY; j < MAXTRACK; j++) {
+				i = mi.tdata[j].wave_no;
+				InitDramObject(i, j - MAXMELODY);
+			}
+
+			SetMutedTrack();
 			return error;
 		}
 		case PSN_QUERYCANCEL: {

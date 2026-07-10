@@ -69,9 +69,7 @@ BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 //BOOL CALLBACK DialogEZCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
-BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
-BOOL CALLBACK DialogWaveDB(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogDecayLength(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogAdvPaste(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogSelPan(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -1862,7 +1860,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		case IDM_PREFERENCES:
 			StopPlayingSong();
-			Rxo_StopAllSoundNow();
 			OpenPreferences(hWnd, 0);
 			break;
 		case IDM_DLGSETTING://Show settings dialog
@@ -2004,11 +2001,13 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			break;
 		case IDM_DLGTHEMES:
 			StopPlayingSong();
-			DialogBox(hInst, "DLGTHEMES", hwnd, DialogTheme);
+			OpenPreferences(hWnd, 3);
+			//DialogBox(hInst, "DLGTHEMES", hwnd, DialogTheme);
 			break;
 		case IDM_DLGWAVEDBS:
 			StopPlayingSong();
-			DialogBox(hInst, "DLGWAVEDBS", hwnd, DialogWaveDB);
+			OpenPreferences(hWnd, 4);
+			//DialogBox(hInst, "DLGWAVEDBS", hwnd, DialogWaveDB);
 			break;
 		case ID_AC_STBACK: // ?
 			StopPlayingSong();
