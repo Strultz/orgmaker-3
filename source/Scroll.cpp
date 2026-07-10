@@ -19,6 +19,8 @@ extern int NoteWidth;
 extern CHAR app_path[BUF_SIZE];
 extern CHAR num_buf[BUF_SIZE];
 
+void ChangeZoomBy(int rel);
+
 BOOL ScrollData::InitScroll(void)
 {
 	scr_info.cbSize = sizeof(SCROLLINFO);
@@ -252,6 +254,8 @@ void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){
 	xPos = (short) LOWORD(lParam);    // horizontal position of pointer
 	yPos = (short) HIWORD(lParam);    // vertical position of pointer
 
+	if (zDelta == 0) return;
+
 	/*
 	switch(LOWORD(wParam)){
 	case SB_LINEDOWN://Downwards
@@ -278,9 +282,13 @@ void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){
 		break;
 	}
 	*/
+	if (fwKeys & MK_CONTROL) {
+		ChangeZoomBy(zDelta < 0 ? -2 : 2);
+		return;
+	}
 	
 	if(zDelta<0){
-		if(fwKeys && MK_CONTROL){
+		if (fwKeys & MK_SHIFT) {
 			if (timer_sw != 0) {
 				if (lockScrollToSong || sFollowScroll) {
 					return;
@@ -288,7 +296,7 @@ void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){
 				followPlayhead = false;
 			}
 
-			hpos += 4;
+			hpos += 16 * 4 / NoteWidth;
 			if (hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
 			if (hpos < 0)hpos = 0;
 		}else{
@@ -297,7 +305,7 @@ void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){
 			if (vpos < 0)vpos = 0;
 		}
 	}else{
-		if(fwKeys && MK_CONTROL){
+		if(fwKeys & MK_SHIFT) {
 			if (timer_sw != 0) {
 				if (lockScrollToSong || sFollowScroll) {
 					return;
@@ -305,7 +313,7 @@ void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){
 				followPlayhead = false;
 			}
 
-			hpos -= 4;
+			hpos -= 16 * 4 / NoteWidth;
 			if (hpos < 0)hpos = 0;
 		}else{
 			vpos-=4;

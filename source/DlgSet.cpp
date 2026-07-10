@@ -1154,7 +1154,7 @@ int WINAPI SheetCallback(HWND hwnd, UINT uMsg, LPARAM lParam)
 	return 0;
 }
 
-void OpenSongProperties(HWND hwnd) {
+void OpenSongProperties(HWND hwnd, int startPage) {
 	PROPSHEETHEADER psh;
 	PROPSHEETPAGE psp[3];
     
@@ -1166,6 +1166,7 @@ void OpenSongProperties(HWND hwnd) {
 	psp[0].pszTitle	   = MAKEINTRESOURCE(IDS_SP_TAB1);
     psp[0].lParam      = 0;
     psp[0].pfnCallback = NULL;
+
     psp[1].dwSize = sizeof(PROPSHEETPAGE);
     psp[1].dwFlags     = PSP_USETITLE;
     psp[1].hInstance   = hInst;
@@ -1174,6 +1175,7 @@ void OpenSongProperties(HWND hwnd) {
     psp[1].pszTitle    = MAKEINTRESOURCE(IDS_SP_TAB2);
     psp[1].lParam      = 0;
     psp[1].pfnCallback = NULL;
+
     psp[2].dwSize = sizeof(PROPSHEETPAGE);
     psp[2].dwFlags     = PSP_USETITLE;
     psp[2].hInstance   = hInst;
@@ -1189,7 +1191,7 @@ void OpenSongProperties(HWND hwnd) {
     psh.hInstance   = hInst;
     psh.pszCaption  = "Song Properties";
     psh.nPages      = sizeof(psp) / sizeof(PROPSHEETPAGE);
-    psh.nStartPage  = 0;
+    psh.nStartPage  = startPage;
     psh.ppsp        = (LPCPROPSHEETPAGE)&psp;
 	psh.pfnCallback = SheetCallback;
     
@@ -2275,4 +2277,292 @@ BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 	return 0;
+}
+
+// Preferences
+BOOL CALLBACK DialogPrefsGeneral(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	int i, j;
+	MUSICINFO mi;
+	LPNMHDR lpnm;
+
+	switch (message) {
+	case WM_INITDIALOG:
+		return 1;
+	case WM_COMMAND:
+		switch (HIWORD(wParam)) {
+		case BN_CLICKED:
+			break;
+		case CBN_SELCHANGE:
+			PropSheet_Changed(GetParent(hdwnd), hdwnd);
+			break;
+		}
+		break;
+	case WM_NOTIFY:
+		lpnm = (LPNMHDR)lParam;
+		switch (lpnm->code) {
+		case PSN_KILLACTIVE: {
+			bool error = false;
+			return error;
+		}
+		case PSN_APPLY: {
+			bool error = false;
+			return error;
+		}
+		case PSN_QUERYCANCEL: {
+			break;
+		}
+		}
+		break;
+	}
+	return 0;
+}
+BOOL CALLBACK DialogPrefsDisplay(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	int i, j;
+	MUSICINFO mi;
+	LPNMHDR lpnm;
+
+	switch (message) {
+	case WM_INITDIALOG:
+		return 1;
+	case WM_COMMAND:
+		switch (HIWORD(wParam)) {
+		case BN_CLICKED:
+			break;
+		case CBN_SELCHANGE:
+			PropSheet_Changed(GetParent(hdwnd), hdwnd);
+			break;
+		}
+		break;
+	case WM_NOTIFY:
+		lpnm = (LPNMHDR)lParam;
+		switch (lpnm->code) {
+		case PSN_KILLACTIVE: {
+			bool error = false;
+			return error;
+		}
+		case PSN_APPLY: {
+			bool error = false;
+			return error;
+		}
+		case PSN_QUERYCANCEL: {
+			break;
+		}
+		}
+		break;
+	}
+	return 0;
+}
+BOOL CALLBACK DialogPrefsAudio(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	int i, j;
+	MUSICINFO mi;
+	LPNMHDR lpnm;
+
+	switch (message) {
+	case WM_INITDIALOG:
+		return 1;
+	case WM_COMMAND:
+		switch (HIWORD(wParam)) {
+		case BN_CLICKED:
+			break;
+		case CBN_SELCHANGE:
+			PropSheet_Changed(GetParent(hdwnd), hdwnd);
+			break;
+		}
+		break;
+	case WM_NOTIFY:
+		lpnm = (LPNMHDR)lParam;
+		switch (lpnm->code) {
+		case PSN_KILLACTIVE: {
+			bool error = false;
+			return error;
+		}
+		case PSN_APPLY: {
+			bool error = false;
+			return error;
+		}
+		case PSN_QUERYCANCEL: {
+			break;
+		}
+		}
+		break;
+	}
+	return 0;
+}
+BOOL CALLBACK DialogPrefsThemes(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	int i, j;
+	MUSICINFO mi;
+	LPNMHDR lpnm;
+
+	switch (message) {
+	case WM_INITDIALOG:
+		return 1;
+	case WM_COMMAND:
+		switch (HIWORD(wParam)) {
+		case BN_CLICKED:
+			break;
+		case CBN_SELCHANGE:
+			PropSheet_Changed(GetParent(hdwnd), hdwnd);
+			break;
+		}
+		break;
+	case WM_NOTIFY:
+		lpnm = (LPNMHDR)lParam;
+		switch (lpnm->code) {
+		case PSN_KILLACTIVE: {
+			bool error = false;
+			return error;
+		}
+		case PSN_APPLY: {
+			bool error = false;
+			return error;
+		}
+		case PSN_QUERYCANCEL: {
+			break;
+		}
+		}
+		break;
+	}
+	return 0;
+}
+BOOL CALLBACK DialogPrefsSoundbanks(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	int i, j;
+	MUSICINFO mi;
+	LPNMHDR lpnm;
+
+	switch (message) {
+	case WM_INITDIALOG:
+		return 1;
+	case WM_COMMAND:
+		switch (HIWORD(wParam)) {
+		case BN_CLICKED:
+			break;
+		case CBN_SELCHANGE:
+			PropSheet_Changed(GetParent(hdwnd), hdwnd);
+			break;
+		}
+		break;
+	case WM_NOTIFY:
+		lpnm = (LPNMHDR)lParam;
+		switch (lpnm->code) {
+		case PSN_KILLACTIVE: {
+			bool error = false;
+			return error;
+		}
+		case PSN_APPLY: {
+			bool error = false;
+			return error;
+		}
+		case PSN_QUERYCANCEL: {
+			break;
+		}
+		}
+		break;
+	}
+	return 0;
+}
+BOOL CALLBACK DialogPrefsLegacy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	int i, j;
+	MUSICINFO mi;
+	LPNMHDR lpnm;
+
+	switch (message) {
+	case WM_INITDIALOG:
+		return 1;
+	case WM_COMMAND:
+		switch (HIWORD(wParam)) {
+		case BN_CLICKED:
+			break;
+		case CBN_SELCHANGE:
+			PropSheet_Changed(GetParent(hdwnd), hdwnd);
+			break;
+		}
+		break;
+	case WM_NOTIFY:
+		lpnm = (LPNMHDR)lParam;
+		switch (lpnm->code) {
+		case PSN_KILLACTIVE: {
+			bool error = false;
+			return error;
+		}
+		case PSN_APPLY: {
+			bool error = false;
+			return error;
+		}
+		case PSN_QUERYCANCEL: {
+			break;
+		}
+		}
+		break;
+	}
+	return 0;
+}
+
+void OpenPreferences(HWND hwnd, int startPage) {
+	PROPSHEETHEADER psh;
+	PROPSHEETPAGE psp[6];
+
+	psp[0].dwSize = sizeof(PROPSHEETPAGE);
+	psp[0].dwFlags = PSP_USETITLE;
+	psp[0].hInstance = hInst;
+	psp[0].pszTemplate = MAKEINTRESOURCE(IDD_PREFSGENERAL);
+	psp[0].pfnDlgProc = DialogPrefsGeneral;
+	psp[0].pszTitle = MAKEINTRESOURCE(IDS_PREFS_TAB1);
+	psp[0].lParam = 0;
+	psp[0].pfnCallback = NULL;
+
+	psp[1].dwSize = sizeof(PROPSHEETPAGE);
+	psp[1].dwFlags = PSP_USETITLE;
+	psp[1].hInstance = hInst;
+	psp[1].pszTemplate = MAKEINTRESOURCE(IDD_PREFSDISPLAY);
+	psp[1].pfnDlgProc = DialogPrefsDisplay;
+	psp[1].pszTitle = MAKEINTRESOURCE(IDS_PREFS_TAB2);
+	psp[1].lParam = 0;
+	psp[1].pfnCallback = NULL;
+
+	psp[2].dwSize = sizeof(PROPSHEETPAGE);
+	psp[2].dwFlags = PSP_USETITLE;
+	psp[2].hInstance = hInst;
+	psp[2].pszTemplate = MAKEINTRESOURCE(IDD_PREFSAUDIO);
+	psp[2].pfnDlgProc = DialogPrefsAudio;
+	psp[2].pszTitle = MAKEINTRESOURCE(IDS_PREFS_TAB3);
+	psp[2].lParam = 0;
+	psp[2].pfnCallback = NULL;
+
+	psp[3].dwSize = sizeof(PROPSHEETPAGE);
+	psp[3].dwFlags = PSP_USETITLE;
+	psp[3].hInstance = hInst;
+	psp[3].pszTemplate = MAKEINTRESOURCE(IDD_PREFSTHEMES);
+	psp[3].pfnDlgProc = DialogPrefsThemes;
+	psp[3].pszTitle = MAKEINTRESOURCE(IDS_PREFS_TAB4);
+	psp[3].lParam = 0;
+	psp[3].pfnCallback = NULL;
+
+	psp[4].dwSize = sizeof(PROPSHEETPAGE);
+	psp[4].dwFlags = PSP_USETITLE;
+	psp[4].hInstance = hInst;
+	psp[4].pszTemplate = MAKEINTRESOURCE(IDD_PREFSSOUNDBANKS);
+	psp[4].pfnDlgProc = DialogPrefsSoundbanks;
+	psp[4].pszTitle = MAKEINTRESOURCE(IDS_PREFS_TAB5);
+	psp[4].lParam = 0;
+	psp[4].pfnCallback = NULL;
+
+	psp[5].dwSize = sizeof(PROPSHEETPAGE);
+	psp[5].dwFlags = PSP_USETITLE;
+	psp[5].hInstance = hInst;
+	psp[5].pszTemplate = MAKEINTRESOURCE(IDD_PREFSLEGACY);
+	psp[5].pfnDlgProc = DialogPrefsLegacy;
+	psp[5].pszTitle = MAKEINTRESOURCE(IDS_PREFS_TAB6);
+	psp[5].lParam = 0;
+	psp[5].pfnCallback = NULL;
+
+	psh.dwSize = sizeof(PROPSHEETHEADER);
+	psh.dwFlags = PSH_PROPSHEETPAGE | PSH_NOCONTEXTHELP;
+	psh.hwndParent = hwnd;
+	psh.hInstance = hInst;
+	psh.pszCaption = "Preferences";
+	psh.nPages = sizeof(psp) / sizeof(PROPSHEETPAGE);
+	psh.nStartPage = startPage;
+	psh.ppsp = (LPCPROPSHEETPAGE)&psp;
+
+	PropertySheet(&psh);
 }

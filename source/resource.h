@@ -148,6 +148,18 @@
 #define IDD_EXPORTPROG                  264
 #define IDD_DIALOG2                     267
 #define IDD_PREFS                       267
+#define IDD_PREFSGENERAL                267
+#define IDS_PREFS_TAB1                  268
+#define IDD_PREFSDISPLAY                268
+#define IDS_PREFS_TAB2                  269
+#define IDD_PREFSAUDIO                  269
+#define IDS_PREFS_TAB3                  270
+#define IDD_PREFSTHEMES                 270
+#define IDS_PREFS_TAB4                  271
+#define IDD_PREFSSOUNDBANKS             271
+#define IDS_PREFS_TAB5                  272
+#define IDD_PREFSLEGACY                 272
+#define IDS_PREFS_TAB6                  273
 #define IDD_LB1                         1001
 #define IDM_DIALOG1                     1002
 #define IDM_DLGGRID                     1002
@@ -884,7 +896,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        269
+#define _APS_NEXT_RESOURCE_VALUE        274
 #define _APS_NEXT_COMMAND_VALUE         40387
 #define _APS_NEXT_CONTROL_VALUE         1313
 #define _APS_NEXT_SYMED_VALUE           101

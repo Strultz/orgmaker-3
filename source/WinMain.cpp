@@ -51,7 +51,8 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK AreaWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-void OpenSongProperties(HWND hwnd);
+void OpenSongProperties(HWND hwnd, int startPage);
+void OpenPreferences(HWND hwnd, int startPage);
 //BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 //BOOL CALLBACK DialogDefault(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 //BOOL CALLBACK DialogDelete(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -348,6 +349,20 @@ void UpdateStatusBar(bool measonly) {
 
 		plCache = pl;
 	}
+}
+
+void ChangeZoomBy(int rel) {
+	MUSICINFO mi;
+	NoteWidth += rel;
+	if (NoteWidth < 4) NoteWidth = 4;
+	if (NoteWidth > 16) NoteWidth = 16;
+	org_data.PutBackGround();
+	org_data.GetMusicInfo(&mi);
+	scr_data.ChangeHorizontalRange(mi.end_x);
+	//org_data.PutMusic();//View sheet music
+	//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+	UpdateToolbarStatus();
+	UpdateStatusBar(false);
 }
 
 void SaveIniFile();
@@ -1832,27 +1847,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		switch(LOWORD(wParam)){
 		case IDM_LOUPE_MINUS:
 		case ID_AC_LOUPE_MINUS: // i hate this whole codebase so much i want to redo everything
-			NoteWidth -= 2;
-			if (NoteWidth < 4) NoteWidth = 4;
-			org_data.PutBackGround();
-			org_data.GetMusicInfo(&mi);
-			scr_data.ChangeHorizontalRange(mi.end_x);
-			//org_data.PutMusic();//View sheet music
-			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-			UpdateToolbarStatus();
-			UpdateStatusBar(false);
+			ChangeZoomBy(-2);
 			break;
 		case IDM_LOUPE_PLUS:
 		case ID_AC_LOUPE_PLUS:
-			NoteWidth += 2;
-			if (NoteWidth > 16) NoteWidth = 16;
-			org_data.PutBackGround();
-			org_data.GetMusicInfo(&mi);
-			scr_data.ChangeHorizontalRange(mi.end_x);
-			//org_data.PutMusic();//View sheet music
-			//RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-			UpdateToolbarStatus();
-			UpdateStatusBar(false);
+			ChangeZoomBy(2);
 			break;
 		case IDM_PLAYPAUSE:
 			if (timer_sw) {
@@ -1862,13 +1861,15 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			}
 			break;
 		case IDM_PREFERENCES:
-			// TODO
+			StopPlayingSong();
+			Rxo_StopAllSoundNow();
+			OpenPreferences(hWnd, 0);
 			break;
 		case IDM_DLGSETTING://Show settings dialog
 		case ID_AC_SETTEMPO:
 			StopPlayingSong();
 			Rxo_StopAllSoundNow();
-			OpenSongProperties(hWnd);
+			OpenSongProperties(hWnd, 0);
 			break;
 		case IDC_START:
 		case ID_AC_HOMEBACK: //home
