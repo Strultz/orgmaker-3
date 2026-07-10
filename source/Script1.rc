@@ -563,6 +563,20 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
 CAPTION "General"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
+    LTEXT           "Default Artist Name:",IDC_STATIC,12,14,69,8
+    EDITTEXT        IDC_EDIT1,90,12,198,14,ES_AUTOHSCROLL
+    CONTROL         "Remember window position and size on exit",IDC_WINDOWPOS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,36,156,10
+    CONTROL         "Confirm unsaved changes on exit",IDC_CONFIRMUNSAVED,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,48,120,10
+    CONTROL         "Use Paste Special settings for regular paste",IDC_USEPASTE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,72,156,10
+    CONTROL         "Pop out toolbars into separate windows",IDC_POPTOOLBARS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,84,143,10
+    CONTROL         "Use legacy playback controls",IDC_LEGACYPLAYCTRL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,96,108,10
+    CONTROL         "Automatically check for updates",IDC_AUTOUPDCHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,120,118,10
+    PUSHBUTTON      "Check for Updates Now",IDC_CHECKUPD,12,132,90,14
 END
 
 IDD_PREFSDISPLAY DIALOGEX 0, 0, 300, 178
@@ -570,6 +584,21 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
 CAPTION "Display"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
+    CONTROL         "Show notes from all channels",IDC_SHOWALL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,12,109,10
+    CONTROL         "Highlight active notes while playing",IDC_NOTEHILIGHT,
+                    "Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,12,24,127,10
+    CONTROL         "Shift overlapping notes on multiple channels",IDC_SHIFTOVERLAP,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,36,156,10
+    CONTROL         "Extend note heads while zoomed out",IDC_ENLARGENOTE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,48,134,10
+    CONTROL         "Always lock scrolling to song playback",IDC_ALWAYSSCROLL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,72,136,10
+    CONTROL         "Only scroll the screen per each measure",IDC_SCROLLMEAS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,84,144,10
+    CONTROL         "Show current playback step as a line",IDC_PLAYLINE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,96,133,10
+    CONTROL         "Allow use of keyboard during playback",IDC_ALLOWKEYBOARD,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,108,139,10
 END
 
 IDD_PREFSAUDIO DIALOGEX 0, 0, 300, 178
@@ -577,6 +606,19 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
 CAPTION "Audio"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
+    LTEXT           "Output Volume:",IDC_STATIC,12,14,51,8
+    LTEXT           "Output Device:",IDC_STATIC,12,32,50,8
+    LTEXT           "Sample Rate:",IDC_STATIC,12,50,44,8
+    LTEXT           "Buffer Size:",IDC_STATIC,12,68,38,8
+    CONTROL         "Mono output",IDC_MONO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,84,57,10
+    CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,78,10,192,18
+    COMBOBOX        IDC_COMBO1,66,30,222,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT1,60,48,42,14,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT2,54,66,30,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "hz",IDC_STATIC,104,50,8,8
+    LTEXT           "ms",IDC_STATIC,86,68,10,8
+    LTEXT           "0%",IDC_STATIC,66,14,12,8
+    LTEXT           "100%",IDC_STATIC,270,14,20,8
 END
 
 IDD_PREFSTHEMES DIALOGEX 0, 0, 300, 178
@@ -602,6 +644,18 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
 CAPTION "Legacy"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
+    CONTROL         "Always use default percussion instruments",IDC_DEFPERC,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,12,152,10
+    CONTROL         "Mute channels U and I by default",IDC_MUTEUI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,24,122,10
+    CONTROL         "Fix volume changes not working at end of song",IDC_FIXVOL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,36,167,10
+    CONTROL         "Fix pizzicato option not working correctly",IDC_FIXPI,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,48,146,10
+    CONTROL         "Use legacy volume calculation",IDC_OLDVOL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,72,111,10
+    CONTROL         "Use legacy pitch calculation",IDC_OLDFREQ,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,84,103,10
+    CONTROL         "Disable audio interpolation",IDC_LOWSNAREFREQUENCY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,96,100,10
+    CONTROL         "Disable volume ramping",IDC_NOVOLRAMP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,108,91,10
 END
 
 
@@ -767,11 +821,11 @@ BEGIN
     END
     POPUP "&Song"
     BEGIN
-        MENUITEM "&Properties...\tF2",              IDM_DLGSETTING
-        MENUITEM "&Default Volume/Panning...\tF3",  IDM_DLGDEFAULT
-        MENUITEM "&Comments...",                    ID_SONG_COMMENTS
+        MENUITEM "&Properties...\tF2",          IDM_DLGSETTING
+        MENUITEM "&Default Volume/Panning...\tF3", IDM_DLGDEFAULT
+        MENUITEM "&Comments...",                ID_SONG_COMMENTS
         MENUITEM SEPARATOR
-        MENUITEM "&Transpose Song...",              IDM_SONG_TRANSPOSE
+        MENUITEM "&Transpose Song...",          IDM_SONG_TRANSPOSE
         POPUP "Change &Resolution"
         BEGIN
             MENUITEM "Increase to 2x",              IDM_2BAI
@@ -779,10 +833,10 @@ BEGIN
             MENUITEM "Reduce to 1/2x",              IDM_2BUNNO1
             MENUITEM "Reduce to 1/3x",              IDM_3BUNNO1
         END
-        MENUITEM "&Repeat Selection",               IDM_SONG_REPEATSELECT
+        MENUITEM "&Repeat Selection",           IDM_SONG_REPEATSELECT
         MENUITEM SEPARATOR
-        MENUITEM "Estimate Song &Length...",        IDM_SONGLEN
-        MENUITEM "&Event Usage...",                 IDM_DLGUSED
+        MENUITEM "Estimate Song &Length...",    IDM_SONGLEN
+        MENUITEM "&Event Usage...",             IDM_DLGUSED
     END
     POPUP "&View"
     BEGIN
@@ -1368,7 +1422,6 @@ BEGIN
     IDD_PREFSGENERAL, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 312
         TOPMARGIN, 7
         BOTTOMMARGIN, 171
     END
@@ -1376,7 +1429,6 @@ BEGIN
     IDD_PREFSDISPLAY, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 312
         TOPMARGIN, 7
         BOTTOMMARGIN, 171
     END
@@ -1384,7 +1436,6 @@ BEGIN
     IDD_PREFSAUDIO, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 312
         TOPMARGIN, 7
         BOTTOMMARGIN, 171
     END
@@ -1392,7 +1443,6 @@ BEGIN
     IDD_PREFSTHEMES, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 312
         TOPMARGIN, 7
         BOTTOMMARGIN, 171
     END
@@ -1400,7 +1450,6 @@ BEGIN
     IDD_PREFSSOUNDBANKS, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 312
         TOPMARGIN, 7
         BOTTOMMARGIN, 171
     END
@@ -1408,7 +1457,6 @@ BEGIN
     IDD_PREFSLEGACY, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 312
         TOPMARGIN, 7
         BOTTOMMARGIN, 171
     END
@@ -1463,6 +1511,13 @@ BEGIN
 0x6142, 0x7373, 0x3130, "\000" 
     IDC_WAVEI, 0x403, 7, 0
 0x6142, 0x7373, 0x3230, "\000" 
+    0
+END
+
+IDD_PREFSAUDIO DLGINIT
+BEGIN
+    IDC_COMBO1, 0x403, 15, 0
+0x6544, 0x6166, 0x6c75, 0x2074, 0x6544, 0x6976, 0x6563, "\000" 
     0
 END
 

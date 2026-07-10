@@ -210,6 +210,10 @@
 #define IDC_ADVMIX                      1009
 #define IDC_DEFVOL6                     1009
 #define IDC_COMMENTSOPEN                1009
+#define IDC_WINDOWPOS                   1009
+#define IDC_SHOWALL                     1009
+#define IDC_MONO                        1009
+#define IDC_DEFPERC                     1009
 #define IDD_SETFREQ4                    1010
 #define IDC_PANPOT7                     1010
 #define IDC_PI2                         1010
@@ -533,6 +537,7 @@
 #define IDC_BUTTON1                     1307
 #define IDC_DEFRESET                    1307
 #define IDC_RESETBUTTON                 1307
+#define IDC_CHECKUPD                    1307
 #define IDC_ABOUTEDIT                   1308
 #define IDC_ABOUTTEXT                   1308
 #define IDC_BOLDLABEL                   1309
@@ -540,6 +545,28 @@
 #define IDC_EXPRFILENAME                1310
 #define IDC_EXPRPROGRESS                1311
 #define IDC_COMMENTSBOX                 1312
+#define IDC_CONFIRMUNSAVED              1313
+#define IDC_USEPASTE                    1314
+#define IDC_POPTOOLBARS                 1315
+#define IDC_LEGACYPLAYCTRL              1316
+#define IDC_AUTOUPDCHECK                1317
+#define IDC_NOTEHILIGHT                 1318
+#define IDC_SHIFTOVERLAP                1319
+#define IDC_ENLARGENOTE                 1320
+#define IDC_ALWAYSSCROLL                1321
+#define IDC_SCROLLMEAS                  1322
+#define IDC_PLAYLINE                    1323
+#define IDC_ALLOWKEYBOARD               1324
+#define IDC_COMBO1                      1325
+#define IDC_EDIT2                       1326
+#define IDC_MUTEUI                      1327
+#define IDC_FIXVOL                      1328
+#define IDC_FIXPI                       1329
+#define IDC_OLDVOL                      1330
+#define IDC_OLDFREQ                     1331
+#define IDC_LOWSNAREFREQUENCY           1332
+#define IDC_CHECK8                      1333
+#define IDC_NOVOLRAMP                   1333
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005
@@ -896,9 +923,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        274
+#define _APS_NEXT_RESOURCE_VALUE        275
 #define _APS_NEXT_COMMAND_VALUE         40387
-#define _APS_NEXT_CONTROL_VALUE         1313
+#define _APS_NEXT_CONTROL_VALUE         1334
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
