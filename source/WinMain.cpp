@@ -1976,20 +1976,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			for (i = 0;i < 8;i++)ucMIDIProgramChangeValue[i] = 255;
 
 			break;
-		case IDM_EXIT:
-			if (CancelDeleteCurrentData(CDCD_EXIT))break;
-			SaveIniFile();
-			QuitMMTimer();
-			PostQuitMessage(0);
-			EndDirectSound();
-			org_data.ReleaseNote();
-			EndGDI();
-			if (hDlgHelp) DestroyWindow(hDlgHelp);
-			if (hDlgComments) DestroyWindow(hDlgComments);
-
-			if (hwnd) DestroyWindow(hwnd);
-			PostQuitMessage(0);
-			break;
 		case IDM_DLGUSED://
 			StopPlayingSong();
 			DialogBox(hInst, "DLGUSED", hwnd, DialogNoteUsed);
@@ -2287,6 +2273,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			ShowWindow(hDlgComments, SW_SHOW);
 			break;
 		}
+		case IDM_EXIT:
 		case ID_AC_CLOSE:
 			SendMessage(hWnd, WM_CLOSE, 0, 0);
 			break;
