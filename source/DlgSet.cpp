@@ -1296,7 +1296,7 @@ BOOL CALLBACK DialogComments(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 
 			int len = GetWindowTextLength(GetDlgItem(hdwnd, IDC_COMMENTSBOX));
 			org_data.comments.resize(len + 1, '\0');
-			GetDlgItemTextA(hdwnd, IDC_COMMENTSBOX, org_data.comments.data(), len + 1);
+			GetDlgItemTextA(hdwnd, IDC_COMMENTSBOX, &org_data.comments[0], len + 1);
 			org_data.comments.pop_back();
 			
 			org_data.openComments = IsDlgButtonChecked(hdwnd, IDC_COMMENTSOPEN);
