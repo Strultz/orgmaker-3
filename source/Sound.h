@@ -3,6 +3,11 @@
 /*****							  *****/
 
 //#include <dsound.h>
+#pragma once
+
+#include "vendor/miniaudio.h"
+
+extern ma_context gMaContext;
 
 typedef struct {
 	short wave_size;//波形のサイズ
@@ -15,8 +20,10 @@ extern short freq_tbl[12];
 extern short pan_tbl[13];
 extern char *wave_data;
 
+bool InitMAContext();
+void DeinitMAContext();
 // DirectSoundの開始
-BOOL InitDirectSound(HWND hwnd);
+BOOL InitDirectSound(HWND hwnd, ma_device_id *dev);
 BOOL LoadSoundObject( char *file_name, int no);
 // DirectSoundの終了
 void EndDirectSound(void);

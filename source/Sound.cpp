@@ -19,6 +19,8 @@
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define CLAMP(x, y, z) MIN(MAX((x), (y)), (z))
 
+ma_context gMaContext;
+
 static struct S_Sound
 {
 	signed char samples[4];
@@ -506,38 +508,24 @@ static void S_Callback(ma_device* device, void* output_stream, const void* input
 	}
 }
 
-// DirectSound‚ÌŠJŽn 
-BOOL InitDirectSound(HWND hwnd)
-{
-//    int i;
-    /*DSBUFFERDESC dsbd;
-
-    // DirectDraw‚Ì‰Šú‰»
-    if(DirectSoundCreate(NULL, &lpDS, NULL) != DS_OK){
-		lpDS = NULL;
-		return(FALSE);
+bool InitMAContext() {
+	if (ma_context_init(NULL, 0, NULL, &gMaContext) != MA_SUCCESS) {
+		return false;
 	}
-    lpDS->SetCooperativeLevel(hwnd, DSSCL_PRIORITY);
+	return true;
+}
 
-    // ˆêŽŸƒoƒbƒtƒ@‚Ì‰Šú‰»
-    ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
-    dsbd.dwSize = sizeof(DSBUFFERDESC);
-    dsbd.dwFlags = DSBCAPS_PRIMARYBUFFER; // | DSBCAPS_CTRLPOSITIONNOTIFY;
-    lpDS->CreateSoundBuffer(&dsbd, &lpPRIMARYBUFFER, NULL);*/
+void DeinitMAContext() {
+	ma_context_uninit(&gMaContext);
+}
 
-//    for(i = 0; i < SE_MAX; i++) lpSECONDARYBUFFER[i] = NULL;
-	
-	//ƒLƒƒƒvƒ`ƒƒƒoƒbƒtƒ@‚Ìì¬ ‘æˆêˆø”NULL‚ÅƒfƒtƒHƒ‹ƒgB‚±‚ê‚Í‚Ç‚¤‚©B
-//	if( DirectSoundCaptureCreate( NULL, &CapDev, NULL ) != S_OK ){
-//		return FALSE;
-//	}
-//	dsbd.dwFlags = 0; //ƒZƒJƒ“ƒ_ƒŠƒoƒbƒtƒ@
-//	CapDev->CreateCaptureBuffer(&dsbd, &CapBuf, NULL);
-
+// DirectSound‚ÌŠJŽn 
+BOOL InitDirectSound(HWND hwnd, ma_device_id *dev)
+{
     sound_list_head = NULL;
 
 	ma_device_config config = ma_device_config_init(ma_device_type_playback);
-	config.playback.pDeviceID = NULL;
+	config.playback.pDeviceID = dev;
 	config.playback.format = ma_format_f32;
 	config.playback.channels = 2;
 	config.sampleRate = 0;
@@ -547,7 +535,7 @@ BOOL InitDirectSound(HWND hwnd)
 	config.noClip = true;
 	//config.performanceProfile = ma_performance_profile_conservative;
 
-	if (ma_device_init(NULL, &config, &device) == MA_SUCCESS)
+	if (ma_device_init(&gMaContext, &config, &device) == MA_SUCCESS)
 	{
 		output_frequency = device.sampleRate;
 
@@ -589,21 +577,6 @@ void EndDirectSound(void)
 			lpSECONDARYBUFFER[i] = NULL;
 		}
     }
-    /*if(lpPRIMARYBUFFER != NULL){
-		lpPRIMARYBUFFER->Release();
-		lpPRIMARYBUFFER = NULL;
-	}
-    if(lpDS != NULL){
-		lpDS->Release();
-		lpDS = NULL;
-	}*/
-//	if( CapBuf ){
-//		CapBuf->Stop();
-//	}
-//    if(CapDev != NULL){
-//		CapDev->Release();
-//		CapDev = NULL;
-//	}
 
 	ma_device_stop(&device);
 	ma_mutex_uninit(&organya_mutex);
@@ -621,38 +594,6 @@ void ReleaseSoundObject(int no){
 // ƒTƒEƒ“ƒh‚ÌÝ’è 
 BOOL InitSoundObject(LPCSTR resname, int no)
 {
-    /*HRSRC hrscr;
-    DSBUFFERDESC dsbd;
-    DWORD *lpdword;//ƒŠƒ\[ƒX‚ÌƒAƒhƒŒƒX
-    // ƒŠƒ\[ƒX‚ÌŒŸõ
-    if((hrscr = FindResource(NULL, resname, "WAVE")) == NULL)
-                                                    return(FALSE);
-    // ƒŠƒ\[ƒX‚ÌƒAƒhƒŒƒX‚ðŽæ“¾
-    lpdword = (DWORD*)LockResource(LoadResource(NULL, hrscr));
-	// “ñŽŸƒoƒbƒtƒ@‚Ì¶¬
-	ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
-	dsbd.dwSize = sizeof(DSBUFFERDESC);
-	dsbd.dwFlags = 
-		DSBCAPS_STATIC|
-		DSBCAPS_GLOBALFOCUS
-		|DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
-	dsbd.dwBufferBytes = *(DWORD*)((BYTE*)lpdword+0x36);//WAVEƒf[ƒ^‚ÌƒTƒCƒY
-	dsbd.lpwfxFormat = (LPWAVEFORMATEX)(lpdword+5); 
-	if(lpDS->CreateSoundBuffer(&dsbd, &lpSECONDARYBUFFER[no],
-								NULL) != DS_OK) return(FALSE);
-    LPVOID lpbuf1, lpbuf2;
-    DWORD dwbuf1, dwbuf2;
-    // “ñŽŸƒoƒbƒtƒ@‚ÌƒƒbƒN
-    lpSECONDARYBUFFER[no]->Lock(0, *(DWORD*)((BYTE*)lpdword+0x36),
-                        &lpbuf1, &dwbuf1, &lpbuf2, &dwbuf2, 0); 
-	// ‰¹Œ¹ƒf[ƒ^‚ÌÝ’è
-	CopyMemory(lpbuf1, (BYTE*)lpdword+0x3a, dwbuf1);
-    if(dwbuf2 != 0) CopyMemory(lpbuf2, (BYTE*)lpdword+0x3a+dwbuf1, dwbuf2);
-	// “ñŽŸƒoƒbƒtƒ@‚ÌƒƒbƒN‰ðœ
-	lpSECONDARYBUFFER[no]->Unlock(lpbuf1, dwbuf1, lpbuf2, dwbuf2); 
-
-    return(TRUE);*/
-
 	ReleaseSoundObject(no);
 
 	HRSRC hrscr;

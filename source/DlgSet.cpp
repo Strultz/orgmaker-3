@@ -15,6 +15,7 @@
 #include <commctrl.h>
 #include "Mouse.h"
 #include "rxoFunction.h"
+#include "Update.h"
 
 #define PI 3.14159265358979323846
 
@@ -741,8 +742,8 @@ BOOL CALLBACK DialogWaveSel(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 	case WM_INITDIALOG: {
 		gWaveSelect = gAllWaveSel[gWaveTrack];
 
-		SendMessage(GetDlgItem(hdwnd, IDC_SLIDERPITCH), TBM_SETPOS, TRUE, SamplePlayHeight);
 		SendMessage(GetDlgItem(hdwnd, IDC_SLIDERPITCH), TBM_SETRANGE, 0, MAKELPARAM(0, 95));
+		SendMessage(GetDlgItem(hdwnd, IDC_SLIDERPITCH), TBM_SETPOS, TRUE, SamplePlayHeight);
 		SendMessage(GetDlgItem(hdwnd, IDC_SLIDERPITCH), TBM_SETLINESIZE, 0, 1);
 		SendMessage(GetDlgItem(hdwnd, IDC_SLIDERPITCH), TBM_SETPAGESIZE, 0, 12);
 		SendMessage(GetDlgItem(hdwnd, IDC_SLIDERPITCH), TBM_SETTICFREQ, 12, 0);
@@ -2073,6 +2074,13 @@ BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 // Preferences
+extern int iChangeFinish;
+extern bool sUseSpecialPaste;
+extern bool autoCheckUpdate;
+extern bool lockScrollToSong;
+extern bool gKeepClickedPos;
+extern int sSmoothScroll;
+
 BOOL CALLBACK DialogPrefsGeneral(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	int i, j;
 	MUSICINFO mi;
@@ -2080,10 +2088,40 @@ BOOL CALLBACK DialogPrefsGeneral(HWND hdwnd, UINT message, WPARAM wParam, LPARAM
 
 	switch (message) {
 	case WM_INITDIALOG:
+		CheckDlgButton(hdwnd, IDC_WINDOWPOS, 1); // TODO
+		CheckDlgButton(hdwnd, IDC_CONFIRMUNSAVED, iChangeFinish != 0);
+
+		CheckDlgButton(hdwnd, IDC_USEPASTE, sUseSpecialPaste);
+		CheckDlgButton(hdwnd, IDC_LEGACYPLAYCTRL, lockScrollToSong);
+		CheckDlgButton(hdwnd, IDC_REMEMBERSTART, gKeepClickedPos);
+
+		CheckDlgButton(hdwnd, IDC_AUTOUPDCHECK, autoCheckUpdate);
+
+		EnableWindow(GetDlgItem(hdwnd, IDC_REMEMBERSTART), !lockScrollToSong);
+
 		return 1;
 	case WM_COMMAND:
 		switch (HIWORD(wParam)) {
 		case BN_CLICKED:
+			switch (LOWORD(wParam)) {
+			case IDC_WINDOWPOS:
+			case IDC_CONFIRMUNSAVED:
+			case IDC_USEPASTE:
+			case IDC_REMEMBERSTART:
+			case IDC_AUTOUPDCHECK: {
+				PropSheet_Changed(GetParent(hdwnd), hdwnd);
+				break;
+			}
+			case IDC_LEGACYPLAYCTRL: {
+				EnableWindow(GetDlgItem(hdwnd, IDC_REMEMBERSTART), !IsDlgButtonChecked(hdwnd, IDC_LEGACYPLAYCTRL));
+				PropSheet_Changed(GetParent(hdwnd), hdwnd);
+				break;
+			}
+			case IDC_CHECKUPD: {
+				// TODO
+				break;
+			}
+			}
 			break;
 		case CBN_SELCHANGE:
 			PropSheet_Changed(GetParent(hdwnd), hdwnd);
@@ -2099,6 +2137,25 @@ BOOL CALLBACK DialogPrefsGeneral(HWND hdwnd, UINT message, WPARAM wParam, LPARAM
 		}
 		case PSN_APPLY: {
 			bool error = false;
+			IsDlgButtonChecked(hdwnd, IDC_WINDOWPOS);
+			iChangeFinish = IsDlgButtonChecked(hdwnd, IDC_CONFIRMUNSAVED);
+
+			sUseSpecialPaste = IsDlgButtonChecked(hdwnd, IDC_USEPASTE);
+			lockScrollToSong = IsDlgButtonChecked(hdwnd, IDC_LEGACYPLAYCTRL);
+			gKeepClickedPos = IsDlgButtonChecked(hdwnd, IDC_REMEMBERSTART);
+
+			autoCheckUpdate = IsDlgButtonChecked(hdwnd, IDC_AUTOUPDCHECK);
+
+			WYOffset = lockScrollToSong ? 0 : 16;
+
+			HMENU hMenu = GetMenu(hWnd);
+			CheckMenuItem(hMenu, IDM_LOCKSCROLL, MF_BYCOMMAND | (lockScrollToSong ? MFS_CHECKED : MFS_UNCHECKED));
+			UpdateToolbarStatus(true);
+			UpdateStatusBar(true);
+
+			EnableMenuItem(hMenu, IDM_PLAYHEAD_ALWAYS, MF_BYCOMMAND | ((!sSmoothScroll && lockScrollToSong) ? MF_ENABLED : MF_GRAYED));
+			EnableMenuItem(hMenu, IDM_FOLLOWSCROLL, MF_BYCOMMAND | (!lockScrollToSong ? MF_ENABLED : MF_GRAYED));
+			EnableMenuItem(hMenu, IDM_SMOOTHSCROLL, MF_BYCOMMAND | (lockScrollToSong ? MF_ENABLED : MF_GRAYED));
 			return error;
 		}
 		case PSN_QUERYCANCEL: {
@@ -2151,8 +2208,40 @@ BOOL CALLBACK DialogPrefsAudio(HWND hdwnd, UINT message, WPARAM wParam, LPARAM l
 	LPNMHDR lpnm;
 
 	switch (message) {
-	case WM_INITDIALOG:
+	case WM_INITDIALOG: {
+		int deviceSel = 0; // TODO
+
+		HWND cc = GetDlgItem(hdwnd, IDC_AUDIODEV);
+		SendMessage(cc, WM_SETREDRAW, 0, 0);
+		SendMessage(cc, CB_RESETCONTENT, 0, 0);
+		SendMessage(cc, CB_ADDSTRING, 0, (LPARAM)"Default Device");
+
+		// TODO store these?
+		ma_device_info* pPlaybackInfos;
+		ma_uint32 playbackCount;
+		ma_device_info* pCaptureInfos;
+		ma_uint32 captureCount;
+		if (ma_context_get_devices(&gMaContext, &pPlaybackInfos, &playbackCount, &pCaptureInfos, &captureCount) == MA_SUCCESS) {
+			for (ma_uint32 iDevice = 0; iDevice < playbackCount; iDevice++) {
+				SendMessage(cc, CB_ADDSTRING, 0, (LPARAM)pPlaybackInfos[iDevice].name);
+			}
+		}
+
+		SendMessage(cc, WM_SETREDRAW, 1, 0);
+		SendMessage(cc, CB_SETCURSEL, deviceSel, 0);
+
+		// TODO fill these out from options
+		SetDlgItemText(hdwnd, IDC_SAMPLERATE, "48000");
+		SetDlgItemText(hdwnd, IDC_BUFFERSIZE, "10");
+
+		cc = GetDlgItem(hdwnd, IDC_SLIDERPITCH);
+		SendMessage(cc, TBM_SETRANGE, 0, MAKELPARAM(0, 100));
+		SendMessage(cc, TBM_SETPOS, TRUE, 100);
+		SendMessage(cc, TBM_SETLINESIZE, 0, 5);
+		SendMessage(cc, TBM_SETPAGESIZE, 0, 10);
+
 		return 1;
+	}
 	case WM_COMMAND:
 		switch (HIWORD(wParam)) {
 		case BN_CLICKED:

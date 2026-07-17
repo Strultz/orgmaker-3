@@ -31,7 +31,7 @@ extern BOOL actApp;//ウインドウのアクティブ
 extern int WXOffset, WYOffset;
 extern int WWidth, WHeight;	//ウィンドウのサイズ
 
-void UpdateToolbarStatus();
+void UpdateToolbarStatus(bool updcheck = false);
 void UpdateStatusBar(bool measonly);
 
 int GetCurrentMeasure();

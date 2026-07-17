@@ -347,6 +347,7 @@
 #define IDC_MUTE15                      1042
 #define IDC_CHECK_PIPI2                 1042
 #define IDC_SLIDER1                     1042
+#define IDC_AUDIOVOL                    1042
 #define IDE_USE8                        1043
 #define IDC_MUTE1                       1043
 #define IDC_CHECK_PIPI3                 1043
@@ -557,16 +558,18 @@
 #define IDC_SCROLLMEAS                  1322
 #define IDC_PLAYLINE                    1323
 #define IDC_ALLOWKEYBOARD               1324
-#define IDC_COMBO1                      1325
-#define IDC_EDIT2                       1326
+#define IDC_AUDIOBOX                    1325
+#define IDC_AUDIODEV                    1325
+#define IDC_BUFFERSIZE                  1326
 #define IDC_MUTEUI                      1327
 #define IDC_FIXVOL                      1328
 #define IDC_FIXPI                       1329
 #define IDC_OLDVOL                      1330
 #define IDC_OLDFREQ                     1331
 #define IDC_LOWSNAREFREQUENCY           1332
-#define IDC_CHECK8                      1333
 #define IDC_NOVOLRAMP                   1333
+#define IDC_REMEMBERSTART               1334
+#define IDC_SAMPLERATE                  1335
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005
@@ -925,7 +928,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        275
 #define _APS_NEXT_COMMAND_VALUE         40387
-#define _APS_NEXT_CONTROL_VALUE         1334
+#define _APS_NEXT_CONTROL_VALUE         1336
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -149,14 +149,14 @@ static bool hasMouseCapture = false;
 int toolbarSavedX[2] = { 100, 100 };
 int toolbarSavedY[2] = { 100, 160 };
 
-static bool autoCheckUpdate = true;
-static bool floatingToolbars = false;
+bool autoCheckUpdate = true;
+bool floatingToolbars = false;
 
 extern void ChangeTrack(int iTrack);
 extern void ChangeTrackPlus(int iValue);
 extern char timer_sw; //Playing?
 
-bool lockScrollToSong = true;
+bool lockScrollToSong = false;
 
 extern int Menu_Recent[];
 extern int iDragMode;
@@ -220,13 +220,13 @@ static const int iChgTrackBtn[16] = {
 };
 
 static int lastUpdCheck = 0;
-void UpdateToolbarStatus() {
+void UpdateToolbarStatus(bool updcheck) {
 	HMENU hMenu;
 	hMenu = GetMenu(hWnd);
 
 	// disable editor features while song is playing
 	bool enabled = timer_sw == 0;
-	if (lastUpdCheck != timer_sw) {
+	if (updcheck || lastUpdCheck != timer_sw) {
 		for (int i = 0; i < sizeof(playbar_controls_menu) / sizeof(int); ++i) {
 			EnableMenuItem(hMenu, playbar_controls_menu[i], MF_BYCOMMAND | (enabled ? MF_ENABLED : MF_GRAYED));
 		}
@@ -548,6 +548,10 @@ static LRESULT CALLBACK SplashWndProc(HWND hwnd, UINT message, WPARAM wParam, LP
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
+static ma_device_id* GetUserDevice(void) {
+	return NULL;
+}
+
 // Oops!
 LONG WINAPI OrgCrashHandler(EXCEPTION_POINTERS* ep) {
 	MessageBox(NULL, "A fatal error has occurred. The program will now exit.", "OrgMaker Crash", MB_OK | MB_ICONERROR);
@@ -570,6 +574,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	for(vvv=0;vvv<256;vvv++){
 		iCast[vvv]=0xFFFF;
 		iKeyPushDown[vvv]=0;
+	}
+
+	if (!InitMAContext()) {
+		MessageBox(NULL, "Sound engine failed to initalize.", "OrgMaker Error", MB_ICONERROR | MB_OK);
+		return 1;
 	}
 
 	//load strings for messages
@@ -753,13 +762,14 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		DestroyWindow(hwndStatus);
 		DestroyWindow(hwndArea);
 		DestroyWindow(hWnd);
-		return 0;
+		DeinitMAContext();
+		return 1;
 	}
 
 	InitBitmaps();
 	InitCursor();
 //Sound initialization ///////
-	if (!InitDirectSound(hWnd)) {
+	if (!InitDirectSound(hWnd, GetUserDevice())) {
 		MessageBox(hWnd, "Sound engine failed to initalize.", "OrgMaker Error", MB_ICONERROR | MB_OK);
 		QuitMMTimer();
 		EndGDI();
@@ -767,7 +777,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		DestroyWindow(hwndStatus);
 		DestroyWindow(hwndArea);
 		DestroyWindow(hWnd);
-		return 0;
+		DeinitMAContext();
+		return 1;
 	}
 	LoadWaveData100(gSelectedWave); // Load the current soundbank, or the default
 	GenerateWaveGraphic(wave_data);
@@ -2277,7 +2288,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case ID_AC_CLOSE:
 			SendMessage(hWnd, WM_CLOSE, 0, 0);
 			break;
-		case IDM_SAVE_NOEXTRAS: {
+		/*case IDM_SAVE_NOEXTRAS: {
 			//MessageBox(hWnd, "Legacy export will save a .org file without any non-standard metadata", "OrgMaker 3", MB_OK | MB_ICONWARNING);
 			
 			char oldName[MAX_PATH];
@@ -2293,7 +2304,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			// put it back.
 			memcpy(music_file, oldName, MAX_PATH);
 			break;
-		}
+		}*/
 		}
 
 		break;
@@ -2320,7 +2331,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_SAVENEW:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Save the active document with a new name"); break;
 		case IDM_EXPORT_MIDI:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Export the active document to a MIDI file"); break;
 		case IDM_EXPORT_WAV:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Export the active document to a WAV file"); break;
-		case IDM_SAVE_NOEXTRAS:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Export an ORG file without any non-standard metadata"); break;
+		//case IDM_SAVE_NOEXTRAS:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Export an ORG file without any non-standard metadata"); break;
 		case IDM_EXIT:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Exit OrgMaker 3"); break;
 
 		case IDM_UNDO:              SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Undo the last action"); break;
@@ -2409,7 +2420,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_METRONOME:         SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Plays a sound on every beat/measure"); break;
 		case IDM_DLGTHEMES:         SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select a custom visual style"); break;
 		case IDM_DLGWAVEDBS:        SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Select a custom sound bank"); break;
-		//case IDM_PREFERENCES:     SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open OrgMaker preferences"); break;
+		case IDM_PREFERENCES:       SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open OrgMaker 3 preferences"); break;
 
 		case IDM_DLGHELP:           SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open the Help menu"); break;
 		case IDM_GITHUB:            SendMessage(hwndStatus, SB_SETTEXT, 0, (LPARAM)"Open the GitHub page for OrgMaker 3"); break;
@@ -2480,8 +2491,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		//if(!hDlgTrack)DestroyWindow(hDlgTrack);
 		//if(hDlgEZCopy) DestroyWindow(hDlgEZCopy);
 		if(hwnd) DestroyWindow(hwnd);
-		PostQuitMessage(0);
 		FreeMessageStringBuffer();	// 2014.10.19 
+		DeinitMAContext();
+		PostQuitMessage(0);
 		break;
 	case WM_KEYDOWN://keyboard pressed
 		switch(wParam){
@@ -2506,7 +2518,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case VK_F5:
 		case VK_SPACE:
 		//case VK_NUMPAD0:
-			if (timer_sw == 0) StartPlayingSong(gClickedPos);
+			if (timer_sw == 0) StartPlayingSong(lockScrollToSong ? -1 : gClickedPos);
 			else StopPlayingSong();
 			break;
 		case VK_F6:
