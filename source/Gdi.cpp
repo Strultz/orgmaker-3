@@ -452,17 +452,19 @@ void PutBitmapHead(long x, long y, RECT* rect, int bmp_no, int noteLength)
 	int totalLength = NoteWidth * noteLength;
 	int bitWidth = totalLength;
 
-	if (bitWidth > 16)
-		bitWidth = 16;
+	if (!gThemeSettings.expandHeadGraphic) {
+		if (bitWidth > 16)
+			bitWidth = 16;
 
-	if (NoteEnlarge_Until_16px == 0) {
-		bitWidth = NoteWidth;
-		totalLength = bitWidth;
-	}
+		if (NoteEnlarge_Until_16px == 0) {
+			bitWidth = NoteWidth;
+			totalLength = bitWidth;
+		}
 
-	if (NoteWidth == 16 || totalLength >= 16) {
-		PutBitmap(x, y, rect, bmp_no);
-		return;
+		if (NoteWidth == 16 || totalLength >= 16) {
+			PutBitmap(x, y, rect, bmp_no);
+			return;
+		}
 	}
 
 	int ww = bitWidth - 4;
@@ -474,9 +476,18 @@ void PutBitmapHead(long x, long y, RECT* rect, int bmp_no, int noteLength)
 	rcWork.right = rcWork.left + 2;
 	PutBitmap(x, y, &rcWork, bmp_no);
 	if (ww > 0) {
-		rcWork.left = rect->left + 2;
-		rcWork.right = rcWork.left + ww;
-		PutBitmap(x + 2, y, &rcWork, bmp_no);
+		if (ww <= 12) {
+			rcWork.left = rect->left + 2;
+			rcWork.right = rcWork.left + ww;
+			PutBitmap(x + 2, y, &rcWork, bmp_no);
+		}
+		else {
+			for (int i = 0; i < ww; i += 12) {
+				rcWork.left = rect->left + 2;
+				rcWork.right = rcWork.left + min(ww - i, 12);
+				PutBitmap(x + 2 + i, y, &rcWork, bmp_no);
+			}
+		}
 	}
 	rcWork.left = rect->left + 14;
 	rcWork.right = rcWork.left + 2;

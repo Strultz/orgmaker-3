@@ -22,6 +22,12 @@
 #define MSGSAVEOK		3	//保存完了
 #define MSGLOADOK		3	//読み込み完了
 
+struct ThemeSettings {
+	bool expandHeadGraphic;
+};
+
+extern ThemeSettings gThemeSettings;
+
 extern char music_file[];
 extern HINSTANCE hInst;//インスタンスハンドル
 extern HWND hWnd;//メインウィンドウハンドル

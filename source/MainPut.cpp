@@ -288,7 +288,9 @@ void OrgData::PutNotes(int TPCY, bool vol, long play)
 	}
 	*/
 	//必要なデータを取得
-	GetMusicInfo(&mi);line = mi.line;dot = mi.dot;
+	GetMusicInfo(&mi);
+	line = mi.line;
+	dot = mi.dot;
 	scr_data.GetScrollPosition(&scr_h,&scr_v);
 
 	bool vmode = gNoteHighlights && timer_sw != 0;
@@ -364,12 +366,16 @@ void OrgData::PutNotes(int TPCY, bool vol, long play)
 						if (k >= 4)addY--;
 					}
 
-					for (j = 0, i = p->length - 1; i > 0; i--, j++) {//尻尾
-						if (TPCY == 0) {
-							if (vmode && !mute[k] && play >= p->x && play < p->x + p->length) {
-								PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &note_tail_rect[k], BMPNOTE);
-							} else PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &note_tail_rect[k + 8], BMPNOTE);
-						} else PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &rc_TCPY[2 + t], BMPNOTE);
+					if (!gThemeSettings.expandHeadGraphic) {
+						for (j = 0, i = p->length - 1; i > 0; i--, j++) {//尻尾
+							if (TPCY == 0) {
+								if (vmode && !mute[k] && play >= p->x && play < p->x + p->length) {
+									PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &note_tail_rect[k], BMPNOTE);
+								}
+								else PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &note_tail_rect[k + 8], BMPNOTE);
+							}
+							else PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &rc_TCPY[2 + t], BMPNOTE);
+						}
 					}
 					if (TPCY == 0) {
 						if (vmode && !mute[k] && play >= p->x && play < p->x + p->length) {
@@ -405,9 +411,11 @@ void OrgData::PutNotes(int TPCY, bool vol, long play)
 				if(xpos > WWidth)break;//表示領域を超えた。
 				if(!vol && ypos >= 0 && ypos < WHeight+286-WHNM && !vmode){//表示範囲YPOS
 					//tBitmap(xpos,ypos+2,&note_rect[0],BMPNOTE);//音符
-					for(j = 0,i = p->length-1; i > 0; i--,j++){//尻尾
-						//PutBitmap(xpos+j*16+16,ypos+3,&note_rect[2],BMPNOTE);
-						PutBitmap2(xpos+j*NoteWidth+NoteWidth,ypos+3,&note_tail_rect[track],BMPNOTE);
+					if (!gThemeSettings.expandHeadGraphic) {
+						for (j = 0, i = p->length - 1; i > 0; i--, j++) {//尻尾
+							//PutBitmap(xpos+j*16+16,ypos+3,&note_rect[2],BMPNOTE);
+							PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3, &note_tail_rect[track], BMPNOTE);
+						}
 					}
 					PutBitmapHead(xpos,ypos+2,&note_blue_rect[track +16],BMPNOTE,p->length);//音符(新)
 				}
@@ -473,13 +481,15 @@ void OrgData::PutNotes2(int TPCY, bool vol, long play)
 						addY=-(k-MAXMELODY)/2+2; //if(addY>=0)addY++;
 						if((k-MAXMELODY)>=4)addY--;
 					}*/
-					for (j = 0, i = p->length - 1; i > 0; i--, j++) {//尻尾
-						if (TPCY == 0) {
-							if (vmode && !mute[k] && play >= p->x && play < p->x + p->length)
-								PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &note_tail_rect[k - 8], BMPNOTE);
-							else PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &note_tail_rect[k], BMPNOTE);
+					if (!gThemeSettings.expandHeadGraphic) {
+						for (j = 0, i = p->length - 1; i > 0; i--, j++) {//尻尾
+							if (TPCY == 0) {
+								if (vmode && !mute[k] && play >= p->x && play < p->x + p->length)
+									PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &note_tail_rect[k - 8], BMPNOTE);
+								else PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &note_tail_rect[k], BMPNOTE);
+							}
+							else PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &rc_TCPY[2 + t], BMPNOTE);
 						}
-						else PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3 + addY, &rc_TCPY[2 + t], BMPNOTE);
 					}
 					if (TPCY == 0) {
 						if (vmode && !mute[k] && play >= p->x && play < p->x + p->length) {
@@ -516,8 +526,10 @@ void OrgData::PutNotes2(int TPCY, bool vol, long play)
 				if(!vol && ypos >= 0 && ypos < WHeight+286-WHNM && !vmode){//表示範囲YPOS
 					//PutBitmap(xpos,ypos+2,&note_rect[0],BMPNOTE);//音符
 					//PutBitmap2(xpos,ypos+2,&note_blue_rect[track+16],BMPNOTE);//音符	// 2014.05.27 D
-					for(j = 0,i = p->length-1; i > 0; i--,j++){//尻尾
-						PutBitmap2(xpos+j*NoteWidth+NoteWidth,ypos+3,&note_tail_rect[track -8],BMPNOTE);
+					if (!gThemeSettings.expandHeadGraphic) {
+						for (j = 0, i = p->length - 1; i > 0; i--, j++) {//尻尾
+							PutBitmap2(xpos + j * NoteWidth + NoteWidth, ypos + 3, &note_tail_rect[track - 8], BMPNOTE);
+						}
 					}
 					PutBitmapHead(xpos,ypos+2,&note_blue_rect[track +16],BMPNOTE,p->length);//音符	// 2014.05.27 A
 				}

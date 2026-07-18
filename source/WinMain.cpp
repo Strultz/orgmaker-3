@@ -82,6 +82,8 @@ BOOL CALLBACK DialogComments(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 void SetModified(bool mod);
 void AdvancedPaste();
 
+ThemeSettings gThemeSettings;
+
 //Declare global variables here
 HINSTANCE hInst;//instance handle
 HWND hWnd;//main window handle
@@ -96,7 +98,7 @@ bool gIsDrawing = false;
 bool gFileModified = false;
 bool gFileUnsaved = true;
 
-bool gKeepClickedPos = false;
+bool gKeepClickedPos = true;
 
 // TODO add these to UI
 bool gUseOldVol = false;
@@ -491,9 +493,9 @@ void InitBitmaps() {
 }
 
 void ReloadBitmaps() {
-	MUSICINFO mi;
-	RECT rect = { 0,0,WWidth,WHeight };//Area to update (track change)
-	org_data.GetMusicInfo(&mi);
+	//MUSICINFO mi;
+	//RECT rect = { 0,0,WWidth,WHeight };//Area to update (track change)
+	//org_data.GetMusicInfo(&mi);
 	
 	InitBitmaps();
 	InitCursor();
@@ -505,6 +507,24 @@ void ReloadBitmaps() {
 
 	//org_data.PutMusic();
 	//RedrawWindow(hWnd, &rect, NULL, RDW_INVALIDATE | RDW_ERASENOW);
+}
+
+void SetThemeIniDefaults() {
+	gThemeSettings.expandHeadGraphic = false;
+}
+
+void LoadThemeIni() {
+	std::string themeIniPath = std::string(gSelectedTheme) + "\\theme.ini";
+	gThemeSettings.expandHeadGraphic = GetPrivateProfileInt("Note", "ExpandHeadGraphic", 0, themeIniPath.c_str());
+}
+
+void LoadActiveTheme() {
+	ReloadBitmaps();
+
+	SetThemeIniDefaults();
+	if (strlen(gSelectedTheme) > 0) {
+		LoadThemeIni();
+	}
 }
 
 void GetApplicationPath(char* path) {
@@ -766,8 +786,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		return 1;
 	}
 
-	InitBitmaps();
-	InitCursor();
+	LoadActiveTheme();
+
 //Sound initialization ///////
 	if (!InitDirectSound(hWnd, GetUserDevice())) {
 		MessageBox(hWnd, "Sound engine failed to initalize.", "OrgMaker Error", MB_ICONERROR | MB_OK);
@@ -849,6 +869,12 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	sFollowScroll = GetPrivateProfileInt(MAIN_WINDOW, "FollowScroll", 0, app_path);
 
 	sUseSpecialPaste = GetPrivateProfileInt(MAIN_WINDOW, "UseSpecialPaste", 0, app_path);
+
+	gKeepClickedPos = GetPrivateProfileInt(MAIN_WINDOW, "KeepClickedPos", 1, app_path);
+
+	// legacy
+	gUseOldVol = GetPrivateProfileInt(MAIN_WINDOW, "UseOldVol", 0, app_path);
+	gUseProperFreq = GetPrivateProfileInt(MAIN_WINDOW, "UseOldFreq", 0, app_path);
 
 	EnableMenuItem(hMenu, IDM_SMOOTHSCROLL, MF_BYCOMMAND | (lockScrollToSong ? MF_ENABLED : MF_GRAYED));
 
@@ -2873,6 +2899,13 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW, "FollowScroll", num_buf, app_path);
 	wsprintf(num_buf, "%d", sUseSpecialPaste);
 	WritePrivateProfileString(MAIN_WINDOW, "UseSpecialPaste", num_buf, app_path);
+	wsprintf(num_buf, "%d", gKeepClickedPos);
+	WritePrivateProfileString(MAIN_WINDOW, "KeepClickedPos", num_buf, app_path);
+	// legacy
+	wsprintf(num_buf, "%d", gUseOldVol);
+	WritePrivateProfileString(MAIN_WINDOW, "UseOldVol", num_buf, app_path);
+	wsprintf(num_buf, "%d", gUseProperFreq);
+	WritePrivateProfileString(MAIN_WINDOW, "UseOldFreq", num_buf, app_path);
 	
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentThemePath", gSelectedTheme, app_path);
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentWavePath", gSelectedWave, app_path);

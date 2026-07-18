@@ -110,7 +110,7 @@ int SamplePlayHeight = 36; //サンプル音を鳴らす高さ
 //int SaveWithInitVolFile;	//曲データと…セーブするか。
 
 extern HINSTANCE hInst;//インスタンスハンドル
-extern void ReloadBitmaps();
+extern void LoadActiveTheme();
 extern void GetApplicationPath(char* path);
 
 double GetNormDistRand(){
@@ -2370,7 +2370,7 @@ BOOL CALLBACK DialogPrefsThemes(HWND hdwnd, UINT message, WPARAM wParam, LPARAM 
 					strcpy(gSelectedTheme, sDir);
 			}
 
-			ReloadBitmaps();
+			LoadActiveTheme();
 			return error;
 		}
 		case PSN_QUERYCANCEL: {
