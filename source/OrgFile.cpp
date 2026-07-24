@@ -44,6 +44,7 @@ void OrgData::WriteMetadata(FILE* fp) {
 	fwrite(name, sizeof(char), 0x20, fp);
 	fwrite(author, sizeof(char), 0x20, fp);
 
+	memset(version, '\0', 0x21);
 	snprintf(version, 0x21, "OrgMaker %s", VER_STRING);
 	fwrite(version, sizeof(char), 0x20, fp);
 
