@@ -1291,6 +1291,8 @@ BOOL CALLBACK DialogComments(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 			//SetUndo(); // TODO this doesnt work
 			SetModified(true);
 
+			memset(org_data.name, '\0', 0x21);
+			memset(org_data.author, '\0', 0x21);
 			GetDlgItemTextA(hdwnd, IDC_NAMETEXT, org_data.name, 0x21);
 			GetDlgItemTextA(hdwnd, IDC_AUTHORTEXT, org_data.author, 0x21);
 
