@@ -80,7 +80,7 @@ void OrgData::PlayData(void)
 				}
 			}
 			if(np[i]->pan != PANDUMMY) ChangeDramPan(np[i]->pan,i-MAXMELODY);
-			if(np[i]->volume != VOLDUMMY) ChangeDramVolume(np[i]->volume * 100 / 0x7F,i-MAXMELODY);
+			if(np[i]->volume != VOLDUMMY) ChangeDramVolume(np[i]->volume * (gUseOldVol ? 0x7F : 100) / 0x7F,i-MAXMELODY);
 			np[i] = np[i]->to;//次の音符を指す
 		}
 
