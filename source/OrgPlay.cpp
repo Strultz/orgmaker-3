@@ -6,11 +6,11 @@
 #include "Scroll.h"
 #include "Timer.h"
 #include "CommCtrl.h"
+#include "Compat.h"
 
 extern long gClickedPos;
 
 extern bool gKeepClickedPos;
-extern bool gUseOldVol;
 extern bool gPlayMidNote;
 extern int sSmoothScroll;
 //extern bool gNoteHighlights;
@@ -55,7 +55,7 @@ void OrgData::PlayData(void)
 				}
 			}
 			if(np[i]->pan != PANDUMMY) ChangeOrganPan(np[i]->y,np[i]->pan,i);
-			if(np[i]->volume != VOLDUMMY) ChangeOrganVolume(np[i]->y,np[i]->volume * (gUseOldVol ? 0x7F : 100) / 0x7F,i);
+			if(np[i]->volume != VOLDUMMY && (!(gCompatFlags & COMPAT_CS_VOLUME_BUG) || np[i]->to)) ChangeOrganVolume(np[i]->y, np[i]->volume * ((gCompatFlags & COMPAT_OLD_VOLUME) ? 0x7F : 100) / 0x7F, i);
 			np[i] = np[i]->to;//次の音符を指す
 		}
 		if(now_leng[i] == 0) {
@@ -80,7 +80,7 @@ void OrgData::PlayData(void)
 				}
 			}
 			if(np[i]->pan != PANDUMMY) ChangeDramPan(np[i]->pan,i-MAXMELODY);
-			if(np[i]->volume != VOLDUMMY) ChangeDramVolume(np[i]->volume * (gUseOldVol ? 0x7F : 100) / 0x7F,i-MAXMELODY);
+			if(np[i]->volume != VOLDUMMY && (!(gCompatFlags & COMPAT_CS_VOLUME_BUG) || np[i]->to)) ChangeDramVolume(np[i]->volume * ((gCompatFlags & COMPAT_OLD_VOLUME) ? 0x7F : 100) / 0x7F,i-MAXMELODY);
 			np[i] = np[i]->to;//次の音符を指す
 		}
 
@@ -184,7 +184,7 @@ void StartPlayingSong(long pos) {
 					}
 
 					if (pan != PANDUMMY) ChangeOrganPan(y, pan, i);
-					if (vol != VOLDUMMY) ChangeOrganVolume(y, vol * (gUseOldVol ? 0x7F : 100) / 0x7F, i);
+					if (vol != VOLDUMMY) ChangeOrganVolume(y, vol * ((gCompatFlags & COMPAT_OLD_VOLUME) ? 0x7F : 100) / 0x7F, i);
 				}
 			}
 			for (int i = MAXMELODY; i < MAXTRACK; i++) {
@@ -211,7 +211,7 @@ void StartPlayingSong(long pos) {
 					}
 
 					if (pan != PANDUMMY) ChangeDramPan(pan, i - MAXMELODY);
-					if (vol != VOLDUMMY) ChangeDramVolume(vol * (gUseOldVol ? 0x7F : 100) / 0x7F, i - MAXMELODY);
+					if (vol != VOLDUMMY) ChangeDramVolume(vol * ((gCompatFlags & COMPAT_OLD_VOLUME) ? 0x7F : 100) / 0x7F, i - MAXMELODY);
 				}
 			}
 		}

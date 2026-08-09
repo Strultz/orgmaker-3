@@ -654,8 +654,10 @@ BEGIN
     CONTROL         "Use legacy volume calculation",IDC_OLDVOL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,72,111,10
     CONTROL         "Use legacy pitch calculation",IDC_OLDFREQ,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,84,103,10
     CONTROL         "Disable audio interpolation",IDC_LOWSNAREFREQUENCY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,96,100,10
-    CONTROL         "Disable volume ramping",IDC_NOVOLRAMP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,108,91,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,108,100,10
+    CONTROL         "Disable volume ramping",IDC_NOVOLRAMP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,121,91,10
+    CONTROL         "Use legacy note change logic",IDC_ORG10NOTECHANGE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,96,109,10
 END
 
 

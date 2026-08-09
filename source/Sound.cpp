@@ -4,6 +4,7 @@
 #include "DefOrg.h"
 #include "Sound.h"
 #include "OrgData.h"
+#include "Compat.h"
 
 #define MINIAUDIO_IMPLEMENTATION
 #define MA_NO_ENCODING
@@ -457,8 +458,6 @@ extern int iKeyPushDown[256];
 
 extern long gClickedPos;
 
-extern bool gUseProperFreq;
-extern bool gUseOldVol;
 extern bool gPlayMidNote;
 
 static void S_Callback(ma_device* device, void* output_stream, const void* input_stream, ma_uint32 frames_total)
@@ -790,7 +789,7 @@ void ChangeOrganFrequency(unsigned char key,char track, DWORD a)
 			//double mul = pow(2.0, ((int)a - 1000) / 12000.0);
 			if (lpORGANBUFFER[track][j][i] != NULL) {
 				DWORD val;
-				if (gUseProperFreq) {
+				if (gCompatFlags & COMPAT_RXO_FREQ_TABLE) {
 					val = (DWORD)((oct_wave[j].wave_size * freq_tbl_prec[key]) * oct_wave[j].oct_par) / 8.00 + (a - 1000);
 				} else {
 					val = (DWORD)((oct_wave[j].wave_size * freq_tbl[key]) * oct_wave[j].oct_par) / 8 + (a - 1000);
@@ -828,7 +827,7 @@ void ResumeOrganObject(unsigned char key, char track, DWORD freq, bool pipi, int
 		sound->position = (int)fpos;
 		sound->sub_position = fpos - sound->position;
 
-		sound->looping = !pipi /* || gCompatFlags & COMPAT_CS_PIPI */;
+		sound->looping = !pipi || gCompatFlags & COMPAT_CS_PIZZICATO;
 		sound->stop_in = 0;
 
 		if (!sound->looping && sound->position >= sound->frames) {
@@ -868,7 +867,7 @@ void PlayOrganObject(unsigned char key, int mode,char track,DWORD freq, bool pip
 			break;
 		case 2: // •à‚©‚¹’âŽ~
 			if(old_key[track] != 255){
-				if (!pipi) /* || gCompatFlags & COMPAT_CS_PIPI */
+				if (!pipi || gCompatFlags & COMPAT_CS_PIZZICATO)
 					S_PlaySound(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], false);
 				old_key[track] = 255;
 			}
@@ -876,23 +875,23 @@ void PlayOrganObject(unsigned char key, int mode,char track,DWORD freq, bool pip
 		case -1:
 			if(old_key[track] == 255){//V‹K–Â‚ç‚·
 				ChangeOrganFrequency(key%12,track,freq);//Žü”g”‚ðÝ’è‚µ‚Ä
-				S_PlaySound(lpORGANBUFFER[track][key / 12][key_twin[track]], !pipi /* || gCompatFlags & COMPAT_CS_PIPI */);
+				S_PlaySound(lpORGANBUFFER[track][key / 12][key_twin[track]], !pipi || gCompatFlags & COMPAT_CS_PIZZICATO);
 				old_key[track] = key;
 				key_on[track] = 1;
 			}else if(key_on[track] == 1 && old_key[track] == key){//“¯‚¶‰¹
 				//¡‚È‚Á‚Ä‚¢‚é‚Ì‚ð•à‚©‚¹’âŽ~
-				if (!pipi) /* || gCompatFlags & COMPAT_CS_PIPI */
+				if (!pipi || gCompatFlags & COMPAT_CS_PIZZICATO)
 					S_PlaySound(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], false);
 				key_twin[track] ^= 1;
 
-				S_PlaySound(lpORGANBUFFER[track][key / 12][key_twin[track]], !pipi /* || gCompatFlags & COMPAT_CS_PIPI */);
+				S_PlaySound(lpORGANBUFFER[track][key / 12][key_twin[track]], !pipi || gCompatFlags & COMPAT_CS_PIZZICATO);
 			}else{//ˆá‚¤‰¹‚ð–Â‚ç‚·‚È‚ç
-				if (!pipi) /* || gCompatFlags & COMPAT_CS_PIPI */
+				if (!pipi|| gCompatFlags & COMPAT_CS_PIZZICATO)
 					S_PlaySound(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], false);
-				key_twin[track] ^= 1;
+				if (!(gCompatFlags & COMPAT_1_0_NOTE_CHANGE)) key_twin[track] ^= 1;
 
 				ChangeOrganFrequency(key%12,track,freq);//Žü”g”‚ðÝ’è‚µ‚Ä
-				S_PlaySound(lpORGANBUFFER[track][key / 12][key_twin[track]], !pipi /* || gCompatFlags & COMPAT_CS_PIPI */);
+				S_PlaySound(lpORGANBUFFER[track][key / 12][key_twin[track]], !pipi || gCompatFlags & COMPAT_CS_PIZZICATO);
 				old_key[track] = key;
 			}
 			break;
@@ -1227,7 +1226,7 @@ void PlayOrganKey(unsigned char key,char track,DWORD freq,int Nagasa)
 	if (track < MAXMELODY && lpORGANBUFFER[track][key/12][0] != NULL){
 		DWORD wait = timeGetTime();
 		ChangeOrganFrequency(key%12,track,freq);//Žü”g”‚ðÝ’è‚µ‚Ä
-		S_SetSoundVolume(lpORGANBUFFER[track][key / 12][0], ((200 * (gUseOldVol ? 0x7F : 100) / 0x7F) - 255) * 8);
+		S_SetSoundVolume(lpORGANBUFFER[track][key / 12][0], ((200 * ((gCompatFlags & COMPAT_OLD_VOLUME) ? 0x7F : 100) / 0x7F) - 255) * 8);
 		S_SetSoundPan(lpORGANBUFFER[track][key / 12][0], 0);
 		S_PlaySoundFor(lpORGANBUFFER[track][key / 12][0], Nagasa);
 //		lpORGANBUFFER[track][key/12][0]->Play(0, 0, 0); //C 2010.09.23 ‘¦Žž’âŽ~‚·‚éB
@@ -1235,7 +1234,7 @@ void PlayOrganKey(unsigned char key,char track,DWORD freq,int Nagasa)
 		S_StopSound(lpDRAMBUFFER[track - MAXMELODY]);
 		S_RewindSound(lpDRAMBUFFER[track - MAXMELODY]);
 		ChangeDramFrequency(key, track - MAXMELODY);//Žü”g”‚ðÝ’è‚µ‚Ä
-		S_SetSoundVolume(lpDRAMBUFFER[track - MAXMELODY], ((200 * (gUseOldVol ? 0x7F : 100) / 0x7F) - 255) * 8);
+		S_SetSoundVolume(lpDRAMBUFFER[track - MAXMELODY], ((200 * ((gCompatFlags & COMPAT_OLD_VOLUME) ? 0x7F : 100) / 0x7F) - 255) * 8);
 		S_SetSoundPan(lpDRAMBUFFER[track - MAXMELODY], 0);
 		S_PlaySound(lpDRAMBUFFER[track - MAXMELODY], false);
 	}
@@ -1248,14 +1247,14 @@ void Rxo_PlayKey(unsigned char key,char track,DWORD freq, int Phase)
 	if (key >= 96) return;
 	if (track < MAXMELODY && lpORGANBUFFER[track][key/12][Phase] != NULL) {
 		ChangeOrganFrequency(key%12,track,freq);
-		S_SetSoundVolume(lpORGANBUFFER[track][key/12][Phase], ((200 * (gUseOldVol ? 0x7F : 100) / 0x7F) - 255) * 8);
+		S_SetSoundVolume(lpORGANBUFFER[track][key/12][Phase], ((200 * ((gCompatFlags & COMPAT_OLD_VOLUME) ? 0x7F : 100) / 0x7F) - 255) * 8);
 		S_SetSoundPan(lpORGANBUFFER[track][key/12][Phase], 0);
 		S_PlaySound(lpORGANBUFFER[track][key/12][Phase], true);
 	} else if (lpDRAMBUFFER[track - MAXMELODY] != NULL) {
 		S_StopSound(lpDRAMBUFFER[track - MAXMELODY]);
 		S_RewindSound(lpDRAMBUFFER[track - MAXMELODY]);
 		ChangeDramFrequency(key, track - MAXMELODY);//Žü”g”‚ðÝ’è‚µ‚Ä
-		S_SetSoundVolume(lpDRAMBUFFER[track - MAXMELODY], ((200 * (gUseOldVol ? 0x7F : 100) / 0x7F) - 255) * 8);
+		S_SetSoundVolume(lpDRAMBUFFER[track - MAXMELODY], ((200 * ((gCompatFlags & COMPAT_OLD_VOLUME) ? 0x7F : 100) / 0x7F) - 255) * 8);
 		S_SetSoundPan(lpDRAMBUFFER[track - MAXMELODY], 0);
 		S_PlaySound(lpDRAMBUFFER[track - MAXMELODY], false);
 	}

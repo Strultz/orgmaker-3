@@ -46,6 +46,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include "Timer.h"
 
 #include "Toolbar.h"
+#include "Compat.h"
 
 //main procedure
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -83,6 +84,7 @@ void SetModified(bool mod);
 void AdvancedPaste();
 
 ThemeSettings gThemeSettings;
+uint32_t gCompatFlags;
 
 //Declare global variables here
 HINSTANCE hInst;//instance handle
@@ -99,10 +101,6 @@ bool gFileModified = false;
 bool gFileUnsaved = true;
 
 bool gKeepClickedPos = true;
-
-// TODO add these to UI
-bool gUseOldVol = false;
-bool gUseProperFreq = false;
 
 long MAXHORZRANGE = 0x7FFFFFFF;
 
@@ -872,9 +870,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	gKeepClickedPos = GetPrivateProfileInt(MAIN_WINDOW, "KeepClickedPos", 1, app_path);
 
-	// legacy
-	gUseOldVol = GetPrivateProfileInt(MAIN_WINDOW, "UseOldVol", 0, app_path);
-	gUseProperFreq = GetPrivateProfileInt(MAIN_WINDOW, "UseOldFreq", 0, app_path);
+	gCompatFlags = GetPrivateProfileInt(MAIN_WINDOW, "CompatFlags", 0, app_path);
 
 	EnableMenuItem(hMenu, IDM_SMOOTHSCROLL, MF_BYCOMMAND | (lockScrollToSong ? MF_ENABLED : MF_GRAYED));
 
@@ -2901,11 +2897,8 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW, "UseSpecialPaste", num_buf, app_path);
 	wsprintf(num_buf, "%d", gKeepClickedPos);
 	WritePrivateProfileString(MAIN_WINDOW, "KeepClickedPos", num_buf, app_path);
-	// legacy
-	wsprintf(num_buf, "%d", gUseOldVol);
-	WritePrivateProfileString(MAIN_WINDOW, "UseOldVol", num_buf, app_path);
-	wsprintf(num_buf, "%d", gUseProperFreq);
-	WritePrivateProfileString(MAIN_WINDOW, "UseOldFreq", num_buf, app_path);
+	wsprintf(num_buf, "%d", gCompatFlags);
+	WritePrivateProfileString(MAIN_WINDOW, "CompatFlags", num_buf, app_path);
 	
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentThemePath", gSelectedTheme, app_path);
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentWavePath", gSelectedWave, app_path);

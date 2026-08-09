@@ -1,3 +1,6 @@
+#pragma once
+
+#include <cstdint>
 #include <windows.h>
 #include "resource.h"
 
@@ -24,6 +27,8 @@
 
 struct ThemeSettings {
 	bool expandHeadGraphic;
+	uint32_t waveLineColor;
+	uint32_t playLineColor;
 };
 
 extern ThemeSettings gThemeSettings;
