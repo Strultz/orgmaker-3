@@ -2084,6 +2084,40 @@ extern bool lockScrollToSong;
 extern bool gKeepClickedPos;
 extern int sSmoothScroll;
 
+HWND AddTooltip(HWND hdwnd, int controlID, PCSTR pszText) {
+	HWND hwndControl = GetDlgItem(hdwnd, controlID);
+	if (!hwndControl) return NULL;
+
+	HWND hwndTT = CreateWindowEx(
+		WS_EX_TOPMOST,
+		TOOLTIPS_CLASS,
+		NULL,
+		WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
+		CW_USEDEFAULT, CW_USEDEFAULT,
+		CW_USEDEFAULT, CW_USEDEFAULT,
+		hdwnd,
+		NULL,
+		GetModuleHandle(NULL),
+		NULL
+	);
+
+	if (!hwndTT) return NULL;
+
+	TOOLINFO ti = { 0 };
+	ti.cbSize = sizeof(TOOLINFO);
+	ti.uFlags = TTF_IDISHWND | TTF_SUBCLASS;
+	ti.hwnd = hdwnd;
+	ti.uId = (UINT_PTR)hwndControl;
+	ti.lpszText = (PSTR)pszText;
+
+	SetWindowPos(hwndTT, HWND_TOPMOST, 0, 0, 0, 0,
+		SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+
+	SendMessage(hwndTT, TTM_ADDTOOL, 0, (LPARAM)&ti);
+
+	return hwndTT;
+}
+
 BOOL CALLBACK DialogPrefsGeneral(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	int i, j;
 	MUSICINFO mi;
@@ -2510,7 +2544,20 @@ BOOL CALLBACK DialogPrefsSoundbanks(HWND hdwnd, UINT message, WPARAM wParam, LPA
 static bool legacyInvert[10] = { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 };
 static int legacyCheckboxes[10] = {
 	IDC_OLDVOL, IDC_OLDFREQ, IDC_ORG10NOTECHANGE, IDC_ORG10VOLUMEBUG,
-	IDC_FIXPI, IDC_FIXVOL, IDC_DEFPERC, IDC_MUTEUI, IDC_NOVOLRAMP, IDC_LOWSNAREFREQUENCY
+	IDC_FIXPI, IDC_FIXVOL, IDC_DEFPERC, IDC_MUTEUI, IDC_NOVOLRAMP,
+	IDC_LOWSNAREFREQUENCY
+};
+static const char* legacyTooltips[10] = {
+	"From OrgMaker only: Volume was calculated differently and was much louder.",
+	"From OrgMaker 2.x only: Note tuning values were altered.",
+	"From OrgMaker 1.0, 1.1: Note changes had different logic.",
+	"From OrgMaker 1.0, 1.1: Volume events while no note was playing could affect the volume of other channels.",
+	"From Cave Story: Pizzicato functionality was broken.",
+	"From Cave Story, OrgView: Volume events at the end of a song would sometimes not work.",
+	"From Cave Story: The percussion instruments were hard-coded.",
+	"From Cave Story: Channels U and I did not work.",
+	"Disable volume ramping, resulting in a click when volumes are changed.",
+	"Disable interpolation, resulting in a much harsher sound.",
 };
 BOOL CALLBACK DialogPrefsLegacy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	int i, j;
@@ -2523,6 +2570,7 @@ BOOL CALLBACK DialogPrefsLegacy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM 
 			bool inv = legacyInvert[i];
 			bool check = (gCompatFlags & (1 << i)) ? !inv : inv;
 			CheckDlgButton(hdwnd, legacyCheckboxes[i], check);
+			AddTooltip(hdwnd, legacyCheckboxes[i], legacyTooltips[i]);
 		}
 		return 1;
 	case WM_COMMAND:
