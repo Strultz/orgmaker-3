@@ -2110,8 +2110,7 @@ HWND AddTooltip(HWND hdwnd, int controlID, PCSTR pszText) {
 	ti.uId = (UINT_PTR)hwndControl;
 	ti.lpszText = (PSTR)pszText;
 
-	SetWindowPos(hwndTT, HWND_TOPMOST, 0, 0, 0, 0,
-		SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+	SetWindowPos(hwndTT, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 
 	SendMessage(hwndTT, TTM_ADDTOOL, 0, (LPARAM)&ti);
 
@@ -2125,6 +2124,9 @@ BOOL CALLBACK DialogPrefsGeneral(HWND hdwnd, UINT message, WPARAM wParam, LPARAM
 
 	switch (message) {
 	case WM_INITDIALOG:
+		SetDlgItemText(hdwnd, IDC_DEFAUTHOR, gArtistName);
+		SendDlgItemMessage(hdwnd, IDC_DEFAUTHOR, EM_SETLIMITTEXT, 0x20, 0);
+
 		CheckDlgButton(hdwnd, IDC_WINDOWPOS, 1); // TODO
 		CheckDlgButton(hdwnd, IDC_CONFIRMUNSAVED, iChangeFinish != 0);
 
@@ -2141,6 +2143,11 @@ BOOL CALLBACK DialogPrefsGeneral(HWND hdwnd, UINT message, WPARAM wParam, LPARAM
 		switch (HIWORD(wParam)) {
 		case BN_CLICKED:
 			switch (LOWORD(wParam)) {
+			case IDC_DEFAUTHOR:
+				if (HIWORD(wParam) == EN_CHANGE) {
+					PropSheet_Changed(GetParent(hdwnd), hdwnd);
+				}
+				break;
 			case IDC_WINDOWPOS:
 			case IDC_CONFIRMUNSAVED:
 			case IDC_USEPASTE:
@@ -2193,6 +2200,8 @@ BOOL CALLBACK DialogPrefsGeneral(HWND hdwnd, UINT message, WPARAM wParam, LPARAM
 			EnableMenuItem(hMenu, IDM_PLAYHEAD_ALWAYS, MF_BYCOMMAND | ((!sSmoothScroll && lockScrollToSong) ? MF_ENABLED : MF_GRAYED));
 			EnableMenuItem(hMenu, IDM_FOLLOWSCROLL, MF_BYCOMMAND | (!lockScrollToSong ? MF_ENABLED : MF_GRAYED));
 			EnableMenuItem(hMenu, IDM_SMOOTHSCROLL, MF_BYCOMMAND | (lockScrollToSong ? MF_ENABLED : MF_GRAYED));
+
+			GetDlgItemText(hdwnd, IDC_DEFAUTHOR, gArtistName, 0x20 + 1);
 			return error;
 		}
 		case PSN_QUERYCANCEL: {

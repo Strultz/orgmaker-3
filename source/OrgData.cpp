@@ -733,6 +733,7 @@ void OrgData::InitOrgData(void)
 	memset(author, '\0', 0x21);
 	memset(version, '\0', 0x21);
 
+	memcpy(author, gArtistName, 0x20);
 	snprintf(version, 0x21, "OrgMaker %s", VER_STRING);
 
 	comments.clear();

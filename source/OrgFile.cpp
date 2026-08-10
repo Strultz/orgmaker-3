@@ -222,8 +222,6 @@ bool OrgData::ReadMetadata(FILE* fp) {
 			fread(author, sizeof(char), 0x20, fp);
 			fread(version, sizeof(char), 0x20, fp);
 
-			comments.clear();
-
 			char ch;
 			while (fread(&ch, 1, 1, fp) == 1 && ch != '\0') {
 				comments += ch;
@@ -375,6 +373,11 @@ BOOL OrgData::LoadMusicData(void)
 	}
 
 	// Read OM3MD segment first (name, author, comments, etc)
+	memset(name, '\0', 0x21);
+	memset(author, '\0', 0x21);
+	memset(version, '\0', 0x21);
+	comments.clear();
+
 	ReadMetadata(fp);
 
     // Read custom segments

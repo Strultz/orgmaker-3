@@ -31,6 +31,7 @@ struct ThemeSettings {
 	uint32_t playLineColor;
 };
 
+extern char gArtistName[0x20 + 1];
 extern ThemeSettings gThemeSettings;
 
 extern char music_file[];

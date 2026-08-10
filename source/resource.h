@@ -178,6 +178,7 @@
 #define IDC_ADVCOUNT                    1004
 #define IDC_DEFVOL1                     1004
 #define IDC_NAMETEXT                    1004
+#define IDC_DEFAUTHOR                   1004
 #define IDD_SETWAIT                     1005
 #define IDE_VIEWXPOS                    1005
 #define IDE_TRACK2                      1005
@@ -571,7 +572,6 @@
 #define IDC_REMEMBERSTART               1334
 #define IDC_SAMPLERATE                  1335
 #define IDC_ORG10NOTECHANGE             1336
-#define IDC_CHECK2                      1337
 #define IDC_ORG10VOLUMEBUG              1337
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004

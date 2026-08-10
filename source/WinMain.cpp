@@ -83,6 +83,7 @@ BOOL CALLBACK DialogComments(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 void SetModified(bool mod);
 void AdvancedPaste();
 
+char gArtistName[0x20 + 1] = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
 ThemeSettings gThemeSettings;
 uint32_t gCompatFlags;
 
@@ -833,6 +834,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	}*/
 	//SaveWithInitVolFile = GetPrivateProfileInt(INIT_DATA,"autosave",0,app_path);
 	//ChangeAutoLoadMode(SaveWithInitVolFile);
+
+	GetPrivateProfileString(MAIN_WINDOW, "DefaultArtist", NULL, gArtistName, 0x20 + 1, app_path);
+
 	org_data.InitOrgData();
 
 	
@@ -2899,6 +2903,7 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW, "KeepClickedPos", num_buf, app_path);
 	wsprintf(num_buf, "%d", gCompatFlags);
 	WritePrivateProfileString(MAIN_WINDOW, "CompatFlags", num_buf, app_path);
+	WritePrivateProfileString(MAIN_WINDOW, "DefaultArtist", gArtistName, app_path);
 	
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentThemePath", gSelectedTheme, app_path);
 	WritePrivateProfileString(MAIN_WINDOW, "CurrentWavePath", gSelectedWave, app_path);
