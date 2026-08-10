@@ -16,6 +16,7 @@
 #include "Mouse.h"
 #include "rxoFunction.h"
 #include "Update.h"
+#include "Compat.h"
 
 #define PI 3.14159265358979323846
 
@@ -2506,6 +2507,11 @@ BOOL CALLBACK DialogPrefsSoundbanks(HWND hdwnd, UINT message, WPARAM wParam, LPA
 	}
 	return 0;
 }
+static bool legacyInvert[10] = { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 };
+static int legacyCheckboxes[10] = {
+	IDC_OLDVOL, IDC_OLDFREQ, IDC_ORG10NOTECHANGE, IDC_ORG10VOLUMEBUG,
+	IDC_FIXPI, IDC_FIXVOL, IDC_DEFPERC, IDC_MUTEUI, IDC_NOVOLRAMP, IDC_LOWSNAREFREQUENCY
+};
 BOOL CALLBACK DialogPrefsLegacy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	int i, j;
 	MUSICINFO mi;
@@ -2513,10 +2519,30 @@ BOOL CALLBACK DialogPrefsLegacy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM 
 
 	switch (message) {
 	case WM_INITDIALOG:
+		for (i = 0; i < 10; i++) {
+			bool inv = legacyInvert[i];
+			bool check = (gCompatFlags & (1 << i)) ? !inv : inv;
+			CheckDlgButton(hdwnd, legacyCheckboxes[i], check);
+		}
 		return 1;
 	case WM_COMMAND:
 		switch (HIWORD(wParam)) {
 		case BN_CLICKED:
+			switch (LOWORD(wParam)) {
+			case IDC_FIXVOL:
+			case IDC_OLDFREQ:
+			case IDC_ORG10NOTECHANGE:
+			case IDC_ORG10VOLUMEBUG:
+			case IDC_FIXPI:
+			case IDC_OLDVOL:
+			case IDC_DEFPERC:
+			case IDC_MUTEUI:
+			case IDC_NOVOLRAMP:
+			case IDC_LOWSNAREFREQUENCY: {
+				PropSheet_Changed(GetParent(hdwnd), hdwnd);
+				break;
+			}
+			}
 			break;
 		case CBN_SELCHANGE:
 			PropSheet_Changed(GetParent(hdwnd), hdwnd);
@@ -2532,6 +2558,17 @@ BOOL CALLBACK DialogPrefsLegacy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM 
 		}
 		case PSN_APPLY: {
 			bool error = false;
+			gCompatFlags = 0;
+			for (i = 0; i < 10; i++) {
+				bool inv = legacyInvert[i];
+				bool check = IsDlgButtonChecked(hdwnd, legacyCheckboxes[i]);
+				gCompatFlags |= (inv ? !check : check) ? (1 << i) : 0;
+			}
+			org_data.GetMusicInfo(&mi);
+			for (i = 0; i < MAXDRAM; ++i) {
+				InitDramObject(mi.tdata[i + MAXMELODY].wave_no, i);
+			}
+			SetMutedTrack();
 			return error;
 		}
 		case PSN_QUERYCANCEL: {

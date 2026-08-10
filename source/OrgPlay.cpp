@@ -54,8 +54,10 @@ void OrgData::PlayData(void)
 					now_leng[i] = np[i]->length;
 				}
 			}
-			if(np[i]->pan != PANDUMMY) ChangeOrganPan(np[i]->y,np[i]->pan,i);
-			if(np[i]->volume != VOLDUMMY && (!(gCompatFlags & COMPAT_CS_VOLUME_BUG) || np[i]->to)) ChangeOrganVolume(np[i]->y, np[i]->volume * ((gCompatFlags & COMPAT_OLD_VOLUME) ? 0x7F : 100) / 0x7F, i);
+			if(np[i]->pan != PANDUMMY)
+				ChangeOrganPan(np[i]->y,np[i]->pan,i);
+			if(np[i]->volume != VOLDUMMY && (!(gCompatFlags & COMPAT_CS_VOLUME_BUG) || np[i]->to))
+				ChangeOrganVolume(np[i]->y, np[i]->volume * ((gCompatFlags & COMPAT_OLD_VOLUME) ? 0x7F : 100) / 0x7F, i);
 			np[i] = np[i]->to;//次の音符を指す
 		}
 		if(now_leng[i] == 0) {
@@ -79,11 +81,12 @@ void OrgData::PlayData(void)
 					PlayDramObject(np[i]->y, 1, i - MAXMELODY);
 				}
 			}
-			if(np[i]->pan != PANDUMMY) ChangeDramPan(np[i]->pan,i-MAXMELODY);
-			if(np[i]->volume != VOLDUMMY && (!(gCompatFlags & COMPAT_CS_VOLUME_BUG) || np[i]->to)) ChangeDramVolume(np[i]->volume * ((gCompatFlags & COMPAT_OLD_VOLUME) ? 0x7F : 100) / 0x7F,i-MAXMELODY);
+			if(np[i]->pan != PANDUMMY)
+				ChangeDramPan(np[i]->pan,i-MAXMELODY);
+			if(np[i]->volume != VOLDUMMY && (!(gCompatFlags & COMPAT_CS_VOLUME_BUG) || np[i]->to))
+				ChangeDramVolume(np[i]->volume * ((gCompatFlags & COMPAT_OLD_VOLUME) ? 0x7F : 100) / 0x7F,i-MAXMELODY);
 			np[i] = np[i]->to;//次の音符を指す
 		}
-
 		/*if (gNoteHighlights && this->track == i && !IsDramPlaying(i - MAXMELODY) && old_key[i] != 255) {
 			iKeyPushDown[old_key[i]] = 0;
 		}*/

@@ -337,7 +337,12 @@ static void S_MixSounds(float* stream, size_t frames_total) {
 
 			for (size_t frames_done = 0; frames_done < frames_total; ++frames_done) {
 				// Update volume ramp
-				if (sound->vol_ticks > 0) {
+				if (gCompatFlags & COMPAT_NO_VOLUME_RAMP) {
+					sound->volume_l = sound->target_volume_l;
+					sound->volume_r = sound->target_volume_r;
+
+					sound->vol_ticks = 0;
+				} else if (sound->vol_ticks > 0) {
 					sound->volume_l += (sound->target_volume_l - sound->volume_l) / (float)sound->vol_ticks;
 					sound->volume_r += (sound->target_volume_r - sound->volume_r) / (float)sound->vol_ticks;
 
@@ -345,22 +350,28 @@ static void S_MixSounds(float* stream, size_t frames_total) {
 				}
 
 				// Perform lagrange interpolation
-				const float subsample = sound->sub_position;
-				const long sp = sound->position;
+				float interpolated_sample;
 
-				const long margin = sound->ring - 2;
+				if (gCompatFlags & COMPAT_NO_INTERPOLATION) {
+					interpolated_sample = (float)sound->samples[sound->ring] / (float)(1 << 7);
+				} else {
+					const float subsample = sound->sub_position;
+					const long sp = sound->position;
 
-				const float sample_a = (float)sound->samples[mmodi(margin - 1, 4)] / (float)(1 << 7);
-				const float sample_b = (float)sound->samples[mmodi(margin, 4)] / (float)(1 << 7);
-				const float sample_c = (float)sound->samples[mmodi(margin + 1, 4)] / (float)(1 << 7);
-				const float sample_d = (float)sound->samples[mmodi(margin + 2, 4)] / (float)(1 << 7);
+					const long margin = sound->ring - 2;
 
-				const float c0 = sample_b;
-				const float c1 = sample_c - 1 / 3.0 * sample_a - 1 / 2.0 * sample_b - 1 / 6.0 * sample_d;
-				const float c2 = 1 / 2.0 * (sample_a + sample_c) - sample_b;
-				const float c3 = 1 / 6.0 * (sample_d - sample_a) + 1 / 2.0 * (sample_b - sample_c);
+					const float sample_a = (float)sound->samples[mmodi(margin - 1, 4)] / (float)(1 << 7);
+					const float sample_b = (float)sound->samples[mmodi(margin, 4)] / (float)(1 << 7);
+					const float sample_c = (float)sound->samples[mmodi(margin + 1, 4)] / (float)(1 << 7);
+					const float sample_d = (float)sound->samples[mmodi(margin + 2, 4)] / (float)(1 << 7);
 
-				const float interpolated_sample = ((c3 * subsample + c2) * subsample + c1) * subsample + c0;
+					const float c0 = sample_b;
+					const float c1 = sample_c - 1 / 3.0 * sample_a - 1 / 2.0 * sample_b - 1 / 6.0 * sample_d;
+					const float c2 = 1 / 2.0 * (sample_a + sample_c) - sample_b;
+					const float c3 = 1 / 6.0 * (sample_d - sample_a) + 1 / 2.0 * (sample_b - sample_c);
+
+					interpolated_sample = ((c3 * subsample + c2) * subsample + c1) * subsample + c0;
+				}
 
 				// Mix, and apply volume
 				if (!sound->mute) {
@@ -809,7 +820,11 @@ void ChangeOrganPan(unsigned char key, unsigned char pan,char track)//512‚ªMA
 }
 void ChangeOrganVolume(int no, long volume,char track)//300‚ªMAX‚Å300‚ªÉ°ÏÙ
 {
-	if(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]] != NULL && old_key[track] != 255)
+	int idx = track * 8 * 2 + (old_key[track] / 12) * 2 + key_twin[track];
+	if(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]] != NULL
+		&& ((gCompatFlags & COMPAT_1_0_VOLUME_BUG)
+			? idx < MAXMELODY * 8 * 2
+			: old_key[track] != 255))
 		S_SetSoundVolume(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], (volume-255)*8);
 }
 
@@ -1044,6 +1059,7 @@ void ReleaseDramObject(char track){
 	}
 }
 // ƒTƒEƒ“ƒh‚ÌÝ’è 
+static int csPerc[MAXDRAM] = { 0, 2, 5, 6, 4, 8, 0, 0 };
 BOOL InitDramObject(char drum, int no)
 {
     //HRSRC hrscr;
@@ -1051,6 +1067,10 @@ BOOL InitDramObject(char drum, int no)
     //DWORD *lpdword;//ƒŠƒ\[ƒX‚ÌƒAƒhƒŒƒX
     // ƒŠƒ\[ƒX‚ÌŒŸõ
 	ReleaseDramObject(no); //‚±‚±‚É‚¨‚¢‚Ä‚Ý‚½B
+
+	if (gCompatFlags & COMPAT_CS_PERCUSSION) {
+		drum = csPerc[no];
+	}
 
 	if (drum < 0 || drum >= NUMDRAMITEM || drumsData[drum].data == NULL) {
 		return FALSE;
@@ -1319,7 +1339,11 @@ void SetMutedTrack(void) {
 		}
 	}
 	for (int i = 0; i < MAXDRAM; i++) {
-		S_MuteSound(lpDRAMBUFFER[i], org_data.mute[MAXMELODY + i] && gPlayMidNote);
+		bool mute = org_data.mute[MAXMELODY + i] && gPlayMidNote;
+		if (i >= 6 && (gCompatFlags & COMPAT_CS_CHANNEL_U_I)) {
+			mute = true;
+		}
+		S_MuteSound(lpDRAMBUFFER[i], mute);
 	}
 }
 

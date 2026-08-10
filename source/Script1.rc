@@ -646,18 +646,18 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "Always use default percussion instruments",IDC_DEFPERC,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,12,152,10
-    CONTROL         "Mute channels U and I by default",IDC_MUTEUI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,24,122,10
+    CONTROL         "Always mute channels U and I",IDC_MUTEUI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,24,112,10
     CONTROL         "Fix volume changes not working at end of song",IDC_FIXVOL,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,36,167,10
     CONTROL         "Fix pizzicato option not working correctly",IDC_FIXPI,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,60,146,10
     CONTROL         "Use legacy volume calculation",IDC_OLDVOL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,84,111,10
-    CONTROL         "Use legacy pitch calculation",IDC_OLDFREQ,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,96,103,10
+    CONTROL         "Use alternate pitch calculation",IDC_OLDFREQ,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,108,112,10
     CONTROL         "Disable audio interpolation",IDC_LOWSNAREFREQUENCY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,132,100,10
-    CONTROL         "Disable volume ramping",IDC_NOVOLRAMP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,144,91,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,144,100,10
+    CONTROL         "Disable volume ramping",IDC_NOVOLRAMP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,132,91,10
     CONTROL         "Use legacy note change logic",IDC_ORG10NOTECHANGE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,108,109,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,96,109,10
     CONTROL         "Fix volume changes with no note affecting other channels",IDC_ORG10VOLUMEBUG,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,48,201,10
 END
