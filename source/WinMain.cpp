@@ -508,13 +508,48 @@ void ReloadBitmaps() {
 	//RedrawWindow(hWnd, &rect, NULL, RDW_INVALIDATE | RDW_ERASENOW);
 }
 
+uint32_t GetHexColor(const char* str) {
+	size_t len = strlen(str);
+	if (len < 6) {
+		return 0x000000;
+	}
+	uint32_t color = 0;
+	for (size_t i = 0; i < 6; i++) {
+		char c = str[i];
+		if (c >= '0' && c <= '9') {
+			c = c - '0';
+		} else if (c >= 'A' && c <= 'F') {
+			c = c - 'A' + 10;
+		} else if (c >= 'a' && c <= 'f') {
+			c = c - 'a' + 10;
+		}
+		color |= c << ((5 - i) * 4);
+	}
+	return color;
+}
+
 void SetThemeIniDefaults() {
 	gThemeSettings.expandHeadGraphic = false;
+	gThemeSettings.waveBackgroundColor = 0x000000;
+	gThemeSettings.waveBaselineColor = 0x007D00;
+	gThemeSettings.waveLineColor = 0x00D800;
+	gThemeSettings.playLineColor = 0xFFFFFF;
 }
 
 void LoadThemeIni() {
 	std::string themeIniPath = std::string(gSelectedTheme) + "\\theme.ini";
-	gThemeSettings.expandHeadGraphic = GetPrivateProfileInt("Note", "ExpandHeadGraphic", 0, themeIniPath.c_str());
+	const char* path = themeIniPath.c_str();
+	gThemeSettings.expandHeadGraphic = GetPrivateProfileInt("Note", "ExpandHeadGraphic", 0, path);
+
+	char colorStr[7] = "\0";
+	GetPrivateProfileStringA("Color", "WaveBackgroundColor", "000000", colorStr, 7, path);
+	gThemeSettings.waveBackgroundColor = GetHexColor(colorStr);
+	GetPrivateProfileStringA("Color", "WaveBaselineColor", "007D00", colorStr, 7, path);
+	gThemeSettings.waveBaselineColor = GetHexColor(colorStr);
+	GetPrivateProfileStringA("Color", "WaveLineColor", "00D800", colorStr, 7, path);
+	gThemeSettings.waveLineColor = GetHexColor(colorStr);
+	GetPrivateProfileStringA("Color", "PlayheadLineColor", "FFFFFF", colorStr, 7, path);
+	gThemeSettings.playLineColor = GetHexColor(colorStr);
 }
 
 void LoadActiveTheme() {
@@ -524,6 +559,8 @@ void LoadActiveTheme() {
 	if (strlen(gSelectedTheme) > 0) {
 		LoadThemeIni();
 	}
+
+	GenerateWaveGraphic(wave_data);
 }
 
 void GetApplicationPath(char* path) {
@@ -785,8 +822,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		return 1;
 	}
 
-	LoadActiveTheme();
-
 //Sound initialization ///////
 	if (!InitDirectSound(hWnd, GetUserDevice())) {
 		MessageBox(hWnd, "Sound engine failed to initalize.", "OrgMaker Error", MB_ICONERROR | MB_OK);
@@ -800,11 +835,12 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		return 1;
 	}
 	LoadWaveData100(gSelectedWave); // Load the current soundbank, or the default
-	GenerateWaveGraphic(wave_data);
 	scr_data.InitScroll();
 
 	InitSoundObject("METRO01", 1);
 	InitSoundObject("METRO02", 2);
+
+	LoadActiveTheme();
 	
 	//hDlgPlayer = CreateDialog(hInst,"PLAYER",hWnd,DialogPlayer);
 	//hDlgTrack = CreateDialog(hInst,"TRACK",hWnd,DialogTrack);

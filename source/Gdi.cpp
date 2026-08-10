@@ -538,6 +538,10 @@ void LoadSingleBitmap(HWND hdwnd, int item, int wdth, int hght, const char* name
 	if (hBmp2 != NULL) DeleteObject(hBmp2);
 }
 
+static inline OrgWaveRenderer::RGB ColToRGB(uint32_t color) {
+	return { (uint8_t) (color >> 16 & 0xFF), (uint8_t) (color >> 8 & 0xFF), (uint8_t) (color & 0xFF) };
+}
+
 void GenerateWaveGraphic(char *wave100) {
 	if (waveBmp != NULL) DeleteObject(waveBmp);
 
@@ -590,10 +594,10 @@ void GenerateWaveGraphic(char *wave100) {
 		params.width = 32;
 		params.height = 32;
 		params.antiAliasingFactor = 8;
-		params.backgroundColor = { 0, 0, 0 };
-		params.lineColor = { 0, 0xD8, 0 };
-		params.lineWidth = 1.2f;
-		params.baselineColor = { 0, 0x7D, 0 };
+		params.backgroundColor = ColToRGB(gThemeSettings.waveBackgroundColor);
+		params.lineColor = ColToRGB(gThemeSettings.waveLineColor);
+		params.lineWidth = 1.2f; // maybe add options for these too?
+		params.baselineColor = ColToRGB(gThemeSettings.waveBaselineColor);
 		params.baselineWidth = 2.0f;
 
 		OrgWaveRenderer::Image img = OrgWaveRenderer::RenderWave(*reinterpret_cast<int8_t(*)[256]>(wave100 + i * 256), params);

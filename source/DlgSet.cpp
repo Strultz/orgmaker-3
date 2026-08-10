@@ -813,7 +813,7 @@ BOOL CALLBACK DialogWaveSel(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 		GetObject(waveBmp, sizeof(bitmap), &bitmap);
 		BitBlt(hdc, 0, 0, bitmap.bmWidth, bitmap.bmHeight, hdcMem, 0, 0, SRCCOPY);
 
-		HBRUSH hbr = CreateSolidBrush(RGB(0, 255, 0));
+		HBRUSH hbr = CreateSolidBrush(RGB_TO_BGR(gThemeSettings.waveLineColor));
 
 		int boxX = 8 + (gWaveSelect % 10) * 36 + ((gWaveSelect % 10) > 4 ? 4 : 0);
 		int boxY = 16 + (gWaveSelect / 10) * 48 + ((gWaveSelect / 10) > 4 ? 4 : 0);

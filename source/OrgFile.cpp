@@ -213,6 +213,11 @@ int OrgData::FileCheckBeforeLoad(char *checkfile)
 }
 
 bool OrgData::ReadMetadata(FILE* fp) {
+	memset(name, '\0', 0x21);
+	memset(author, '\0', 0x21);
+	memset(version, '\0', 0x21);
+	comments.clear();
+
 	char pass_check[6];
 	size_t read = fread(&pass_check[0], sizeof(char), 6, fp);
 	if (read == 6 && !memcmp(pass_check, "OM3MD", 5)) {
@@ -373,11 +378,6 @@ BOOL OrgData::LoadMusicData(void)
 	}
 
 	// Read OM3MD segment first (name, author, comments, etc)
-	memset(name, '\0', 0x21);
-	memset(author, '\0', 0x21);
-	memset(version, '\0', 0x21);
-	comments.clear();
-
 	ReadMetadata(fp);
 
     // Read custom segments

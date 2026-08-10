@@ -25,8 +25,12 @@
 #define MSGSAVEOK		3	//保存完了
 #define MSGLOADOK		3	//読み込み完了
 
+#define RGB_TO_BGR(rgb) (((rgb) & 0x00FF0000) >> 16 | ((rgb) & 0x000000FF) << 16 | ((rgb) & 0x0000FF00))
+
 struct ThemeSettings {
 	bool expandHeadGraphic;
+	uint32_t waveBackgroundColor;
+	uint32_t waveBaselineColor;
 	uint32_t waveLineColor;
 	uint32_t playLineColor;
 };

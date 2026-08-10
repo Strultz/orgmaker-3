@@ -652,7 +652,7 @@ void OrgData::PutMusic(void)
 		int x = KEYWIDTH + (playPos - hpos) * NoteWidth;
 
 		brect = { x, -WYOffset, x + 1, WHeight + 288 - WHNM };
-		PutRect(&brect, 0xFFFFFF);
+		PutRect(&brect, gThemeSettings.playLineColor);
 	}
 
 	PutNumber();
