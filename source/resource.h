@@ -570,8 +570,9 @@
 #define IDC_NOVOLRAMP                   1333
 #define IDC_REMEMBERSTART               1334
 #define IDC_SAMPLERATE                  1335
-#define IDC_CHECK2                      1336
 #define IDC_ORG10NOTECHANGE             1336
+#define IDC_CHECK2                      1337
+#define IDC_ORG10VOLUMEBUG              1337
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005
@@ -930,7 +931,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        275
 #define _APS_NEXT_COMMAND_VALUE         40387
-#define _APS_NEXT_CONTROL_VALUE         1337
+#define _APS_NEXT_CONTROL_VALUE         1338
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
