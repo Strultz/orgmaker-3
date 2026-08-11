@@ -69,7 +69,7 @@ void OpenPreferences(HWND hwnd, int startPage);
 //BOOL CALLBACK DialogTrack(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogNoteUsed(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
-BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+//BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 //BOOL CALLBACK DialogEZCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -92,7 +92,7 @@ uint32_t gCompatFlags;
 //Declare global variables here
 HINSTANCE hInst;//instance handle
 HWND hWnd;//main window handle
-HWND hDlgHelp = nullptr;
+//HWND hDlgHelp = nullptr;
 HWND hDlgComments = nullptr;
 BOOL actApp;
 
@@ -1056,7 +1056,7 @@ BOOL SystemTask(void)
 
 		// These will handle keyboard input when focused
 		if ((hDlgComments && IsDialogMessage(hDlgComments, &msg))
-			|| (hDlgHelp && IsDialogMessage(hDlgHelp, &msg))) {
+			/* || (hDlgHelp && IsDialogMessage(hDlgHelp, &msg))*/) {
 			continue;
 		}
 

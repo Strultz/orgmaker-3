@@ -34,7 +34,7 @@ extern char TrackN[];
 extern HBITMAP waveBmp; // azy
 extern void SetModified(bool mod);
 
-extern HWND hDlgHelp;
+//extern HWND hDlgHelp;
 extern HWND hDlgComments;
 
 int volChangeLength = 10;
@@ -2010,7 +2010,7 @@ BOOL CALLBACK DialogDefault(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 	}
 	return 0;
 }*/
-BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
+/*BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	HRSRC hrscr;
 	HWND haDlg;
@@ -2074,7 +2074,7 @@ BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 	return 0;
-}
+}*/
 
 // Preferences
 extern int iChangeFinish;
