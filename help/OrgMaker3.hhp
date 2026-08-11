@@ -1,0 +1,19 @@
+[OPTIONS]
+Compatibility=1.1 or later
+Compiled file=OrgMaker3.chm
+Contents file=toc.hhc
+Default topic=index.html
+Display compile progress=Yes
+Full-text search=Yes
+Language=0x409 English (United States)
+Default Window=main
+
+[WINDOWS]
+main="OrgMaker 3 Help","toc.hhc",,,,,,,,0x2020,,0x300e,[100,100,1024,768],,,,,0
+
+[FILES]
+toc.hhc
+index.html
+banner.png
+screenshot.png
+test.html

@@ -21,10 +21,12 @@
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
+#pragma comment(lib, "htmlhelp.lib")
 
 #include <windows.h>
 #include <winuser.h>
 #include <CommCtrl.h>
+#include <htmlhelp.h>
 #include <string>
 #include <thread>
 
@@ -1039,6 +1041,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		}
 	}
 
+	HtmlHelp(NULL, NULL, HH_CLOSE_ALL, 0);
 	DestroyAcceleratorTable(Ac);
 	return 0;
 }
@@ -2075,17 +2078,26 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			gClickedPos = 0;
 			break;
 		case IDM_DLGHELP://
-		case ID_AC_HELP:
+		case ID_AC_HELP: {
 			//LoadFromResource(IDR_HELPHTML);
-			if (hDlgHelp) {
-				DestroyWindow(hDlgHelp);
-				hDlgHelp = nullptr;
+			//if (hDlgHelp) {
+			//	DestroyWindow(hDlgHelp);
+			//	hDlgHelp = nullptr;
+			//}
+			//hDlgHelp = CreateDialog(hInst, "DLGHELP", hwnd, DialogHelp);
+			//ShowWindow(hDlgHelp, SW_SHOW);
+			char helpFilePath[MAX_PATH];
+			GetApplicationPath(helpFilePath);
+			strcat(helpFilePath, "OrgMaker3.chm");
+
+			if (!HtmlHelp(hWnd, helpFilePath, HH_DISPLAY_TOPIC, 0)) {
+				MessageBox(hWnd, "Failed to open help file OrgMaker3.chm", "OrgMaker 3", MB_ICONERROR | MB_OK);
 			}
-			hDlgHelp = CreateDialog(hInst, "DLGHELP", hwnd, DialogHelp);
-			ShowWindow(hDlgHelp, SW_SHOW);
+
 			//StopPlayingSong();
 			//DialogBox(hInst,"DLGHELP",hwnd,DialogHelp);
 			break;
+		}
 		case IDM_SAVEOVER:
 		case ID_AC_MENUOVERSAVE:
 			if (gFileModified)
