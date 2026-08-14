@@ -103,7 +103,7 @@ bool gIsDrawing = false;
 bool gFileModified = false;
 bool gFileUnsaved = true;
 
-bool gKeepClickedPos = true;
+bool gKeepClickedPos = false;
 
 long MAXHORZRANGE = 0x7FFFFFFF;
 

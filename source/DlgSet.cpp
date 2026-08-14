@@ -2550,7 +2550,8 @@ BOOL CALLBACK DialogPrefsSoundbanks(HWND hdwnd, UINT message, WPARAM wParam, LPA
 	}
 	return 0;
 }
-static bool legacyInvert[10] = { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 };
+// These line up with the enum order
+static bool legacyInvert[10] = { 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 };
 static int legacyCheckboxes[10] = {
 	IDC_OLDVOL, IDC_OLDFREQ, IDC_ORG10NOTECHANGE, IDC_ORG10VOLUMEBUG,
 	IDC_FIXPI, IDC_FIXVOL, IDC_DEFPERC, IDC_MUTEUI, IDC_NOVOLRAMP,
