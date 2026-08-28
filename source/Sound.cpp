@@ -785,6 +785,10 @@ BOOL MakeSoundObject8(char *wavep,char track, char pipi )
 				return FALSE;
 
 			S_RewindSound(lpORGANBUFFER[track][j][k]);
+
+			if (gCompatFlags & COMPAT_CS_VOLUME_BUG) {
+				S_SetSoundVolume(lpORGANBUFFER[track][j][k], -255*8);
+			}
 		}
 	}
 	return(TRUE);
@@ -1082,6 +1086,10 @@ BOOL InitDramObject(char drum, int no)
 		return FALSE;
 
 	S_RewindSound(lpDRAMBUFFER[no]);
+
+	if (gCompatFlags & COMPAT_CS_VOLUME_BUG) {
+		S_SetSoundVolume(lpDRAMBUFFER[no], -255*8);
+	}
 
     /*if((hrscr = FindResource(NULL, resname, "WAVE")) == NULL)
                                                     return(FALSE);
