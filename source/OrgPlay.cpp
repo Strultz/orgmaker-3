@@ -28,6 +28,7 @@ long oplay_p;
 long play_p;//現在再生位置（キャンバス）
 NOTELIST *np[MAXTRACK];//現在再生準備の音符
 long now_leng[MAXMELODY] = {NULL};//再生中音符の長さ
+long nvol[MAXTRACK] = {0};
 int s_solo = -1;
 //DWORD lastDrawTime = -1;
 //DWORD drawCatch = 0;
@@ -56,8 +57,13 @@ void OrgData::PlayData(void)
 			}
 			if(np[i]->pan != PANDUMMY)
 				ChangeOrganPan(np[i]->y,np[i]->pan,i);
-			if(np[i]->volume != VOLDUMMY && (!(gCompatFlags & COMPAT_CS_VOLUME_BUG) || np[i]->to))
-				ChangeOrganVolume(np[i]->y, np[i]->volume * ((gCompatFlags & COMPAT_OLD_VOLUME) ? 0x7F : 100) / 0x7F, i);
+			if(np[i]->volume != VOLDUMMY) {
+				if (gCompatFlags & COMPAT_CS_VOLUME_BUG) {
+					nvol[i] = np[i]->volume;
+				} else {
+					ChangeOrganVolume(np[i]->y, np[i]->volume * ((gCompatFlags & COMPAT_OLD_VOLUME) ? 0x7F : 100) / 0x7F, i);
+				}
+			}
 			np[i] = np[i]->to;//次の音符を指す
 		}
 		if(now_leng[i] == 0) {
@@ -65,6 +71,8 @@ void OrgData::PlayData(void)
 			PlayOrganObject(NULL,2,i,info.tdata[i].freq, info.tdata[i].pipi);
 		}
 		if(now_leng[i] > 0) now_leng[i]--;
+		if(gCompatFlags & COMPAT_CS_VOLUME_BUG && np[i])
+			ChangeOrganVolume(np[i]->y, nvol[i] * ((gCompatFlags & COMPAT_OLD_VOLUME) ? 0x7F : 100) / 0x7F, i);
 	}
 	//ドラムの再生
 	for(int i = MAXMELODY; i < MAXTRACK; i++) {
@@ -83,10 +91,17 @@ void OrgData::PlayData(void)
 			}
 			if(np[i]->pan != PANDUMMY)
 				ChangeDramPan(np[i]->pan,i-MAXMELODY);
-			if(np[i]->volume != VOLDUMMY && (!(gCompatFlags & COMPAT_CS_VOLUME_BUG) || np[i]->to))
-				ChangeDramVolume(np[i]->volume * ((gCompatFlags & COMPAT_OLD_VOLUME) ? 0x7F : 100) / 0x7F,i-MAXMELODY);
+			if(np[i]->volume != VOLDUMMY) {
+				if (gCompatFlags & COMPAT_CS_VOLUME_BUG) {
+					nvol[i] = np[i]->volume;
+				} else {
+					ChangeDramVolume(np[i]->volume * ((gCompatFlags & COMPAT_OLD_VOLUME) ? 0x7F : 100) / 0x7F,i-MAXMELODY);
+				}
+			}
 			np[i] = np[i]->to;//次の音符を指す
 		}
+		if(gCompatFlags & COMPAT_CS_VOLUME_BUG && np[i])
+			ChangeDramVolume(nvol[i] * ((gCompatFlags & COMPAT_OLD_VOLUME) ? 0x7F : 100) / 0x7F, i-MAXMELODY);
 		/*if (gNoteHighlights && this->track == i && !IsDramPlaying(i - MAXMELODY) && old_key[i] != 255) {
 			iKeyPushDown[old_key[i]] = 0;
 		}*/
