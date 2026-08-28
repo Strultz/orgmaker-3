@@ -910,7 +910,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	sUseSpecialPaste = GetPrivateProfileInt(MAIN_WINDOW, "UseSpecialPaste", 0, app_path);
 
-	gKeepClickedPos = GetPrivateProfileInt(MAIN_WINDOW, "KeepClickedPos", 0, app_path);
+	gKeepClickedPos = GetPrivateProfileInt(MAIN_WINDOW, "KeepClickedPos", 1, app_path);
 
 	gCompatFlags = GetPrivateProfileInt(MAIN_WINDOW, "CompatFlags", 0, app_path);
 
