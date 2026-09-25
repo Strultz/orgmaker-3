@@ -1903,11 +1903,11 @@ BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lP
 					}
 
 					char* pC;
-					char tstr[15] = { NULL };
+					char tstr[16] = { NULL };
 					char chPath[MAX_PATH] = { NULL };
 
 					snprintf(chPath, MAX_PATH, "%s", strPath);
-					snprintf(tstr, 15, " - Track %s.wav", TrackCode[i]);
+					snprintf(tstr, 16, " - Track %s.wav", TrackCode[i]);
 
 					pC = strrchr(chPath, '.');
 					if (pC != NULL) pC[0] = '\0';
