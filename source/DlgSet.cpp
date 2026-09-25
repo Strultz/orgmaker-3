@@ -1289,7 +1289,7 @@ BOOL CALLBACK DialogComments(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			//SetUndo(); // TODO this doesnt work
+			//SetUndo(); // TODO: this doesnt work
 			SetModified(true);
 
 			memset(org_data.name, '\0', 0x21);
@@ -1530,7 +1530,7 @@ static int ExportWave(unsigned int samples, char* strPath) {
 				SendMessage(hProg, PBM_SETPOS, (samples - samplesLeft), 0);
 
 				// Update dialog
-				// TODO doing this here is kinda bad. The rendering should probably be on a separate thread or something
+				// TODO: doing this here is kinda bad. The rendering should probably be on a separate thread or something
 				while (PeekMessage(&msg, window, 0, 0, PM_REMOVE))
 				{
 					TranslateMessage(&msg);
@@ -2262,7 +2262,7 @@ BOOL CALLBACK DialogPrefsAudio(HWND hdwnd, UINT message, WPARAM wParam, LPARAM l
 		SendMessage(cc, CB_RESETCONTENT, 0, 0);
 		SendMessage(cc, CB_ADDSTRING, 0, (LPARAM)"Default Device");
 
-		// TODO store these?
+		// TODO: store these?
 		ma_device_info* pPlaybackInfos;
 		ma_uint32 playbackCount;
 		ma_device_info* pCaptureInfos;
@@ -2276,7 +2276,7 @@ BOOL CALLBACK DialogPrefsAudio(HWND hdwnd, UINT message, WPARAM wParam, LPARAM l
 		SendMessage(cc, WM_SETREDRAW, 1, 0);
 		SendMessage(cc, CB_SETCURSEL, deviceSel, 0);
 
-		// TODO fill these out from options
+		// TODO: fill these out from options
 		SetDlgItemText(hdwnd, IDC_SAMPLERATE, "48000");
 		SetDlgItemText(hdwnd, IDC_BUFFERSIZE, "10");
 

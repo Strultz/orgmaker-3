@@ -626,7 +626,7 @@ void OrgData::PutMusic(void)
 	}*/
 
 	//キーボード鍵盤（譜面背景を光らす部分）
-	// TODO this doesn't work while playing because we fill iKeyPushDown in PutNotes...
+	// FIXME: this doesn't work while playing because we fill iKeyPushDown in PutNotes...
 	for(j = 0; j < 96; j++){ // 2010.09.22 A
 		if(iKeyPushDown[j]!=0){
 			PutBitmap(0,  (95 - j - vpos2)*12, &rc_PushKB[j%12],BMPMUSIC);//鍵盤

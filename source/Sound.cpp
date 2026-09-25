@@ -366,9 +366,9 @@ static void S_MixSounds(float* stream, size_t frames_total) {
 					const float sample_d = (float)sound->samples[mmodi(margin + 2, 4)] / (float)(1 << 7);
 
 					const float c0 = sample_b;
-					const float c1 = sample_c - 1 / 3.0 * sample_a - 1 / 2.0 * sample_b - 1 / 6.0 * sample_d;
-					const float c2 = 1 / 2.0 * (sample_a + sample_c) - sample_b;
-					const float c3 = 1 / 6.0 * (sample_d - sample_a) + 1 / 2.0 * (sample_b - sample_c);
+					const float c1 = sample_c - 1 / 3.0f * sample_a - 1 / 2.0f * sample_b - 1 / 6.0f * sample_d;
+					const float c2 = 1 / 2.0f * (sample_a + sample_c) - sample_b;
+					const float c3 = 1 / 6.0f * (sample_d - sample_a) + 1 / 2.0f * (sample_b - sample_c);
 
 					interpolated_sample = ((c3 * subsample + c2) * subsample + c1) * subsample + c0;
 				}
