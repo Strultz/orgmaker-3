@@ -1360,6 +1360,7 @@ void SetupExportBuffer(unsigned long sample_rate, size_t frames_total, size_t fa
 
 	Rxo_StopAllSoundNow();
 	S_ResetSounds();
+	SetMutedTrack(); // Maybe this could become an option?
 
 	exporting = true;
 
