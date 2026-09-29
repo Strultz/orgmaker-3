@@ -268,7 +268,7 @@ BOOL OrgData::GrabNoteData(SAVEDNOTE* sn, char track1, char track2, long x1, lon
 
 // I'm tired of this
 NOTELIST* OrgData::FindOrgNote(char track, int x) {
-	if (track < 0 || track > 15) return NULL;
+	if (track < 0 || track >= MAXTRACK) return NULL;
 	NOTELIST* rnp = info.tdata[track].note_list;
 	while (rnp != NULL && rnp->x < x) {
 		rnp = rnp->to;
@@ -279,7 +279,7 @@ NOTELIST* OrgData::FindOrgNote(char track, int x) {
 }
 
 NOTELIST* OrgData::CreateOrgNote(char track, int x) {
-	if (track < 0 || track > 15) return NULL;
+	if (track < 0 || track >= MAXTRACK) return NULL;
 	NOTELIST* nfrom = info.tdata[track].note_list;
 	if (nfrom != NULL) {
 		while (nfrom->x < x && nfrom->to != NULL) {
@@ -332,7 +332,7 @@ NOTELIST* OrgData::CreateOrgNote(char track, int x) {
 }
 
 void OrgData::DeleteOrgNote(char track,NOTELIST* note) {
-	if (track < 0 || track > 15) return;
+	if (track < 0 || track >= MAXTRACK) return;
 	if (note == NULL) return;
 	if (note->from == NULL) {
 		if (note != info.tdata[track].note_list) {
@@ -351,7 +351,7 @@ void OrgData::DeleteOrgNote(char track,NOTELIST* note) {
 }
 
 void OrgData::TransposeTrack(char track, int by) {
-	if (track < 0 || track > 15) return;
+	if (track < 0 || track >= MAXTRACK) return;
 
 	NOTELIST* p = info.tdata[track].note_list;
 	while (p != nullptr) {
@@ -365,7 +365,7 @@ void OrgData::TransposeTrack(char track, int by) {
 }
 
 NOTELIST* OrgData::FindLastOrgNoteKey(char track, int x) {
-	if (track < 0 || track > 15) return NULL;
+	if (track < 0 || track >= MAXTRACK) return NULL;
 
 	NOTELIST* rnp = info.tdata[track].note_list;
 
@@ -387,7 +387,7 @@ NOTELIST* OrgData::FindLastOrgNoteKey(char track, int x) {
 }
 
 NOTELIST* OrgData::FindOrgNoteLength(char track, int x) {
-	if (track < 0 || track > 15) return NULL;
+	if (track < 0 || track >= MAXTRACK) return NULL;
 
 	NOTELIST* rnp = info.tdata[track].note_list;
 
